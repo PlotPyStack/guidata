@@ -1,0 +1,14 @@
+\.pyc$
+\.settings$
+\.ropeproject$
+\.orig$
+\.pyd$
+^build/
+^dist/
+Thumbs.db$
+test.h5$
+test.eta$
+essai.csv$
+MANIFEST$
+\.pot$
+~$

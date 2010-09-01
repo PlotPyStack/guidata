@@ -1,0 +1,44 @@
+guidata
+=======
+
+Copyright © 2009-2010 CEA
+Pierre Raybaut <pierre.raybaut@cea.fr>
+Licensed under the terms of the CECILL License (see below)
+
+
+    Overview
+
+	Set of basic GUIs to edit and display objects of many kinds:
+	    - integers, floats, strings ;
+	    - ndarrays (NumPy's n-dimensional arrays) ;
+	    - etc.
+	Application development tools:
+	    - configuration management
+	    - internationalization (gettext)
+	    - deployment tools
+	    - HDF5 I/O helpers
+	    - misc. utils
+
+    Dependencies
+    
+        Requirements
+            Python 2.x (x>=5)
+            PyQt4 4.x (x>=3)
+            QScintilla2 2.x (x>=1) (PyQt4 additional module) for test launcher
+            numpy (N-dimensional arrays)
+	    h5py (HDF5 files support)
+            
+	Recommended modules
+	    guiqwt >=v2.0
+
+    Installation
+    
+        From the source package:
+            python setup.py install
+            
+    More informations
+    
+        Downloads, bug reports and feature requests:
+            http://guidata.googlecode.com
+        Discussions:
+            http://groups.google.com/group/guidata
