@@ -2,8 +2,8 @@ guidata
 =======
 
 Copyright © 2009-2010 CEA
-Pierre Raybaut <pierre.raybaut@cea.fr>
-Licensed under the terms of the CECILL License (see below)
+Pierre Raybaut
+Licensed under the terms of the CECILL License (see Licence_CeCILL_V2-en.txt)
 
 
     Overview
@@ -36,9 +36,3 @@ Licensed under the terms of the CECILL License (see below)
         From the source package:
             python setup.py install
             
-    More informations
-    
-        Downloads, bug reports and feature requests:
-            http://guidata.googlecode.com
-        Discussions:
-            http://groups.google.com/group/guidata
