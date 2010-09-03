@@ -1,4 +1,5 @@
 recursive-include guidata *.inc *.png *.mo
+recursive-include doc_src *.py *.rst *.png *.
 include guidata-tests
 include guidata-tests.py
 include MANIFEST.in
