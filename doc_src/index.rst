@@ -10,6 +10,11 @@ graphical user interfaces -- it also provides helpers and application
 development tools for PyQt4.
 
 
+SourceForge website:
+
+ http://sourceforge.net/projects/guidata/
+
+
 Contents:
 
 .. toctree::
