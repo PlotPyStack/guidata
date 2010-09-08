@@ -483,7 +483,11 @@ class FileWidget(HLayoutMixin, LineEditWidget):
                                 % " *.".join(formats))
         if fname is None:
             fname = ""
-        fname = self.filedialog(parent, parent.child_title(self.item), fname,
+        if isinstance(parent, QGroupBox):
+            child_title = parent.parent().child_title
+        else:
+            child_title = parent.child_title
+        fname = self.filedialog(parent, child_title(self.item), fname,
                                 "\n".join(filter_lines))
         sys.stdout = _temp
         if fname:
@@ -509,8 +513,12 @@ class DirectoryWidget(HLayoutMixin, LineEditWidget):
         parent = self.parent_layout.parent
         _temp = sys.stdout
         sys.stdout = None
+        if isinstance(parent, QGroupBox):
+            child_title = parent.parent().child_title
+        else:
+            child_title = parent.child_title
         dname = QFileDialog.getExistingDirectory(parent,
-                                                 parent.child_title(self.item),
+                                                 child_title(self.item),
                                                  os.path.basename(value))
         sys.stdout = _temp
         if dname:
