@@ -229,7 +229,8 @@ def add_modules(module_names, data_files, includes, excludes, vs2008=True):
                          'docutils.languages.en',
                          'docutils.languages.fr']
             if module_name == 'rst2pdf':
-                add_module_data_files("rst2pdf", ("styles",), ('.json',),
+                add_module_data_files("rst2pdf", ("styles",),
+                                      ('.json', '.style'),
                                       data_files, copy_to_root=True)
         
         else:
