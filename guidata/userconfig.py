@@ -187,10 +187,10 @@ class UserConfig(ConfigParser):
         Remove options which are present in the .ini file but not in defaults
         """
         for section in self.sections():
-            for option, _ in self.items(section):
+            for option, _ in self.items(section, raw=self.raw):
                 if self.get_default(section, option) is NoDefault:
                     self.remove_option(section, option)
-                    if len(self.items(section)) == 0:
+                    if len(self.items(section, raw=self.raw)) == 0:
                         self.remove_section(section)
         
     def __save(self):
@@ -220,7 +220,7 @@ class UserConfig(ConfigParser):
         self.defaults = {}
         for section in self.sections():
             secdict = {}
-            for option, value in self.items(section):
+            for option, value in self.items(section, raw=self.raw):
                 secdict[option] = value
             self.defaults[section] = secdict
 
