@@ -607,8 +607,7 @@ class DataSet(object):
             self.__title = title
         self.__changed = False
         # Set default values
-        for item in self._items:
-            item.set_default(self)
+        self.set_defaults()
     
     def _get_translation(self):
         """We try to find the translation function (_) from the module
@@ -656,6 +655,11 @@ class DataSet(object):
         Return data set icon
         """
         return self.__icon
+    
+    def set_defaults(self):
+        """Set default values"""
+        for item in self._items:
+            item.set_default(self)
         
     def __str__(self):
         indent = "\n    "
