@@ -96,6 +96,8 @@ def restore_dataset(source, dest):
 def assert_interface_supported(klass, iface):
     """Makes sure a class supports an interface"""
     for name, func in iface.__dict__.items():
+        if name == '__inherits__':
+            continue
         if callable(func):
             assert hasattr(klass, name), "Attribute %s missing from %r" % (name,klass)
             imp_func = getattr(klass, name)
@@ -118,6 +120,8 @@ def assert_interfaces_valid(klass):
     assert hasattr(klass, "__implements__"), "Class doesn't implements anything"
     for iface in klass.__implements__:
         assert_interface_supported(klass, iface)
+        if hasattr(iface, "__inherits__"):
+            assert issubclass(klass, iface.__inherits__), "%s should be a subclass of %s" % (klass, iface.__inherits__)
 
 
 def add_extension(item, value):
