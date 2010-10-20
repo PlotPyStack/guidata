@@ -328,6 +328,7 @@ class DataSetShowWidget(AbstractDataSetWidget):
         self.group.setWordWrap(True)
         self.group.setToolTip(item.get_help())
         self.group.setStyleSheet( LABEL_CSS )
+        self.group.setTextInteractionFlags(Qt.TextSelectableByMouse)
         #self.group.setEnabled(False)
 
     def get(self):
