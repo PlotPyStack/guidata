@@ -159,7 +159,7 @@ def font_is_installed(font):
     """
     Check if font is installed
     """
-    return [fam for fam in QFontDatabase().families() if str(fam)==font]
+    return [fam for fam in QFontDatabase().families() if unicode(fam)==font]
 
 
 MONOSPACE = ['Courier New', 'Bitstream Vera Sans Mono', 'Andale Mono',
