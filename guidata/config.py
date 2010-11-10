@@ -24,7 +24,7 @@ DEFAULTS = {'arrayeditor' :
               'font/family/nt' : ['Consolas', 'Courier New'],
               'font/family/posix' : 'Bitstream Vera Sans Mono',
               'font/family/mac' : 'Monaco',
-              'font/size' : 10,
+              'font/size' : 9,
               'font/bold' : False,
               },
             }

@@ -184,6 +184,8 @@ def get_font(conf, section, option=""):
     conf: UserConfig instance
     section [, option]: configuration entry
     """
+    if not option:
+        option = "font"
     if 'font' not in option:
         option += '/font'
     font = QFont()
@@ -202,7 +204,7 @@ def get_font(conf, section, option=""):
                 break
         font.setFamily(family)
     if conf.has_option(section, option+'/size'):
-        font.setPixelSize(conf.get(section, option+'/size'))
+        font.setPointSize(conf.get(section, option+'/size'))
     if conf.get(section, option+'/bold', False):
         font.setWeight(QFont.Bold)
     else:
