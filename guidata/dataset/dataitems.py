@@ -484,27 +484,9 @@ class FloatArrayItem(DataItem):
     help [string]: text shown in tooltip (optional)
     format [string]: formatting string (example: '%.3f') (optional)
     """
-    def __init__(self, label, default=None, help='', format=None, xy=False):
+    def __init__(self, label, default=None, help='', format=None):
         DataItem.__init__(self, label, default=default, help=help)
-        # Option to show x, y0, y1, ... in column headers (see ArrayEditor):
-        self.set_prop("display", xy=xy, format=format)
-
-
-class XYItem(FloatArrayItem):
-    """
-    XY float array data item.
-    (i.e. first row represents x values, second represents y0 values, etc.)
-    
-    Parameters (name [type]: description)
-    -------------------------------------
-    label [string]: name
-    default [numpy.ndarray]: default value (optional)
-    help [string]: text shown in tooltip (optional)
-    format [string]: formatting string (example: '%.3f') (optional)
-    """
-    def __init__(self, label, default=None, help='', format="%.3f"):
-        FloatArrayItem.__init__(self, label, default=default, help=help,
-                                format=format, xy=True)
+        self.set_prop("display", format=format)
 
 
 class ButtonItem(DataItem):

@@ -37,7 +37,7 @@ from guidata.configtools import get_icon
 from guidata.config import _
 
 from qtitemwidgets import (LineEditWidget, TextEditWidget, CheckBoxWidget,
-                           ColorWidget, FileWidget, DirectoryWidget, XYWidget,
+                           ColorWidget, FileWidget, DirectoryWidget,
                            ChoiceWidget, MultipleChoiceWidget, FloatArrayWidget,
                            GroupWidget, AbstractDataSetWidget, ButtonWidget,
                            TabGroupWidget, DateWidget, DateTimeWidget)
@@ -288,7 +288,7 @@ class DataSetEditLayout(object):
 from guidata.dataset.dataitems import (FloatItem, StringItem, TextItem, IntItem,
                 BoolItem, ColorItem, FileOpenItem, FilesOpenItem, FileSaveItem,
                 DirectoryItem, ChoiceItem, ImageChoiceItem, MultipleChoiceItem,
-                FloatArrayItem, XYItem, ButtonItem, DateItem, DateTimeItem)
+                FloatArrayItem, ButtonItem, DateItem, DateTimeItem)
 
 DataSetEditLayout.register(GroupItem, GroupWidget)
 DataSetEditLayout.register(TabGroupItem, TabGroupWidget)
@@ -311,7 +311,6 @@ DataSetEditLayout.register(ChoiceItem, ChoiceWidget)
 DataSetEditLayout.register(ImageChoiceItem, ChoiceWidget)
 DataSetEditLayout.register(MultipleChoiceItem, MultipleChoiceWidget)
 DataSetEditLayout.register(FloatArrayItem, FloatArrayWidget)
-DataSetEditLayout.register(XYItem, XYWidget)
 DataSetEditLayout.register(ButtonItem, ButtonWidget)
 
 
@@ -431,7 +430,6 @@ DataSetShowLayout.register(ChoiceItem, ShowChoiceWidget)
 DataSetShowLayout.register(ImageChoiceItem, ShowChoiceWidget)
 DataSetShowLayout.register(MultipleChoiceItem, ShowChoiceWidget)
 DataSetShowLayout.register(FloatArrayItem, ShowFloatArrayWidget)
-DataSetShowLayout.register(XYItem, DataSetShowWidget)
 
 
 class DataSetShowGroupBox(QGroupBox):
