@@ -645,12 +645,12 @@ class FloatArrayWidget(AbstractDataSetWidget):
         self.first_line.addWidget(edit_button)
         self.layout.addLayout(self.first_line, 0, 0)
         
-        self.max_line, self.max_label = get_image_layout("max.png",
-                                                 _("Largest element in array"))
-        self.layout.addLayout(self.max_line, 1, 0)
         self.min_line, self.min_label = get_image_layout("min.png",
                                                  _("Smallest element in array"))
-        self.layout.addLayout(self.min_line, 2, 0)
+        self.layout.addLayout(self.min_line, 1, 0)
+        self.max_line, self.max_label = get_image_layout("max.png",
+                                                 _("Largest element in array"))
+        self.layout.addLayout(self.max_line, 2, 0)
         
         QObject.connect(edit_button, SIGNAL("clicked()"), self.edit_array )
         self.arr = None # le tableau si il a été modifié
@@ -668,6 +668,8 @@ class FloatArrayWidget(AbstractDataSetWidget):
     def get(self):
         """Override AbstractDataSetWidget method"""
         self.arr = numpy.array(self.item.get(), copy=False)
+        if self.item.get_prop_value("display", "transpose"):
+            self.arr = self.arr.T
         self.update(self.arr)
 
     def update(self, arr):
@@ -677,12 +679,31 @@ class FloatArrayWidget(AbstractDataSetWidget):
             shape = (1,) + shape
         dim = " x ".join( [ str(d) for d in shape ])
         self.dim_label.setText(dim)
-        self.min_label.setText(u"%s" % arr.min())
-        self.max_label.setText(u"%s" % arr.max())
+        
+        format = self.item.get_prop_value("display", "format")
+        minmax = self.item.get_prop_value("display", "minmax")
+        try:
+            if minmax == "all":
+                mint = format % arr.min()
+                maxt = format % arr.max()
+            elif minmax == "columns":
+                mint = ", ".join([format % arr[r, :].min()
+                                  for r in range(arr.shape[0])])
+                maxt = ", ".join([format % arr[r, :].max()
+                                  for r in range(arr.shape[0])])
+            else:
+                mint = ", ".join([format % arr[:, r].min()
+                                  for r in range(arr.shape[1])])
+                maxt = ", ".join([format % arr[:, r].max()
+                                  for r in range(arr.shape[1])])
+        except (TypeError, IndexError):
+            mint, maxt = "-", "-"
+        self.min_label.setText(mint)
+        self.max_label.setText(maxt)
 
     def set(self):
         """Override AbstractDataSetWidget method"""
-        self.item.set(self.value())
+        self.item.set(self.value().T)
 
     def value(self):
         return self.arr

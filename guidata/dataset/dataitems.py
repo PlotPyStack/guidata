@@ -483,10 +483,14 @@ class FloatArrayItem(DataItem):
     default [numpy.ndarray]: default value (optional)
     help [string]: text shown in tooltip (optional)
     format [string]: formatting string (example: '%.3f') (optional)
+    transpose [bool]: transpose matrix (display only)
+    minmax [string]: "all" (default), "columns", "rows"
     """
-    def __init__(self, label, default=None, help='', format=None):
+    def __init__(self, label, default=None, help='', format='%.3f',
+                 transpose=False, minmax="all"):
         DataItem.__init__(self, label, default=default, help=help)
-        self.set_prop("display", format=format)
+        self.set_prop("display", format=format, transpose=transpose,
+                      minmax=minmax)
 
 
 class ButtonItem(DataItem):
