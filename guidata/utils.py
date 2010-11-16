@@ -121,7 +121,8 @@ def assert_interfaces_valid(klass):
     for iface in klass.__implements__:
         assert_interface_supported(klass, iface)
         if hasattr(iface, "__inherits__"):
-            assert issubclass(klass, iface.__inherits__), "%s should be a subclass of %s" % (klass, iface.__inherits__)
+            base = iface.__inherits__()
+            assert issubclass(klass, base), "%s should be a subclass of %s" % (klass, base)
 
 
 def add_extension(item, value):
