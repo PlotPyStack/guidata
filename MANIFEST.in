@@ -1,5 +1,5 @@
-recursive-include guidata *.inc *.png *.mo
-recursive-include doc_src *.py *.rst *.png *.
+recursive-include guidata *.inc *.png *.svg *.pot *.po *.mo
+recursive-include doc *.py *.rst *.png *.ico
 include guidata-tests
 include guidata-tests.py
 include MANIFEST.in
