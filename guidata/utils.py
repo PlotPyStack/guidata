@@ -6,7 +6,11 @@
 # (see guidata/__init__.py for details)
 
 """
-Various helper functions (pure python)
+utils
+-----
+
+The ``guidata.utils`` module provides various utility helper functions 
+(pure python).
 """
 
 import sys, time, subprocess, os, os.path as osp

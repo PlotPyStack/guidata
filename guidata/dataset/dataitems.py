@@ -6,10 +6,11 @@
 # (see guidata/__init__.py for details)
 
 """
-dataitems
-=========
+dataset.dataitems
+=================
 
-Contains implementation for concrete DataItems
+The ``guidata.dataset.dataitems`` module contains implementation for 
+concrete DataItems.
 """
 
 from __future__ import division

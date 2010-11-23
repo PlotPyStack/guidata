@@ -6,7 +6,11 @@
 # (see guidata/__init__.py for details)
 
 """
-Set of helpers for Python package distribution with py2exe
+disthelpers
+-----------
+
+The ``guidata.disthelpers`` module provides helper functions for Python 
+package distribution on Microsoft Windows platforms with ``py2exe``.
 """
 
 import sys, os, os.path as osp, shutil

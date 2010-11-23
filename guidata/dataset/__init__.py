@@ -6,11 +6,17 @@
 # (see guidata/__init__.py for details)
 
 """
-guidata.dataset
-===============
+dataset
+=======
 
-Set of basic GUIs to edit and display objects of many kinds:
-    - integers, floats, strings ;
-    - ndarrays (NumPy's n-dimensional arrays) ;
-    - etc.
+The ``guidata.dataset`` package provides the core features for data set 
+display and editing with automatically generated graphical user interfaces.
+
+.. automodule:: guidata.dataset.dataitems
+   :members:
+   :inherited-members:
+       
+.. automodule:: guidata.dataset.datatypes
+   :members:
+   :inherited-members:
 """

@@ -6,7 +6,10 @@
 # (see guidata/__init__.py for details)
 
 """
-Configuration related tools
+configtools
+-----------
+
+The ``guidata.configtools`` module provides configuration related tools.
 """
 
 import os

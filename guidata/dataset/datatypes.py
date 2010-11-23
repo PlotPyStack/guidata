@@ -6,16 +6,12 @@
 # (see guidata/__init__.py for details)
 
 """
-datatypes
-=========
+dataset.datatypes
+=================
 
-Handle easy-to-create GUI-editable datasets of various object types (int, float,
-str, unicode, ndarray, lists, file path, directory path...)
-
-Classes:
-    DataItem : basic data item
-    DataSet : set of data items
-    DataSetGroup : group of datasets
+The ``guidata.dataset.datatypes`` module contains implementation for 
+DataSets (DataSet, DataSetGroup, ...) and related objects (ItemProperty, 
+ValueProp, ...).
 """
 
 # pylint: disable-msg=W0622

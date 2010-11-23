@@ -6,7 +6,11 @@
 # (see guidata/__init__.py for details)
 
 """
-PyQt helpers
+qthelpers
+---------
+
+The ``guidata.qthelpers`` module provides helper functions for developing 
+easily Qt-based graphical user interfaces.
 """
 
 import sys, os, os.path as osp
