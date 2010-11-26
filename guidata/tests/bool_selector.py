@@ -13,14 +13,13 @@ box widgets in the editing dialog box) and item groups may be enabled/disabled
 using one group parameter (a boolean item).
 """
 
+SHOW = True # Show test in GUI-based test launcher
+
 from guidata.dataset.datatypes import DataSet, BeginGroup, EndGroup, ValueProp
 from guidata.dataset.dataitems import BoolItem, FloatItem
 
 prop1 = ValueProp(False)
 prop2 = ValueProp(False)
-
-SHOW = True # Show test in GUI-based test launcher
-
 
 class GroupSelection(DataSet):
     u"""
@@ -45,7 +44,6 @@ class GroupSelection(DataSet):
     param2_2 = FloatItem(u"Param 2.2",
                          default=.93).set_prop("display", active=prop2)
     _g2 = EndGroup("group 2")
-
 
 if __name__ == '__main__':
     # Create QApplication

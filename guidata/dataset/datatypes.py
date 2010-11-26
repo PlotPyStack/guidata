@@ -582,14 +582,11 @@ class DataSetMeta(type):
 
 class DataSet(object):
     """
-    A DataSet object is a set of DataItem objects.
-    
-    Parameters (name [type]: description)
-    -------------------------------------
-    title [string]
-    comment [string]: text shown on the top of the first data item
-    icon [QIcon or string]: icon show on the button (optional)
-        (string: icon filename as in guidata/guiqwt image search paths)
+    Construct a DataSet object is a set of DataItem objects
+        * title [string]
+        * comment [string]: text shown on the top of the first data item
+        * icon [QIcon or string]: icon show on the button (optional)
+          (string: icon filename as in guidata/guiqwt image search paths)
     """
     __metaclass__ = DataSetMeta
 
@@ -790,19 +787,16 @@ class ActivableDataSet(DataSet):
 
 class DataSetGroup(object):
     """
-    An helper class used to group several datasets together.
+    Construct a DataSetGroup object, used to group several datasets together
+        * datasets [list of DataSet objects]
+        * title [string]
+        * icon [QIcon or string]: icon show on the button (optional)
+          (string: icon filename as in guidata/guiqwt image search paths)
     
-    It tries to mimics the DataSet interface.
+    This class tries to mimics the DataSet interface.
     
     The GUI should represent it as a notebook with one page for each
     contained dataset.
-    
-    Parameters (name [type]: description)
-    -------------------------------------
-    datasets [list of DataSet objects]
-    title [string]
-    icon [QIcon or string]: icon show on the button (optional)
-        (string: icon filename as in guidata/guiqwt image search paths)
     """
     def __init__(self, datasets, title=None, icon=''):
         self.__icon = icon

@@ -7,12 +7,12 @@
 
 """Unit tests"""
 
+SHOW = False # Do not show test in GUI-based test launcher
+
 import unittest
 from guidata.dataset.datatypes import DataSet
 from guidata.dataset.dataitems import FloatItem, IntItem
 from guidata.utils import update_dataset
-
-SHOW = False # Do not show test in GUI-based test launcher
 
 class Parameters(DataSet):
     float1 = FloatItem("float #1", min=1, max=250, help="height in cm")

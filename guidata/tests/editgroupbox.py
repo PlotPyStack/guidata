@@ -12,6 +12,8 @@ These group box widgets are intended to be integrated in a GUI application
 layout, showing read-only parameter sets or allowing to edit parameter values.
 """
 
+SHOW = True # Show test in GUI-based test launcher
+
 from PyQt4.QtGui import QMainWindow, QSplitter
 from PyQt4.QtCore import SIGNAL
 
@@ -24,9 +26,6 @@ from guidata.qthelpers import create_action, add_actions, get_std_icon
 
 # Local test import:
 from activable_dataset import ExampleDataSet
-
-SHOW = True # Show test in GUI-based test launcher
-
 
 class AnotherDataSet(DataSet):
     u"""
@@ -61,7 +60,6 @@ class OtherDataSet(DataSet):
                                ("guidata.png", "guidata"),
                                ("settings.png", "Settings")))
     opacity = FloatItem("Opacity", default=1., min=.1, max=1)
-
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -135,7 +133,6 @@ class MainWindow(QMainWindow):
     def edit_dataset4(self):
         if self.groupbox4.dataset.edit():
             self.update_groupboxes()
-        
         
 if __name__ == '__main__':
     from PyQt4.QtGui import QApplication

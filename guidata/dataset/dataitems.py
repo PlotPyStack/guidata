@@ -78,34 +78,28 @@ class NumericTypeItem(DataItem):
 
 class FloatItem(NumericTypeItem):
     """
-    Float data item.
-    
-    Parameters (name [type]: description)
-    -------------------------------------
-    label [string]: name
-    default [float]: default value (optional)
-    min [float]: minimum value (optional)
-    max [float]: maximum value (optional)
-    nonzero [bool]: if True, zero is not a valid value (optional)
-    help [string]: text shown in tooltip (optional)
+    Construct a float data item
+        * label [string]: name
+        * default [float]: default value (optional)
+        * min [float]: minimum value (optional)
+        * max [float]: maximum value (optional)
+        * nonzero [bool]: if True, zero is not a valid value (optional)
+        * help [string]: text shown in tooltip (optional)
     """
     type = float
     
     
 class IntItem(NumericTypeItem):
     """
-    Integer data item.
-    
-    Parameters (name [type]: description)
-    -------------------------------------
-    label [string]: name
-    default [int]: default value (optional)
-    min [int]: minimum value (optional)
-    max [int]: maximum value (optional)
-    nonzero [bool]: if True, zero is not a valid value (optional)
-    even [bool]: if True, even values are valid, if False, odd values are valid
+    Construct an integer data item
+        * label [string]: name
+        * default [int]: default value (optional)
+        * min [int]: minimum value (optional)
+        * max [int]: maximum value (optional)
+        * nonzero [bool]: if True, zero is not a valid value (optional)
+        * even [bool]: if True, even values are valid, if False, odd values are valid
                  if None (default), ignored (optional)
-    help [string]: text shown in tooltip (optional)
+        * help [string]: text shown in tooltip (optional)
     """
     type = int
     def __init__(self, label, default=None,
@@ -140,13 +134,10 @@ class IntItem(NumericTypeItem):
 
 class StringItem(DataItem):
     """
-    String data item.
-    
-    Parameters (name [type]: description)
-    -------------------------------------
-    label [string]: name
-    default [string]: default value (optional)
-    help [string]: text shown in tooltip (optional)
+    Construct a string data item
+        * label [string]: name
+        * default [string]: default value (optional)
+        * help [string]: text shown in tooltip (optional)
     """
     type = (unicode, str)
     def check_value(self, value):
@@ -162,27 +153,21 @@ class StringItem(DataItem):
 
 class TextItem(StringItem):
     """
-    Text data item (multiline string).
-    
-    Parameters (name [type]: description)
-    -------------------------------------
-    label [string]: name
-    default [string]: default value (optional)
-    help [string]: text shown in tooltip (optional)
+    Construct a text data item (multiline string)
+        * label [string]: name
+        * default [string]: default value (optional)
+        * help [string]: text shown in tooltip (optional)
     """
     pass
 
 
 class BoolItem(DataItem):
     """
-    Boolean data item.
-    
-    Parameters (name [type]: description)
-    -------------------------------------
-    text [string]: form's field name (optional)
-    label [string]: name
-    default [string]: default value (optional)
-    help [string]: text shown in tooltip (optional)
+    Construct a boolean data item
+        * text [string]: form's field name (optional)
+        * label [string]: name
+        * default [string]: default value (optional)
+        * help [string]: text shown in tooltip (optional)
     """
     type = bool
     def __init__(self, text='', label='', default=None, help=''):
@@ -192,14 +177,11 @@ class BoolItem(DataItem):
 
 class DateItem(DataItem):
     """
-    Date data item.
-    
-    Parameters (name [type]: description)
-    -------------------------------------
-    text [string]: form's field name (optional)
-    label [string]: name
-    default [datetime.date]: default value (optional)
-    help [string]: text shown in tooltip (optional)
+    Construct a date data item.
+        * text [string]: form's field name (optional)
+        * label [string]: name
+        * default [datetime.date]: default value (optional)
+        * help [string]: text shown in tooltip (optional)
     """
     type = datetime.date
 
@@ -209,15 +191,12 @@ class DateTimeItem(DateItem):
 
 class ColorItem(StringItem):
     """
-    Color data item.
+    Construct a color data item
+        * label [string]: name
+        * default [string]: default value (optional)
+        * help [string]: text shown in tooltip (optional)
     
-    Color values are encoded as hexadecimal strings or Qt color names.
-    
-    Parameters (name [type]: description)
-    -------------------------------------
-    label [string]: name
-    default [string]: default value (optional)
-    help [string]: text shown in tooltip (optional)
+    Color values are encoded as hexadecimal strings or Qt color names
     """
     def check_value(self, value):
         """Override DataItem method"""
@@ -229,15 +208,12 @@ class ColorItem(StringItem):
 
 class FileSaveItem(StringItem):
     """
-    Path data item for a file to be saved.
-    
-    Parameters (name [type]: description)
-    -------------------------------------
-    label [string]: name
-    formats [string (or string list)]: wildcard filter (e.g. '*.txt')
-    default [string]: default value (optional)
-    basedir [string]: default base directory (optional)
-    help [string]: text shown in tooltip (optional)
+    Construct a path data item for a file to be saved
+        * label [string]: name
+        * formats [string (or string list)]: wildcard filter (e.g. '*.txt')
+        * default [string]: default value (optional)
+        * basedir [string]: default base directory (optional)
+        * help [string]: text shown in tooltip (optional)
     """
     def __init__(self, label, formats='*', default=None,
                  basedir=None, help=''):
@@ -266,15 +242,12 @@ class FileSaveItem(StringItem):
 
 class FileOpenItem(FileSaveItem):
     """
-    Path data item for a file to be opened.
-    
-    Parameters (name [type]: description)
-    -------------------------------------
-    label [string]: name
-    formats [string (or string list)]: wildcard filter (e.g. '*.txt')
-    default [string]: default value (optional)
-    basedir [string]: default base directory (optional)
-    help [string]: text shown in tooltip (optional)
+    Construct a path data item for a file to be opened
+        * label [string]: name
+        * formats [string (or string list)]: wildcard filter (e.g. '*.txt')
+        * default [string]: default value (optional)
+        * basedir [string]: default base directory (optional)
+        * help [string]: text shown in tooltip (optional)
     """
     def check_value(self, value):
         """Override DataItem method"""
@@ -285,15 +258,12 @@ class FileOpenItem(FileSaveItem):
 
 class FilesOpenItem(FileSaveItem):
     """
-    Path data item for multiple files to be opened.
-    
-    Parameters (name [type]: description)
-    -------------------------------------
-    label [string]: name
-    formats [string (or string list)]: wildcard filter (e.g. '*.txt')
-    default [string]: default value (optional)
-    basedir [string]: default base directory (optional)
-    help [string]: text shown in tooltip (optional)
+    Construct a path data item for multiple files to be opened.
+        * label [string]: name
+        * formats [string (or string list)]: wildcard filter (e.g. '*.txt')
+        * default [string]: default value (optional)
+        * basedir [string]: default base directory (optional)
+        * help [string]: text shown in tooltip (optional)
     """
     type = list
     def __init__(self, label, formats='*', default=None, help=''):
@@ -322,13 +292,10 @@ class FilesOpenItem(FileSaveItem):
 
 class DirectoryItem(StringItem):
     """
-    Path data item for a directory.
-    
-    Parameters (name [type]: description)
-    -------------------------------------
-    label [string]: name
-    default [string]: default value (optional)
-    help [string]: text shown in tooltip (optional)
+    Construct a path data item for a directory.
+        * label [string]: name
+        * default [string]: default value (optional)
+        * help [string]: text shown in tooltip (optional)
     """
     def check_value(self, value):
         """Override DataItem method"""
@@ -342,18 +309,14 @@ class FirstChoice(object):
 
 class ChoiceItem(DataItem):
     """
-    Data item for a list of choices.
-    
-    Parameters (name [type]: description)
-    -------------------------------------
-    label [string]: name
-    choices [list, tuple or function]:
-        string list or (key, label) list
-        function of two arguments (item, value) returning a list of tuples 
-        (key, label, image) where image is an icon path, a QIcon instance 
-        or a function of one argument (key) returning a QIcon instance
-    default [-]: default label or default key (optional)
-    help [string]: text shown in tooltip (optional)
+    Construct a data item for a list of choices.
+        * label [string]: name
+        * choices [list, tuple or function]: string list or (key, label) list
+          function of two arguments (item, value) returning a list of tuples 
+          (key, label, image) where image is an icon path, a QIcon instance 
+          or a function of one argument (key) returning a QIcon instance
+        * default [-]: default label or default key (optional)
+        * help [string]: text shown in tooltip (optional)
     """
     def __init__(self, label, choices, default=FirstChoice, help=''):
         if callable(choices):
@@ -389,14 +352,12 @@ class ChoiceItem(DataItem):
         
 class MultipleChoiceItem(ChoiceItem):
     """
-    Data item for a list of choices -- multiple choices can be selected.
-    
-    Parameters (name [type]: description)
-    -------------------------------------
-    label [string]: name
-    choices [list or tuple]: string list or (key, label) list
-    default [-]: default label or default key (optional)
-    help [string]: text shown in tooltip (optional)
+    Construct a data item for a list of choices -- multiple choices can be 
+    selected
+        * label [string]: name
+        * choices [list or tuple]: string list or (key, label) list
+        * default [-]: default label or default key (optional)
+        * help [string]: text shown in tooltip (optional)
     """
     def __init__(self, label, choices, default=(), help=''):
         ChoiceItem.__init__(self, label, choices, default, help)
@@ -448,18 +409,15 @@ class MultipleChoiceItem(ChoiceItem):
 
 class ImageChoiceItem(ChoiceItem):
     """
-    Data item for a list of choices with images.
-    
-    Parameters (name [type]: description)
-    -------------------------------------
-    label [string]: name
-    choices [list, tuple or function]:
-        (label, image) list or (key, label, image) list
-        function of two arguments (item, value) returning a list of tuples 
-        (key, label, image) where image is an icon path, a QIcon instance 
-        or a function of one argument (key) returning a QIcon instance
-    default [-]: default label or default key (optional)
-    help [string]: text shown in tooltip (optional)
+    Construct a data item for a list of choices with images
+        * label [string]: name
+        * choices [list, tuple or function]: (label, image) list or 
+          (key, label, image) list function of two arguments (item, value) 
+          returning a list of tuples (key, label, image) where image is an 
+          icon path, a QIcon instance or a function of one argument (key) 
+          returning a QIcon instance
+        * default [-]: default label or default key (optional)
+        * help [string]: text shown in tooltip (optional)
     """
     def _normalize_choice(self, idx, choice_tuple):
         assert isinstance(choice_tuple, tuple)
@@ -476,16 +434,13 @@ class ImageChoiceItem(ChoiceItem):
 
 class FloatArrayItem(DataItem):
     """
-    Float array data item.
-    
-    Parameters (name [type]: description)
-    -------------------------------------
-    label [string]: name
-    default [numpy.ndarray]: default value (optional)
-    help [string]: text shown in tooltip (optional)
-    format [string]: formatting string (example: '%.3f') (optional)
-    transpose [bool]: transpose matrix (display only)
-    minmax [string]: "all" (default), "columns", "rows"
+    Construct a float array data item
+        * label [string]: name
+        * default [numpy.ndarray]: default value (optional)
+        * help [string]: text shown in tooltip (optional)
+        * format [string]: formatting string (example: '%.3f') (optional)
+        * transpose [bool]: transpose matrix (display only)
+        * minmax [string]: "all" (default), "columns", "rows"
     """
     def __init__(self, label, default=None, help='', format='%.3f',
                  transpose=False, minmax="all"):
@@ -496,24 +451,20 @@ class FloatArrayItem(DataItem):
 
 class ButtonItem(DataItem):
     """
-    A simple button that calls a method when hit.
+    Construct a simple button that calls a method when hit
+        * label [string]: text shown on the button
+        * callback [function]: function with three parameters (dataset, item, value)
+            - dataset [DataSet]: instance of the parent dataset
+            - item [DataItem]: instance of ButtonItem (i.e. self)
+            - value [unspecified]: value of ButtonItem (default ButtonItem 
+              value or last value returned by the callback)
+        * icon [QIcon or string]: icon show on the button (optional)
+          (string: icon filename as in guidata/guiqwt image search paths)
+        * default [unspecified]: default value passed to the callback (optional)
+        * help [string]: text shown in button's tooltip (optional)
     
-    The value of this item is unspecified but is passed
-    to the callback along with the whole dataset.
-    The value is assigned the callback`s return value.
-
-    Parameters (name [type]: description)
-    -------------------------------------
-    label [string]: text shown on the button
-    callback [function]: function with three parameters (dataset, item, value)
-        dataset [DataSet]: instance of the parent dataset
-        item [DataItem]: instance of ButtonItem (i.e. self)
-        value [unspecified]: value of ButtonItem (default ButtonItem value or 
-            last value returned by the callback)
-    icon [QIcon or string]: icon show on the button (optional)
-        (string: icon filename as in guidata/guiqwt image search paths)
-    default [unspecified]: default value passed to the callback (optional)
-    help [string]: text shown in button's tooltip (optional)
+    The value of this item is unspecified but is passed to the callback along 
+    with the whole dataset. The value is assigned the callback`s return value.
     """
     def __init__(self, label, callback, icon=None, default=None, help=''):
         DataItem.__init__(self, label, default=default, help=help)
@@ -529,12 +480,9 @@ class ButtonItem(DataItem):
 
 class FontFamilyItem(StringItem):
     """
-    Font family name item.
-    
-    Parameters (name [type]: description)
-    -------------------------------------
-    label [string]: name
-    default [string]: default value (optional)
-    help [string]: text shown in tooltip (optional)
+    Construct a font family name item
+        * label [string]: name
+        * default [string]: default value (optional)
+        * help [string]: text shown in tooltip (optional)
     """
     pass

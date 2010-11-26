@@ -12,11 +12,11 @@ From time to time, it may be useful to derive a DataSet from another. The main
 application is to extend a parameter set with additionnal parameters.
 """
 
+SHOW = True # Show test in GUI-based test launcher
+
 from all_features import TestParameters, removefiles
 from guidata.dataset.datatypes import BeginGroup, EndGroup
 from guidata.dataset.dataitems import FloatItem, BoolItem
-
-SHOW = True # Show test in GUI-based test launcher
 
 class TestParameters2(TestParameters):
     bool1 = BoolItem("Boolean option (bis)")

@@ -30,15 +30,15 @@ This library aims to provide these features thanks to automatic graphical user
 interface generation for data set editing and display. Widgets inside GUIs are 
 automatically generated depending on each data item type.
 
-``guidata`` also provides the following features:
+The `guidata` library also provides the following features:
 
-    * ``guidata.qthelpers``: ``PyQt4`` helpers
-    * ``guidata.disthelpers``: ``py2exe`` helpers
-    * ``guidata.userconfig``: ``.ini`` configuration management helpers (based 
-      on Python standard module ``ConfigParser``)
-    * ``guidata.configtools``: library/application data management
-    * ``guidata.gettext_helpers``: translation helpers (based on the GNU tool 
-      ``gettext``)
-    * ``guidata.guitest``: automatic GUI-based test launcher
-    * ``guidata.utils``: miscelleneous utilities
+    * :py:mod:`guidata.qthelpers`: `PyQt4` helpers
+    * :py:mod:`guidata.disthelpers`: `py2ex` helpers
+    * :py:mod:`guidata.userconfig`: `.ini` configuration management helpers 
+      (based on Python standard module :py:mod:`ConfigParser`)
+    * :py:mod:`guidata.configtools`: library/application data management
+    * :py:mod:`guidata.gettext_helpers`: translation helpers 
+      (based on the GNU tool `gettext`)
+    * :py:mod:`guidata.guitest`: automatic GUI-based test launcher
+    * :py:mod:`guidata.utils`: miscelleneous utilities
 

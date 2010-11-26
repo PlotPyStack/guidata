@@ -25,4 +25,9 @@ From the source package:
 Help and support
 ----------------
 
-See the guidata SourceForge website (discussion group and bug tracker)
+External resources:
+    * Downloads, bug reports and feature requests: `SourceForge`_
+    * Help, support and discussions around the project: `Google Group`_
+  
+.. _SourceForge: http://sourceforge.net/projects/guidata/
+.. _Google Group: http://groups.google.fr/group/guidata_guiqwt

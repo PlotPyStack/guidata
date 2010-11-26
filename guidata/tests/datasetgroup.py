@@ -12,10 +12,10 @@ DataSet objects may be grouped into DataSetGroup, allowing them to be edited
 in a single dialog box (with one tab per DataSet object).
 """
 
+SHOW = True # Show test in GUI-based test launcher
+
 from all_features import TestParameters, removefiles
 from guidata.dataset.datatypes import DataSetGroup
-
-SHOW = True # Show test in GUI-based test launcher
 
 if __name__ == "__main__":
     # Create QApplication
