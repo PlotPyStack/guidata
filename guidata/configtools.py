@@ -47,7 +47,9 @@ def get_translation(modname):
     # fixup environment var LANG in case it's unknown
     if "LANG" not in os.environ:
         import locale
-        os.environ["LANG"] = locale.getdefaultlocale()[0]
+        lang = locale.getdefaultlocale()[0]
+        if lang is not None:
+            os.environ["LANG"] = lang
     try:
         _trans = gettext.translation(modname, get_module_locale_path(modname),
                                      codeset="utf-8")
