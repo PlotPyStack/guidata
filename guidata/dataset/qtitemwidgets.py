@@ -483,10 +483,10 @@ class FileWidget(HLayoutMixin, LineEditWidget):
                                 % " *.".join(formats))
         if fname is None:
             fname = ""
-        if isinstance(parent, QGroupBox):
-            child_title = parent.parent().child_title
-        else:
+        try:
             child_title = parent.child_title
+        except AttributeError:
+            child_title = parent.parent().child_title
         fname = self.filedialog(parent, child_title(self.item), fname,
                                 "\n".join(filter_lines))
         sys.stdout = _temp
