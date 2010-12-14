@@ -56,7 +56,7 @@ PACKAGES = [LIBNAME+p for p in ['', '.dataset', '.tests']]
 PACKAGE_DATA = {LIBNAME: get_package_data(LIBNAME, ('.png', '.mo'))}
 
 if os.name == 'nt':
-    SCRIPTS = ['guidata-tests.py']
+    SCRIPTS = ['guidata-tests', 'guidata-tests.bat']
 else:
     SCRIPTS = ['guidata-tests']
 
