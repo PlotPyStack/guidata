@@ -703,7 +703,11 @@ class FloatArrayWidget(AbstractDataSetWidget):
 
     def set(self):
         """Override AbstractDataSetWidget method"""
-        self.item.set(self.value().T)
+        if self.item.get_prop_value("display", "transpose"):
+            value = self.value().T
+        else:
+            value = self.value()
+        self.item.set(value)
 
     def value(self):
         return self.arr
