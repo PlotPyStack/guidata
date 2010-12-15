@@ -28,10 +28,15 @@ Licensed under the terms of the CECILL License (see Licence_CeCILL_V2-en.txt)
     
         Requirements
             Python 2.x (x>=5)
-            PyQt4 4.x (x>=3)
-            QScintilla2 2.x (x>=1) (PyQt4 additional module) for test launcher
-            numpy (N-dimensional arrays)
-	    h5py (HDF5 files support)
+            PyQt4 4.x (x>=3 ; recommended x>=4)
+            QScintilla2 2.x (x>=1) (PyQt4 extension) for the test launcher
+	    
+	Optional Python modules
+	    h5py (HDF5 files I/O)
+	    py2exe (application deployment on Windows platforms)
+
+	Other optional modules:
+	    gettext
             
 	Recommended modules
 	    guiqwt >=v2.0

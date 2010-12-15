@@ -8,11 +8,11 @@ generating graphical user interfaces for easy dataset editing and display.
 It also provides helpers and application development tools for PyQt4.
 
 External resources:
-    * Downloads, bug reports and feature requests: `SourceForge`_
-    * Help, support and discussions around the project: `Google Group`_
-  
-.. _SourceForge: http://sourceforge.net/projects/guidata/
-.. _Google Group: http://groups.google.fr/group/guidata_guiqwt
+    * Bug reports and feature requests: `GoogleCode`_
+    * Help, support and discussions around the project: `GoogleGroup`_
+
+.. _GoogleCode: http://guidata.googlecode.com
+.. _GoogleGroup: http://groups.google.fr/group/guidata_guiqwt
 """
 
 
