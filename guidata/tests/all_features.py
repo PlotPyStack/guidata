@@ -11,7 +11,7 @@ All guidata item/group features demo
 
 SHOW = True # Show test in GUI-based test launcher
 
-import os
+import tempfile, atexit, shutil
 import numpy as np
 
 from guidata.dataset.datatypes import (DataSet, BeginTabGroup, EndTabGroup,
@@ -24,35 +24,29 @@ from guidata.dataset.dataitems import (FloatItem, IntItem, BoolItem, ChoiceItem,
 from guidata.dataset.qtwidgets import DataSetEditLayout, DataSetShowLayout
 from guidata.dataset.qtitemwidgets import DataSetWidget
 
-def createfile(name):
-    """Create dummy files for test purpose only"""
-    filename = os.path.join(os.getcwd(), name)
-    if not os.path.exists(filename):
-        f = open(filename, 'w')
-        f.close()
-    return filename
 
-def removefiles():
-    [os.remove(fname) for fname in [f_eta, f_csv]]
+# Creating temporary files and registering cleanup functions
+TEMPDIR = tempfile.mkdtemp(prefix="test_")
+atexit.register(shutil.rmtree, TEMPDIR)
+FILE_ETA = tempfile.NamedTemporaryFile(suffix=".eta", dir=TEMPDIR)
+atexit.register(FILE_ETA.close)
+FILE_CSV = tempfile.NamedTemporaryFile(suffix=".csv", dir=TEMPDIR)
+atexit.register(FILE_CSV.close)
 
-
-f_eta = createfile('test.eta')
-f_csv = createfile('essai.csv')
-
-class SubDataset(DataSet):
-    dir = DirectoryItem("Directory", os.path.dirname(f_eta))
-    fname = FileOpenItem("Single file (open)", ("csv", "eta"), f_csv)
-    fnames = FilesOpenItem("Multiple files", "csv", f_csv)
-    fname_s = FileSaveItem("Single file (save)", "eta", f_eta)
+class SubDataSet(DataSet):
+    dir = DirectoryItem("Directory", TEMPDIR)
+    fname = FileOpenItem("Single file (open)", ("csv", "eta"), FILE_CSV.name)
+    fnames = FilesOpenItem("Multiple files", "csv", FILE_CSV.name)
+    fname_s = FileSaveItem("Single file (save)", "eta", FILE_ETA.name)
 
 class SubDataSetWidget(DataSetWidget):
-    klass = SubDataset
+    klass = SubDataSet
 
-class SubDatasetItem(ObjectItem):
-    klass = SubDataset
+class SubDataSetItem(ObjectItem):
+    klass = SubDataSet
 
-DataSetEditLayout.register(SubDatasetItem, SubDataSetWidget)
-DataSetShowLayout.register(SubDatasetItem, SubDataSetWidget)
+DataSetEditLayout.register(SubDataSetItem, SubDataSetWidget)
+DataSetShowLayout.register(SubDataSetItem, SubDataSetWidget)
 
 class TestParameters(DataSet):
     """
@@ -61,7 +55,7 @@ class TestParameters(DataSet):
     <b>rich text<sup>2</sup></b> are both supported,
     as well as special characters (α, β, γ, δ, ...)
     """
-    files = SubDatasetItem("files")
+    files = SubDataSetItem("files")
     string = StringItem("String")
     text = TextItem("Text")
     _bg = BeginGroup("A sub group")
@@ -96,9 +90,6 @@ class TestParameters(DataSet):
     
     
 if __name__ == "__main__":
-    f_eta = createfile('test.eta')
-    f_csv = createfile('essai.csv')
-
     # Create QApplication
     import guidata
     guidata.qapplication()
@@ -109,4 +100,3 @@ if __name__ == "__main__":
     if e.edit():
         print e
     e.view()
-    removefiles()

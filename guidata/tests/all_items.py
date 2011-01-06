@@ -17,7 +17,7 @@ DataSet class definition: each parameter type has its own DataItem class
 
 SHOW = True # Show test in GUI-based test launcher
 
-import os, datetime, numpy as np
+import tempfile, atexit, shutil, datetime, numpy as np
 
 from guidata.dataset.datatypes import DataSet, BeginGroup, EndGroup
 from guidata.dataset.dataitems import (FloatItem, IntItem, BoolItem, ChoiceItem,
@@ -27,19 +27,13 @@ from guidata.dataset.dataitems import (FloatItem, IntItem, BoolItem, ChoiceItem,
                              DateItem, DateTimeItem)
 
 
-def createfile(name):
-    """Create dummy files for test purpose only"""
-    filename = os.path.join(os.getcwd(), name)
-    if not os.path.exists(filename):
-        f = open(filename, 'w')
-        f.close()
-    return filename
-
-def removefiles():
-    [os.remove(fname) for fname in [f_eta, f_csv]]
-
-f_eta = createfile('test.eta')
-f_csv = createfile('essai.csv')
+# Creating temporary files and registering cleanup functions
+TEMPDIR = tempfile.mkdtemp(prefix="test_")
+atexit.register(shutil.rmtree, TEMPDIR)
+FILE_ETA = tempfile.NamedTemporaryFile(suffix=".eta", dir=TEMPDIR)
+atexit.register(FILE_ETA.close)
+FILE_CSV = tempfile.NamedTemporaryFile(suffix=".csv", dir=TEMPDIR)
+atexit.register(FILE_CSV.close)
 
 class TestParameters(DataSet):
     """
@@ -48,10 +42,10 @@ class TestParameters(DataSet):
     <b>rich text<sup>2</sup></b> are both supported,
     as well as special characters (α, β, γ, δ, ...)
     """
-    dir = DirectoryItem("Directory", os.path.dirname(f_eta))
-    fname = FileOpenItem("Open file", ("csv", "eta"), f_csv)
-    fnames = FilesOpenItem("Open files", "csv", f_csv)
-    fname_s = FileSaveItem("Save file", "eta", f_eta)
+    dir = DirectoryItem("Directory", TEMPDIR)
+    fname = FileOpenItem("Open file", ("csv", "eta"), FILE_CSV.name)
+    fnames = FilesOpenItem("Open files", "csv", FILE_CSV.name)
+    fname_s = FileSaveItem("Save file", "eta", FILE_ETA.name)
     string = StringItem("String")
     text = TextItem("Text")
     fl1 = FloatItem("Float", min=1, max=30, help="Help on float item")
@@ -82,9 +76,6 @@ class TestParameters(DataSet):
     
     
 if __name__ == "__main__":
-    f_eta = createfile('test.eta')
-    f_csv = createfile('essai.csv')
-
     # Create QApplication
     import guidata
     guidata.qapplication()
@@ -95,4 +86,3 @@ if __name__ == "__main__":
     if e.edit():
         print e
     e.view()
-    removefiles()
