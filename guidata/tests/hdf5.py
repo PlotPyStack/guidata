@@ -23,7 +23,7 @@ SHOW = hdf5_is_available # Show test in GUI-based test launcher
 
 import os
 from guidata.hdf5io import HDF5Reader, HDF5Writer
-from all_features import TestParameters, removefiles
+from all_features import TestParameters
 
 if __name__ == '__main__':
     # Create QApplication
@@ -42,5 +42,3 @@ if __name__ == '__main__':
         reader = HDF5Reader("test.h5")
         e.deserialize(reader)
         e.edit()
-    
-    removefiles()

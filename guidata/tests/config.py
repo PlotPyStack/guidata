@@ -11,7 +11,7 @@ SHOW = False # Do not show test in GUI-based test launcher
 
 import unittest
 
-from all_features import TestParameters, removefiles
+from all_features import TestParameters
 from guidata.config import UserConfig
 
 class TestBasic(unittest.TestCase):
@@ -52,6 +52,5 @@ class TestBasic(unittest.TestCase):
         print "fin test_restore"
         
 if __name__=="__main__":
-    removefiles()
     CONF = UserConfig({})
     unittest.main()

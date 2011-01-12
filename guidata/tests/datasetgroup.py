@@ -14,7 +14,7 @@ in a single dialog box (with one tab per DataSet object).
 
 SHOW = True # Show test in GUI-based test launcher
 
-from all_features import TestParameters, removefiles
+from all_features import TestParameters
 from guidata.dataset.datatypes import DataSetGroup
 
 if __name__ == "__main__":
@@ -28,4 +28,3 @@ if __name__ == "__main__":
     g.edit()
     print e1
     g.edit()
-    removefiles()

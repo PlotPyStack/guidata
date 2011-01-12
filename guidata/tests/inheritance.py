@@ -14,7 +14,7 @@ application is to extend a parameter set with additionnal parameters.
 
 SHOW = True # Show test in GUI-based test launcher
 
-from all_features import TestParameters, removefiles
+from all_features import TestParameters
 from guidata.dataset.datatypes import BeginGroup, EndGroup
 from guidata.dataset.dataitems import FloatItem, BoolItem
 
@@ -36,4 +36,3 @@ if __name__ == '__main__':
     e = TestParameters2()
     e.edit()
     print e
-    removefiles()
