@@ -373,6 +373,30 @@ class ToolbarListWidget(QWidget):
         """Current row has just changed"""
         pass
 
+if sys.platform=="win32":
+    def _qt_file_wrap(fct, *args, **kwargs):
+        _temp1, _temp2 = sys.stdout, sys.stderr
+        sys.stdout, sys.stderr = None, None
+        try:
+            return fct(*args, **kwargs)
+        finally:
+            sys.stdout, sys.stderr = _temp1, _temp2
+else:
+    def _qt_file_wrap(fct, *args, **kwargs):
+        return fct(*args, **kwargs)
+
+def getOpenFileName(*args, **kwargs):
+    return _qt_file_wrap(QFileDialog.getOpenFileName, *args, **kwargs)
+
+def getOpenFileNames(*args, **kwargs):
+    return _qt_file_wrap(QFileDialog.getOpenFileNames, *args, **kwargs)
+
+def getSaveFileName(*args, **kwargs):
+    return _qt_file_wrap(QFileDialog.getSaveFileName, *args, **kwargs)
+
+def getExistingDirectory(*args, **kwargs):
+    return _qt_file_wrap(QFileDialog.getExistingDirectory, *args, **kwargs)
+
 def open_file(parent, filename=None,
               title=_(u"Open a file"),
               filetypes=_(u"All")+" (*.*)",
@@ -388,11 +412,7 @@ def open_file(parent, filename=None,
         if isinstance(action, QAction):
             filename = unicode(action.data().toString())
     if not filename:
-        _temp1, _temp2 = sys.stdout, sys.stderr
-        sys.stdout, sys.stderr = None, None
-        filename = QFileDialog.getOpenFileName(parent, title,
-                                               os.getcwdu(), filetypes)
-        sys.stdout, sys.stderr = _temp1, _temp2
+        filename = getOpenFileName(parent, title, os.getcwdu(), filetypes)
     if filename:
         filename = unicode(filename)
         os.chdir(osp.dirname(filename))

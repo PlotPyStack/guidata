@@ -40,6 +40,7 @@ __version__ = '1.0.6b'
 
 import os, re
 import os.path as osp
+import sys
 from ConfigParser import ConfigParser, MissingSectionHeaderError
 
 def _check_values(sections):
@@ -80,6 +81,12 @@ def get_home_dir():
 def utf8(x):
     """Encode unicode string in UTF-8"""
     return x.encode("utf-8")
+    
+def get_config_dir():
+    if sys.platform=="win32":
+        # TODO: on windows config files usually go in
+        return get_home_dir()
+    return osp.join(get_home_dir(), ".config")
 
 class NoDefault:
     pass
@@ -206,7 +213,7 @@ class UserConfig(ConfigParser):
         """
         Create a .ini filename located in user home directory
         """
-        return osp.join(get_home_dir(), '.%s.ini' % self.name)
+        return osp.join(get_config_dir(), '.%s.ini' % self.name)
         
     def cleanup(self):
         """
@@ -373,12 +380,13 @@ class UserConfigBase(object):
 class UserConfigWriter(UserConfigBase):
     def write_any(self, val):
         option = "/".join(self.option)
-#        print "Write:", option, "=", repr(val)
         self.conf.set(self.section, option, val)
-        
+
     write_int = write_any
     write_float = write_any
-    write_unicode = write_any
+    def write_unicode(self, val):
+        self.write_any(val.encode("utf-8"))
+
     write_array = write_any
     write_sequence = write_any
     def write_none(self):
@@ -392,7 +400,9 @@ class UserConfigReader(UserConfigBase):
 
     read_int = read_any
     read_float = read_any
-    read_unicode = read_any
+    def read_unicode(self):
+        val = self.read_any()
+        return unicode(val, "utf-8")
     read_array = read_any
     read_sequence = read_any
     read_none = read_any

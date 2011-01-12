@@ -138,11 +138,19 @@ class StringItem(DataItem):
         * label [string]: name
         * default [string]: default value (optional)
         * help [string]: text shown in tooltip (optional)
+    notempty [bool]: if True, empty string is not a valid value (optional)
     """
     type = (unicode, str)
+    def __init__(self, label, default=None,
+                 notempty=None, help=''):
+        DataItem.__init__(self, label, default=default, help=help)
+        self.set_prop("data", notempty=notempty)
+
     def check_value(self, value):
         """Override DataItem method"""
-        # This method is needed because of StringItem widget implementation
+        notempty = self.get_prop("data", "notempty")
+        if notempty and not value:
+            return False
         return True
     
     def from_string(self, value):

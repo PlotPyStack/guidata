@@ -32,7 +32,7 @@ from PyQt4.QtGui import (QIcon, QPixmap, QHBoxLayout, QGridLayout, QColorDialog,
 from PyQt4.QtCore import Qt, QObject, QStringList, SIGNAL
 
 from guidata.utils import update_dataset, restore_dataset, utf8_to_unicode
-from guidata.qthelpers import text_to_qcolor, get_std_icon
+from guidata.qthelpers import text_to_qcolor, get_std_icon, getExistingDirectory
 from guidata.configtools import get_icon, get_image_layout, get_image_file_path
 from guidata.config import _
 
@@ -227,9 +227,15 @@ class LineEditWidget(AbstractDataSetWidget):
     def get(self):
         """Override AbstractDataSetWidget method"""
         value = self.item.get()
+        old_value = unicode(self.value())
         if value is not None:
-            self.edit.setText(utf8_to_unicode(value))
-        self.line_edit_changed( value )
+            uvalue = utf8_to_unicode(value)
+            if uvalue!=old_value:
+                self.edit.setText(utf8_to_unicode(value))
+                self.line_edit_changed( value )
+        else:
+            self.line_edit_changed( value )
+            
             
     def line_edit_changed(self, qvalue):
         """QLineEdit validator"""
@@ -238,6 +244,9 @@ class LineEditWidget(AbstractDataSetWidget):
             self.edit.setStyleSheet( "background-color:rgb(255, 175, 90);" )
         else:
             self.edit.setStyleSheet( "" )
+            cb = self.item.get_prop_value("display", "callback", None)
+            if cb is not None:
+                cb(self.item.instance, self.item.item, value)
         self.update(value)
         
     def update(self, value):
@@ -245,7 +254,7 @@ class LineEditWidget(AbstractDataSetWidget):
         pass
 
     def value(self):
-        return self.edit.text()
+        return unicode(self.edit.text())
 
     def check(self):
         """Override AbstractDataSetWidget method"""
@@ -511,16 +520,13 @@ class DirectoryWidget(HLayoutMixin, LineEditWidget):
         """Open a directory selection dialog box"""
         value = self.item.from_string(unicode(self.edit.text()))
         parent = self.parent_layout.parent
-        _temp = sys.stdout
-        sys.stdout = None
         if isinstance(parent, QGroupBox):
             child_title = parent.parent().child_title
         else:
             child_title = parent.child_title
-        dname = QFileDialog.getExistingDirectory(parent,
-                                                 child_title(self.item),
-                                                 os.path.basename(value))
-        sys.stdout = _temp
+        dname = getExistingDirectory(parent,
+                                     child_title(self.item),
+                                     os.path.basename(value))
         if dname:
             self.edit.setText(dname)
 

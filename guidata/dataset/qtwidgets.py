@@ -462,19 +462,21 @@ class DataSetEditGroupBox(DataSetShowGroupBox):
     button_text: action button text (default: "Apply")
     button_icon: QIcon object or string (default "apply.png")
     """
-    def __init__(self, label, klass, button_text=None, button_icon=None):
+    def __init__(self, label, klass, button_text=None, button_icon=None,
+                 show_button=True):
         DataSetShowGroupBox.__init__(self, label, klass)
-        if button_text is None:
-            button_text = _("Apply")
-        if button_icon is None:
-            button_icon = get_icon("apply.png")
-        elif isinstance(button_icon, basestring):
-            button_icon = get_icon(button_icon)
-        apply_btn = QPushButton(button_icon, button_text, self)
-        self.connect(apply_btn, SIGNAL("clicked()"), self.set)
-        layout = self.edit.layout
-        layout.addWidget(apply_btn, layout.rowCount(), 0, 1, -1, Qt.AlignRight)
-        
+        if show_button:
+            if button_text is None:
+                button_text = _("Apply")
+            if button_icon is None:
+                button_icon = get_icon("apply.png")
+            elif isinstance(button_icon, basestring):
+                button_icon = get_icon(button_icon)
+            apply_btn = QPushButton(button_icon, button_text, self)
+            self.connect(apply_btn, SIGNAL("clicked()"), self.set)
+            layout = self.edit.layout
+            layout.addWidget(apply_btn, layout.rowCount(), 0, 1, -1, Qt.AlignRight)
+
     def get_edit_layout(self):
         """Return edit layout"""
         return DataSetEditLayout(self, self.dataset, self.layout)
