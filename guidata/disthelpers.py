@@ -97,6 +97,8 @@ def add_module_data_files(module_name, data_dir_names, extensions, data_files,
     nstrip = len(module_dir) + len(osp.sep)
     for data_dir_name in data_dir_names:
         data_dir = osp.join(module_dir, data_dir_name)
+        if not osp.isdir(data_dir):
+            raise IOError, "Directory not found: %s" % data_dir
         for dirpath, _dirnames, filenames in os.walk(data_dir):
             dirname = dirpath[nstrip:]
             if not copy_to_root:
@@ -168,11 +170,7 @@ def create_vs2008_data_files():
 def add_modules(module_names, data_files, includes, excludes, vs2008=True):
     """Include module *module_name*"""
     for module_name in module_names:
-        if module_name in ('guidata', 'guiqwt', 'dp'):
-            add_module_data_files(module_name, ("images",), ('.png', '.svg'),
-                                  data_files, copy_to_root=False)
-        
-        elif module_name == 'PyQt4':
+        if module_name == 'PyQt4':
             includes += ['sip', 'PyQt4.Qt', 'PyQt4.QtSvg', 'PyQt4.QtNetwork']
             
             import PyQt4
@@ -238,4 +236,10 @@ def add_modules(module_names, data_files, includes, excludes, vs2008=True):
                                       data_files, copy_to_root=True)
         
         else:
-            raise RuntimeError("Module not supported: %s" % module_name)
+            try:
+                # guidata, guiqwt, ...
+                add_module_data_files(module_name,
+                                      ("images",), ('.png', '.svg'),
+                                      data_files, copy_to_root=False)
+            except IOError:
+                raise RuntimeError("Module not supported: %s" % module_name)
