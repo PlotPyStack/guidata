@@ -15,7 +15,7 @@ SHOW = True # Show test in GUI-based test launcher
 
 from PyQt4.QtGui import QFrame, QGridLayout
 from PyQt4.QtCore import Qt
-from guidata.qthelpers import RotatedLabel
+from guidata.qtwidgets import RotatedLabel
 
 class Frame(QFrame):
     def __init__(self, parent=None):

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2010-06-24 15:42+Paris, Madrid\n"
+"POT-Creation-Date: 2011-02-04 11:36+Paris, Madrid\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15,97 +15,77 @@ msgstr ""
 "Content-Transfer-Encoding: utf-8\n"
 "Generated-By: pygettext.py 1.5\n"
 
-#: guidata\dataset\dataitems.py:36
+#: guidata\dataset\dataitems.py:37
 msgid "float"
 msgstr "flottant"
 
-#: guidata\dataset\dataitems.py:36
+#: guidata\dataset\dataitems.py:37
 msgid "integer"
 msgstr "entier"
 
-#: guidata\dataset\dataitems.py:41
+#: guidata\dataset\dataitems.py:42
 msgid " and "
 msgstr " et "
 
-#: guidata\dataset\dataitems.py:41
+#: guidata\dataset\dataitems.py:42
 msgid " between "
 msgstr " compris entre "
 
-#: guidata\dataset\dataitems.py:43
+#: guidata\dataset\dataitems.py:44
 msgid " higher than "
 msgstr " supérieur à "
 
-#: guidata\dataset\dataitems.py:45
+#: guidata\dataset\dataitems.py:46
 msgid " lower than "
 msgstr " inférieur à "
 
-#: guidata\dataset\dataitems.py:47
+#: guidata\dataset\dataitems.py:48
 msgid "non zero"
 msgstr "non nul"
 
-#: guidata\dataset\dataitems.py:122
+#: guidata\dataset\dataitems.py:117
 msgid "even"
 msgstr "pair"
 
-#: guidata\dataset\dataitems.py:124
+#: guidata\dataset\dataitems.py:119
 msgid "odd"
 msgstr "impair"
 
-#: guidata\dataset\dataitems.py:252
+#: guidata\dataset\dataitems.py:237
 msgid "all file types"
 msgstr "tout type de fichier"
 
-#: guidata\dataset\dataitems.py:253
+#: guidata\dataset\dataitems.py:238
 msgid "supported file types:"
 msgstr "types de fichiers pris en charge : "
 
-#: guidata\dataset\qtitemwidgets.py:223 guidata\dataset\qtitemwidgets.py:267
+#: guidata\dataset\qtitemwidgets.py:223 guidata\dataset\qtitemwidgets.py:276
 msgid "Value is forced to %d"
 msgstr "La valeur est imposée à %d"
 
-#: guidata\dataset\qtitemwidgets.py:479
+#: guidata\dataset\qtitemwidgets.py:488
 msgid "%s files"
 msgstr "Fichiers %s"
 
-#: guidata\dataset\qtitemwidgets.py:482
+#: guidata\dataset\qtitemwidgets.py:491
 msgid "All supported files"
 msgstr "Tous les fichiers pris en charge"
 
-#: guidata\dataset\qtitemwidgets.py:633
+#: guidata\dataset\qtitemwidgets.py:647
 msgid "Number of rows x Number of columns"
 msgstr "Nombre de lignes x Nombre de colonnes"
 
-#: guidata\dataset\qtitemwidgets.py:635
+#: guidata\dataset\qtitemwidgets.py:649
 msgid "Edit array contents"
 msgstr "Modifier le contenu du tableau"
 
-#: guidata\dataset\qtitemwidgets.py:641
-msgid "Largest element in array"
-msgstr "Valeur maximale du tableau"
-
-#: guidata\dataset\qtitemwidgets.py:644
+#: guidata\dataset\qtitemwidgets.py:655
 msgid "Smallest element in array"
 msgstr "Valeur minimale du tableau"
 
-#: guidata\dataset\qtitemwidgets.py:693
-msgid "Number of curves x Number of points"
-msgstr "Nombre de courbes x Nombre de points"
-
-#: guidata\dataset\qtitemwidgets.py:694
-msgid "Smallest y-axis value"
-msgstr "Valeur minimale des ordonnées"
-
-#: guidata\dataset\qtitemwidgets.py:695
-msgid "Largest y-axis value"
-msgstr "Valeur maximale des ordonnées"
-
-#: guidata\dataset\qtitemwidgets.py:697
-msgid "Smallest x-axis value"
-msgstr "Valeur minimale des abscisses"
-
-#: guidata\dataset\qtitemwidgets.py:700
-msgid "Largest x-axis value"
-msgstr "Valeur maximale des abscisses"
+#: guidata\dataset\qtitemwidgets.py:658
+msgid "Largest element in array"
+msgstr "Valeur maximale du tableau"
 
 #: guidata\dataset\qtwidgets.py:121
 msgid "Some required entries are incorrect"
@@ -115,7 +95,7 @@ msgstr "Les champs surlignés n'ont pas été remplis correctement."
 msgid "Please check highlighted fields."
 msgstr "Veuillez vérifier votre saisie."
 
-#: guidata\dataset\qtwidgets.py:469
+#: guidata\dataset\qtwidgets.py:470
 msgid "Apply"
 msgstr "Appliquer"
 
@@ -147,8 +127,8 @@ msgstr "Quitter"
 msgid "Tests - %s module"
 msgstr "Tests - Module %s"
 
-#: guidata\qtarrayeditor.py:303 guidata\qtarrayeditor.py:451
-#: guidata\qtarrayeditor.py:515
+#: guidata\qtarrayeditor.py:303 guidata\qtarrayeditor.py:453
+#: guidata\qtarrayeditor.py:518
 msgid "Array editor"
 msgstr "Éditeur de tableaux"
 
@@ -156,70 +136,75 @@ msgstr "Éditeur de tableaux"
 msgid ""
 "Resizing cells of a table of such size could take a long time.\n"
 "Do you want to continue anyway?"
-msgstr "Redimensionner les cellules d'un tableau d'une telle taille sera probablement très long.\nSouhaitez-vous néanmoins effectuer cette opération ?"
+msgstr ""
+"Redimensionner les cellules d'un tableau d'une telle taille sera "
+"probablement très long.\n"
+"Souhaitez-vous néanmoins effectuer cette opération ?"
 
 #: guidata\qtarrayeditor.py:315
 msgid "Copy"
 msgstr "Copier"
 
-#: guidata\qtarrayeditor.py:377 guidata\qtarrayeditor.py:410
+#: guidata\qtarrayeditor.py:378 guidata\qtarrayeditor.py:411
 msgid "Format"
 msgstr "Format"
 
-#: guidata\qtarrayeditor.py:382
+#: guidata\qtarrayeditor.py:383
 msgid "Resize"
 msgstr "Ajuster"
 
-#: guidata\qtarrayeditor.py:385
+#: guidata\qtarrayeditor.py:386
 msgid "Background color"
 msgstr "Couleur de fond"
 
-#: guidata\qtarrayeditor.py:411
+#: guidata\qtarrayeditor.py:412
 msgid "Float formatting"
 msgstr "Format de flottant"
 
-#: guidata\qtarrayeditor.py:418
+#: guidata\qtarrayeditor.py:419
 msgid "Error"
 msgstr "Erreur"
 
-#: guidata\qtarrayeditor.py:419
+#: guidata\qtarrayeditor.py:420
 msgid "Format (%s) is incorrect"
 msgstr "Le format (%s) est incorrect"
 
-#: guidata\qtarrayeditor.py:437
+#: guidata\qtarrayeditor.py:439
 msgid "Arrays with more than 2 dimensions are not supported"
 msgstr "Les tableaux ayant plus de deux dimensions ne sont pas pris en charge"
 
-#: guidata\qtarrayeditor.py:444
+#: guidata\qtarrayeditor.py:446
 msgid "%s arrays"
 msgstr "les tableaux %s"
 
-#: guidata\qtarrayeditor.py:445
+#: guidata\qtarrayeditor.py:447
 msgid "%s are currently not supported"
 msgstr "Attention: %s ne sont pas pris en charge"
 
-#: guidata\qtarrayeditor.py:454
+#: guidata\qtarrayeditor.py:456
 msgid "read only"
 msgstr "lecture seule"
 
-#: guidata\qtarrayeditor.py:474
+#: guidata\qtarrayeditor.py:477
 msgid "Record array fields:"
 msgstr "Champs :"
 
-#: guidata\qthelpers.py:375
+#: guidata\qthelpers.py:194
 msgid "Open a file"
 msgstr "Ouvrir un fichier"
 
-#: guidata\qthelpers.py:376
+#: guidata\qthelpers.py:195
 msgid "All"
 msgstr "Tout"
 
-#: guidata\qthelpers.py:378
+#: guidata\qthelpers.py:197
 msgid "Opening "
 msgstr "Ouverture de "
 
-#~ msgid "Supported file types"
-#~ msgstr "Fichiers pris en charge"
+#: guidata\qtwidgets.py:247
+msgid "Cancel"
+msgstr "Annuler"
 
-#~ msgid "Adjust"
-#~ msgstr "Ajuster"
+#: guidata\qtwidgets.py:252
+msgid "Progression"
+msgstr "Progression"
