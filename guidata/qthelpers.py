@@ -17,7 +17,7 @@ import sys, os, os.path as osp
 from PyQt4.QtGui import (QAction, QApplication, QColor, QCursor, QFileDialog,
                          QHBoxLayout, QIcon, QKeySequence, QLabel, QLineEdit,
                          QMenu, QPushButton, QStyle, QToolButton, QVBoxLayout,
-                         QWidget)
+                         QWidget, QGroupBox)
 from PyQt4.QtCore import SIGNAL, QString, Qt
 
 # Local imports:
@@ -91,6 +91,23 @@ def create_toolbutton(parent, icon=None, text=None, triggered=None, tip=None,
     if shortcut is not None:
         button.setShortcut(shortcut)
     return button
+    
+def create_groupbox(parent, title=None, toggled=None, checked=None,
+                    flat=False, layout=None):
+    """Create a QGroupBox"""
+    if title is None:
+        group = QGroupBox(parent)
+    else:
+        group = QGroupBox(title, parent)
+    group.setFlat(flat)
+    if toggled is not None:
+        group.setCheckable(True)
+        if checked is not None:
+            group.setChecked(checked)
+        parent.connect(group, SIGNAL("toggled(bool)"), toggled)
+    if layout is not None:
+        group.setLayout(layout)
+    return group
 
 def keybinding(attr):
     """Return keybinding"""
