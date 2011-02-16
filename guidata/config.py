@@ -19,15 +19,33 @@ APP_PATH = osp.dirname(__file__)
 add_image_module_path( "guidata", "images" )
 _ = get_translation("guidata")
 
-DEFAULTS = {'arrayeditor' :
-             {
-              'font/family/nt' : ['Consolas', 'Courier New'],
-              'font/family/posix' : 'Bitstream Vera Sans Mono',
-              'font/family/mac' : 'Monaco',
-              'font/size' : 9,
-              'font/bold' : False,
-              },
-            }
+DEFAULTS = {'arrayeditor':
+            {
+             'font/family/nt' : ['Consolas', 'Courier New'],
+             'font/family/posix' : 'Bitstream Vera Sans Mono',
+             'font/family/mac' : 'Monaco',
+             'font/size' : 9,
+             'font/bold' : False,
+             },
+            'dicteditor':
+            {
+             'font/family/nt' : ['Consolas', 'Courier New'],
+             'font/family/posix' : 'Bitstream Vera Sans Mono',
+             'font/family/mac' : 'Monaco',
+             'font/size': 9,
+             'font/italic': False,
+             'font/bold': False,
+            },
+            'texteditor':
+            {
+             'font/family/nt' : ['Consolas', 'Courier New'],
+             'font/family/posix' : 'Bitstream Vera Sans Mono',
+             'font/family/mac' : 'Monaco',
+             'font/size': 9,
+             'font/italic': False,
+             'font/bold': False,
+            },
+           }
 
 CONF = UserConfig(DEFAULTS)
 

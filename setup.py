@@ -52,7 +52,7 @@ KEYWORDS = ''
 CLASSIFIERS = ['Development Status :: 5 - Production/Stable',
                'Topic :: Scientific/Engineering']
 
-PACKAGES = [LIBNAME+p for p in ['', '.dataset', '.tests']]
+PACKAGES = [LIBNAME+p for p in ['', '.dataset', '.editors', '.tests']]
 PACKAGE_DATA = {LIBNAME: get_package_data(LIBNAME, ('.png', '.mo'))}
 
 if os.name == 'nt':

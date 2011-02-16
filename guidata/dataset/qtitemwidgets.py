@@ -27,16 +27,14 @@ except ImportError:
 
 from PyQt4.QtGui import (QIcon, QPixmap, QHBoxLayout, QGridLayout, QColorDialog,
                          QPushButton, QLineEdit, QCheckBox, QComboBox, QWidget,
-                         QTabWidget, QFileDialog, QGroupBox, QLabel, QTextEdit,
-                         QFrame, QDateEdit, QDateTimeEdit)
+                         QTabWidget, QGroupBox, QLabel, QTextEdit, QFrame,
+                         QDateEdit, QDateTimeEdit)
 from PyQt4.QtCore import Qt, QObject, QStringList, SIGNAL
 
 from guidata.utils import update_dataset, restore_dataset, utf8_to_unicode
 from guidata.qthelpers import text_to_qcolor, get_std_icon, getExistingDirectory
 from guidata.configtools import get_icon, get_image_layout, get_image_file_path
 from guidata.config import _
-
-from guidata.qtarrayeditor import ArrayEditor
 
 # ========================== <!> IMPORTANT <!> =================================
 #
@@ -645,7 +643,7 @@ class FloatArrayWidget(AbstractDataSetWidget):
         
         self.first_line, self.dim_label = get_image_layout("shape.png",
                                    _("Number of rows x Number of columns"))
-        edit_button = QPushButton(get_icon("table.png"),"")
+        edit_button = QPushButton(get_icon("arredit.png"),"")
         edit_button.setToolTip(_("Edit array contents"))
         edit_button.setMaximumWidth(32)
         self.first_line.addWidget(edit_button)
@@ -665,6 +663,7 @@ class FloatArrayWidget(AbstractDataSetWidget):
     def edit_array(self):
         """Open an array editor dialog"""
         label = self.item.get_prop_value("display", "label")
+        from guidata.editors.arrayeditor import ArrayEditor
         editor = ArrayEditor(self.parent_layout.parent)
         if editor.setup_and_check(self.arr, title=label):
             if editor.exec_():

@@ -4,36 +4,9 @@
 # (module: spyderlib/widgets/arrayeditor.py)
 #
 # Original license and copyright:
-#
 # Copyright © 2009-2010 Pierre Raybaut
 # Licensed under the terms of the MIT License
-#
-# Spyder License Agreement (MIT License)
-# --------------------------------------
-#
-# Copyright (c) 2009-2010 Pierre Raybaut
-#
-# Permission is hereby granted, free of charge, to any person
-# obtaining a copy of this software and associated documentation
-# files (the "Software"), to deal in the Software without
-# restriction, including without limitation the rights to use,
-# copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the
-# Software is furnished to do so, subject to the following
-# conditions:
-#
-# The above copyright notice and this permission notice shall be
-# included in all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-# OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-# HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-# WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-# OTHER DEALINGS IN THE SOFTWARE.
-
+# (see guidata/editors/__init__.py for more details)
 
 """
 NumPy Array Editor Dialog based on PyQt4
@@ -45,7 +18,7 @@ NumPy Array Editor Dialog based on PyQt4
 # pylint: disable-msg=R0201
 
 from PyQt4.QtCore import (Qt, QVariant, QModelIndex, QAbstractTableModel,
-                          SIGNAL, SLOT)
+                          SIGNAL, SLOT, QString)
 from PyQt4.QtGui import (QHBoxLayout, QColor, QTableView, QItemDelegate,
                          QLineEdit, QCheckBox, QGridLayout, QDoubleValidator,
                          QDialog, QDialogButtonBox, QMessageBox, QPushButton,
@@ -57,9 +30,15 @@ import StringIO
 
 # Local imports
 from guidata import qapplication
-from guidata.configtools import get_font, get_icon
+from guidata.configtools import get_icon
 from guidata.qthelpers import add_actions, create_action, keybinding
-from guidata.config import CONF, _
+from guidata.config import CONF
+
+# Adapting guidata's translation/configuration management to spyderlib's
+from guidata.config import _ as original_
+_ = lambda text: QString(original_(text))
+from guidata.configtools import get_font as guidata_get_font
+get_font = lambda text: guidata_get_font(CONF, text)
 
 # Note: string and unicode data types will be formatted with '%s' (see below)
 SUPPORTED_FORMATS = {
@@ -209,7 +188,7 @@ class ArrayModel(QAbstractTableModel):
             color = QColor.fromHsvF(hue, self.sat, self.val, self.alp)
             return QVariant(color)
         elif role == Qt.FontRole:
-            return QVariant(get_font(CONF, 'arrayeditor'))
+            return QVariant(get_font('arrayeditor'))
         return QVariant()
 
     def setData(self, index, value, role=Qt.EditRole):
@@ -297,7 +276,7 @@ class ArrayDelegate(QItemDelegate):
             return
         else:
             editor = QLineEdit(parent)
-            editor.setFont(get_font(CONF, 'arrayeditor'))
+            editor.setFont(get_font('arrayeditor'))
             editor.setAlignment(Qt.AlignCenter)
             if is_number(self.dtype):
                 editor.setValidator(QDoubleValidator(editor))
@@ -340,8 +319,8 @@ class ArrayView(QTableView):
         if size > 1e5:
             answer = QMessageBox.warning(self, _("Array editor"),
                                 _("Resizing cells of a table of such "
-                                  "size could take a long time.\n"
-                                  "Do you want to continue anyway?"),
+                                          "size could take a long time.\n"
+                                          "Do you want to continue anyway?"),
                                 QMessageBox.Yes | QMessageBox.No)
             if answer == QMessageBox.No:
                 return
@@ -350,7 +329,8 @@ class ArrayView(QTableView):
 
     def setup_menu(self):
         """Setup context menu"""
-        self.copy_action = create_action(self, _("Copy"),
+        self.copy_action = create_action(self,
+                                         _("Copy"),
                                          shortcut=keybinding("Copy"),
                                          icon=get_icon('editcopy.png'),
                                          triggered=self.copy,
@@ -443,16 +423,17 @@ class ArrayEditorWidget(QWidget):
         
     def change_format(self):
         """Change display format"""
-        format, valid = QInputDialog.getText(self, _('Format'),
-                                     _("Float formatting"),
-                                     QLineEdit.Normal, self.model.get_format())
+        format, valid = QInputDialog.getText(self,
+                                 _('Format'),
+                                 _("Float formatting"),
+                                 QLineEdit.Normal, self.model.get_format())
         if valid:
             format = str(format)
             try:
                 format % 1.1
             except:
                 QMessageBox.critical(self, _("Error"),
-                                     _("Format (%s) is incorrect") % format)
+                          _("Format (%1) is incorrect").arg(format))
                 return
             self.model.set_format(format)    
 
@@ -476,19 +457,19 @@ class ArrayEditor(QDialog):
             return False
         if data.ndim > 2:
             self.error(_("Arrays with more than 2 dimensions "
-                         "are not supported"))
+                               "are not supported"))
             return False
         if not self.is_record_array:
             dtn = data.dtype.name
             if dtn not in SUPPORTED_FORMATS and not dtn.startswith('string') \
                and not dtn.startswith('unicode'):
-                arr = _("%s arrays") % data.dtype.name
-                self.error(_("%s are currently not supported") % arr)
+                arr = _("%1 arrays").arg(data.dtype.name)
+                self.error(_("%1 are currently not supported").arg(arr))
                 return False
         
         self.layout = QGridLayout()
         self.setLayout(self.layout)
-        self.setWindowIcon(get_icon('table.png'))
+        self.setWindowIcon(get_icon('arredit.png'))
         if not title:
             title = _("Array editor")
         if readonly:
@@ -576,7 +557,7 @@ def aedit(data, title="", xy=False, readonly=False, parent=None):
     (instantiate a new QApplication if necessary,
     so it can be called directly from the interpreter)
     """
-    _app = qapplication()
+    app = qapplication()
     dialog = ArrayEditor(parent)
     if dialog.setup_and_check(data, title, xy=xy, readonly=readonly):
         dialog.show()
