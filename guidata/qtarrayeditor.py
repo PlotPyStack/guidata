@@ -1,9 +1,39 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright © 2009-2010 CEA
-# Pierre Raybaut
-# Licensed under the terms of the CECILL License
-# (see guidata/__init__.py for details)
+# The following code is freely adapted from Spyder package
+# (module: spyderlib/widgets/arrayeditor.py)
+#
+# Original license and copyright:
+#
+# Copyright © 2009-2010 Pierre Raybaut
+# Licensed under the terms of the MIT License
+#
+# Spyder License Agreement (MIT License)
+# --------------------------------------
+#
+# Copyright (c) 2009-2010 Pierre Raybaut
+#
+# Permission is hereby granted, free of charge, to any person
+# obtaining a copy of this software and associated documentation
+# files (the "Software"), to deal in the Software without
+# restriction, including without limitation the rights to use,
+# copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following
+# conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+# OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+# HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+# WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+# OTHER DEALINGS IN THE SOFTWARE.
+
 
 """
 NumPy Array Editor Dialog based on PyQt4
@@ -90,15 +120,22 @@ def get_idx_rect(index_list):
 
 class ArrayModel(QAbstractTableModel):
     """Array Editor Table Model"""
-    def __init__(self, data, changes,
-                 format="%.3f", xy_mode=False, readonly=False, parent=None):
-        super(ArrayModel, self).__init__()
+    def __init__(self, data, format="%.3f",
+                 xy_mode=False, readonly=False, parent=None):
+        QAbstractTableModel.__init__(self)
 
         self.dialog = parent
-        self.changes = changes
+        self.changes = {}
         self.readonly = readonly
         self.test_array = np.array([0], dtype=data.dtype)
 
+        # for complex numbers, shading will be based on absolute value
+        # but for all other types it will be the real part
+        if data.dtype in (np.complex64, np.complex128):
+            self.color_func = np.abs
+        else:
+            self.color_func = np.real
+        
         # Backgroundcolor settings
         huerange = [.66, .99] # Hue
         self.sat = .7 # Saturation
@@ -110,8 +147,8 @@ class ArrayModel(QAbstractTableModel):
         self._xy = xy_mode
         
         try:
-            self.vmin = data.min()
-            self.vmax = data.max()
+            self.vmin = self.color_func(data).min()
+            self.vmax = self.color_func(data).max()
             if self.vmax == self.vmin:
                 self.vmin -= 1
             self.hue0 = huerange[0]
@@ -167,7 +204,8 @@ class ArrayModel(QAbstractTableModel):
         elif role == Qt.TextAlignmentRole:
             return QVariant(int(Qt.AlignCenter|Qt.AlignVCenter))
         elif role == Qt.BackgroundColorRole and self.bgcolor_enabled:
-            hue = self.hue0+self.dhue*(self.vmax-value)/(self.vmax-self.vmin)
+            hue = self.hue0+self.dhue*(self.vmax-self.color_func(value))/(self.vmax-self.vmin)
+            hue = float(np.abs(hue))
             color = QColor.fromHsvF(hue, self.sat, self.val, self.alp)
             return QVariant(color)
         elif role == Qt.FontRole:
@@ -247,7 +285,7 @@ class ArrayModel(QAbstractTableModel):
 class ArrayDelegate(QItemDelegate):
     """Array Editor Item Delegate"""
     def __init__(self, dtype, parent=None):
-        super(ArrayDelegate, self).__init__(parent)
+        QItemDelegate.__init__(self, parent)
         self.dtype = dtype
 
     def createEditor(self, parent, option, index):
@@ -354,7 +392,7 @@ class ArrayView(QTableView):
 
 
 class ArrayEditorWidget(QWidget):
-    def __init__(self, parent, data, format, xy, readonly):
+    def __init__(self, parent, data, xy, readonly):
         QWidget.__init__(self, parent)
         self.data = data
         self.old_data_shape = None
@@ -365,11 +403,8 @@ class ArrayEditorWidget(QWidget):
             self.old_data_shape = self.data.shape
             self.data.shape = (1, 1)
 
-        self.changes = {}
-        
-        if format is None:
-            format = SUPPORTED_FORMATS.get(data.dtype.name, '%s')
-        self.model = ArrayModel(self.data, self.changes, format=format,
+        format = SUPPORTED_FORMATS.get(data.dtype.name, '%s')
+        self.model = ArrayModel(self.data, format=format,
                                 xy_mode=xy, readonly=readonly, parent=self)
         self.view = ArrayView(self, self.model, data.dtype, data.shape)
         
@@ -396,7 +431,7 @@ class ArrayEditorWidget(QWidget):
         
     def accept_changes(self):
         """Accept changes"""
-        for (i, j), value in self.changes.iteritems():
+        for (i, j), value in self.model.changes.iteritems():
             self.data[i, j] = value
         if self.old_data_shape is not None:
             self.data.shape = self.old_data_shape
@@ -425,16 +460,20 @@ class ArrayEditorWidget(QWidget):
 class ArrayEditor(QDialog):
     """Array Editor Dialog"""    
     def __init__(self, parent=None):
-        super(ArrayEditor, self).__init__(parent)
+        QDialog.__init__(self, parent)
+        self.data = None
     
-    def setup_and_check(self, data, title='', format=None,
-                        xy=False, readonly=False):
+    def setup_and_check(self, data, title='', xy=False, readonly=False):
         """
         Setup ArrayEditor:
         return False if data is not supported, True otherwise
         """
+        self.data = data
         self.arraywidget = None
         self.is_record_array = data.dtype.names is not None
+        if data.size == 0:
+            self.error(_("Array is empty"))
+            return False
         if data.ndim > 2:
             self.error(_("Arrays with more than 2 dimensions "
                          "are not supported"))
@@ -450,8 +489,8 @@ class ArrayEditor(QDialog):
         self.layout = QGridLayout()
         self.setLayout(self.layout)
         self.setWindowIcon(get_icon('table.png'))
-        title = _("Array editor") + \
-                "%s" % (" - "+unicode(title) if unicode(title) else "")
+        if not title:
+            title = _("Array editor")
         if readonly:
             title += ' (' + _('read only') + ')'
         self.setWindowTitle(title)
@@ -461,11 +500,10 @@ class ArrayEditor(QDialog):
         self.stack = QStackedWidget(self)
         if self.is_record_array:
             for name in data.dtype.names:
-                self.stack.addWidget(ArrayEditorWidget(self, data[name], format,
+                self.stack.addWidget(ArrayEditorWidget(self, data[name],
                                                        xy, readonly))
         else:
-            self.stack.addWidget(ArrayEditorWidget(self, data, format,
-                                                   xy, readonly))
+            self.stack.addWidget(ArrayEditorWidget(self, data, xy, readonly))
         self.arraywidget = self.stack.currentWidget()
         self.connect(self.stack, SIGNAL('currentChanged(int)'),
                      self.current_widget_changed)
@@ -512,6 +550,10 @@ class ArrayEditor(QDialog):
         for index in range(self.stack.count()):
             self.stack.widget(index).accept_changes()
         QDialog.accept(self)
+        
+    def get_value(self):
+        """Return modified array -- this is *not* a copy"""
+        return self.data
 
     def error(self, message):
         """An error occured, closing the dialog box"""
@@ -537,8 +579,10 @@ def aedit(data, title="", xy=False, readonly=False, parent=None):
     _app = qapplication()
     dialog = ArrayEditor(parent)
     if dialog.setup_and_check(data, title, xy=xy, readonly=readonly):
-        if dialog.exec_():
-            return data
+        dialog.show()
+        app.exec_()
+        if dialog.result():
+            return dialog.get_value()
 
 
 def test():

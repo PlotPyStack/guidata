@@ -665,9 +665,8 @@ class FloatArrayWidget(AbstractDataSetWidget):
     def edit_array(self):
         """Open an array editor dialog"""
         label = self.item.get_prop_value("display", "label")
-        format = self.item.get_prop_value("display", "format")
         editor = ArrayEditor(self.parent_layout.parent)
-        if editor.setup_and_check(self.arr, title=label, format=format):
+        if editor.setup_and_check(self.arr, title=label):
             if editor.exec_():
                 self.update(self.arr)
         
