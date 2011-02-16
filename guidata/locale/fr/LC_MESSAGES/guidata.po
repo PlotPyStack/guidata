@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2011-02-16 14:28+Paris, Madrid\n"
+"POT-Creation-Date: 2011-02-16 15:14+Paris, Madrid\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -99,12 +99,12 @@ msgstr "Veuillez vérifier votre saisie."
 msgid "Apply"
 msgstr "Appliquer"
 
-#: guidata\editors\arrayeditor.py:320 guidata\editors\arrayeditor.py:474
-#: guidata\editors\arrayeditor.py:541
+#: guidata\editors\arrayeditor.py:314 guidata\editors\arrayeditor.py:478
+#: guidata\editors\arrayeditor.py:546
 msgid "Array editor"
 msgstr "Éditeur de tableaux"
 
-#: guidata\editors\arrayeditor.py:321
+#: guidata\editors\arrayeditor.py:315
 msgid ""
 "Resizing cells of a table of such size could take a long time.\n"
 "Do you want to continue anyway?"
@@ -113,55 +113,63 @@ msgstr ""
 "probablement très long.\n"
 "Souhaitez-vous néanmoins effectuer cette opération ?"
 
-#: guidata\editors\arrayeditor.py:333 guidata\editors\dicteditor.py:656
+#: guidata\editors\arrayeditor.py:327 guidata\editors\dicteditor.py:656
 msgid "Copy"
 msgstr "Copier"
 
-#: guidata\editors\arrayeditor.py:393 guidata\editors\arrayeditor.py:427
+#: guidata\editors\arrayeditor.py:388 guidata\editors\arrayeditor.py:422
 msgid "Format"
 msgstr "Format"
 
-#: guidata\editors\arrayeditor.py:398
+#: guidata\editors\arrayeditor.py:393
 msgid "Resize"
 msgstr "Ajuster"
 
-#: guidata\editors\arrayeditor.py:401
+#: guidata\editors\arrayeditor.py:396
 msgid "Background color"
 msgstr "Couleur de fond"
 
-#: guidata\editors\arrayeditor.py:428
+#: guidata\editors\arrayeditor.py:423
 msgid "Float formatting"
 msgstr "Format de flottant"
 
-#: guidata\editors\arrayeditor.py:435
+#: guidata\editors\arrayeditor.py:430
 msgid "Error"
 msgstr "Erreur"
 
-#: guidata\editors\arrayeditor.py:436
+#: guidata\editors\arrayeditor.py:431
 msgid "Format (%1) is incorrect"
 msgstr "Le format (%1) est incorrect"
 
-#: guidata\editors\arrayeditor.py:456
+#: guidata\editors\arrayeditor.py:452
 msgid "Array is empty"
 msgstr "Le tableau est vide"
 
-#: guidata\editors\arrayeditor.py:459
+#: guidata\editors\arrayeditor.py:455
 msgid "Arrays with more than 2 dimensions are not supported"
 msgstr "Les tableaux ayant plus de deux dimensions ne sont pas pris en charge"
 
-#: guidata\editors\arrayeditor.py:466
+#: guidata\editors\arrayeditor.py:459
+msgid "The 'xlabels' argument length do no match array column number"
+msgstr "La taille de l'argument 'xlabels' ne correspond pas au nombre de colonnes du tableau"
+
+#: guidata\editors\arrayeditor.py:463
+msgid "The 'ylabels' argument length do no match array row number"
+msgstr "La taille de l'argument 'ylabels' ne correspond pas au nombre de lignes du tableau"
+
+#: guidata\editors\arrayeditor.py:470
 msgid "%1 arrays"
 msgstr "les tableaux %1"
 
-#: guidata\editors\arrayeditor.py:467
+#: guidata\editors\arrayeditor.py:471
 msgid "%1 are currently not supported"
 msgstr "Attention: %1 ne sont pas pris en charge"
 
-#: guidata\editors\arrayeditor.py:476
+#: guidata\editors\arrayeditor.py:480
 msgid "read only"
 msgstr "lecture seule"
 
-#: guidata\editors\arrayeditor.py:496
+#: guidata\editors\arrayeditor.py:501
 msgid "Record array fields:"
 msgstr "Champs :"
 
