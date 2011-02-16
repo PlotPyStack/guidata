@@ -757,9 +757,8 @@ class ButtonWidget(AbstractDataSetWidget):
 
     def clicked(self, *args):
         inst = self.item.instance
-        item = self.item.item
         callback = self.item.get_prop_value("display", "callback")
-        self.cb_value = callback( inst, item, self.cb_value )
+        self.cb_value = callback(inst, self.cb_value, self.button.parent())
         for widget in self.parent_layout.widgets:
             # instance may have been modified so we update all the
             # widgets of the instance

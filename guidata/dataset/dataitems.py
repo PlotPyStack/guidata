@@ -461,11 +461,11 @@ class ButtonItem(DataItem):
     """
     Construct a simple button that calls a method when hit
         * label [string]: text shown on the button
-        * callback [function]: function with three parameters (dataset, item, value)
+        * callback [function]: function with three parameters (dataset, value, parent)
             - dataset [DataSet]: instance of the parent dataset
-            - item [DataItem]: instance of ButtonItem (i.e. self)
             - value [unspecified]: value of ButtonItem (default ButtonItem 
               value or last value returned by the callback)
+            - parent [QObject]: button's parent widget
         * icon [QIcon or string]: icon show on the button (optional)
           (string: icon filename as in guidata/guiqwt image search paths)
         * default [unspecified]: default value passed to the callback (optional)
