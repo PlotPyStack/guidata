@@ -756,9 +756,13 @@ class ButtonWidget(AbstractDataSetWidget):
         layout.addWidget(self.group, row, label_column, row_span, column_span+1)
 
     def clicked(self, *args):
-        inst = self.item.instance
         callback = self.item.get_prop_value("display", "callback")
-        self.cb_value = callback(inst, self.cb_value, self.button.parent())
+        inst = self.item.instance
+        item = self.item.item
+        value = self.cb_value
+        parent = self.button.parent()
+        self.cb_value = callback(inst, item, value, parent)
+        self.set()
         for widget in self.parent_layout.widgets:
             # instance may have been modified so we update all the
             # widgets of the instance

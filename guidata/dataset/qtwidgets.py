@@ -288,7 +288,7 @@ class DataSetEditLayout(object):
 from guidata.dataset.dataitems import (FloatItem, StringItem, TextItem, IntItem,
                 BoolItem, ColorItem, FileOpenItem, FilesOpenItem, FileSaveItem,
                 DirectoryItem, ChoiceItem, ImageChoiceItem, MultipleChoiceItem,
-                FloatArrayItem, ButtonItem, DateItem, DateTimeItem)
+                FloatArrayItem, ButtonItem, DateItem, DateTimeItem, DictItem)
 
 DataSetEditLayout.register(GroupItem, GroupWidget)
 DataSetEditLayout.register(TabGroupItem, TabGroupWidget)
@@ -312,6 +312,7 @@ DataSetEditLayout.register(ImageChoiceItem, ChoiceWidget)
 DataSetEditLayout.register(MultipleChoiceItem, MultipleChoiceWidget)
 DataSetEditLayout.register(FloatArrayItem, FloatArrayWidget)
 DataSetEditLayout.register(ButtonItem, ButtonWidget)
+DataSetEditLayout.register(DictItem, ButtonWidget)
 
 
 LABEL_CSS = """

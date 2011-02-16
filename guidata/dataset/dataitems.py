@@ -461,8 +461,9 @@ class ButtonItem(DataItem):
     """
     Construct a simple button that calls a method when hit
         * label [string]: text shown on the button
-        * callback [function]: function with three parameters (dataset, value, parent)
+        * callback [function]: function with four parameters (dataset, item, value, parent)
             - dataset [DataSet]: instance of the parent dataset
+            - item [DataItem]: instance of ButtonItem (i.e. self)
             - value [unspecified]: value of ButtonItem (default ButtonItem 
               value or last value returned by the callback)
             - parent [QObject]: button's parent widget
@@ -484,6 +485,32 @@ class ButtonItem(DataItem):
     
     def deserialize(self, instance, reader):
         pass
+    
+
+
+class DictItem(ButtonItem):
+    """
+    Construct a dictionary data item
+        * label [string]: name
+        * default [dict]: default value (optional)
+        * help [string]: text shown in tooltip (optional)
+    """
+    def __init__(self, label, default=None, help=''):
+        def dictedit(instance, item, value, parent):
+            from guidata.editors.dicteditor import DictEditor
+            editor = DictEditor(parent)
+            value_was_none = value is None
+            if value_was_none:
+                value = {}
+            editor.setup(value)
+            if editor.exec_():
+                return editor.get_value()
+            else:
+                if value_was_none:
+                    return
+                return value
+        ButtonItem.__init__(self, label, dictedit,
+                            icon='dictedit.png', default=default, help=help)
 
 
 class FontFamilyItem(StringItem):
