@@ -32,7 +32,7 @@ External resources:
 #    This Agreement is a Free Software license agreement that is the result
 #    of discussions between its authors in order to ensure compliance with
 #    the two main principles guiding its drafting:
-#    
+#    unicode
 #        * firstly, compliance with the principles governing the distribution
 #          of Free Software: access to source code, broad rights granted to
 #          users,
@@ -531,7 +531,7 @@ External resources:
 #    Version 2.0 dated 2006-09-05.
 
 
-__version__ = '1.2.5'
+__version__ = '1.3.0'
 
 # Dear (Debian, RPM, ...) package makers, please feel free to customize the
 # following path to module's data (images) and translations:
