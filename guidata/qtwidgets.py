@@ -269,28 +269,23 @@ class ProgressPopUp(QDialog):
         return self.canceled
 
 
-class DockableWidget(QWidget):
+class DockableWidgetMixin(object):
     ALLOWED_AREAS = Qt.AllDockWidgetAreas
     LOCATION = Qt.TopDockWidgetArea
     FEATURES = QDockWidget.DockWidgetClosable | \
                QDockWidget.DockWidgetFloatable | \
                QDockWidget.DockWidgetMovable
     def __init__(self, parent):
-        super(DockableWidget, self).__init__(parent)
         self.parent_widget = parent
         self._isvisible = False
         self.dockwidget = None
         
-    def get_widget_title(self):
-        """Return widget title"""
-        raise NotImplementedError
-        
     def get_focus_widget(self):
         pass
         
-    def create_dockwidget(self):
+    def create_dockwidget(self, title):
         """Add to parent QMainWindow as a dock widget"""
-        dock = QDockWidget(self.get_widget_title(), self.parent_widget)
+        dock = QDockWidget(title, self.parent_widget)
         dock.setObjectName(self.__class__.__name__+"_dw")
         dock.setAllowedAreas(self.ALLOWED_AREAS)
         dock.setFeatures(self.FEATURES)
@@ -311,3 +306,12 @@ class DockableWidget(QWidget):
             if widget is not None:
                 widget.setFocus()
         self._isvisible = enable and self.dockwidget.isVisible()
+
+def create_dockable_widget_class(WidgetClass):
+    class DockableWidgetClass(WidgetClass, DockableWidgetMixin):
+        def __init__(self, parent):
+            WidgetClass.__init__(self, parent)
+            DockableWidgetMixin.__init__(self, parent)
+    return DockableWidgetClass
+
+DockableWidget = create_dockable_widget_class(QWidget)
