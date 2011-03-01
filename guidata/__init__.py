@@ -566,11 +566,6 @@ def qapplication():
         paths = QLibraryInfo.location(QLibraryInfo.TranslationsPath)
         qt_translator.load("qt_" + locale, paths )
         app.installTranslator(qt_translator)
-        try:
-            from spyderlib.utils.qthelpers import install_translators
-            install_translators(app)
-        except ImportError:
-            pass
     return app
 
 def exec_qapplication_eventloop():

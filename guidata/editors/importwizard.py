@@ -591,7 +591,7 @@ class ImportWizard(QDialog):
 
 def test(text):
     """Test"""
-    from spyderlib.utils.qthelpers import qapplication
+    from guidata import qapplication
     _app = qapplication()
     dialog = ImportWizard(None, text)
     if dialog.exec_():

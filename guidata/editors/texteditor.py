@@ -70,7 +70,7 @@ class TextEditor(QDialog):
     
 def test():
     """Text editor demo"""
-    from spyderlib.utils.qthelpers import qapplication
+    from guidata import qapplication
     app = qapplication()
     dialog = TextEditor("""
     01234567890123456789012345678901234567890123456789012345678901234567890123456789

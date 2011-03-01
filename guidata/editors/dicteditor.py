@@ -32,10 +32,10 @@ from PyQt4.QtCore import (Qt, QVariant, QModelIndex, QAbstractTableModel,
 from guidata import qapplication
 from guidata.configtools import get_icon
 from guidata.config import CONF
-from spyderlib.utils import fix_reference_name
+from guidata.utils import fix_reference_name
 from guidata.qthelpers import add_actions, create_action
-from spyderlib.widgets.texteditor import TextEditor
-from spyderlib.widgets.importwizard import ImportWizard
+from guidata.editors.texteditor import TextEditor
+from guidata.editors.importwizard import ImportWizard
 
 # Adapting guidata's translation/configuration management to spyderlib's
 from guidata.config import _ as original_
@@ -50,7 +50,7 @@ class FakeObject(object):
 try:
     from numpy import ndarray
     from numpy import array, matrix #@UnusedImport (object eval)
-    from spyderlib.widgets.arrayeditor import ArrayEditor
+    from guidata.editors.arrayeditor import ArrayEditor
 except ImportError:
     class ndarray(FakeObject):
         """Fake ndarray"""
@@ -981,16 +981,8 @@ class BaseTableView(QTableView):
             import guiqwt.pyplot #@UnusedImport
             return True
         except ImportError:
-            try:
-                if 'matplotlib' not in sys.modules:
-                    from spyderlib import mpl_patch
-                    mpl_patch.set_backend("Qt4Agg")
-                    mpl_patch.apply()
-                return True
-            except ImportError:
-                QMessageBox.warning(self, _("Import error"),
-                                    _("Please install <b>matplotlib</b>"
-                                              " or <b>guiqwt</b>."))
+            QMessageBox.warning(self, _("Import error"),
+                                _("Please install <b>guiqwt</b>."))
 
     def plot_item(self):
         """Plot item"""
@@ -1160,7 +1152,7 @@ class DictEditorTableView(BaseTableView):
     def plot(self, key):
         """Plot item"""
         data = self.model.get_data()
-        import spyderlib.pyplot as plt
+        import guiqwt.pyplot as plt
         plt.figure()
         plt.plot(data[key])
         plt.show()
@@ -1168,7 +1160,7 @@ class DictEditorTableView(BaseTableView):
     def imshow(self, key):
         """Show item's image"""
         data = self.model.get_data()
-        import spyderlib.pyplot as plt
+        import guiqwt.pyplot as plt
         plt.figure()
         plt.imshow(data[key])
         plt.show()
@@ -1462,20 +1454,6 @@ def test():
     """Dictionary editor test"""
     out = dedit( get_test_data() )
     print "out:", out
-    
-def remote_editor_test():
-    """Remote dictionary editor test"""
-    from spyderlib.plugins.variableexplorer import VariableExplorer
-    from spyderlib.widgets.externalshell.monitor import make_remote_view
-    remote = make_remote_view(get_test_data(), VariableExplorer.get_settings())
-    from pprint import pprint
-    pprint(remote)
-    app = qapplication()
-    dialog = DictEditor(remote, remote=True)
-    dialog.show()
-    app.exec_()
-    if dialog.result():
-        print dialog.get_value()
 
 if __name__ == "__main__":
     test()
