@@ -16,12 +16,12 @@ package distribution on Microsoft Windows platforms with ``py2exe``.
 import sys, os, os.path as osp, shutil
 
 
-def remove_build_dist():
+def remove_build_dist(dist="dist"):
     """Remove *build* and *dist* directories
     (before building a new py2exe distribution)"""
-    print "Removing 'build' and 'dist' directories"
+    print "Removing 'build' and '%s' directories" % dist
     shutil.rmtree("build", ignore_errors=True)
-    shutil.rmtree("dist", ignore_errors=True)
+    shutil.rmtree(dist, ignore_errors=True)
 
 
 def get_changeset(path, rev=None):

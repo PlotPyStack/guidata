@@ -307,11 +307,7 @@ class DockableWidgetMixin(object):
                 widget.setFocus()
         self._isvisible = enable and self.dockwidget.isVisible()
 
-def create_dockable_widget_class(WidgetClass):
-    class DockableWidgetClass(WidgetClass, DockableWidgetMixin):
-        def __init__(self, parent):
-            WidgetClass.__init__(self, parent)
-            DockableWidgetMixin.__init__(self, parent)
-    return DockableWidgetClass
-
-DockableWidget = create_dockable_widget_class(QWidget)
+class DockableWidget(QWidget, DockableWidgetMixin):
+    def __init__(self, parent):
+        QWidget.__init__(self, parent)
+        DockableWidgetMixin.__init__(self, parent)
