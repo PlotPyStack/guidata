@@ -43,7 +43,9 @@ def get_module_data_path(modname):
     else:
         return get_module_path(modname)
 
-def get_translation(modname):
+def get_translation(modname, dirname=None):
+    if dirname is None:
+        dirname = modname
     # fixup environment var LANG in case it's unknown
     if "LANG" not in os.environ:
         import locale
@@ -51,7 +53,7 @@ def get_translation(modname):
         if lang is not None:
             os.environ["LANG"] = lang
     try:
-        _trans = gettext.translation(modname, get_module_locale_path(modname),
+        _trans = gettext.translation(modname, get_module_locale_path(dirname),
                                      codeset="utf-8")
         lgettext = _trans.lgettext
         def translate_gettext(x):

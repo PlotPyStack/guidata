@@ -462,10 +462,9 @@ class DictDelegate(QItemDelegate):
         except Exception, msg:
             QMessageBox.critical(self.parent(),
                                  _("Edit item"),
-                                 _(
-                                           "<b>Unable to retrieve data.</b>"
-                                           "<br><br>Error message:<br>%1"
-                                           ).arg(unicode(msg)))
+                                 _("<b>Unable to retrieve data.</b>"
+                                   "<br><br>Error message:<br>%s"
+                                   ) % unicode(msg))
             return
         key = index.model().get_key(index)
         readonly = isinstance(value, tuple) or self.parent().readonly \
@@ -601,10 +600,8 @@ class DictDelegate(QItemDelegate):
                                      ignore_errors=False)
         except Exception, msg:
             QMessageBox.critical(editor, _("Edit item"),
-                                 _(
-                                       "<b>Unable to assign data to item.</b>"
-                                       "<br><br>Error message:<br>%1"
-                                       ).arg(str(msg)))
+                                 _("<b>Unable to assign data to item.</b>"
+                                   "<br><br>Error message:<br>%s") % str(msg))
             return
         self.set_value(index, value)
 
@@ -993,8 +990,9 @@ class BaseTableView(QTableView):
                 self.plot(key)
             except ValueError, error:
                 QMessageBox.critical(self, _("Plot"),
-                    _("<b>Unable to plot data.</b>"
-                              "<br><br>Error message:<br>%1").arg(str(error)))
+                                     _("<b>Unable to plot data.</b>"
+                                       "<br><br>Error message:<br>%s"
+                                       ) % str(error))
             
     def imshow_item(self):
         """Imshow item"""
@@ -1008,8 +1006,9 @@ class BaseTableView(QTableView):
                     self.imshow(key)
             except ValueError, error:
                 QMessageBox.critical(self, _("Plot"),
-                    _("<b>Unable to show image.</b>"
-                              "<br><br>Error message:<br>%1").arg(str(error)))
+                                     _("<b>Unable to show image.</b>"
+                                       "<br><br>Error message:<br>%s"
+                                       ) % str(error))
             
     def save_array(self):
         """Save array"""
@@ -1028,8 +1027,9 @@ class BaseTableView(QTableView):
                 np.save(self.array_filename, data)
             except Exception, error:
                 QMessageBox.critical(self, title,
-                     _("<b>Unable to save array</b>"
-                               "<br><br>Error message:<br>%1").arg(str(error)))
+                                     _("<b>Unable to save array</b>"
+                                       "<br><br>Error message:<br>%s"
+                                       ) % str(error))
     def copy(self):
         """Copy text to clipboard"""
         clipboard = QApplication.clipboard()

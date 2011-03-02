@@ -15,7 +15,9 @@ pygettext=osp.join( sys.prefix, "Tools", "i18n", "pygettext.py" )
 msgfmt=osp.join( sys.prefix, "Tools", "i18n", "msgfmt.py" )
 
 
-def get_files( modname ):
+def get_files(modname):
+    if not osp.isdir(modname):
+        return [modname]
     files = []
     for dirname, _dirnames, filenames in os.walk(modname):
         files += [ osp.join(dirname, f)
@@ -31,9 +33,14 @@ def get_lang( modname ):
         break # we just want the list of first level directories
     return dirnames
 
-def do_rescan( modname ):
-    files = get_files( modname )
-    localedir = osp.join(modname, "locale")
+
+def do_rescan(modname):
+    files = get_files(modname)
+    dirname = modname
+    do_rescan_files(files, modname, dirname)
+        
+def do_rescan_files(files, modname, dirname):
+    localedir = osp.join(dirname, "locale")
     potfile = modname+".pot"
     call( ["python", pygettext,
               ##"-D",   # Extract docstrings
@@ -41,30 +48,31 @@ def do_rescan( modname ):
                     "-p", localedir, # dest
                   ] + files
             )
-    for lang in get_lang( modname ):
-        pofilepath = osp.join( localedir, lang, "LC_MESSAGES", modname + ".po" )
-        potfilepath = osp.join( localedir, potfile )
+    for lang in get_lang(dirname):
+        pofilepath = osp.join(localedir, lang, "LC_MESSAGES", modname+".po")
+        potfilepath = osp.join(localedir, potfile)
         print "Updating...", pofilepath
-        if not osp.exists( osp.join( localedir, lang, "LC_MESSAGES" ) ):
-            os.mkdir( osp.join( localedir, lang, "LC_MESSAGES" ) )
+        if not osp.exists( osp.join(localedir, lang, "LC_MESSAGES") ):
+            os.mkdir( osp.join(localedir, lang, "LC_MESSAGES") )
         if not osp.exists( pofilepath ):
-            outf = file( pofilepath, "w" )
-            outf.write( "# -*- coding: utf-8 -*-\n" )
+            outf = file(pofilepath, "w")
+            outf.write("# -*- coding: utf-8 -*-\n")
             data = file( potfilepath ).read()
-            data = data.replace( "charset=CHARSET", "charset=utf-8" )
-            data = data.replace( "Content-Transfer-Encoding: ENCODING",
-                                 "Content-Transfer-Encoding: utf-8" )
+            data = data.replace("charset=CHARSET", "charset=utf-8")
+            data = data.replace("Content-Transfer-Encoding: ENCODING",
+                                "Content-Transfer-Encoding: utf-8")
             outf.write(data)
         else:
             print "merge..."
             call([ "msgmerge", "-o", pofilepath, pofilepath, potfilepath] )
 
 
-def do_compile( modname ):
-#    files = get_files( modname )
-    localedir = osp.join(modname, "locale")
-    for lang in get_lang( modname ):
-        pofilepath = osp.join( localedir, lang, "LC_MESSAGES", modname + ".po" )
+def do_compile(modname, dirname=None):
+    if dirname is None:
+        dirname = modname
+    localedir = osp.join(dirname, "locale")
+    for lang in get_lang(dirname):
+        pofilepath = osp.join(localedir, lang, "LC_MESSAGES", modname+".po")
         call( ["python", msgfmt, pofilepath] )
     
 

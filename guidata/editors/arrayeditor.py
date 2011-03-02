@@ -428,7 +428,7 @@ class ArrayEditorWidget(QWidget):
                 format % 1.1
             except:
                 QMessageBox.critical(self, _("Error"),
-                          _("Format (%1) is incorrect").arg(format))
+                                     _("Format (%s) is incorrect") % format)
                 return
             self.model.set_format(format)    
 
@@ -467,8 +467,8 @@ class ArrayEditor(QDialog):
             dtn = data.dtype.name
             if dtn not in SUPPORTED_FORMATS and not dtn.startswith('string') \
                and not dtn.startswith('unicode'):
-                arr = _("%1 arrays").arg(data.dtype.name)
-                self.error(_("%1 are currently not supported").arg(arr))
+                arr = _("%s arrays") % data.dtype.name
+                self.error(_("%s are currently not supported") % arr)
                 return False
         
         self.layout = QGridLayout()
