@@ -23,12 +23,9 @@ from PyQt4.QtGui import (QTableView, QVBoxLayout, QHBoxLayout, QGridLayout,
 from functools import partial as ft_partial
 
 # Local import
+from guidata.config import _
 from guidata.configtools import get_icon
 from guidata.qthelpers import add_actions, create_action
-
-# Adapting guidata's translation mecanism to spyderlib's
-from guidata.config import _ as original_
-_ = lambda text: QString(original_(text))
 
 def try_to_parse(value):
     _types = ('int', 'float')
@@ -164,8 +161,7 @@ class ContentsWidget(QWidget):
 
         grid_layout.setRowMinimumHeight(2, 15)
         
-        other_group = QGroupBox(_(
-                                            "Additionnal options"))
+        other_group = QGroupBox(_("Additionnal options"))
         other_layout = QGridLayout()
         other_group.setLayout(other_layout)
 
@@ -455,11 +451,9 @@ class ImportWizard(QDialog):
         self.text_widget = ContentsWidget(self, text)
         self.table_widget = PreviewWidget(self)
         
-        self.tab_widget.addTab(self.text_widget, _(
-                                                           "text"))
+        self.tab_widget.addTab(self.text_widget, _("text"))
         self.tab_widget.setTabText(0, contents_title)
-        self.tab_widget.addTab(self.table_widget, _(
-                                                            "table"))
+        self.tab_widget.addTab(self.table_widget, _("table"))
         self.tab_widget.setTabText(1, _("Preview"))
         self.tab_widget.setTabEnabled(1, False)
         
@@ -531,13 +525,10 @@ class ImportWizard(QDialog):
                 self.fwd_btn.setEnabled(False)
                 self.back_btn.setEnabled(True)
             except (SyntaxError, AssertionError), error:
-                QMessageBox.critical(self,
-                            _("Import wizard"),
-                            _(
-                                      "<b>Unable to proceed to next step</b>"
-                                      "<br><br>Please check your entries."
-                                      "<br><br>Error message:<br>%2") \
-                            .arg(str(error)))
+                QMessageBox.critical(self, _("Import wizard"),
+                            _("<b>Unable to proceed to next step</b>"
+                              "<br><br>Please check your entries."
+                              "<br><br>Error message:<br>%s") % str(error))
                 return
         elif new_tab == 0:
             self.done_btn.setEnabled(False)

@@ -18,7 +18,7 @@ NumPy Array Editor Dialog based on PyQt4
 # pylint: disable-msg=R0201
 
 from PyQt4.QtCore import (Qt, QVariant, QModelIndex, QAbstractTableModel,
-                          SIGNAL, SLOT, QString)
+                          SIGNAL, SLOT)
 from PyQt4.QtGui import (QHBoxLayout, QColor, QTableView, QItemDelegate,
                          QLineEdit, QCheckBox, QGridLayout, QDoubleValidator,
                          QDialog, QDialogButtonBox, QMessageBox, QPushButton,
@@ -32,11 +32,9 @@ import StringIO
 from guidata import qapplication
 from guidata.configtools import get_icon
 from guidata.qthelpers import add_actions, create_action, keybinding
-from guidata.config import CONF
+from guidata.config import CONF, _
 
-# Adapting guidata's translation/configuration management to spyderlib's
-from guidata.config import _ as original_
-_ = lambda text: QString(original_(text))
+# Adapting guidata's configuration management to spyderlib's
 from guidata.configtools import get_font as guidata_get_font
 get_font = lambda text: guidata_get_font(CONF, text)
 
@@ -312,10 +310,10 @@ class ArrayView(QTableView):
             size *= dim
         if size > 1e5:
             answer = QMessageBox.warning(self, _("Array editor"),
-                                _("Resizing cells of a table of such "
-                                          "size could take a long time.\n"
-                                          "Do you want to continue anyway?"),
-                                QMessageBox.Yes | QMessageBox.No)
+                                         _("Resizing cells of a table of such "
+                                           "size could take a long time.\n"
+                                           "Do you want to continue anyway?"),
+                                         QMessageBox.Yes | QMessageBox.No)
             if answer == QMessageBox.No:
                 return
         self.resizeColumnsToContents()
@@ -323,8 +321,7 @@ class ArrayView(QTableView):
 
     def setup_menu(self):
         """Setup context menu"""
-        self.copy_action = create_action(self,
-                                         _("Copy"),
+        self.copy_action = create_action(self, _( "Copy"),
                                          shortcut=keybinding("Copy"),
                                          icon=get_icon('editcopy.png'),
                                          triggered=self.copy,
@@ -385,15 +382,15 @@ class ArrayEditorWidget(QWidget):
         
         btn_layout = QHBoxLayout()
         btn_layout.setAlignment(Qt.AlignLeft)
-        btn = QPushButton(_("Format"))
+        btn = QPushButton(_( "Format"))
         # disable format button for int type
         btn.setEnabled(is_float(data.dtype))
         btn_layout.addWidget(btn)
         self.connect(btn, SIGNAL("clicked()"), self.change_format)
-        btn = QPushButton(_("Resize"))
+        btn = QPushButton(_( "Resize"))
         btn_layout.addWidget(btn)
         self.connect(btn, SIGNAL("clicked()"), self.view.resize_to_contents)
-        bgcolor = QCheckBox(_('Background color'))
+        bgcolor = QCheckBox(_( 'Background color'))
         bgcolor.setChecked(self.model.bgcolor_enabled)
         bgcolor.setEnabled(self.model.bgcolor_enabled)
         self.connect(bgcolor, SIGNAL("stateChanged(int)"), self.model.bgcolor)
@@ -418,9 +415,8 @@ class ArrayEditorWidget(QWidget):
         
     def change_format(self):
         """Change display format"""
-        format, valid = QInputDialog.getText(self,
-                                 _('Format'),
-                                 _("Float formatting"),
+        format, valid = QInputDialog.getText(self, _( 'Format'),
+                                 _( "Float formatting"),
                                  QLineEdit.Normal, self.model.get_format())
         if valid:
             format = str(format)

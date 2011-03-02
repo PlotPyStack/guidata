@@ -20,26 +20,24 @@ Dictionary Editor Widget and Dialog based on PyQt4
 # pylint: disable-msg=R0911
 # pylint: disable-msg=R0201
 
-import re, os, sys
+import re, os
 from PyQt4.QtGui import (QMessageBox, QTableView, QItemDelegate, QLineEdit,
                          QVBoxLayout, QWidget, QColor, QDialog, QDateEdit,
                          QDialogButtonBox, QMenu, QInputDialog, QDateTimeEdit,
                          QApplication, QKeySequence, QFileDialog)
 from PyQt4.QtCore import (Qt, QVariant, QModelIndex, QAbstractTableModel,
-                          SIGNAL, SLOT, QDateTime, QString)
+                          SIGNAL, SLOT, QDateTime)
 
 # Local import
 from guidata import qapplication
 from guidata.configtools import get_icon
-from guidata.config import CONF
+from guidata.config import CONF, _
 from guidata.utils import fix_reference_name
 from guidata.qthelpers import add_actions, create_action
 from guidata.editors.texteditor import TextEditor
 from guidata.editors.importwizard import ImportWizard
 
-# Adapting guidata's translation/configuration management to spyderlib's
-from guidata.config import _ as original_
-_ = lambda text: QString(original_(text))
+# Adapting guidata's configuration management to spyderlib's
 from guidata.configtools import get_font as guidata_get_font
 get_font = lambda text: guidata_get_font(CONF, text)
 
@@ -260,8 +258,7 @@ class ReadOnlyDictModel(QAbstractTableModel):
                 self.header0 = _("Key")
         else:
             raise TypeError("Invalid data type")
-        self.title += ' ('+str(len(self.keys))+' '+ \
-                      _("elements")+')'
+        self.title += ' ('+str(len(self.keys))+' '+ _("elements")+')'
         if self.remote:
             self.sizes = [ data[self.keys[index]]['size']
                            for index in range(len(self.keys)) ]
@@ -383,10 +380,7 @@ class ReadOnlyDictModel(QAbstractTableModel):
                 return QVariant()
         i_column = int(section)
         if orientation == Qt.Horizontal:
-            headers = (self.header0,
-                       _("Type"),
-                       _("Size"),
-                       _("Value"))
+            headers = (self.header0, _("Type"), _("Size"), _("Value"))
             return QVariant( headers[i_column] )
         else:
             return QVariant()
@@ -460,8 +454,7 @@ class DictDelegate(QItemDelegate):
         try:
             value = self.get_value(index)
         except Exception, msg:
-            QMessageBox.critical(self.parent(),
-                                 _("Edit item"),
+            QMessageBox.critical(self.parent(), _("Edit item"),
                                  _("<b>Unable to retrieve data.</b>"
                                    "<br><br>Error message:<br>%s"
                                    ) % unicode(msg))
@@ -601,7 +594,8 @@ class DictDelegate(QItemDelegate):
         except Exception, msg:
             QMessageBox.critical(editor, _("Edit item"),
                                  _("<b>Unable to assign data to item.</b>"
-                                   "<br><br>Error message:<br>%s") % str(msg))
+                                   "<br><br>Error message:<br>%s"
+                                   ) % str(msg))
             return
         self.set_value(index, value)
 
@@ -645,73 +639,59 @@ class BaseTableView(QTableView):
             self.collvalue_action.setChecked(collvalue)
             return
         
-        self.paste_action = create_action(self,
-                                      _("Paste"),
-                                      icon=get_icon('editpaste.png'),
-                                      triggered=self.paste)
-        self.copy_action = create_action(self,
-                                      _("Copy"),
-                                      icon=get_icon('editcopy.png'),
-                                      triggered=self.copy)                                      
-        self.edit_action = create_action(self, 
-                                      _("Edit"),
-                                      icon=get_icon('edit.png'),
-                                      triggered=self.edit_item)
-        self.plot_action = create_action(self, 
-                                      _("Plot"),
-                                      icon=get_icon('plot.png'),
-                                      triggered=self.plot_item)
+        self.paste_action = create_action(self, _("Paste"),
+                                          icon=get_icon('editpaste.png'),
+                                          triggered=self.paste)
+        self.copy_action = create_action(self, _("Copy"),
+                                         icon=get_icon('editcopy.png'),
+                                         triggered=self.copy)                                      
+        self.edit_action = create_action(self, _("Edit"),
+                                         icon=get_icon('edit.png'),
+                                         triggered=self.edit_item)
+        self.plot_action = create_action(self, _("Plot"),
+                                         icon=get_icon('plot.png'),
+                                         triggered=self.plot_item)
         self.plot_action.setVisible(False)
-        self.imshow_action = create_action(self, 
-                                      _("Show image"),
-                                      icon=get_icon('imshow.png'),
-                                      triggered=self.imshow_item)
+        self.imshow_action = create_action(self, _("Show image"),
+                                           icon=get_icon('imshow.png'),
+                                           triggered=self.imshow_item)
         self.imshow_action.setVisible(False)
-        self.save_array_action = create_action(self, 
-                                      _("Save array"),
-                                      icon=get_icon('filesave.png'),
-                                      triggered=self.save_array)
+        self.save_array_action = create_action(self, _("Save array"),
+                                               icon=get_icon('filesave.png'),
+                                               triggered=self.save_array)
         self.save_array_action.setVisible(False)
-        self.insert_action = create_action(self, 
-                                      _("Insert"),
-                                      icon=get_icon('insert.png'),
-                                      triggered=self.insert_item)
-        self.remove_action = create_action(self, 
-                                      _("Remove"),
-                                      icon=get_icon('editdelete.png'),
-                                      triggered=self.remove_item)
-        self.truncate_action = create_action(self,
-                                    _("Truncate values"),
-                                    toggled=self.toggle_truncate)
+        self.insert_action = create_action(self, _("Insert"),
+                                           icon=get_icon('insert.png'),
+                                           triggered=self.insert_item)
+        self.remove_action = create_action(self, _("Remove"),
+                                           icon=get_icon('editdelete.png'),
+                                           triggered=self.remove_item)
+        self.truncate_action = create_action(self, _("Truncate values"),
+                                             toggled=self.toggle_truncate)
         self.truncate_action.setChecked(truncate)
         self.toggle_truncate(truncate)
-        self.minmax_action = create_action(self,
-                                _("Show arrays min/max"),
-                                toggled=self.toggle_minmax)
+        self.minmax_action = create_action(self, _("Show arrays min/max"),
+                                           toggled=self.toggle_minmax)
         self.minmax_action.setChecked(minmax)
         self.toggle_minmax(minmax)
         self.collvalue_action = create_action(self,
-                            _("Show collection contents"),
-                            toggled=self.toggle_collvalue)
+                                              _("Show collection contents"),
+                                              toggled=self.toggle_collvalue)
         self.collvalue_action.setChecked(collvalue)
         self.toggle_collvalue(collvalue)
-        self.inplace_action = create_action(self,
-                                       _(
-                                                 "Always edit in-place"),
-                                       toggled=self.toggle_inplace)
+        self.inplace_action = create_action(self, _("Always edit in-place"),
+                                            toggled=self.toggle_inplace)
         self.inplace_action.setChecked(inplace)
         if self.delegate is None:
             self.inplace_action.setEnabled(False)
         else:
             self.toggle_inplace(inplace)
-        self.rename_action = create_action(self,
-                                    _("Rename"),
-                                    icon=get_icon('rename.png'),
-                                    triggered=self.rename_item)
-        self.duplicate_action = create_action(self,
-                                    _("Duplicate"),
-                                    icon=get_icon('edit_add.png'),
-                                    triggered=self.duplicate_item)
+        self.rename_action = create_action(self, _( "Rename"),
+                                           icon=get_icon('rename.png'),
+                                           triggered=self.rename_item)
+        self.duplicate_action = create_action(self, _( "Duplicate"),
+                                              icon=get_icon('edit_add.png'),
+                                              triggered=self.duplicate_item)
         menu = QMenu(self)
         menu_actions = [self.edit_action, self.plot_action, self.imshow_action,
                         self.save_array_action, self.insert_action,
@@ -904,10 +884,8 @@ class BaseTableView(QTableView):
             if not index.isValid():
                 return
         one = _("Do you want to remove selected item?")
-        more = _(
-                         "Do you want to remove all selected items?")
-        answer = QMessageBox.question(self,
-                                      _("Remove"),
+        more = _("Do you want to remove all selected items?")
+        answer = QMessageBox.question(self, _( "Remove"),
                                       one if len(indexes) == 1 else more,
                                       QMessageBox.Yes | QMessageBox.No)
         if answer == QMessageBox.Yes:
@@ -924,10 +902,8 @@ class BaseTableView(QTableView):
         if len(idx_rows) > 1 or not indexes[0].isValid():
             return
         orig_key = self.model.keys[idx_rows[0]]
-        new_key, valid = QInputDialog.getText(self,
-                          _('Rename'),
-                          _('Key:'),
-                          QLineEdit.Normal,orig_key)
+        new_key, valid = QInputDialog.getText(self, _( 'Rename'), _( 'Key:'),
+                                              QLineEdit.Normal,orig_key)
         if valid and not new_key.isEmpty():
             new_key = try_to_eval(unicode(new_key))
             if new_key == orig_key:
@@ -956,20 +932,16 @@ class BaseTableView(QTableView):
             key = row
             data.insert(row, '')
         elif isinstance(data, dict):
-            key, valid = QInputDialog.getText(self,
-                              _('Insert'),
-                              _('Key:'),
-                              QLineEdit.Normal)
+            key, valid = QInputDialog.getText(self, _( 'Insert'), _( 'Key:'),
+                                              QLineEdit.Normal)
             if valid and not key.isEmpty():
                 key = try_to_eval(unicode(key))
             else:
                 return
         else:
             return
-        value, valid = QInputDialog.getText(self,
-                  _('Insert'),
-                  _('Value:'),
-                  QLineEdit.Normal)
+        value, valid = QInputDialog.getText(self, _('Insert'), _('Value:'),
+                                            QLineEdit.Normal)
         if valid and not value.isEmpty():
             self.new_value(key, try_to_eval(unicode(value)))
             
@@ -989,7 +961,7 @@ class BaseTableView(QTableView):
             try:
                 self.plot(key)
             except ValueError, error:
-                QMessageBox.critical(self, _("Plot"),
+                QMessageBox.critical(self, _( "Plot"),
                                      _("<b>Unable to plot data.</b>"
                                        "<br><br>Error message:<br>%s"
                                        ) % str(error))
@@ -1005,14 +977,14 @@ class BaseTableView(QTableView):
                 else:
                     self.imshow(key)
             except ValueError, error:
-                QMessageBox.critical(self, _("Plot"),
+                QMessageBox.critical(self, _( "Plot"),
                                      _("<b>Unable to show image.</b>"
                                        "<br><br>Error message:<br>%s"
                                        ) % str(error))
             
     def save_array(self):
         """Save array"""
-        title = _("Save array")
+        title = _( "Save array")
         if self.array_filename is None:
             self.array_filename = os.getcwdu()
         self.emit(SIGNAL('redirect_stdio(bool)'), False)
@@ -1044,8 +1016,7 @@ class BaseTableView(QTableView):
         """Import data from string"""
         data = self.model.get_data()
         editor = ImportWizard(self, text, title=title,
-                              contents_title=_(
-                                                       "Clipboard contents"),
+                              contents_title=_("Clipboard contents"),
                               varname=fix_reference_name("data",
                                                          blacklist=data.keys()))
         if editor.exec_():
@@ -1059,14 +1030,10 @@ class BaseTableView(QTableView):
         if clipboard.mimeData().hasText():
             cliptext = unicode(clipboard.text())
         if cliptext.strip():
-            self.import_from_string(cliptext,
-                                    title=_(
-                                                    "Import from clipboard"))
+            self.import_from_string(cliptext, title=_("Import from clipboard"))
         else:
-            QMessageBox.warning(self,
-                                _("Empty clipboard"),
-                                _("Nothing to be imported"
-                                          " from clipboard."))
+            QMessageBox.warning(self, _( "Empty clipboard"),
+                                _("Nothing to be imported from clipboard."))
         
 
 class DictEditorTableView(BaseTableView):
@@ -1352,9 +1319,8 @@ class RemoteDictEditorTableView(BaseTableView):
             return
         
         self.remote_editing_action = create_action(self,
-                _("Edit data in the remote process"),
-                tip=_(
-                      "Editors are opened in the remote process for NumPy "
+                _( "Edit data in the remote process"),
+                tip=_("Editors are opened in the remote process for NumPy "
                       "arrays, PIL images, lists, tuples and dictionaries.\n"
                       "This avoids transfering large amount of data between "
                       "the remote process and Spyder (through the socket)."),

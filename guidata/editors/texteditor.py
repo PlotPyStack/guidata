@@ -12,16 +12,14 @@
 Text Editor Dialog based on PyQt4
 """
 
-from PyQt4.QtCore import Qt, SIGNAL, SLOT, QString
+from PyQt4.QtCore import Qt, SIGNAL, SLOT
 from PyQt4.QtGui import QVBoxLayout, QTextEdit, QDialog, QDialogButtonBox
 
 # Local import
 from guidata.configtools import get_icon
-from guidata.config import CONF
+from guidata.config import CONF, _
 
-# Adapting guidata's translation/configuration management to spyderlib's
-from guidata.config import _ as original_
-_ = lambda text: QString(original_(text))
+# Adapting guidata's configuration management to spyderlib's
 from guidata.configtools import get_font as guidata_get_font
 get_font = lambda text: guidata_get_font(CONF, text)
 
