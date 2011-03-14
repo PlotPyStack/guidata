@@ -436,10 +436,10 @@ DataSetShowLayout.register(FloatArrayItem, ShowFloatArrayWidget)
 
 class DataSetShowGroupBox(QGroupBox):
     """Group box widget showing a read-only DataSet"""
-    def __init__(self, label, klass):
+    def __init__(self, label, klass, **kwargs):
         QGroupBox.__init__(self, label)
         self.klass = klass
-        self.dataset = klass()
+        self.dataset = klass(**kwargs)
         self.layout = QGridLayout()
         self.setLayout(self.layout)
         self.edit = self.get_edit_layout()
@@ -464,8 +464,8 @@ class DataSetEditGroupBox(DataSetShowGroupBox):
     button_icon: QIcon object or string (default "apply.png")
     """
     def __init__(self, label, klass, button_text=None, button_icon=None,
-                 show_button=True):
-        DataSetShowGroupBox.__init__(self, label, klass)
+                 show_button=True, **kwargs):
+        DataSetShowGroupBox.__init__(self, label, klass, **kwargs)
         if show_button:
             if button_text is None:
                 button_text = _("Apply")
