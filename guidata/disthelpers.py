@@ -206,6 +206,9 @@ def add_modules(module_names, data_files, includes, excludes, vs2008=True):
                                 (osp.join(pyqt_path, "translations",
                                           "qt_fr.qm"),)) )
         
+        elif module_name == 'scipy.io':
+            includes += ['scipy.io.matlab.streams']
+        
         elif module_name == 'matplotlib':
             if 'matplotlib' in excludes:
                 excludes.pop(excludes.index('matplotlib'))
