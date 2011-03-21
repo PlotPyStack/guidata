@@ -440,13 +440,17 @@ class DataSetShowGroupBox(QGroupBox):
         QGroupBox.__init__(self, label)
         self.klass = klass
         self.dataset = klass(**kwargs)
-        self.layout = QGridLayout()
+        self.layout = QVBoxLayout()
+        if self.dataset.get_comment():
+            self.layout.addWidget(QLabel(self.dataset.get_comment()))
+        self.grid_layout = QGridLayout()
+        self.layout.addLayout(self.grid_layout)
         self.setLayout(self.layout)
         self.edit = self.get_edit_layout()
         
     def get_edit_layout(self):
         """Return edit layout"""
-        return DataSetShowLayout(self, self.dataset, self.layout) 
+        return DataSetShowLayout(self, self.dataset, self.grid_layout) 
 
     def get(self):
         """Update group box contents from data item values"""
@@ -476,11 +480,12 @@ class DataSetEditGroupBox(DataSetShowGroupBox):
             apply_btn = QPushButton(button_icon, button_text, self)
             self.connect(apply_btn, SIGNAL("clicked()"), self.set)
             layout = self.edit.layout
-            layout.addWidget(apply_btn, layout.rowCount(), 0, 1, -1, Qt.AlignRight)
+            layout.addWidget(apply_btn, layout.rowCount(),
+                             0, 1, -1, Qt.AlignRight)
 
     def get_edit_layout(self):
         """Return edit layout"""
-        return DataSetEditLayout(self, self.dataset, self.layout)
+        return DataSetEditLayout(self, self.dataset, self.grid_layout)
         
     def set(self):
         """Update data item values from layout contents"""

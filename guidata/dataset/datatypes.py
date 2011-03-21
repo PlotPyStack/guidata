@@ -591,13 +591,14 @@ class DataSet(object):
     __metaclass__ = DataSetMeta
 
     def __init__(self, title=None, comment=None, icon=''):
+        self.__title = title
         self.__comment = comment
         self.__icon = icon
-        if not title:
-            self.__title = self.__class__.__name__
-            self._compute_title_and_comment()
-        else:
-            self.__title = title
+        comp_title, comp_comment = self._compute_title_and_comment()
+        if title is None:
+            self.__title = comp_title
+        if comment is None:
+            self.__comment = comp_comment
         self.__changed = False
         # Set default values
         self.set_defaults()
@@ -618,18 +619,19 @@ class DataSet(object):
     def _compute_title_and_comment(self):
         """
         Private method to compute title and comment of the data set
-        """        
-        if not self.__doc__:
-            return
-        doc = utf8_to_unicode(self.__doc__)
-        doc_lines = doc.splitlines()
-        # Remove empty lines at the begining of comment
-        while doc_lines and not doc_lines[0].strip():
-            del doc_lines[0]
-        if not doc_lines:
-            return
-        self.__title = doc_lines[0].strip()
-        self.__comment = "\n".join( [ x.strip() for x in doc_lines[1:] ])
+        """
+        comp_title = self.__class__.__name__
+        comp_comment = None
+        if self.__doc__:
+            doc_lines = utf8_to_unicode(self.__doc__).splitlines()
+            # Remove empty lines at the begining of comment
+            while doc_lines and not doc_lines[0].strip():
+                del doc_lines[0]
+            if doc_lines:
+                comp_title = doc_lines.pop(0).strip()
+            if doc_lines:
+                comp_comment = "\n".join([x.strip() for x in doc_lines])
+        return comp_title, comp_comment
 
     def get_title(self):
         """

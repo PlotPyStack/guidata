@@ -69,13 +69,13 @@ class MainWindow(QMainWindow):
         
         # Instantiate dataset-related widgets:
         self.groupbox1 = DataSetShowGroupBox("Activable dataset",
-                                             ExampleDataSet)
+                                             ExampleDataSet, comment='')
         self.groupbox2 = DataSetShowGroupBox("Standard dataset",
-                                             AnotherDataSet)
+                                             AnotherDataSet, comment='')
         self.groupbox3 = DataSetEditGroupBox("Standard dataset",
-                                             OtherDataSet)
+                                             OtherDataSet, comment='')
         self.groupbox4 = DataSetShowGroupBox("Standard dataset",
-                                             ExampleMultiGroupDataSet)
+                                             ExampleMultiGroupDataSet, comment='')
         self.connect(self.groupbox3, SIGNAL("apply_button_clicked()"),
                      self.update_window)
         self.update_groupboxes()
