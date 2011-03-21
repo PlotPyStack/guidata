@@ -220,7 +220,7 @@ class LineEditWidget(AbstractDataSetWidget):
                 self.edit.setEnabled(False)
             self.edit.setToolTip(_("Value is forced to %d") % item.get_max())
         QObject.connect(self.edit, SIGNAL("textChanged(QString)"),
-                        self.line_edit_changed )
+                        self.line_edit_changed)
 
     def get(self):
         """Override AbstractDataSetWidget method"""
@@ -230,18 +230,17 @@ class LineEditWidget(AbstractDataSetWidget):
             uvalue = utf8_to_unicode(value)
             if uvalue!=old_value:
                 self.edit.setText(utf8_to_unicode(value))
-                self.line_edit_changed( value )
+                self.line_edit_changed(value)
         else:
-            self.line_edit_changed( value )
-            
+            self.line_edit_changed(value)
             
     def line_edit_changed(self, qvalue):
         """QLineEdit validator"""
         value = self.item.from_string(unicode(qvalue))
         if not self.item.check_value(value):
-            self.edit.setStyleSheet( "background-color:rgb(255, 175, 90);" )
+            self.edit.setStyleSheet("background-color:rgb(255, 175, 90);")
         else:
-            self.edit.setStyleSheet( "" )
+            self.edit.setStyleSheet("")
             cb = self.item.get_prop_value("display", "callback", None)
             if cb is not None:
                 cb(self.item.instance, self.item.item, value)
@@ -249,7 +248,9 @@ class LineEditWidget(AbstractDataSetWidget):
         
     def update(self, value):
         """Override AbstractDataSetWidget method"""
-        pass
+        cb = self.item.get_prop_value("display", "value_callback", None)
+        if cb is not None:
+            cb(value)
 
     def value(self):
         return unicode(self.edit.text())
@@ -289,9 +290,9 @@ class TextEditWidget(AbstractDataSetWidget):
         """QLineEdit validator"""
         value = self.item.from_string(self.__get_text())
         if not self.item.check_value(value):
-            self.edit.setStyleSheet( "background-color:rgb(255, 175, 90);" )
+            self.edit.setStyleSheet("background-color:rgb(255, 175, 90);")
         else:
-            self.edit.setStyleSheet( "" )
+            self.edit.setStyleSheet("")
         self.update(value)
         
     def update(self, value):
@@ -435,7 +436,8 @@ class ColorWidget(HLayoutMixin, LineEditWidget):
         self.group.addWidget(self.button)
         
     def update(self, value):
-        """Override AbstractDataSetWidget method"""
+        """Reimplement LineEditWidget method"""
+        LineEditWidget.update(self, value)
         color = text_to_qcolor(value)
         if color.isValid():
             bitmap = QPixmap(16, 16)
