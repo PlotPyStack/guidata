@@ -520,10 +520,10 @@ class DirectoryWidget(HLayoutMixin, LineEditWidget):
         """Open a directory selection dialog box"""
         value = self.item.from_string(unicode(self.edit.text()))
         parent = self.parent_layout.parent
-        if isinstance(parent, QGroupBox):
-            child_title = parent.parent().child_title
-        else:
+        try:
             child_title = parent.child_title
+        except AttributeError:
+            child_title = parent.parent().child_title
         dname = getExistingDirectory(parent,
                                      child_title(self.item),
                                      os.path.basename(value))
