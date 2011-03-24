@@ -274,11 +274,12 @@ class FilesOpenItem(FileSaveItem):
         * help [string]: text shown in tooltip (optional)
     """
     type = list
-    def __init__(self, label, formats='*', default=None, help=''):
+    def __init__(self, label, formats='*', default=None,
+                 basedir=None, help=''):
         if isinstance(default, (unicode, str)):
             default = [default]
         FileSaveItem.__init__(self, label, formats=formats,
-                              default=default, help=help)
+                              default=default, basedir=basedir, help=help)
 
     def check_value(self, value):
         """Override DataItem method"""
