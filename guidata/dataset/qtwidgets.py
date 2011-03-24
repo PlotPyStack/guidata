@@ -54,7 +54,9 @@ class DataSetEditDialog(QDialog):
         self.apply_func = apply
         self.layout = QVBoxLayout()
         if instance.get_comment():
-            self.layout.addWidget(QLabel(instance.get_comment()))
+            label = QLabel(instance.get_comment())
+            label.setWordWrap(True)
+            self.layout.addWidget(label)
         self.instance = instance
         self.edit_layout = [  ]
 
@@ -146,7 +148,9 @@ class DataSetGroupEditDialog(DataSetEditDialog):
             layout = QVBoxLayout()
             layout.setAlignment(Qt.AlignTop)
             if dataset.get_comment():
-                layout.addWidget(QLabel(dataset.get_comment()))
+                label = QLabel(dataset.get_comment())
+                label.setWordWrap(True)
+                layout.addWidget(label)
             grid = QGridLayout()
             self.edit_layout.append( self.layout_factory(dataset, grid) )
             layout.addLayout(grid)
@@ -442,7 +446,9 @@ class DataSetShowGroupBox(QGroupBox):
         self.dataset = klass(**kwargs)
         self.layout = QVBoxLayout()
         if self.dataset.get_comment():
-            self.layout.addWidget(QLabel(self.dataset.get_comment()))
+            label = QLabel(self.dataset.get_comment())
+            label.setWordWrap(True)
+            self.layout.addWidget(label)
         self.grid_layout = QGridLayout()
         self.layout.addLayout(self.grid_layout)
         self.setLayout(self.layout)
