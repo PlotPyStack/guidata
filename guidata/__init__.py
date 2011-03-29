@@ -539,40 +539,27 @@ DATAPATH = LOCALEPATH = ''
 
 import guidata.config
 
-TRANSLATORS = []
-
-# We keep the QApplication instance reference alive when created here:
-# (i.e. if QApplication has been instantiated elsewhere,
-#  QAPP_CREATED_HERE will stay as None)
-QAPP_CREATED_HERE = None
-
-def qapplication():
+def qapplication(translate=True):
     """
-    *** For testing purpose (and for guiqwt.pyplot interface) only ***
-    Create and return an instance of QApplication, which is needed before
-    trying to show any Qt-based GUI. This function is only used by tests:
-    QApplication is already instantiated in a PyQt application, a PyQtShell
-    console or a IPython shell with option -q4thread
+    Return QApplication instance
+    Creates it if it doesn't already exist
     """
-    global TRANSLATORS, QAPP_CREATED_HERE
     from PyQt4.QtGui import QApplication
     app = QApplication.instance()
-    if QAPP_CREATED_HERE is None and app is None:
-        from PyQt4.QtCore import QLocale, QTranslator, QLibraryInfo
-        QAPP_CREATED_HERE = app = QApplication([])
-        locale = QLocale.system().name()
-        qt_translator = QTranslator()
-        TRANSLATORS.append( qt_translator ) # keep ref alive
-        paths = QLibraryInfo.location(QLibraryInfo.TranslationsPath)
-        qt_translator.load("qt_" + locale, paths )
-        app.installTranslator(qt_translator)
+    if not app:
+        app = QApplication([])
+    install_translator(app)
     return app
 
-def exec_qapplication_eventloop():
-    """
-    Execute event loop when QApplication has been created here
-    See guiqwt.pyplot
-    """
-    global QAPP_CREATED_HERE
-    if QAPP_CREATED_HERE is not None:
-        QAPP_CREATED_HERE.exec_()
+TRANSLATORS = []
+def install_translator(qapp):
+    """Install Qt translator to the QApplication instance"""
+    global TRANSLATORS
+    from PyQt4.QtCore import QLocale, QTranslator, QLibraryInfo
+    locale = QLocale.system().name()
+    # Qt-specific translator
+    qt_translator = QTranslator()
+    TRANSLATORS.append(qt_translator) # Keep reference alive
+    paths = QLibraryInfo.location(QLibraryInfo.TranslationsPath)
+    if qt_translator.load("qt_"+locale, paths):
+        qapp.installTranslator(qt_translator)
