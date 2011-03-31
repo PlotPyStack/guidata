@@ -28,7 +28,7 @@ from all_features import TestParameters
 if __name__ == '__main__':
     # Create QApplication
     import guidata
-    guidata.qapplication()
+    _app = guidata.qapplication()
     
     if os.path.exists("test.h5"):
         os.unlink("test.h5")

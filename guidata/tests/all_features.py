@@ -92,7 +92,7 @@ class TestParameters(DataSet):
 if __name__ == "__main__":
     # Create QApplication
     import guidata
-    guidata.qapplication()
+    _app = guidata.qapplication()
     
     e = TestParameters()
     e.floatarray[:, 0] = np.linspace( -5, 5, 50)

@@ -20,7 +20,7 @@ from guidata.dataset.datatypes import DataSetGroup
 if __name__ == "__main__":
     # Create QApplication
     import guidata
-    guidata.qapplication()
+    _app = guidata.qapplication()
 
     e1 = TestParameters("DataSet #1")
     e2 = TestParameters("DataSet #2")

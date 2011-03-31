@@ -31,7 +31,7 @@ class TestParameters2(TestParameters):
 if __name__ == '__main__':
     # Create QApplication
     import guidata
-    guidata.qapplication()
+    _app = guidata.qapplication()
     
     e = TestParameters2()
     e.edit()

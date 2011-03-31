@@ -48,7 +48,7 @@ class GroupSelection(DataSet):
 if __name__ == '__main__':
     # Create QApplication
     import guidata
-    guidata.qapplication()
+    _app = guidata.qapplication()
     
     prm = GroupSelection()
     prm.edit()

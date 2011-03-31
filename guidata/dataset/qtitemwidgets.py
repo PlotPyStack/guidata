@@ -472,6 +472,7 @@ class FileWidget(HLayoutMixin, LineEditWidget):
         QObject.connect(button, SIGNAL("clicked()"), self.select_file)
         self.group.addWidget(button)
         self.basedir = item.get_prop_value("data", "basedir")
+        self.all_files_first = item.get_prop_value("data", "all_files_first")
 
     def select_file(self):
         """Open a file selection dialog box"""
@@ -487,9 +488,12 @@ class FileWidget(HLayoutMixin, LineEditWidget):
         formats = [unicode(format).lower() for format in _formats]
         filter_lines = [(_("%s files")+" (*.%s)") % (format.upper(), format)
                         for format in formats]
+        all_filter = _("All supported files")+" (*.%s)" % " *.".join(formats)
         if len(formats) > 1:
-            filter_lines.append(_("All supported files")+" (*.%s)" \
-                                % " *.".join(formats))
+            if self.all_files_first:
+                filter_lines.insert(0, all_filter)
+            else:
+                filter_lines.append(all_filter)
         if fname is None:
             fname = ""
         try:

@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
+# Note: the two following lines are not required
+#       if a QApplication has already been created
 import guidata
-guidata.qapplication() # not required if a QApplication has already been created
+_app = guidata.qapplication()
 
 import guidata.dataset.datatypes as dt
 import guidata.dataset.dataitems as di

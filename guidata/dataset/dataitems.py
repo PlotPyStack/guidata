@@ -224,12 +224,13 @@ class FileSaveItem(StringItem):
         * help [string]: text shown in tooltip (optional)
     """
     def __init__(self, label, formats='*', default=None,
-                 basedir=None, help=''):
+                 basedir=None, all_files_first=False, help=''):
         DataItem.__init__(self, label, default=default, help=help)
         if isinstance(formats, str):
             formats = [formats]
         self.set_prop("data", formats=formats)
         self.set_prop("data", basedir=basedir)
+        self.set_prop("data", all_files_first=all_files_first)
 
     def get_auto_help(self, instance):
         """Override DataItem method"""
@@ -275,11 +276,12 @@ class FilesOpenItem(FileSaveItem):
     """
     type = list
     def __init__(self, label, formats='*', default=None,
-                 basedir=None, help=''):
+                 basedir=None, all_files_first=False, help=''):
         if isinstance(default, (unicode, str)):
             default = [default]
         FileSaveItem.__init__(self, label, formats=formats,
-                              default=default, basedir=basedir, help=help)
+                              default=default, basedir=basedir,
+                              all_files_first=all_files_first, help=help)
 
     def check_value(self, value):
         """Override DataItem method"""
