@@ -356,10 +356,14 @@ class DataSetShowWidget(AbstractDataSetWidget):
         else:
             fmt = self.item.get_prop_value("display", "format", u"%s")
             func = self.item.get_prop_value("display", "func", lambda x:x)
-            if isinstance(fmt, basestring):
+            new_value = func(value)
+            if callable(fmt) and new_value is not None:
+                return fmt(new_value)
+            elif isinstance(fmt, basestring):
                 fmt = unicode(fmt)
+
             if value is not None:
-                text = fmt % (func(value), )
+                text = fmt % (new_value, )
             else:
                 text = u""
             return text
