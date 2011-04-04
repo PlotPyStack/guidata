@@ -351,8 +351,12 @@ class DataSetShowWidget(AbstractDataSetWidget):
             return repval
         else:
             fmt = self.item.get_prop_value("display", "format", u"%s")
-            if isinstance(fmt, basestring):
+
+            if callable(fmt) and value is not None:
+                return fmt(value)
+            elif isinstance(fmt, basestring):
                 fmt = unicode(fmt)
+
             if value is not None:
                 text = fmt % (value,)
             else:
