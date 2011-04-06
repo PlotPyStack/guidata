@@ -53,7 +53,7 @@ CLASSIFIERS = ['Development Status :: 5 - Production/Stable',
                'Topic :: Scientific/Engineering']
 
 PACKAGES = [LIBNAME+p for p in ['', '.dataset', '.editors', '.tests']]
-PACKAGE_DATA = {LIBNAME: get_package_data(LIBNAME, ('.png', '.mo'))}
+PACKAGE_DATA = {LIBNAME: get_package_data(LIBNAME, ('.png', '.svg', '.mo'))}
 
 if os.name == 'nt':
     SCRIPTS = ['guidata-tests', 'guidata-tests.bat']
