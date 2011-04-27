@@ -14,15 +14,11 @@ for developing easily Qt-based graphical user interfaces.
 """
 
 from math import cos, sin, pi
-from PyQt4.QtGui import (QAction,  QFrame, QGridLayout, QLabel, QListWidget,
-                         QListWidgetItem, QMenu, QPainter, QPen, QPushButton, 
-                         QToolButton, QVBoxLayout, QWidget, QDialog,
-                         QApplication, QProgressBar, QDockWidget)
+from PyQt4.QtGui import QLabel, QPainter, QPen, QWidget, QDockWidget
 from PyQt4.QtCore import SIGNAL, QSize, Qt
 
 # Local imports:
-from guidata.configtools import get_icon, get_family
-from guidata.config import _
+from guidata.configtools import get_family
 
 
 class RotatedLabel(QLabel):
@@ -70,45 +66,6 @@ class RotatedLabel(QLabel):
     
     def minimumSizeHint(self):
         return self.sizeHint()
-
-
-class ProgressPopUp(QDialog):
-    def __init__(self, parent, message, cancelable=True):
-        super(ProgressPopUp, self).__init__(parent)
-        layout = QVBoxLayout()
-        self.setLayout(layout)
-        
-        label = QLabel(message)
-        label.setAlignment(Qt.AlignHCenter)
-        layout.addWidget(label)
-        
-        self.progress = QProgressBar(self)
-        layout.addWidget(self.progress)
-        
-        self.canceled = False
-        cancel_btn = QPushButton(_("Cancel"))
-        cancel_btn.setVisible(cancelable)
-        self.connect(cancel_btn, SIGNAL("clicked()"), self.cancel)
-        layout.addWidget(cancel_btn)
-        
-        self.setWindowTitle(_("Progression"))
-        self.setWindowFlags(Qt.Popup)
-        self.setWindowModality(Qt.WindowModal)
-        
-    def show(self):
-        """Reimplemented Qt method"""
-        super(ProgressPopUp, self).show()
-        QApplication.processEvents()
-        
-    def set_value(self, value):
-        self.progress.setValue(value)
-        QApplication.processEvents()
-        
-    def cancel(self):
-        self.canceled = True
-        
-    def is_canceled(self):
-        return self.canceled
 
 
 class DockableWidgetMixin(object):
