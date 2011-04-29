@@ -669,7 +669,7 @@ class FloatArrayWidget(AbstractDataSetWidget):
     def edit_array(self):
         """Open an array editor dialog"""
         label = self.item.get_prop_value("display", "label")
-        from guidata.editors.arrayeditor import ArrayEditor
+        from spyderlib.widgets.arrayeditor import ArrayEditor
         editor = ArrayEditor(self.parent_layout.parent)
         if editor.setup_and_check(self.arr, title=label):
             if editor.exec_():

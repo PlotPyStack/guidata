@@ -500,7 +500,7 @@ class DictItem(ButtonItem):
     """
     def __init__(self, label, default=None, help=''):
         def dictedit(instance, item, value, parent):
-            from guidata.editors.dicteditor import DictEditor
+            from spyderlib.widgets.dicteditor import DictEditor
             editor = DictEditor(parent)
             value_was_none = value is None
             if value_was_none:

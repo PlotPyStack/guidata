@@ -14,7 +14,8 @@ from PyQt4.QtGui import (QWidget, QVBoxLayout, QSplitter, QFont, QListWidget,
                          QPushButton, QLabel, QGroupBox, QHBoxLayout, QShortcut,
                          QKeySequence)
 from PyQt4.QtCore import SIGNAL, Qt, QSize
-from PyQt4.Qsci import QsciScintilla, QsciLexerPython
+
+from spyderlib.widgets.sourcecode.codeeditor import CodeEditor
 
 from guidata.config import _
 from guidata.configtools import get_icon, get_family, MONOSPACE
@@ -57,9 +58,6 @@ class TestModule(object):
             lines[0] = format % lines[0]
             return '<br>'.join(lines)
     
-    def get_code(self):
-        return unicode(file(self.filename, 'rb').read(), 'utf-8')
-    
     def run(self, args=''):
         command = [sys.executable, '"'+self.filename+'"']
         if args:
@@ -87,13 +85,10 @@ class TestPropertiesWidget(QWidget):
         layout.addWidget(self.desc_label)
         group_desc.setLayout(layout)
         
-        self.editor = QsciScintilla(self)
-        lexer = QsciLexerPython()
-        lexer.setFont(font)
-        self.editor.setLexer(lexer)
+        self.editor = CodeEditor(self)
+        self.editor.setup_editor(linenumbers=True, code_analysis=False,
+                                 todo_list=False, font=font)
         self.editor.setReadOnly(True)
-        self.editor.setMarginLineNumbers(1, True)
-        self.editor.setMarginWidth(1, 25)
         group_code = QGroupBox(_("Source code"), self)
         layout = QVBoxLayout()
         layout.addWidget(self.editor)
@@ -119,7 +114,7 @@ class TestPropertiesWidget(QWidget):
         
     def set_item(self, test):
         self.desc_label.setText(test.get_description())
-        self.editor.setText(test.get_code())
+        self.editor.set_text_from_file(test.filename)
 
 
 class TestLauncherWindow(QSplitter):
