@@ -78,6 +78,19 @@ class DockableWidgetMixin(object):
         self.parent_widget = parent
         self._isvisible = False
         self.dockwidget = None
+        self._allowed_areas = self.ALLOWED_AREAS
+        self._location = self.LOCATION
+        self._features = self.FEATURES
+        
+    def setup_dockwidget(self, location=None, features=None,
+                         allowed_areas=None):
+        assert self.dockwidget is None, "Dockwidget must be setup before calling 'create_dockwidget'"
+        if location is not None:
+            self._location = location
+        if features is not None:
+            self._features = features
+        if allowed_areas is not None:
+            self._allowed_areas = allowed_areas
         
     def get_focus_widget(self):
         pass
@@ -86,13 +99,13 @@ class DockableWidgetMixin(object):
         """Add to parent QMainWindow as a dock widget"""
         dock = QDockWidget(title, self.parent_widget)
         dock.setObjectName(self.__class__.__name__+"_dw")
-        dock.setAllowedAreas(self.ALLOWED_AREAS)
-        dock.setFeatures(self.FEATURES)
+        dock.setAllowedAreas(self._allowed_areas)
+        dock.setFeatures(self._features)
         dock.setWidget(self)
         self.connect(dock, SIGNAL('visibilityChanged(bool)'),
                      self.visibility_changed)
         self.dockwidget = dock
-        return (dock, self.LOCATION)
+        return (dock, self._location)
         
     def is_visible(self):
         return self._isvisible
