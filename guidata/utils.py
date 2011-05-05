@@ -46,13 +46,13 @@ def utf8_to_unicode(string):
     """
     Convert UTF-8 string to Unicode
     """
-    if not isinstance(string, (str,unicode)):
-        string = str(string)
+    if not isinstance(string, basestring):
+        string = unicode(string)
     if not isinstance(string, unicode):
         try:
             string = unicode(string, "utf-8")
         except UnicodeDecodeError, error:
-            message = u"La chaîne: '%r' n'est pas encodee en UTF-8"
+            message = "String %r is not UTF-8 encoded"
             raise UnicodeDecodeError(message % string, *error.args[1:])
     return string
 
