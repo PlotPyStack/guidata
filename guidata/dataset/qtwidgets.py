@@ -403,7 +403,7 @@ class ShowFloatArrayWidget(DataSetShowWidget):
         self.set_state()
         value = self.item.get()
         if value is not None:
-            self.group.setText(u"~= %f [%f .. %f]" \
+            self.group.setText(u"~= %g [%g .. %g]" \
                                % (value.mean(), value.min(), value.max()))
 
 class ShowChoiceWidget(DataSetShowWidget):
