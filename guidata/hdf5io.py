@@ -105,6 +105,8 @@ class Dset(Attr):
         value = self.get_value(struct)
         if isinstance(value, float):
             value = np.float64(value)
+        elif isinstance(value, int):
+            value = np.int32(value)
         if value is None or value.size==0:
             value = np.array([0.0])
         if value.shape == ():
