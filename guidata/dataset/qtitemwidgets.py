@@ -54,7 +54,8 @@ class AbstractDataSetWidget(object):
     
     DataSetEditLayout uses a registry of *Item to *Widget mapping in order to
     automatically create a GUI for a DataSet structure
-        """
+    """
+    READ_ONLY = False
     def __init__(self, item, parent_layout):
         """Derived constructors should create the necessary widgets
         The base class keeps a reference to item and parent 
@@ -68,7 +69,11 @@ class AbstractDataSetWidget(object):
         """
         Place item label on layout at specified position (row, column)
         """
-        self.label = QLabel(self.item.get_prop_value("display", "label"))
+        label_text = self.item.get_prop_value("display", "label")
+        unit = self.item.get_prop_value("display", "unit", '')
+        if unit and not self.READ_ONLY:
+            label_text += (' (%s)' % unit)
+        self.label = QLabel(label_text)
         self.label.setToolTip(self.item.get_help())
         layout.addWidget(self.label, row, column)
 

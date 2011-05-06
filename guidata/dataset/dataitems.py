@@ -27,10 +27,11 @@ class NumericTypeItem(DataItem):
     Numeric data item
     """
     type = None
-    def __init__(self, label, default=None,
-                 min=None, max=None, nonzero=None, help=''):
+    def __init__(self, label, default=None, min=None, max=None,
+                 nonzero=None, unit='', help=''):
         DataItem.__init__(self, label, default=default, help=help)
         self.set_prop("data", min=min, max=max, nonzero=nonzero)
+        self.set_prop("display", unit=unit)
         
     def get_auto_help(self, instance):
         """Override DataItem method"""
@@ -38,6 +39,7 @@ class NumericTypeItem(DataItem):
         _min = self.get_prop_value("data", instance, "min")
         _max = self.get_prop_value("data", instance, "max")
         nonzero = self.get_prop_value("data", instance, "nonzero")
+        unit = self.get_prop_value("display", instance, "unit")
         if _min is not None and _max is not None:
             auto_help += _(" between ")+str(_min)+ _(" and ")+str(_max)
         elif _min is not None:
@@ -46,6 +48,8 @@ class NumericTypeItem(DataItem):
             auto_help += _(" lower than ")+str(_max)
         if nonzero:
             auto_help += ", "+_("non zero")
+        if unit:
+            auto_help += (", %s %s" % (_("unit:"), unit))
         return auto_help
 
     def check_value(self, value):
@@ -84,6 +88,7 @@ class FloatItem(NumericTypeItem):
         * min [float]: minimum value (optional)
         * max [float]: maximum value (optional)
         * nonzero [bool]: if True, zero is not a valid value (optional)
+        * unit [string]: physical unit (optional)
         * help [string]: text shown in tooltip (optional)
     """
     type = float
@@ -97,15 +102,16 @@ class IntItem(NumericTypeItem):
         * min [int]: minimum value (optional)
         * max [int]: maximum value (optional)
         * nonzero [bool]: if True, zero is not a valid value (optional)
+        * unit [string]: physical unit (optional)
         * even [bool]: if True, even values are valid, if False, odd values are valid
                  if None (default), ignored (optional)
         * help [string]: text shown in tooltip (optional)
     """
     type = int
-    def __init__(self, label, default=None,
-                 min=None, max=None, nonzero=None, even=None, help=''):
+    def __init__(self, label, default=None, min=None, max=None,
+                 nonzero=None, unit='', even=None, help=''):
         super(IntItem, self).__init__(label, default=default, min=min, max=max,
-                                      nonzero=nonzero, help=help)
+                                      nonzero=nonzero, unit=unit, help=help)
         self.set_prop("data", even=even)
         
     def get_auto_help(self, instance):

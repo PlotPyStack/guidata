@@ -326,6 +326,7 @@ QLabel:disabled { font-weight: bold; color: grey }
 
 class DataSetShowWidget(AbstractDataSetWidget):
     """Read-only base widget"""
+    READ_ONLY = True
     def __init__(self, item, parent_layout):
         AbstractDataSetWidget.__init__(self, item, parent_layout)
         self.group = QLabel()
@@ -363,6 +364,11 @@ class DataSetShowWidget(AbstractDataSetWidget):
 
             if value is not None:
                 text = fmt % (func(value), )
+                # We add directly the unit to 'text' (instead of adding it 
+                # to 'fmt') to avoid string formatting error if '%' is in unit
+                unit = self.item.get_prop_value("display", "unit", '')
+                if unit:
+                    text += ' '+unit
             else:
                 text = u""
             return text
