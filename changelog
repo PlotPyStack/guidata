@@ -31,32 +31,32 @@
 
   * setup.py: added svg icons to data files
   * gettext helpers were not working on Linux (Windows install pygettext was hardcoded)
-  * DataSet/bugfix: comment/title options now override the DataSet class __doc__ attribute
-  * Added missing option 'basedir' for FilesOpenItem
-  * DirectoryItem: fixed missing child_title attribute bug
-  * For all dataset GUI representation, the comment text is now word-wrapped
-  * Bugfix: recent versions of PyQt don't like the QApplication reference to be stored in modules (why is that?!)
+  * !DataSet/bugfix: comment/title options now override the !DataSet class __doc__ attribute
+  * Added missing option 'basedir' for !FilesOpenItem
+  * !DirectoryItem: fixed missing child_title attribute bug
+  * For all !DataSet GUI representation, the comment text is now word-wrapped
+  * Bugfix: recent versions of !PyQt don't like the QApplication reference to be stored in modules (why is that?!)
   * Bugfix/tests: always keep a reference to the QApplication instance
 
 === Other changes (since v1.2.5) ===
 
   * setup.py: added source archive download url
   * Tests: now creating real temporary files and cleaning up at exit
-  * qtAllow a callback on LineEditWidget to notify about text changes (use set_prop("display", "callback", callback))
-  * qthelpers: provide wrapper for qt.getOpen/SaveFileName to work around win32 bug
-  * qtwidgets: optionally hide apply button in DataSetEditGroupBox
+  * qtAllow a callback on !LineEditWidget to notify about text changes (use set_prop("display", "callback", callback))
+  * qthelpers: provide wrapper for qt.getOpen/!SaveFileName to work around win32 bug
+  * qtwidgets: optionally hide apply button in !DataSetEditGroupBox
   * added module guidata.qtwidgets (moved some generic widgets from guidata.qthelpers and from other external packages)
   * qthelpers: added helper 'create_groupbox' (QGroupBox object creation)
-  * qtarrayeditor: updated code from Spyder's array editor (original code)
+  * Array editor: updated code from Spyder's array editor (original code)
   * Added package guidata.editors: contains editor widgets derived from Spyder editor widgets (array editor, dictionary editor, text editor)
   * Array editor: added option to set row/col labels (resp. ylabels and xlabels)
-  * ButtonItem: changed callback arguments to  *instance* (DataSet object), *value* (item value), *parent* (button's parent widget)
-  * editors.dicteditor.DictEditor: moved options from constructor to 'setup' method (like ArrayEditor's setup_and_check), added parent widget to constructor options
-  * Added DictItem type: simple button to edit a dictionary
-  * editors.dicteditor.DictEditor/bugfixes: added action "Insert" to context menu for an empty dictionary + fixed inline unicode editing (was showing the error message "Unable to assign data to item")
-  * guidata.qtwidgets: added 'DockableWidgetMixin' to fabricate any dockable QWidget class
+  * !ButtonItem: changed callback arguments to  *instance* (!DataSet object), *value* (item value), *parent* (button's parent widget)
+  * editors.!DictEditor.!DictEditor: moved options from constructor to 'setup' method (like !ArrayEditor's setup_and_check), added parent widget to constructor options
+  * Added !DictItem type: simple button to edit a dictionary
+  * editors.!DictEditor.!DictEditor/bugfixes: added action "Insert" to context menu for an empty dictionary + fixed inline unicode editing (was showing the error message "Unable to assign data to item")
+  * guidata.qtwidgets: added '!DockableWidgetMixin' to fabricate any dockable QWidget class
   * gettext helpers: added support for individual module translation (until now, only whole packages were supported)
-  * DataSetShowGroupBox/DataSetEditGroupBox: **kwargs may now be passed to the dataset constructor
+  * !DataSetShowGroupBox/!DataSetEditGroupBox: **kwargs may now be passed to the !DataSet constructor
   * disthelpers: added 'scipy.io' to supported modules (includes)
   * Added new "value_callback" display property: this function is called when QLineEdit text has changed (item value is passed)
-  * Added option to pass a text formatting function in DataSetShowWidget
+  * Added option to pass a text formatting function in !DataSetShowWidget

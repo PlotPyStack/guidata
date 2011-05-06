@@ -533,9 +533,7 @@ class DirectoryWidget(HLayoutMixin, LineEditWidget):
             child_title = parent.child_title
         except AttributeError:
             child_title = parent.parent().child_title
-        dname = getExistingDirectory(parent,
-                                     child_title(self.item),
-                                     os.path.basename(value))
+        dname = getExistingDirectory(parent, child_title(self.item), value)
         if dname:
             self.edit.setText(dname)
 
