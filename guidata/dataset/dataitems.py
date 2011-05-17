@@ -51,6 +51,16 @@ class NumericTypeItem(DataItem):
         if unit:
             auto_help += (", %s %s" % (_("unit:"), unit))
         return auto_help
+        
+    def format_string(self, instance, value, fmt, func):
+        """Override DataItem method"""
+        text = fmt % (func(value), )
+        # We add directly the unit to 'text' (instead of adding it 
+        # to 'fmt') to avoid string formatting error if '%' is in unit
+        unit = self.get_prop_value("display", instance, "unit", '')
+        if unit:
+            text += ' '+unit
+        return text
 
     def check_value(self, value):
         """Override DataItem method"""
@@ -365,6 +375,17 @@ class ChoiceItem(DataItem):
 #        if callable(_choices_data):
 #            return _choices_data(self, item)
 #        return _choices_data
+
+    def get_string_value(self, instance):
+        """Override DataItem method"""
+        value = self.get_value(instance)
+        choices = self.get_prop_value("data", instance, "choices")
+        #print "ShowChoiceWidget:", choices, value
+        for choice in choices:
+            if choice[0] == value:
+                return unicode(choice[1])
+        else:
+            return DataItem.get_string_value(self, instance)
         
         
 class MultipleChoiceItem(ChoiceItem):
@@ -464,6 +485,11 @@ class FloatArrayItem(DataItem):
         DataItem.__init__(self, label, default=default, help=help)
         self.set_prop("display", format=format, transpose=transpose,
                       minmax=minmax)
+        
+    def format_string(self, instance, value, fmt, func):
+        """Override DataItem method"""
+        v = func(value)
+        return u"~= %g [%g .. %g]" % (v.mean(), v.min(), v.max())
 
 
 class ButtonItem(DataItem):

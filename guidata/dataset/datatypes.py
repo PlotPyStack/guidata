@@ -249,6 +249,33 @@ class DataItem(object):
         Return the automatically generated part of data item's tooltip
         """
         return u""
+        
+    def format_string(self, instance, value, fmt, func):
+        """Apply format to string representation of the item's value"""
+        return fmt % (func(value), )
+        
+    def get_string_value(self, instance):
+        """
+        Return a formatted unicode representation of the item's value
+        obeying 'display' or 'repr' properties
+        """
+        value = self.get_value(instance)
+        repval = self.get_prop_value("display", instance, "repr", None)
+        if repval is not None:
+            return repval
+        else:
+            fmt = self.get_prop_value("display", instance, "format", u"%s")
+            func = self.get_prop_value("display", instance, "func", lambda x:x)
+            if callable(fmt) and value is not None:
+                return fmt(func(value))
+            elif isinstance(fmt, basestring):
+                fmt = unicode(fmt)
+
+            if value is not None:
+                text = self.format_string(instance, value, fmt, func)
+            else:
+                text = u""
+            return text
 
     def set_name(self, new_name):
         """
@@ -423,6 +450,10 @@ class DataItemProxy(object):
     def get_auto_help(self, instance):
         """DataItem method proxy"""
         return self.item.get_auto_help(instance)
+    
+    def get_string_value(self, instance):
+        """DataItem method proxy"""
+        return self.item.get_string_value(instance)
 
     def set_from_string(self, instance, string_value):
         """DataItem method proxy"""
@@ -522,6 +553,13 @@ class DataItemVariable(object):
         # XXX incohérent ?
         return self.item.get_auto_help(self.instance)
         
+    def get_string_value(self):
+        """
+        Return a unicode representation of the item's value
+        obeying 'display' or 'repr' properties
+        """
+        return self.item.get_string_value(self.instance)
+
     def set_default(self):
         """Re-implement DataItem method"""
         return self.item.set_default(self.instance)
@@ -657,24 +695,7 @@ class DataSet(object):
             item.set_default(self)
         
     def __str__(self):
-        indent = "\n    "
-        txt = self.__title+" :"
-        for item in self._items:
-            if isinstance(item, BeginGroup):
-                txt += indent + item._name+":"
-                indent += "  "
-                continue
-            elif isinstance(item,EndGroup):
-                indent = indent[:-2]
-                continue
-            value = getattr(self, "_"+item._name)
-            if value is None:
-                value_str = "-"
-            else:
-                value_str = str(value)
-            txt += indent+item._name+" = "+value_str+ \
-                   " ("+item.__class__.__name__+")"
-        return txt
+        return self.to_string(debug=False)
     
     def check(self):
         """
@@ -709,6 +730,54 @@ class DataSet(object):
         from guidata.dataset.qtwidgets import DataSetShowDialog
         win = DataSetShowDialog(self, icon=self.__icon, parent=parent)
         return win.exec_()
+        
+    def to_string(self, debug=False, indent=None, align=False):
+        """
+        Return readable string representation of the data set
+        If debug is True, add more details on data items
+        """
+        if indent is None:
+            indent = "\n    "
+        txt = self.__title+":"
+        def _get_label(item):
+            if debug:
+                return item._name
+            else:
+                return item.get_prop_value("display", self, "label")
+        length = 0
+        if align:
+            for item in self._items:
+                item_length = len(_get_label(item))
+                if item_length > length:
+                    length = item_length
+        for item in self._items:
+            if isinstance(item, ObjectItem):
+                composite_dataset = item.get_value(self)
+                txt += indent+composite_dataset.to_string(debug=debug,
+                                                          indent=indent+"  ")
+                continue
+            elif isinstance(item, BeginGroup):
+                txt += indent+item._name+":"
+                indent += "  "
+                continue
+            elif isinstance(item, EndGroup):
+                indent = indent[:-2]
+                continue
+            value = getattr(self, "_"+item._name)
+            if value is None:
+                value_str = "-"
+            else:
+                value_str = item.get_string_value(self)
+            if debug:
+                label = item._name
+            else:
+                label = item.get_prop_value("display", self, "label")
+            if length:
+                label = label.ljust(length)
+            txt += indent+label+": "+value_str
+            if debug:
+                txt += " ("+item.__class__.__name__+")"
+        return txt
     
     def accept(self, vis):
         """

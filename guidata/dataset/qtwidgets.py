@@ -339,39 +339,12 @@ class DataSetShowWidget(AbstractDataSetWidget):
     def get(self):
         """Re-implement AbstractDataSetWidget method"""
         self.set_state()
-        text = self.display_value()
+        text = self.item.get_string_value()
         self.group.setText(text)
 
     def set(self):
         """Read only..."""
         pass
-
-    def display_value(self):
-        """Return a unicode representation of the item's value
-        obeying 'display' or 'repr' properties
-        """
-        value = self.item.get()
-        repval = self.item.get_prop_value("display", "repr", None)
-        if repval is not None:
-            return repval
-        else:
-            fmt = self.item.get_prop_value("display", "format", u"%s")
-            func = self.item.get_prop_value("display", "func", lambda x:x)
-            if callable(fmt) and value is not None:
-                return fmt(func(value))
-            elif isinstance(fmt, basestring):
-                fmt = unicode(fmt)
-
-            if value is not None:
-                text = fmt % (func(value), )
-                # We add directly the unit to 'text' (instead of adding it 
-                # to 'fmt') to avoid string formatting error if '%' is in unit
-                unit = self.item.get_prop_value("display", "unit", '')
-                if unit:
-                    text += ' '+unit
-            else:
-                text = u""
-            return text
 
 
 class DataSetShowLayout(DataSetEditLayout):
@@ -402,32 +375,6 @@ class ShowColorWidget(DataSetShowWidget):
             painter.end()
             self.group.setPicture(self.picture)
 
-class ShowFloatArrayWidget(DataSetShowWidget):
-    """Represents a read-only view of an array"""
-    def get(self):
-        """Re-implement AbstractDataSetWidget method"""
-        self.set_state()
-        value = self.item.get()
-        if value is not None:
-            self.group.setText(u"~= %g [%g .. %g]" \
-                               % (value.mean(), value.min(), value.max()))
-
-class ShowChoiceWidget(DataSetShowWidget):
-    """Represents a read-only view of a ChoiceItem"""
-    def get(self):
-        """Re-implement AbstractDataSetWidget method"""
-        value = self.item.get()
-        self.set_state()
-        if value is not None:
-            choices = self.item.get_prop_value("data", "choices")
-            #print "ShowChoiceWidget:", choices, value
-            for choice in choices:
-                if choice[0] == value:
-                    self.group.setText( unicode(choice[1]) )
-                    return
-            text = self.display_value()
-            self.group.setText( text )
-
 DataSetShowLayout.register(GroupItem, GroupWidget)
 DataSetShowLayout.register(TabGroupItem, TabGroupWidget)
 DataSetShowLayout.register(FloatItem, DataSetShowWidget)
@@ -442,10 +389,10 @@ DataSetShowLayout.register(FileOpenItem, DataSetShowWidget )
 DataSetShowLayout.register(FilesOpenItem, DataSetShowWidget )
 DataSetShowLayout.register(FileSaveItem, DataSetShowWidget )
 DataSetShowLayout.register(DirectoryItem, DataSetShowWidget)
-DataSetShowLayout.register(ChoiceItem, ShowChoiceWidget)
-DataSetShowLayout.register(ImageChoiceItem, ShowChoiceWidget)
-DataSetShowLayout.register(MultipleChoiceItem, ShowChoiceWidget)
-DataSetShowLayout.register(FloatArrayItem, ShowFloatArrayWidget)
+DataSetShowLayout.register(ChoiceItem, DataSetShowWidget)
+DataSetShowLayout.register(ImageChoiceItem, DataSetShowWidget)
+DataSetShowLayout.register(MultipleChoiceItem, DataSetShowWidget)
+DataSetShowLayout.register(FloatArrayItem, DataSetShowWidget)
 
 
 class DataSetShowGroupBox(QGroupBox):
