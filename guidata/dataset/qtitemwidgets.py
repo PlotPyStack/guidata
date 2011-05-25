@@ -25,11 +25,17 @@ try:
 except ImportError:
     pass
 
-from PyQt4.QtGui import (QIcon, QPixmap, QHBoxLayout, QGridLayout, QColorDialog,
-                         QPushButton, QLineEdit, QCheckBox, QComboBox, QWidget,
-                         QTabWidget, QGroupBox, QLabel, QTextEdit, QFrame,
-                         QDateEdit, QDateTimeEdit)
-from PyQt4.QtCore import Qt, QObject, QStringList, SIGNAL
+from guidata.qt.QtGui import (QIcon, QPixmap, QHBoxLayout, QGridLayout,
+                              QColorDialog, QPushButton, QLineEdit, QCheckBox,
+                              QComboBox, QWidget, QTabWidget, QGroupBox,
+                              QLabel, QTextEdit, QFrame, QDateEdit,
+                              QDateTimeEdit)
+from guidata.qt.QtCore import Qt, QObject, SIGNAL
+try:
+    from guidata.qt.QtCore import QStringList
+except ImportError:
+    # PyQt API#2
+    QStringList = list
 
 from guidata.utils import update_dataset, restore_dataset, utf8_to_unicode
 from guidata.qthelpers import text_to_qcolor, get_std_icon, getExistingDirectory

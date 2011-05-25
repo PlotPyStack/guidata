@@ -10,10 +10,10 @@ GUI-based test launcher
 """
 
 import sys, os, os.path as osp, subprocess
-from PyQt4.QtGui import (QWidget, QVBoxLayout, QSplitter, QFont, QListWidget,
-                         QPushButton, QLabel, QGroupBox, QHBoxLayout, QShortcut,
-                         QKeySequence)
-from PyQt4.QtCore import SIGNAL, Qt, QSize
+from guidata.qt.QtGui import (QWidget, QVBoxLayout, QSplitter, QFont,
+                              QListWidget, QPushButton, QLabel, QGroupBox,
+                              QHBoxLayout, QShortcut, QKeySequence)
+from guidata.qt.QtCore import SIGNAL, Qt, QSize
 
 from spyderlib.widgets.sourcecode.codeeditor import CodeEditor
 
@@ -157,7 +157,7 @@ class TestLauncherWindow(QSplitter):
 
 def run_testlauncher(package):
     """Run test launcher"""
-    from PyQt4.QtGui import QApplication
+    from guidata.qt.QtGui import QApplication
     app = QApplication([])
     win = TestLauncherWindow(package)
     win.show()

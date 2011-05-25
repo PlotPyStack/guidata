@@ -26,12 +26,12 @@ try:
 except ImportError:
     pass
 
-from PyQt4.QtGui import (QDialog, QFileDialog, QMessageBox, QDialogButtonBox,
-                         QVBoxLayout, QGridLayout, QLabel, QSpacerItem, QColor,
-                         QTabWidget, QWidget, QIcon, QApplication, QPainter,
-                         QPicture, QBrush, QGroupBox, QPushButton)
-
-from PyQt4.QtCore import SIGNAL, SLOT, Qt, QRect
+from guidata.qt.QtGui import (QDialog, QFileDialog, QMessageBox,
+                              QDialogButtonBox, QVBoxLayout, QGridLayout,
+                              QLabel, QSpacerItem, QColor, QTabWidget, QWidget,
+                              QIcon, QApplication, QPainter, QPicture, QBrush,
+                              QGroupBox, QPushButton)
+from guidata.qt.QtCore import SIGNAL, SLOT, Qt, QRect
 
 from guidata.configtools import get_icon
 from guidata.config import _

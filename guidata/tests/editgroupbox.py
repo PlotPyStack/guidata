@@ -14,8 +14,8 @@ layout, showing read-only parameter sets or allowing to edit parameter values.
 
 SHOW = True # Show test in GUI-based test launcher
 
-from PyQt4.QtGui import QMainWindow, QSplitter
-from PyQt4.QtCore import SIGNAL
+from guidata.qt.QtGui import QMainWindow, QSplitter
+from guidata.qt.QtCore import SIGNAL
 
 from guidata.dataset.datatypes import (DataSet, BeginGroup, EndGroup,
                                        BeginTabGroup, EndTabGroup)
@@ -135,7 +135,7 @@ class MainWindow(QMainWindow):
             self.update_groupboxes()
         
 if __name__ == '__main__':
-    from PyQt4.QtGui import QApplication
+    from guidata.qt.QtGui import QApplication
     import sys
     app = QApplication(sys.argv)
     window = MainWindow()
