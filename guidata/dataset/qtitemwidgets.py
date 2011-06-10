@@ -410,11 +410,11 @@ class DateTimeWidget(AbstractDataSetWidget):
 
 class GroupLayout(QHBoxLayout):
     def __init__(self):
-        super(GroupLayout, self).__init__()
+        QHBoxLayout.__init__(self)
         self.widgets = []
         
     def addWidget(self, widget):
-        super(GroupLayout, self).addWidget(widget)
+        QHBoxLayout.addWidget(self, widget)
         self.widgets.append(widget)
         
     def setEnabled(self, state):
