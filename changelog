@@ -1,15 +1,25 @@
 == Version 1.3.2 ==
 
+Since this version, `guidata` is compatible with PyQt4 API #1 *and* API #2.
+Please read carefully the coding guidelines which have been recently added to 
+the documentation.
+
 === Bug fixes (since v1.3.1) ===
 
-  * Fixed compatiblity issues with PyQt v4.4 [Contributor: Carlos Pascual]
+  * qtwidgets.!ShowFloatArrayWidget: fixed string float formatting issue (replaced %f by %g)
+  * Fixed compatiblity issues with !PyQt v4.4 [Contributor: Carlos Pascual]
 
 === Other changes (since v1.3.1) ===
 
   * added *this* changelog
-  * qtwidgets: removed ProgressPopUp dialog (it is now recommended to use QProgressDialog instead, which is pretty much identical)
-  * Replaced QScintilla by spyderlib (as a dependency for array editor, code editor (test launcher) and dict editor)
-  * qtwidgets.DockWidgetMixin: added method 'setup_dockwidget' to change dockwidget's features, location and allowed areas after class instantiation
+  * qtwidgets: removed !ProgressPopUp dialog (it is now recommended to use !QProgressDialog instead, which is pretty much identical)
+  * Replaced !QScintilla by spyderlib (as a dependency for array editor, code editor (test launcher) and dict editor)
+  * qtwidgets.!DockWidgetMixin: added method 'setup_dockwidget' to change dockwidget's features, location and allowed areas after class instantiation
+  * guidata.utils.utf8_to_unicode: translated error message in english
+  * Add support for 'int' in hdf5 save function
+  * guidata.dataset/Numeric items (!FloatItem, !IntItem): added option 'unit' (automatically add suffix ' (unit)' to label in edit mode and suffix ' unit' to value in read-only mode)
+  * Improved dataset __str__ method: code refactoring with read-only dataset widgets (!DataItem: added methods 'format_string' and 'get_string_value', !DataSet: added method 'to_string')
+  * Added coding guidelines to the documentation
 
 ----
 
