@@ -7,7 +7,7 @@ Dependencies
 Requirements:
     * Python 2.x (x>=5)
     * PyQt4 4.x (x>=3 ; recommended x>=4)
-    * spyderlib 2.0.x (x>=11) or 2.1 for the test launcher
+    * spyderlib 2.1 for the test launcher and array/dictionnary editors
     
 Optional Python modules:
     * h5py (HDF5 files I/O)
