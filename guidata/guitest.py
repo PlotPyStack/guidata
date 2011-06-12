@@ -66,7 +66,7 @@ class TestModule(object):
 class TestPropertiesWidget(QWidget):
     def __init__(self, parent):
         QWidget.__init__(self, parent)
-        font = QFont(get_family(MONOSPACE), 9, QFont.Normal)
+        font = QFont(get_family(MONOSPACE), 10, QFont.Normal)
         
         info_icon = QLabel()
         icon = get_std_icon('MessageBoxInformation').pixmap(24, 24)
@@ -100,13 +100,9 @@ class TestPropertiesWidget(QWidget):
         
         self.run_button = QPushButton(get_icon("apply.png"),
                                       _("Run this script"), self)
-        self.run_all_button = QPushButton(get_icon("busy.png"),
-                                          _("Run all tests"), self)
         self.quit_button = QPushButton(get_icon("exit.png"), _("Quit"), self)
         hlayout = QHBoxLayout()
         hlayout.addWidget(self.run_button)
-        hlayout.addStretch()
-        hlayout.addWidget(self.run_all_button)
         hlayout.addStretch()
         hlayout.addWidget(self.quit_button)
         
@@ -144,8 +140,6 @@ class TestLauncherWindow(QSplitter):
         
         self.connect(self.properties.run_button, SIGNAL("clicked()"),
                      lambda: tests[listwidget.currentRow()].run())
-        self.connect(self.properties.run_all_button, SIGNAL("clicked()"),
-                     lambda: [test.run() for test in tests])
         self.connect(self.properties.quit_button, SIGNAL("clicked()"),
                      self.close)
         self.connect(listwidget, SIGNAL('currentRowChanged(int)'),
@@ -158,7 +152,7 @@ class TestLauncherWindow(QSplitter):
             
         self.setSizes([150, 1])
         self.setStretchFactor(1, 1)
-        self.resize(QSize(800, 600))
+        self.resize(QSize(950, 600))
         self.properties.set_item(tests[0])
     
 
