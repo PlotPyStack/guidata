@@ -6,14 +6,14 @@
 
 """Transitional package (PyQt4 --> PySide)"""
 
-import os, warnings
+import os, warnings, imp
 
-_default_modname = 'PyQt4'
-try:
-    import PyQt4
-except ImportError:
-    import PySide
-    _default_modname = 'PySide'
+for _default_modname in ('PyQt4', 'PySide'):
+    try:
+        imp.find_module(_default_modname)
+        break
+    except ImportError:
+        pass
 
 _modname = os.environ.setdefault('PYTHON_QT_LIBRARY', _default_modname)
 assert _modname in ('PyQt4', 'PySide')
@@ -38,6 +38,8 @@ if _modname == 'PyQt4':
     __version_info__ = tuple(__version__.split('.')+['final', 1])
     is_pyqt46 = __version__.startswith('4.6')
 else:
+    warnings.warn("guidata is still not fully compatible with PySide",
+                  RuntimeWarning)
     import PySide
     __version__ = PySide.__version__
     from PySide import *
