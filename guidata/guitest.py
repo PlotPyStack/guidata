@@ -15,8 +15,6 @@ from guidata.qt.QtGui import (QWidget, QVBoxLayout, QSplitter, QFont,
                               QHBoxLayout, QShortcut, QKeySequence)
 from guidata.qt.QtCore import SIGNAL, Qt, QSize
 
-from spyderlib.widgets.sourcecode.codeeditor import CodeEditor
-
 from guidata.config import _
 from guidata.configtools import get_icon, get_family, MONOSPACE
 from guidata.qthelpers import get_std_icon
@@ -85,14 +83,20 @@ class TestPropertiesWidget(QWidget):
         layout.addWidget(self.desc_label)
         group_desc.setLayout(layout)
         
-        self.editor = CodeEditor(self)
-        self.editor.setup_editor(linenumbers=True, code_analysis=False,
-                                 todo_list=False, font=font)
-        self.editor.setReadOnly(True)
-        group_code = QGroupBox(_("Source code"), self)
-        layout = QVBoxLayout()
-        layout.addWidget(self.editor)
-        group_code.setLayout(layout)
+        from guidata.utils import is_compatible_spyderlib_installed
+        if is_compatible_spyderlib_installed(self):
+            from spyderlib.widgets.sourcecode.codeeditor import CodeEditor
+            self.editor = CodeEditor(self)
+            self.editor.setup_editor(linenumbers=True, code_analysis=False,
+                                     todo_list=False, font=font)
+            self.editor.setReadOnly(True)
+            group_code = QGroupBox(_("Source code"), self)
+            layout = QVBoxLayout()
+            layout.addWidget(self.editor)
+            group_code.setLayout(layout)
+        else:
+            self.editor = None
+            group_code = None
         
         self.run_button = QPushButton(get_icon("apply.png"),
                                       _("Run this script"), self)
@@ -108,13 +112,15 @@ class TestPropertiesWidget(QWidget):
         
         vlayout = QVBoxLayout()
         vlayout.addWidget(group_desc)
-        vlayout.addWidget(group_code)
+        if group_code is not None:
+            vlayout.addWidget(group_code)
         vlayout.addLayout(hlayout)
         self.setLayout(vlayout)
         
     def set_item(self, test):
         self.desc_label.setText(test.get_description())
-        self.editor.set_text_from_file(test.filename)
+        if self.editor is not None:
+            self.editor.set_text_from_file(test.filename)
 
 
 class TestLauncherWindow(QSplitter):
@@ -153,6 +159,7 @@ class TestLauncherWindow(QSplitter):
         self.setSizes([150, 1])
         self.setStretchFactor(1, 1)
         self.resize(QSize(800, 600))
+        self.properties.set_item(tests[0])
     
 
 def run_testlauncher(package):
