@@ -260,11 +260,17 @@ def is_compatible_spyderlib_installed(parent=None):
     try:
         from spyderlib.requirements import check_pyqt_api
     except ImportError:
-        if parent is not None:
-            from guidata.qt.QtGui import QMessageBox
-            QMessageBox.critical(parent, "Error", "This feature requires the "
-                                 "<b>spyderlib</b> Python library.<br> "
-                                 "Please install spyderlib v2.1 or later.",
+        micro_req = 10
+        from spyderlib import __version__ as sver
+        if sver.startswith('2.0') and int(sver.split('.')[-1]) >= micro_req:
+            return True
+        else:
+            if parent is not None:
+                from guidata.qt.QtGui import QMessageBox
+                QMessageBox.critical(parent, "Error",
+                                 "This feature requires the <b>spyderlib</b> "
+                                 "Python library.<br> Please install spyderlib "
+                                 ">= v2.0.%d." % micro_req,
                                  QMessageBox.Ok)
-        return False
+            return False
     return check_pyqt_api(parent)
