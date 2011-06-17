@@ -14,8 +14,8 @@ for developing easily Qt-based graphical user interfaces.
 """
 
 from math import cos, sin, pi
-from PyQt4.QtGui import QLabel, QPainter, QPen, QWidget, QDockWidget
-from PyQt4.QtCore import SIGNAL, QSize, Qt
+from guidata.qt.QtGui import QLabel, QPainter, QPen, QWidget, QDockWidget
+from guidata.qt.QtCore import SIGNAL, QSize, Qt
 
 # Local imports:
 from guidata.configtools import get_family

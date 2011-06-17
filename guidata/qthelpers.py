@@ -14,11 +14,11 @@ easily Qt-based graphical user interfaces.
 """
 
 import sys, os, os.path as osp
-from PyQt4.QtGui import (QAction, QApplication, QColor, QCursor, QFileDialog,
-                         QHBoxLayout, QIcon, QKeySequence, QLabel, QLineEdit,
-                         QMenu, QPushButton, QStyle, QToolButton, QVBoxLayout,
-                         QWidget, QGroupBox)
-from PyQt4.QtCore import SIGNAL, QString, Qt
+from guidata.qt.QtGui import (QAction, QApplication, QColor, QCursor,
+                              QFileDialog, QHBoxLayout, QIcon, QKeySequence,
+                              QLabel, QLineEdit, QMenu, QPushButton, QStyle,
+                              QToolButton, QVBoxLayout, QWidget, QGroupBox)
+from guidata.qt.QtCore import SIGNAL, Qt, QObject
 
 # Local imports:
 from guidata.configtools import get_icon
@@ -28,7 +28,7 @@ from guidata.config import _
 def text_to_qcolor(text):
     """Create a QColor from specified string"""
     color = QColor()
-    if isinstance(text, QString):
+    if isinstance(text, QObject):
         text = str(text)
     if not isinstance(text, (unicode, str)):
         return color
@@ -151,7 +151,7 @@ class ShowStdIcons(QWidget):
     Dialog showing standard icons
     """
     def __init__(self, parent):
-        super(ShowStdIcons, self).__init__(parent)
+        QWidget.__init__(self, parent)
         layout = QHBoxLayout()
         row_nb = 14
         cindex = 0

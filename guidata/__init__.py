@@ -531,7 +531,7 @@ External resources:
 #    Version 2.0 dated 2006-09-05.
 
 
-__version__ = '1.4.0'
+__version__ = '1.3.2beta2'
 
 # Dear (Debian, RPM, ...) package makers, please feel free to customize the
 # following path to module's data (images) and translations:
@@ -544,7 +544,7 @@ def qapplication():
     Return QApplication instance
     Creates it if it doesn't already exist
     """
-    from PyQt4.QtGui import QApplication
+    from guidata.qt.QtGui import QApplication
     app = QApplication.instance()
     if not app:
         app = QApplication([])
@@ -556,7 +556,7 @@ def install_translator(qapp):
     """Install Qt translator to the QApplication instance"""
     global QT_TRANSLATOR
     if QT_TRANSLATOR is None:
-        from PyQt4.QtCore import QLocale, QTranslator, QLibraryInfo
+        from guidata.qt.QtCore import QLocale, QTranslator, QLibraryInfo
         locale = QLocale.system().name()
         # Qt-specific translator
         qt_translator = QTranslator()

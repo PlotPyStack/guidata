@@ -25,11 +25,17 @@ try:
 except ImportError:
     pass
 
-from PyQt4.QtGui import (QIcon, QPixmap, QHBoxLayout, QGridLayout, QColorDialog,
-                         QPushButton, QLineEdit, QCheckBox, QComboBox, QWidget,
-                         QTabWidget, QGroupBox, QLabel, QTextEdit, QFrame,
-                         QDateEdit, QDateTimeEdit)
-from PyQt4.QtCore import Qt, QObject, QStringList, SIGNAL
+from guidata.qt.QtGui import (QIcon, QPixmap, QHBoxLayout, QGridLayout,
+                              QColorDialog, QPushButton, QLineEdit, QCheckBox,
+                              QComboBox, QWidget, QTabWidget, QGroupBox,
+                              QLabel, QTextEdit, QFrame, QDateEdit,
+                              QDateTimeEdit)
+from guidata.qt.QtCore import Qt, QObject, SIGNAL
+try:
+    from guidata.qt.QtCore import QStringList
+except ImportError:
+    # PyQt API#2
+    QStringList = list
 
 from guidata.utils import update_dataset, restore_dataset, utf8_to_unicode
 from guidata.qthelpers import text_to_qcolor, get_std_icon, getExistingDirectory
@@ -404,11 +410,11 @@ class DateTimeWidget(AbstractDataSetWidget):
 
 class GroupLayout(QHBoxLayout):
     def __init__(self):
-        super(GroupLayout, self).__init__()
+        QHBoxLayout.__init__(self)
         self.widgets = []
         
     def addWidget(self, widget):
-        super(GroupLayout, self).addWidget(widget)
+        QHBoxLayout.addWidget(self, widget)
         self.widgets.append(widget)
         
     def setEnabled(self, state):
@@ -671,12 +677,15 @@ class FloatArrayWidget(AbstractDataSetWidget):
 
     def edit_array(self):
         """Open an array editor dialog"""
-        label = self.item.get_prop_value("display", "label")
-        from spyderlib.widgets.arrayeditor import ArrayEditor
-        editor = ArrayEditor(self.parent_layout.parent)
-        if editor.setup_and_check(self.arr, title=label):
-            if editor.exec_():
-                self.update(self.arr)
+        parent = self.parent_layout.parent
+        from guidata.utils import is_compatible_spyderlib_installed
+        if is_compatible_spyderlib_installed(parent):
+            label = self.item.get_prop_value("display", "label")
+            from spyderlib.widgets.arrayeditor import ArrayEditor
+            editor = ArrayEditor(parent)
+            if editor.setup_and_check(self.arr, title=label):
+                if editor.exec_():
+                    self.update(self.arr)
         
     def get(self):
         """Override AbstractDataSetWidget method"""

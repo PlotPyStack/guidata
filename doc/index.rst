@@ -9,6 +9,7 @@ Contents:
     
     overview
     installation
+    development
     examples
     reference
     

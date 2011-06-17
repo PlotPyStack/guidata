@@ -17,9 +17,9 @@ import os.path as osp
 import sys
 import gettext
 
-from PyQt4.QtGui import (QFont, QLabel, QPixmap, QIcon, QHBoxLayout, QColor,
-                         QPen, QBrush, QFontDatabase)
-from PyQt4.QtCore import Qt
+from guidata.qt.QtGui import (QFont, QLabel, QPixmap, QIcon, QHBoxLayout,
+                              QColor, QPen, QBrush, QFontDatabase)
+from guidata.qt.QtCore import Qt
 
 IMG_PATH = []
 
