@@ -6,16 +6,9 @@
 
 """Transitional package (PyQt4 --> PySide)"""
 
-import os, warnings, imp
+import os, warnings
 
-for _default_modname in ('PyQt4', 'PySide'):
-    try:
-        imp.find_module(_default_modname)
-        break
-    except ImportError:
-        pass
-
-_modname = os.environ.setdefault('PYTHON_QT_LIBRARY', _default_modname)
+_modname = os.environ.setdefault('PYTHON_QT_LIBRARY', 'PyQt4')
 assert _modname in ('PyQt4', 'PySide')
 
 if _modname == 'PyQt4':
