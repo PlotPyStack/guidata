@@ -3,6 +3,7 @@
 	<name>guidata</name>
 	<comment></comment>
 	<projects>
+		<project>spyder</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

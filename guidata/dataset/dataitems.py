@@ -532,20 +532,18 @@ class DictItem(ButtonItem):
     """
     def __init__(self, label, default=None, help=''):
         def dictedit(instance, item, value, parent):
-            from guidata.utils import is_compatible_spyderlib_installed
-            if is_compatible_spyderlib_installed(parent):
-                from spyderlib.widgets.dicteditor import DictEditor
-                editor = DictEditor(parent)
-                value_was_none = value is None
+            from spyderlib.widgets.dicteditor import DictEditor
+            editor = DictEditor(parent)
+            value_was_none = value is None
+            if value_was_none:
+                value = {}
+            editor.setup(value)
+            if editor.exec_():
+                return editor.get_value()
+            else:
                 if value_was_none:
-                    value = {}
-                editor.setup(value)
-                if editor.exec_():
-                    return editor.get_value()
-                else:
-                    if value_was_none:
-                        return
-                    return value
+                    return
+                return value
         ButtonItem.__init__(self, label, dictedit,
                             icon='dictedit.png', default=default, help=help)
 

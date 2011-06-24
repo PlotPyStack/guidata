@@ -252,25 +252,3 @@ def trace(f):
         print "leave:", f.__name__
         return res
     return wrapper
-
-def is_compatible_spyderlib_installed(parent=None):
-    """Return True if the compatible spyderlib module is installed,
-    otherwise show a critical message box (hence the 'parent' argument)
-    and then return False -- if parent is None, do not show message box"""
-    try:
-        from spyderlib.requirements import check_pyqt_api
-    except ImportError:
-        micro_req = 10
-        from spyderlib import __version__ as sver
-        if sver.startswith('2.0') and int(sver.split('.')[-1]) >= micro_req:
-            return True
-        else:
-            if parent is not None:
-                from guidata.qt.QtGui import QMessageBox
-                QMessageBox.critical(parent, "Error",
-                                 "This feature requires the <b>spyderlib</b> "
-                                 "Python library.<br> Please install spyderlib "
-                                 ">= v2.0.%d." % micro_req,
-                                 QMessageBox.Ok)
-            return False
-    return check_pyqt_api(parent)
