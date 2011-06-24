@@ -18,7 +18,7 @@ from guidata.qt.QtGui import (QAction, QApplication, QColor, QCursor,
                               QFileDialog, QHBoxLayout, QIcon, QKeySequence,
                               QLabel, QLineEdit, QMenu, QPushButton, QStyle,
                               QToolButton, QVBoxLayout, QWidget, QGroupBox)
-from guidata.qt.QtCore import SIGNAL, Qt, QObject
+from guidata.qt.QtCore import SIGNAL, Qt
 
 # Local imports:
 from guidata.configtools import get_icon
@@ -28,7 +28,7 @@ from guidata.config import _
 def text_to_qcolor(text):
     """Create a QColor from specified string"""
     color = QColor()
-    if isinstance(text, QObject):
+    if not isinstance(text, basestring): # testing for QString (PyQt API#1)
         text = str(text)
     if not isinstance(text, (unicode, str)):
         return color
