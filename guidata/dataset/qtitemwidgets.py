@@ -772,6 +772,9 @@ class ButtonWidget(AbstractDataSetWidget):
         layout.addWidget(self.group, row, label_column, row_span, column_span+1)
 
     def clicked(self, *args):
+        for widget in self.parent_layout.widgets:
+            # widget may have been modified, so we update the dataset
+            widget.set()
         callback = self.item.get_prop_value("display", "callback")
         inst = self.item.instance
         item = self.item.item
