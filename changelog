@@ -1,6 +1,6 @@
 == Version 1.3.2 ==
 
-Since this version, `guidata` is compatible with PyQt4 API #1 *and* API #2.
+Since this version, `guidata` is compatible with !PyQt4 API #1 *and* API #2.
 Please read carefully the coding guidelines which have been recently added to 
 the documentation.
 
@@ -20,6 +20,7 @@ the documentation.
   * guidata.dataset/Numeric items (!FloatItem, !IntItem): added option 'unit' (automatically add suffix ' (unit)' to label in edit mode and suffix ' unit' to value in read-only mode)
   * Improved dataset __str__ method: code refactoring with read-only dataset widgets (!DataItem: added methods 'format_string' and 'get_string_value', !DataSet: added method 'to_string')
   * Added coding guidelines to the documentation
+  * guidata.dataset.qtwidget: added specific widget (!ShowBooleanWidget) for read-only display of bool items (text is striked out when value is False)
 
 ----
 

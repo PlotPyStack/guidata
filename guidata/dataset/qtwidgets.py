@@ -138,7 +138,7 @@ class DataSetGroupEditDialog(DataSetEditDialog):
     Tabbed dialog box for DataSet editing
     """
     def setup_instance(self, instance):
-        """Re-implement DataSetEditDialog method"""
+        """Override DataSetEditDialog method"""
         from guidata.dataset.datatypes import DataSetGroup
         assert isinstance(instance, DataSetGroup)
         tabs = QTabWidget()
@@ -337,7 +337,7 @@ class DataSetShowWidget(AbstractDataSetWidget):
         #self.group.setEnabled(False)
 
     def get(self):
-        """Re-implement AbstractDataSetWidget method"""
+        """Override AbstractDataSetWidget method"""
         self.set_state()
         text = self.item.get_string_value()
         self.group.setText(text)
@@ -346,25 +346,14 @@ class DataSetShowWidget(AbstractDataSetWidget):
         """Read only..."""
         pass
 
-
-class DataSetShowLayout(DataSetEditLayout):
-    """Read-only layout"""
-    _widget_factory = {}
-
-class DataSetShowDialog(DataSetEditDialog):
-    """Read-only dialog box"""
-    def layout_factory(self, instance, grid ):
-        """Re-implement DataSetEditDialog method"""
-        return DataSetShowLayout( self, instance, grid )
-
 class ShowColorWidget(DataSetShowWidget):
-    """Read-only base widget"""
+    """Read-only color item widget"""
     def __init__(self, item, parent_layout):
         DataSetShowWidget.__init__(self, item, parent_layout)
         self.picture = None
         
     def get(self):
-        """Re-implement AbstractDataSetWidget method"""
+        """Override AbstractDataSetWidget method"""
         value = self.item.get()
         if value is not None:
             color = QColor(value)
@@ -375,13 +364,48 @@ class ShowColorWidget(DataSetShowWidget):
             painter.end()
             self.group.setPicture(self.picture)
 
+class ShowBooleanWidget(DataSetShowWidget):
+    """Read-only bool item widget"""
+    def place_on_grid(self, layout, row, label_column, widget_column,
+                      row_span=1, column_span=1):
+        """Override AbstractDataSetWidget method"""
+        if not self.item.get_prop_value("display", "label"):
+            widget_column = label_column
+            column_span += 1
+        else:
+            self.place_label(layout, row, label_column)
+        layout.addWidget(self.group, row, widget_column, row_span, column_span)
+        
+    def get(self):
+        """Override AbstractDataSetWidget method"""
+        DataSetShowWidget.get(self)
+        text = self.item.get_prop_value("display", "text")
+        self.group.setText(text)
+        font = self.group.font()
+        value = self.item.get()
+        state = bool(value)
+        font.setStrikeOut(not state)
+        self.group.setFont(font)
+        self.group.setEnabled(state)
+
+
+class DataSetShowLayout(DataSetEditLayout):
+    """Read-only layout"""
+    _widget_factory = {}
+
+class DataSetShowDialog(DataSetEditDialog):
+    """Read-only dialog box"""
+    def layout_factory(self, instance, grid ):
+        """Override DataSetEditDialog method"""
+        return DataSetShowLayout( self, instance, grid )
+
 DataSetShowLayout.register(GroupItem, GroupWidget)
 DataSetShowLayout.register(TabGroupItem, TabGroupWidget)
 DataSetShowLayout.register(FloatItem, DataSetShowWidget)
 DataSetShowLayout.register(StringItem, DataSetShowWidget)
 DataSetShowLayout.register(TextItem, DataSetShowWidget)
 DataSetShowLayout.register(IntItem, DataSetShowWidget)
-DataSetShowLayout.register(BoolItem, DataSetShowWidget)
+DataSetShowLayout.register(BoolItem, ShowBooleanWidget)
 DataSetShowLayout.register(DateItem, DataSetShowWidget)
 DataSetShowLayout.register(DateTimeItem, DataSetShowWidget)
 DataSetShowLayout.register(ColorItem, ShowColorWidget)
