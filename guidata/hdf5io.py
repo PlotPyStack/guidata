@@ -91,8 +91,9 @@ class Dset(Attr):
     Generic load/save for an hdf5 dataset:
     scalar=float -> used to convert the value when it is scalar
     """
-    def __init__(self, hdf_name, struct_name=None, type=None, scalar=None):
-        Attr.__init__(self, hdf_name, struct_name, type)
+    def __init__(self, hdf_name, struct_name=None, type=None, scalar=None,
+                 optional=False):
+        Attr.__init__(self, hdf_name, struct_name, type, optional)
         self.scalar = scalar
 
     def get_value(self, struct):

@@ -21,6 +21,7 @@ the documentation.
   * Improved dataset __str__ method: code refactoring with read-only dataset widgets (!DataItem: added methods 'format_string' and 'get_string_value', !DataSet: added method 'to_string')
   * Added coding guidelines to the documentation
   * guidata.dataset.qtwidget: added specific widget (!ShowBooleanWidget) for read-only display of bool items (text is striked out when value is False)
+  * guidata.hdf5io.Dset: added missing keyword argument 'optional' (same effect as parent class Attr)
 
 ----
 
