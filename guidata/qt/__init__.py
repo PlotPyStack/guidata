@@ -42,10 +42,15 @@ if _modname == 'PyQt4':
 #                      "we try to keep it compatible with API#1, "
 #                      "so please report any compatibility issue.",
 #                      PendingDeprecationWarning, stacklevel=2)
-    from PyQt4.QtCore import PYQT_VERSION_STR as __version__
-    __version_info__ = tuple(__version__.split('.')+['final', 1])
-    is_pyqt46 = __version__.startswith('4.6')
-else:
+    try:
+        from PyQt4.QtCore import PYQT_VERSION_STR as __version__
+        __version_info__ = tuple(__version__.split('.')+['final', 1])
+        is_pyqt46 = __version__.startswith('4.6')
+    except ImportError:
+        # Switching to PySide
+        os.environ['PYTHON_QT_LIBRARY'] = _modname = 'PySide'
+
+if _modname == 'PySide':
     warnings.warn("guidata is still not fully compatible with PySide",
                   RuntimeWarning)
     import PySide

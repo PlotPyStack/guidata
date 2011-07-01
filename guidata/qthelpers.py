@@ -18,7 +18,7 @@ from guidata.qt.QtGui import (QAction, QApplication, QColor, QCursor,
                               QFileDialog, QHBoxLayout, QIcon, QKeySequence,
                               QLabel, QLineEdit, QMenu, QPushButton, QStyle,
                               QToolButton, QVBoxLayout, QWidget, QGroupBox)
-from guidata.qt.QtCore import SIGNAL, Qt
+from guidata.qt.QtCore import SIGNAL, Qt, from_qvariant
 
 # Local imports:
 from guidata.configtools import get_icon
@@ -220,7 +220,7 @@ def open_file(parent, filename=None,
         # For recent files
         action = parent.sender()
         if isinstance(action, QAction):
-            filename = unicode(action.data().toString())
+            filename = from_qvariant(action.data(), unicode)
     if not filename:
         filename = getOpenFileName(parent, title, os.getcwdu(), filetypes)
     if filename:
