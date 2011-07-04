@@ -470,6 +470,19 @@ class ColorWidget(HLayoutMixin, LineEditWidget):
             self.update(value)
 
 
+def _get_child_title_func(ancestor):
+    previous_ancestor = None
+    while True:
+        try:
+            if previous_ancestor is ancestor:
+                break
+            return ancestor.child_title
+        except AttributeError:
+            previous_ancestor = ancestor
+            ancestor = ancestor.parent()
+    return lambda item: ''
+
+
 class FileWidget(HLayoutMixin, LineEditWidget):
     """
     File path item widget
@@ -507,10 +520,7 @@ class FileWidget(HLayoutMixin, LineEditWidget):
                 filter_lines.append(all_filter)
         if fname is None:
             fname = ""
-        try:
-            child_title = parent.child_title
-        except AttributeError:
-            child_title = parent.parent().child_title
+        child_title = _get_child_title_func(parent)
         fname = self.filedialog(parent, child_title(self.item), fname,
                                 "\n".join(filter_lines))
         sys.stdout = _temp
@@ -535,10 +545,7 @@ class DirectoryWidget(HLayoutMixin, LineEditWidget):
         """Open a directory selection dialog box"""
         value = self.item.from_string(unicode(self.edit.text()))
         parent = self.parent_layout.parent
-        try:
-            child_title = parent.child_title
-        except AttributeError:
-            child_title = parent.parent().child_title
+        child_title = _get_child_title_func(parent)
         dname = getExistingDirectory(parent, child_title(self.item), value)
         if dname:
             self.edit.setText(dname)

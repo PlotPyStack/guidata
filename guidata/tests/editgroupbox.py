@@ -19,7 +19,8 @@ from guidata.qt.QtCore import SIGNAL
 
 from guidata.dataset.datatypes import (DataSet, BeginGroup, EndGroup,
                                        BeginTabGroup, EndTabGroup)
-from guidata.dataset.dataitems import ChoiceItem, FloatItem, StringItem
+from guidata.dataset.dataitems import (ChoiceItem, FloatItem, StringItem,
+                                       DirectoryItem, FileOpenItem)
 from guidata.dataset.qtwidgets import DataSetShowGroupBox, DataSetEditGroupBox
 from guidata.configtools import get_icon
 from guidata.qthelpers import create_action, add_actions, get_std_icon
@@ -45,6 +46,8 @@ class ExampleMultiGroupDataSet(DataSet):
     t_group = BeginTabGroup("T group")
     a_group = BeginGroup("A group")
     param2 = FloatItem(u"Foobar 2", default=.93)
+    dir1 = DirectoryItem(u"Directory 1")
+    file1 = FileOpenItem(u"File 1")
     _a_group = EndGroup("A group")
     b_group = BeginGroup("B group")
     param3 = FloatItem(u"Foobar 3", default=123)

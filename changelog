@@ -8,6 +8,7 @@ the documentation.
 
   * qtwidgets.!ShowFloatArrayWidget: fixed string float formatting issue (replaced %f by %g)
   * Fixed compatiblity issues with !PyQt v4.4 [Contributor: Carlos Pascual]
+  * Fixed missing 'child_title' attribute error with !FileOpenItem, !FilesOpenItem, !FileSaveItem and !DirectoryItem
 
 === Other changes (since v1.3.1) ===
 
