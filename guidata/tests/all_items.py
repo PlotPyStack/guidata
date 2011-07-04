@@ -49,7 +49,8 @@ class TestParameters(DataSet):
     string = StringItem("String")
     text = TextItem("Text")
     fl1 = FloatItem("Float", min=1, max=30, help="Help on float item")
-    integer = IntItem("Integer", default=5, min=3, max=6).set_pos(col=1)
+    integer = IntItem("Integer", default=5, min=3, max=16, slider=True
+                      ).set_pos(col=1)
     dtime = DateTimeItem("Date/time", default=datetime.datetime(2010, 10, 10))
     date = DateItem("Date", default=datetime.date(2010, 10, 10)).set_pos(col=1)
     bool1 = BoolItem("Boolean option without label")

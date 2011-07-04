@@ -23,6 +23,7 @@ the documentation.
   * Added coding guidelines to the documentation
   * guidata.dataset.qtwidget: added specific widget (!ShowBooleanWidget) for read-only display of bool items (text is striked out when value is False)
   * guidata.hdf5io.Dset: added missing keyword argument 'optional' (same effect as parent class Attr)
+  * guidata.dataset.dataitems.!IntItem objects: added support for sliders (fixes Issue 9) with option slider=True (see documentation)
 
 ----
 

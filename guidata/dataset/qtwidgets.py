@@ -36,11 +36,6 @@ from guidata.qt.QtCore import SIGNAL, SLOT, Qt, QRect
 from guidata.configtools import get_icon
 from guidata.config import _
 
-from qtitemwidgets import (LineEditWidget, TextEditWidget, CheckBoxWidget,
-                           ColorWidget, FileWidget, DirectoryWidget,
-                           ChoiceWidget, MultipleChoiceWidget, FloatArrayWidget,
-                           GroupWidget, AbstractDataSetWidget, ButtonWidget,
-                           TabGroupWidget, DateWidget, DateTimeWidget)
 from guidata.dataset.datatypes import (BeginGroup, EndGroup, GroupItem,
                                        TabGroupItem)
 
@@ -289,6 +284,11 @@ class DataSetEditLayout(object):
 
 
 # Enregistrement des correspondances avec les widgets
+from guidata.dataset.qtitemwidgets import (LineEditWidget, TextEditWidget,
+                CheckBoxWidget, ColorWidget, FileWidget, DirectoryWidget,
+                ChoiceWidget, MultipleChoiceWidget, FloatArrayWidget,
+                GroupWidget, AbstractDataSetWidget, ButtonWidget,
+                TabGroupWidget, DateWidget, DateTimeWidget, SliderWidget)
 from guidata.dataset.dataitems import (FloatItem, StringItem, TextItem, IntItem,
                 BoolItem, ColorItem, FileOpenItem, FilesOpenItem, FileSaveItem,
                 DirectoryItem, ChoiceItem, ImageChoiceItem, MultipleChoiceItem,
@@ -299,7 +299,7 @@ DataSetEditLayout.register(TabGroupItem, TabGroupWidget)
 DataSetEditLayout.register(FloatItem, LineEditWidget)
 DataSetEditLayout.register(StringItem, LineEditWidget)
 DataSetEditLayout.register(TextItem, TextEditWidget)
-DataSetEditLayout.register(IntItem, LineEditWidget)
+DataSetEditLayout.register(IntItem, SliderWidget)
 DataSetEditLayout.register(BoolItem, CheckBoxWidget)
 DataSetEditLayout.register(DateItem, DateWidget)
 DataSetEditLayout.register(DateTimeItem, DateTimeWidget)

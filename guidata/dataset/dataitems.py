@@ -113,16 +113,19 @@ class IntItem(NumericTypeItem):
         * max [int]: maximum value (optional)
         * nonzero [bool]: if True, zero is not a valid value (optional)
         * unit [string]: physical unit (optional)
-        * even [bool]: if True, even values are valid, if False, odd values are valid
-                 if None (default), ignored (optional)
+        * even [bool]: if True, even values are valid, if False,
+          odd values are valid if None (default), ignored (optional)
+        * slider [bool]: if True, shows a slider widget right after the line 
+          edit widget (default is False)
         * help [string]: text shown in tooltip (optional)
     """
     type = int
     def __init__(self, label, default=None, min=None, max=None,
-                 nonzero=None, unit='', even=None, help=''):
+                 nonzero=None, unit='', even=None, slider=False, help=''):
         super(IntItem, self).__init__(label, default=default, min=min, max=max,
                                       nonzero=nonzero, unit=unit, help=help)
         self.set_prop("data", even=even)
+        self.set_prop("display", slider=slider)
         
     def get_auto_help(self, instance):
         """Override DataItem method"""

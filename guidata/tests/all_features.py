@@ -87,7 +87,9 @@ class TestParameters(DataSet):
     mchoice3 = MultipleChoiceItem("MC type 3",
                                   [ str(i) for i in range(10)] ).horizontal(2)
     eg0 = EndTabGroup("group")
-    integer = IntItem("Integer", default=5, min=3, max=6).set_pos(col=2)
+    integer_slider = IntItem("Integer (with slider)",
+                             default=5, min=0, max=100, slider=True)
+    integer = IntItem("Integer", default=5, min=3, max=6).set_pos(col=1)
     
     
 if __name__ == "__main__":

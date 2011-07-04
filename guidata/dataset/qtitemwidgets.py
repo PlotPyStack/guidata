@@ -28,7 +28,7 @@ except ImportError:
 from guidata.qt.QtGui import (QIcon, QPixmap, QHBoxLayout, QGridLayout,
                               QColorDialog, QPushButton, QLineEdit, QCheckBox,
                               QComboBox, QWidget, QTabWidget, QGroupBox,
-                              QLabel, QTextEdit, QFrame, QDateEdit,
+                              QLabel, QTextEdit, QFrame, QDateEdit, QSlider,
                               QDateTimeEdit)
 from guidata.qt.QtCore import Qt, QObject, SIGNAL
 try:
@@ -468,6 +468,40 @@ class ColorWidget(HLayoutMixin, LineEditWidget):
             value = color.name()
             self.edit.setText(value)
             self.update(value)
+
+
+class SliderWidget(HLayoutMixin, LineEditWidget):
+    """
+    IntItem with Slider
+    """
+    def __init__(self, item, parent_layout):
+        super(SliderWidget, self).__init__(item, parent_layout)
+        if item.get_prop_value("display", "slider"):
+            self.slider = QSlider()
+            self.slider.setOrientation(Qt.Horizontal)
+            vmin = item.get_prop_value("data", "min")
+            vmax = item.get_prop_value("data", "max")
+            assert vmin is not None and vmax is not None, "SliderWidget requires that IntItem min/max have been defined"
+            self.slider.setRange(vmin, vmax)
+            QObject.connect(self.slider, SIGNAL("valueChanged(int)"),
+                            self.value_changed)
+            self.group.addWidget(self.slider)
+        else:
+            self.slider = None
+        
+    def update(self, value):
+        """Reimplement LineEditWidget method"""
+        LineEditWidget.update(self, value)
+        if  self.slider is not None and isinstance(value, int):
+            self.slider.blockSignals(True)
+            self.slider.setValue(int(value))
+            self.slider.blockSignals(False)
+            
+    def value_changed(self, ivalue):
+        """Update the lineedit"""
+        value = str(ivalue)
+        self.edit.setText(value)
+        self.update(value)
 
 
 def _get_child_title_func(ancestor):
