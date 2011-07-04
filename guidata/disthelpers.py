@@ -199,7 +199,8 @@ def add_modules(module_names, data_files, includes, excludes, vs2008=True):
                     filelist.append(vc90man)
                 data_files.append( (dirpath[len(pyqt_path)+len(os.pathsep):],
                                     filelist) )
-            remove_at_exit(vc90man)
+            if vs2008:
+                remove_at_exit(vc90man)
             
             # Including french translation
             data_files.append( ('translations',
