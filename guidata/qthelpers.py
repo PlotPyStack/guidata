@@ -13,16 +13,15 @@ The ``guidata.qthelpers`` module provides helper functions for developing
 easily Qt-based graphical user interfaces.
 """
 
-import sys, os, os.path as osp
-from guidata.qt.QtGui import (QAction, QApplication, QColor, QCursor,
-                              QFileDialog, QHBoxLayout, QIcon, QKeySequence,
-                              QLabel, QLineEdit, QMenu, QPushButton, QStyle,
-                              QToolButton, QVBoxLayout, QWidget, QGroupBox)
-from guidata.qt.QtCore import SIGNAL, Qt, from_qvariant
+import sys
+from guidata.qt.QtGui import (QAction, QApplication, QColor, QHBoxLayout, QIcon,
+                              QKeySequence, QLabel, QLineEdit, QMenu,
+                              QPushButton, QStyle, QToolButton, QVBoxLayout,
+                              QWidget, QGroupBox)
+from guidata.qt.QtCore import SIGNAL, Qt
 
 # Local imports:
 from guidata.configtools import get_icon
-from guidata.config import _
 
 
 def text_to_qcolor(text):
@@ -181,65 +180,6 @@ def show_std_icons():
     dialog = ShowStdIcons(None)
     dialog.show()
     sys.exit(app.exec_())
-
-
-if sys.platform=="win32":
-    def _qt_file_wrap(fct, *args, **kwargs):
-        _temp1, _temp2 = sys.stdout, sys.stderr
-        sys.stdout, sys.stderr = None, None
-        try:
-            return fct(*args, **kwargs)
-        finally:
-            sys.stdout, sys.stderr = _temp1, _temp2
-else:
-    def _qt_file_wrap(fct, *args, **kwargs):
-        return fct(*args, **kwargs)
-
-def getOpenFileName(*args, **kwargs):
-    return _qt_file_wrap(QFileDialog.getOpenFileName, *args, **kwargs)
-
-def getOpenFileNames(*args, **kwargs):
-    return _qt_file_wrap(QFileDialog.getOpenFileNames, *args, **kwargs)
-
-def getSaveFileName(*args, **kwargs):
-    return _qt_file_wrap(QFileDialog.getSaveFileName, *args, **kwargs)
-
-def getExistingDirectory(*args, **kwargs):
-    return _qt_file_wrap(QFileDialog.getExistingDirectory, *args, **kwargs)
-
-def open_file(parent, filename=None,
-              title=_(u"Open a file"),
-              filetypes=_(u"All")+" (*.*)",
-              callback=None,
-              opening_message=_(u"Opening ")):
-    """
-    Generic method for opening a file.
-    Returns the file name and the result of the callback.
-    """
-    if not filename:
-        # For recent files
-        action = parent.sender()
-        if isinstance(action, QAction):
-            filename = from_qvariant(action.data(), unicode)
-    if not filename:
-        filename = getOpenFileName(parent, title, os.getcwdu(), filetypes)
-    if filename:
-        filename = unicode(filename)
-        os.chdir(osp.dirname(filename))
-        parent.statusBar().showMessage(opening_message+filename)
-        QApplication.setOverrideCursor(QCursor(Qt.WaitCursor))
-        parent.repaint()
-        try:
-            if callback is not None:
-                result = callback(filename)
-            else:
-                result = None
-        finally:
-            parent.statusBar().clearMessage()
-            QApplication.restoreOverrideCursor()
-
-        return filename, result
-
 
 if __name__ == "__main__":
     from guidata.utils import pairs

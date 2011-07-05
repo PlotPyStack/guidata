@@ -31,6 +31,7 @@ from guidata.qt.QtGui import (QIcon, QPixmap, QHBoxLayout, QGridLayout,
                               QLabel, QTextEdit, QFrame, QDateEdit, QSlider,
                               QDateTimeEdit)
 from guidata.qt.QtCore import Qt, QObject, SIGNAL
+from guidata.qt.compat import getexistingdirectory
 try:
     from guidata.qt.QtCore import QStringList
 except ImportError:
@@ -38,7 +39,7 @@ except ImportError:
     QStringList = list
 
 from guidata.utils import update_dataset, restore_dataset, utf8_to_unicode
-from guidata.qthelpers import text_to_qcolor, get_std_icon, getExistingDirectory
+from guidata.qthelpers import text_to_qcolor, get_std_icon
 from guidata.configtools import get_icon, get_image_layout, get_image_file_path
 from guidata.config import _
 
@@ -580,7 +581,7 @@ class DirectoryWidget(HLayoutMixin, LineEditWidget):
         value = self.item.from_string(unicode(self.edit.text()))
         parent = self.parent_layout.parent
         child_title = _get_child_title_func(parent)
-        dname = getExistingDirectory(parent, child_title(self.item), value)
+        dname = getexistingdirectory(parent, child_title(self.item), value)
         if dname:
             self.edit.setText(dname)
 

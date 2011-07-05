@@ -4,6 +4,12 @@ Since this version, `guidata` is compatible with !PyQt4 API #1 *and* API #2.
 Please read carefully the coding guidelines which have been recently added to 
 the documentation.
 
+=== Possible API compatibility issues (since v1.3.1) ===
+
+  * Removed deprecated wrappers around QFileDialog's static methods (use the 
+    wrappers provided by `guidata.qt.compat` instead):
+    * getExistingDirectory, getOpenFileName, getOpenFileNames, getSaveFileName
+
 === Bug fixes (since v1.3.1) ===
 
   * qtwidgets.!ShowFloatArrayWidget: fixed string float formatting issue (replaced %f by %g)
