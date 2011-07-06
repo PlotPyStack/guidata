@@ -42,14 +42,17 @@ def text_to_qcolor(text):
     return color
 
 def create_action(parent, title, triggered=None, toggled=None,
-                  shortcut=None, icon=None, tip=None,
-                  context=Qt.WindowShortcut):
+                  shortcut=None, icon=None, tip=None, checkable=None,
+                  context=Qt.WindowShortcut, enabled=None):
     """
     Create a new QAction
     """
     action = QAction(title, parent)
     if triggered:
         parent.connect(action, SIGNAL("triggered(bool)"), triggered)
+    if checkable is not None:
+        # Action may be checkable even if the toggled signal is not connected
+        action.setCheckable(checkable)
     if toggled:
         parent.connect(action, SIGNAL("toggled(bool)"), toggled)
         action.setCheckable(True)
@@ -61,11 +64,14 @@ def create_action(parent, title, triggered=None, toggled=None,
     if tip is not None:
         action.setToolTip(tip)
         action.setStatusTip(tip)
+    if enabled is not None:
+        action.setEnabled(enabled)
     action.setShortcutContext(context)
     return action
 
 def create_toolbutton(parent, icon=None, text=None, triggered=None, tip=None,
-                      toggled=None, shortcut=None, autoraise=True):
+                      toggled=None, shortcut=None, autoraise=True,
+                      enabled=None):
     """Create a QToolButton"""
     if autoraise:
         button = QToolButton(parent)
@@ -89,6 +95,8 @@ def create_toolbutton(parent, icon=None, text=None, triggered=None, tip=None,
         button.setCheckable(True)
     if shortcut is not None:
         button.setShortcut(shortcut)
+    if enabled is not None:
+        button.setEnabled(enabled)
     return button
     
 def create_groupbox(parent, title=None, toggled=None, checked=None,
