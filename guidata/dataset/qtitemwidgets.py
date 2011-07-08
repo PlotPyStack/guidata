@@ -556,12 +556,12 @@ class FileWidget(HLayoutMixin, LineEditWidget):
         if fname is None:
             fname = ""
         child_title = _get_child_title_func(parent)
-        fname = self.filedialog(parent, child_title(self.item), fname,
-                                "\n".join(filter_lines))
+        fname, _filter = self.filedialog(parent, child_title(self.item), fname,
+                                         "\n".join(filter_lines))
         sys.stdout = _temp
         if fname:
-            if isinstance(fname, QStringList):
-                fname = str([str(path) for path in fname])
+            if isinstance(fname, list):
+                fname = unicode(fname)
             self.edit.setText(fname)
 
 

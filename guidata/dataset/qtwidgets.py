@@ -26,12 +26,12 @@ try:
 except ImportError:
     pass
 
-from guidata.qt.QtGui import (QDialog, QFileDialog, QMessageBox,
-                              QDialogButtonBox, QVBoxLayout, QGridLayout,
-                              QLabel, QSpacerItem, QColor, QTabWidget, QWidget,
-                              QIcon, QApplication, QPainter, QPicture, QBrush,
-                              QGroupBox, QPushButton)
+from guidata.qt.QtGui import (QDialog, QMessageBox, QDialogButtonBox, QWidget,
+                              QVBoxLayout, QGridLayout, QLabel, QSpacerItem,
+                              QColor, QTabWidget, QIcon, QApplication, QPainter,
+                              QPicture, QBrush, QGroupBox, QPushButton)
 from guidata.qt.QtCore import SIGNAL, SLOT, Qt, QRect
+from guidata.qt.compat import getopenfilename, getopenfilenames, getsavefilename
 
 from guidata.configtools import get_icon
 from guidata.config import _
@@ -305,11 +305,11 @@ DataSetEditLayout.register(DateItem, DateWidget)
 DataSetEditLayout.register(DateTimeItem, DateTimeWidget)
 DataSetEditLayout.register(ColorItem, ColorWidget)
 DataSetEditLayout.register(FileOpenItem, lambda item,
-                parent: FileWidget(item, parent, QFileDialog.getOpenFileName) )
+                           parent: FileWidget(item, parent, getopenfilename) )
 DataSetEditLayout.register(FilesOpenItem, lambda item,
-                parent: FileWidget(item, parent, QFileDialog.getOpenFileNames) )
+                           parent: FileWidget(item, parent, getopenfilenames) )
 DataSetEditLayout.register(FileSaveItem, lambda item,
-                parent: FileWidget(item, parent, QFileDialog.getSaveFileName) )
+                           parent: FileWidget(item, parent, getsavefilename) )
 DataSetEditLayout.register(DirectoryItem, DirectoryWidget)
 DataSetEditLayout.register(ChoiceItem, ChoiceWidget)
 DataSetEditLayout.register(ImageChoiceItem, ChoiceWidget)
