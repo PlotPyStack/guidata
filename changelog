@@ -6,22 +6,21 @@ the documentation.
 
 === Possible API compatibility issues (since v1.3.1) ===
 
-  * Removed deprecated wrappers around QFileDialog's static methods (use the 
-    wrappers provided by `guidata.qt.compat` instead):
+  * Removed deprecated wrappers around QFileDialog's static methods (use the wrappers provided by `guidata.qt.compat` instead):
     * getExistingDirectory, getOpenFileName, getOpenFileNames, getSaveFileName
 
 === Bug fixes (since v1.3.1) ===
 
   * qtwidgets.!ShowFloatArrayWidget: fixed string float formatting issue (replaced %f by %g)
-  * Fixed compatiblity issues with !PyQt v4.4 [Contributor: Carlos Pascual]
+  * Fixed compatiblity issues with !PyQt v4.4 (Contributor: Carlos Pascual)
   * Fixed missing 'child_title' attribute error with !FileOpenItem, !FilesOpenItem, !FileSaveItem and !DirectoryItem
   * (Fixes Issue 8) disthelpers.add_modules was failing when vs2008=False
 
 === Other changes (since v1.3.1) ===
 
   * added *this* changelog
-  * qtwidgets: removed !ProgressPopUp dialog (it is now recommended to use !QProgressDialog instead, which is pretty much identical)
-  * Replaced !QScintilla by spyderlib (as a dependency for array editor, code editor (test launcher) and dict editor)
+  * qtwidgets: removed !ProgressPopUp dialog (it is now recommended to use QProgressDialog instead, which is pretty much identical)
+  * Replaced QScintilla by spyderlib (as a dependency for array editor, code editor (test launcher) and dict editor)
   * qtwidgets.!DockWidgetMixin: added method 'setup_dockwidget' to change dockwidget's features, location and allowed areas after class instantiation
   * guidata.utils.utf8_to_unicode: translated error message in english
   * Add support for 'int' in hdf5 save function
