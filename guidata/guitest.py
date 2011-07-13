@@ -87,8 +87,7 @@ class TestPropertiesWidget(QWidget):
         group_desc.setLayout(layout)
         
         self.editor = CodeEditor(self)
-        self.editor.setup_editor(linenumbers=True, code_analysis=False,
-                                 todo_list=False, font=font)
+        self.editor.setup_editor(linenumbers=True, font=font)
         self.editor.setReadOnly(True)
         group_code = QGroupBox(_("Source code"), self)
         layout = QVBoxLayout()
