@@ -16,7 +16,7 @@ from guidata.configtools import add_image_module_path, get_translation
 from guidata.userconfig import UserConfig
 
 APP_PATH = osp.dirname(__file__)
-add_image_module_path( "guidata", "images" )
+add_image_module_path("guidata", "images")
 _ = get_translation("guidata")
 
 DEFAULTS = {'arrayeditor':

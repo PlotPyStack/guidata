@@ -21,29 +21,29 @@ from guidata.qt.QtGui import (QFont, QLabel, QPixmap, QIcon, QHBoxLayout,
                               QColor, QPen, QBrush, QFontDatabase)
 from guidata.qt.QtCore import Qt
 
+from guidata.utils import get_module_path
+
 IMG_PATH = []
 
-def is_module_installed_in_system(modname):
-    """Return True if module is installed in system"""
-    modpath = osp.abspath(osp.dirname(sys.modules[modname].__file__))
-    return modpath.startswith(sys.prefix)
 
-def get_module_path(modname):
-    """Return module *modname* base path"""
-    return osp.abspath(osp.dirname(sys.modules[modname].__file__))
-
-def get_module_data_path(modname):
-    """Return the module's data path, selecting
-    the local (development path) or the distributed
-    (installed) data path
-    """
-    datapath = getattr(sys.modules[modname],'DATAPATH', '')
-    if datapath != '':
-        return datapath
-    else:
-        return get_module_path(modname)
+def get_module_data_path(modname, relpath=None):
+    """Return module *modname* data path
+    Handles py2exe/cx_Freeze distributions"""
+    datapath = getattr(sys.modules[modname], 'DATAPATH', '')
+    if not datapath:
+        datapath = get_module_path(modname)
+        parentdir = osp.join(datapath, osp.pardir)
+        if osp.isfile(parentdir):
+            # Parent directory is not a directory but the 'library.zip' file:
+            # this is either a py2exe or a cx_Freeze distribution
+            datapath = osp.abspath(osp.join(osp.join(parentdir, osp.pardir),
+                                            modname))
+    if relpath is not None:
+        datapath = osp.abspath(osp.join(datapath, relpath))
+    return datapath
 
 def get_translation(modname, dirname=None):
+    """Return translation callback for module *modname*"""
     if dirname is None:
         dirname = modname
     # fixup environment var LANG in case it's unknown
@@ -70,20 +70,14 @@ def get_translation(modname, dirname=None):
         return translate_dumb
 
 def get_module_locale_path(modname):
-    localepath = getattr(sys.modules[modname],'LOCALEPATH', '')
-    if localepath != '':
-        return localepath
-    else:
-        localepath = osp.join(get_module_path(modname), "locale")
-        if not osp.isdir(localepath):
-            # Assuming py2exe distribution
-            localepath = osp.join(sys.prefix, modname, "locale")
-        return localepath
+    """Return module *modname* gettext translation path"""
+    localepath = getattr(sys.modules[modname], 'LOCALEPATH', '')
+    if not localepath:
+        localepath = get_module_data_path(modname, relpath="locale")
+    return localepath
 
 def add_image_path(path, subfolders=True):
-    """
-    Append image path (opt. with its subfolders) to global list IMG_PATH
-    """
+    """Append image path (opt. with its subfolders) to global list IMG_PATH"""
     global IMG_PATH
     IMG_PATH.append(path)
     if subfolders:
@@ -101,11 +95,7 @@ def add_image_module_path(modname, relpath, subfolders=True):
     modname must be the name of an already imported module as found in 
     sys.modules
     """
-    data_path = osp.join(get_module_data_path(modname), relpath)
-    if not osp.isdir(data_path):
-        # Assuming py2exe distribution
-        data_path = osp.join(sys.prefix, modname, relpath)
-    add_image_path(data_path, subfolders)
+    add_image_path(get_module_data_path(modname, relpath=relpath), subfolders)
 
 def get_image_file_path(name, default="not_found.png"):
     """

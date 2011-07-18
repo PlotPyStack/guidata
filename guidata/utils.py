@@ -5,6 +5,8 @@
 # Licensed under the terms of the CECILL License
 # (see guidata/__init__.py for details)
 
+# pylint: disable=C0103
+
 """
 utils
 -----
@@ -13,39 +15,83 @@ The ``guidata.utils`` module provides various utility helper functions
 (pure python).
 """
 
-import sys, time, subprocess, os, os.path as osp
-
-# Findout the encoding used for stdout or use ascii as default
-stdout_encoding = "ascii"
-if hasattr(sys.stdout, "encoding"):
-    if sys.stdout.encoding:
-        stdout_encoding = sys.stdout.encoding
+import sys
+import time
+import subprocess
+import os
+import os.path as osp
 
 
+#==============================================================================
+# Misc.
+#==============================================================================
 def min_equals_max(min, max):
     """
     Return True if minimium value equals maximum value
     Return False if not, or if maximum or minimum value is not defined
     """
-    return min is not None and max is not None and min==max
+    return min is not None and max is not None and min == max
 
 
 def pairs(iterable):
     """A simple generator that takes a list and generates
     pairs [ (l[0],l[1]), ..., (l[n-2], l[n-1])]
     """
-    it = iter(iterable)
-    first = it.next()
+    iterator = iter(iterable)
+    first = iterator.next()
     while True:
-        second = it.next()
-        yield (first,second)
+        second = iterator.next()
+        yield (first, second)
         first = second
 
 
+def add_extension(item, value):
+    """
+    Add extension to filename
+    `item`: data item representing a file path
+    `value`: possible value for data item
+    """
+    value = unicode(value)
+    formats = item.get_prop("data", "formats")
+    if len(formats) == 1 and formats[0] != '*':
+        if not value.endswith('.' + formats[0]) and len(value) > 0:
+            return value + '.' + formats[0]
+    return value
+
+
+def bind(fct, value):
+    """
+    Returns a callable representing the function 'fct' with it's
+    first argument bound to the value
+    
+    if g = bind(f,1) and f is a function of x,y,z
+    then g(y,z) will return f(1,y,z)
+    """
+    def callback(*args, **kwargs):
+        return fct(value, *args, **kwargs)
+    return callback
+
+
+def trace(fct):
+    """A decorator that traces function entry/exit
+    used for debugging only
+    """
+    from functools import wraps
+    @wraps(fct)
+    def wrapper(*args, **kwargs):
+        """Tracing function entry/exit (debugging only)"""
+        print "enter:", fct.__name__
+        res = fct(*args, **kwargs)
+        print "leave:", fct.__name__
+        return res
+    return wrapper
+
+
+#==============================================================================
+# Strings
+#==============================================================================
 def utf8_to_unicode(string):
-    """
-    Convert UTF-8 string to Unicode
-    """
+    """Convert UTF-8 string to Unicode"""
     if not isinstance(string, basestring):
         string = unicode(string)
     if not isinstance(string, unicode):
@@ -56,12 +102,22 @@ def utf8_to_unicode(string):
             raise UnicodeDecodeError(message % string, *error.args[1:])
     return string
 
+
+# Findout the encoding used for stdout or use ascii as default
+STDOUT_ENCODING = "ascii"
+if hasattr(sys.stdout, "encoding"):
+    if sys.stdout.encoding:
+        STDOUT_ENCODING = sys.stdout.encoding
+
 def unicode_to_stdout(ustr):
     """convert a unicode string to a byte string encoded
     for stdout output"""
-    return ustr.encode(stdout_encoding, "replace")
+    return ustr.encode(STDOUT_ENCODING, "replace")
 
 
+#==============================================================================
+# Updating, restoring datasets
+#==============================================================================
 def update_dataset(dest, source, visible_only=False):
     """
     Update `dest` dataset items from `source` dataset
@@ -97,79 +153,62 @@ def restore_dataset(source, dest):
             setattr(dest, item._name, getattr(source, item._name))
 
 
+#==============================================================================
+# Interface checking
+#==============================================================================
 def assert_interface_supported(klass, iface):
     """Makes sure a class supports an interface"""
     for name, func in iface.__dict__.items():
         if name == '__inherits__':
             continue
         if callable(func):
-            assert hasattr(klass, name), "Attribute %s missing from %r" % (name,klass)
+            assert hasattr(klass, name), \
+                   "Attribute %s missing from %r" % (name,klass)
             imp_func = getattr(klass, name)
             imp_code = imp_func.func_code
             code = func.func_code
             imp_nargs = imp_code.co_argcount
             nargs = code.co_argcount
             if imp_code.co_varnames[:imp_nargs] != code.co_varnames[:nargs]:
-                assert False, "Arguments of %s.%s differ from interface: %r!=%r" % (
+                assert False, "Arguments of %s.%s differ from interface: "\
+                              "%r!=%r" % (
                                 klass.__name__, imp_func.func_name,
                                 imp_func.func_code.co_varnames[:imp_nargs],
                                 func.func_code.co_varnames[:nargs]
                                 )
         else:
-            pass # should check class attributes for consistency
+            pass  # should check class attributes for consistency
 
 def assert_interfaces_valid(klass):
     """Makes sure a class supports the interfaces
     it declares"""
-    assert hasattr(klass, "__implements__"), "Class doesn't implements anything"
+    assert hasattr(klass, "__implements__"), \
+           "Class doesn't implements anything"
     for iface in klass.__implements__:
         assert_interface_supported(klass, iface)
         if hasattr(iface, "__inherits__"):
             base = iface.__inherits__()
-            assert issubclass(klass, base), "%s should be a subclass of %s" % (klass, base)
+            assert issubclass(klass, base), \
+                   "%s should be a subclass of %s" % (klass, base)
 
 
-def add_extension(item, value):
-    """
-    Add extension to filename
-    `item`: data item representing a file path
-    `value`: possible value for data item
-    """
-    value = unicode(value)
-    formats = item.get_prop("data", "formats")
-    if len(formats) == 1 and formats[0] != '*':
-        if not value.endswith('.'+formats[0]) and len(value) > 0:
-            return value+'.'+formats[0]
-    return value
-
-
-def bind(fct, v):
-    """
-    Returns a callable representing the function 'fct' with it's
-    first argument bound to the value v
-    
-    if g = bind(f,1) and f is a function of x,y,z
-    then g(y,z) will return f(1,y,z)
-    """
-    def cb(*args, **kwargs):
-        return fct(v, *args, **kwargs)
-    return cb
-
-
+#==============================================================================
+# Date, time, timer
+#==============================================================================
 def localtime_to_isodate(time_struct):
+    """Convert local time to ISO date"""
     s = time.strftime("%Y-%m-%d %H:%M:%S ", time_struct)
     s += "%+05d" % time.timezone
     return s
 
-def isodate_to_localtime(s):
-    return time.strptime(s[:16], "%Y-%m-%d %H:%M:%S")
+def isodate_to_localtime(datestr):
+    """Convert ISO date to local time"""
+    return time.strptime(datestr[:16], "%Y-%m-%d %H:%M:%S")
 
 class FormatTime(object):
     """Helper object that substitute as a string to
-    format seconds into (nn H mm min ss s)
-    """
-    def __init__(self, hours_fmt="%d H ", min_fmt="%d min ",
-                 sec_fmt="%d s"):
+    format seconds into (nn H mm min ss s)"""
+    def __init__(self, hours_fmt="%d H ", min_fmt="%d min ", sec_fmt="%d s"):
         self.sec_fmt = sec_fmt
         self.hours_fmt = hours_fmt
         self.min_fmt = min_fmt
@@ -177,8 +216,8 @@ class FormatTime(object):
     def __mod__(self, val):
         val = val[0]
         hours = val // 3600.
-        minutes = (val%3600.)//60
-        seconds = (val%60.)
+        minutes = (val % 3600.) // 60
+        seconds = (val % 60.)
         if hours:
             return ((self.hours_fmt % hours) + 
                     (self.min_fmt % minutes) +
@@ -194,16 +233,27 @@ format_hms = FormatTime()
 class Timer(object):
     """MATLAB-like timer: tic, toc"""
     def __init__(self):
-        self.cl = {}
+        self.t0_dict = {}
     def tic(self, cat):
+        """Starting timer"""
         print ">", cat
-        self.cl[cat] = time.clock()
+        self.t0_dict[cat] = time.clock()
     def toc(self, cat, msg="delta:"):
-        print "<", cat, ":", msg, time.clock()-self.cl[cat]
+        """Stopping timer"""
+        print "<", cat, ":", msg, time.clock() - self.t0_dict[cat]
 
-_tm = Timer()
-tic = _tm.tic
-toc = _tm.toc
+_TIMER = Timer()
+tic = _TIMER.tic
+toc = _TIMER.toc
+
+
+#==============================================================================
+# Module, scripts, programs
+#==============================================================================
+def get_module_path(modname):
+    """Return module *modname* base path"""
+    module = sys.modules.get(modname, __import__(modname))
+    return osp.abspath(osp.dirname(module.__file__))
 
 
 def is_program_installed(basename, get_path=False):
@@ -239,16 +289,3 @@ def is_module_available(module_name):
         return True
     except ImportError:
         return False
-
-def trace(f):
-    """A decorator that traces function entry/exit
-    used for debugging only
-    """
-    from functools import wraps
-    @wraps(f)
-    def wrapper(*args,**kwargs):
-        print "enter:", f.__name__
-        res = f(*args,**kwargs)
-        print "leave:", f.__name__
-        return res
-    return wrapper
