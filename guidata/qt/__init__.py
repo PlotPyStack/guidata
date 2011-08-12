@@ -8,8 +8,8 @@
 
 import os, warnings
 
-_modname = os.environ.setdefault('PYTHON_QT_LIBRARY', 'PyQt4')
-assert _modname in ('PyQt4', 'PySide')
+_modname = os.environ.setdefault('QT_API', 'pyqt')
+assert _modname in ('pyqt', 'pyside')
 
 if _modname == 'PyQt4':
     # [June 2011]
@@ -48,9 +48,9 @@ if _modname == 'PyQt4':
         is_pyqt46 = __version__.startswith('4.6')
     except ImportError:
         # Switching to PySide
-        os.environ['PYTHON_QT_LIBRARY'] = _modname = 'PySide'
+        os.environ['QT_API'] = _modname = 'pyside'
 
-if _modname == 'PySide':
+if _modname == 'pyside':
     warnings.warn("guidata is still not fully compatible with PySide",
                   RuntimeWarning)
     import PySide

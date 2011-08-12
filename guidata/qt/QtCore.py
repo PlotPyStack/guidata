@@ -5,7 +5,7 @@
 # (copied from Spyder source code [spyderlib.qt])
 
 import os
-if os.environ['PYTHON_QT_LIBRARY'] == 'PyQt4':
+if os.environ['QT_API'] == 'pyqt':
     from PyQt4.QtCore import *
     from PyQt4.Qt import QCoreApplication
     from PyQt4.Qt import Qt
