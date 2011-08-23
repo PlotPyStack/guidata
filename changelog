@@ -1,3 +1,21 @@
+== Version 1.4.0 ==
+
+=== Possible API compatibility issues (since v1.3.2) ===
+
+  * disthelpers: removed functions remove_build_dist, add_module_data_files,
+    add_text_data_file, get_default_excludes, get_default_includes, 
+    get_default_dll_excludes, create_vs2008_data_files (...) which were 
+    replaced by a class named Distribution, 
+    see the new disthelpers test for more details (tests/dishelpers.py)
+  * reorganized utils and configtools modules
+
+=== Other changes (since v1.3.2) ===
+
+  * disthelpers: replaced almost all functions by a class named Distribution,
+    and added support for cx_Freeze (module remains compatible with py2exe),
+    see the new disthelpers test for more details (tests/dishelpers.py)
+  * reorganized utils and configtools modules
+
 == Version 1.3.2 ==
 
 Since this version, `guidata` is compatible with !PyQt4 API #1 *and* API #2.
