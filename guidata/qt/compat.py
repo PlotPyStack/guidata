@@ -19,7 +19,7 @@ This module should be fully compatible with:
 
 import os, sys
 
-from spyderlib.qt.QtGui import QFileDialog
+from guidata.qt.QtGui import QFileDialog
 
 #===============================================================================
 # QVariant conversion utilities
