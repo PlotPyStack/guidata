@@ -5,3 +5,4 @@ include guidata-tests.py
 include MANIFEST.in
 include Licence_CeCILL_V2-en.txt
 include README
+include changelog

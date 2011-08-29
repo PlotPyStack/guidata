@@ -25,14 +25,21 @@ try:
 except ImportError:
     pass
 
-from PyQt4.QtGui import (QIcon, QPixmap, QHBoxLayout, QGridLayout, QColorDialog,
-                         QPushButton, QLineEdit, QCheckBox, QComboBox, QWidget,
-                         QTabWidget, QGroupBox, QLabel, QTextEdit, QFrame,
-                         QDateEdit, QDateTimeEdit)
-from PyQt4.QtCore import Qt, QObject, QStringList, SIGNAL
+from guidata.qt.QtGui import (QIcon, QPixmap, QHBoxLayout, QGridLayout,
+                              QColorDialog, QPushButton, QLineEdit, QCheckBox,
+                              QComboBox, QWidget, QTabWidget, QGroupBox,
+                              QLabel, QTextEdit, QFrame, QDateEdit, QSlider,
+                              QDateTimeEdit)
+from guidata.qt.QtCore import Qt, QObject, SIGNAL
+from guidata.qt.compat import getexistingdirectory
+try:
+    from guidata.qt.QtCore import QStringList
+except ImportError:
+    # PyQt API#2
+    QStringList = list
 
 from guidata.utils import update_dataset, restore_dataset, utf8_to_unicode
-from guidata.qthelpers import text_to_qcolor, get_std_icon, getExistingDirectory
+from guidata.qthelpers import text_to_qcolor, get_std_icon
 from guidata.configtools import get_icon, get_image_layout, get_image_file_path
 from guidata.config import _
 
@@ -54,7 +61,8 @@ class AbstractDataSetWidget(object):
     
     DataSetEditLayout uses a registry of *Item to *Widget mapping in order to
     automatically create a GUI for a DataSet structure
-        """
+    """
+    READ_ONLY = False
     def __init__(self, item, parent_layout):
         """Derived constructors should create the necessary widgets
         The base class keeps a reference to item and parent 
@@ -68,7 +76,11 @@ class AbstractDataSetWidget(object):
         """
         Place item label on layout at specified position (row, column)
         """
-        self.label = QLabel(self.item.get_prop_value("display", "label"))
+        label_text = self.item.get_prop_value("display", "label")
+        unit = self.item.get_prop_value("display", "unit", '')
+        if unit and not self.READ_ONLY:
+            label_text += (' (%s)' % unit)
+        self.label = QLabel(label_text)
         self.label.setToolTip(self.item.get_help())
         layout.addWidget(self.label, row, column)
 
@@ -400,11 +412,11 @@ class DateTimeWidget(AbstractDataSetWidget):
 
 class GroupLayout(QHBoxLayout):
     def __init__(self):
-        super(GroupLayout, self).__init__()
+        QHBoxLayout.__init__(self)
         self.widgets = []
         
     def addWidget(self, widget):
-        super(GroupLayout, self).addWidget(widget)
+        QHBoxLayout.addWidget(self, widget)
         self.widgets.append(widget)
         
     def setEnabled(self, state):
@@ -460,6 +472,53 @@ class ColorWidget(HLayoutMixin, LineEditWidget):
             self.update(value)
 
 
+class SliderWidget(HLayoutMixin, LineEditWidget):
+    """
+    IntItem with Slider
+    """
+    def __init__(self, item, parent_layout):
+        super(SliderWidget, self).__init__(item, parent_layout)
+        if item.get_prop_value("display", "slider"):
+            self.slider = QSlider()
+            self.slider.setOrientation(Qt.Horizontal)
+            vmin = item.get_prop_value("data", "min")
+            vmax = item.get_prop_value("data", "max")
+            assert vmin is not None and vmax is not None, "SliderWidget requires that IntItem min/max have been defined"
+            self.slider.setRange(vmin, vmax)
+            QObject.connect(self.slider, SIGNAL("valueChanged(int)"),
+                            self.value_changed)
+            self.group.addWidget(self.slider)
+        else:
+            self.slider = None
+        
+    def update(self, value):
+        """Reimplement LineEditWidget method"""
+        LineEditWidget.update(self, value)
+        if  self.slider is not None and isinstance(value, int):
+            self.slider.blockSignals(True)
+            self.slider.setValue(int(value))
+            self.slider.blockSignals(False)
+            
+    def value_changed(self, ivalue):
+        """Update the lineedit"""
+        value = str(ivalue)
+        self.edit.setText(value)
+        self.update(value)
+
+
+def _get_child_title_func(ancestor):
+    previous_ancestor = None
+    while True:
+        try:
+            if previous_ancestor is ancestor:
+                break
+            return ancestor.child_title
+        except AttributeError:
+            previous_ancestor = ancestor
+            ancestor = ancestor.parent()
+    return lambda item: ''
+
+
 class FileWidget(HLayoutMixin, LineEditWidget):
     """
     File path item widget
@@ -497,16 +556,13 @@ class FileWidget(HLayoutMixin, LineEditWidget):
                 filter_lines.append(all_filter)
         if fname is None:
             fname = ""
-        try:
-            child_title = parent.child_title
-        except AttributeError:
-            child_title = parent.parent().child_title
-        fname = self.filedialog(parent, child_title(self.item), fname,
-                                "\n".join(filter_lines))
+        child_title = _get_child_title_func(parent)
+        fname, _filter = self.filedialog(parent, child_title(self.item), fname,
+                                         "\n".join(filter_lines))
         sys.stdout = _temp
         if fname:
-            if isinstance(fname, QStringList):
-                fname = str([str(path) for path in fname])
+            if isinstance(fname, list):
+                fname = unicode(fname)
             self.edit.setText(fname)
 
 
@@ -525,13 +581,8 @@ class DirectoryWidget(HLayoutMixin, LineEditWidget):
         """Open a directory selection dialog box"""
         value = self.item.from_string(unicode(self.edit.text()))
         parent = self.parent_layout.parent
-        try:
-            child_title = parent.child_title
-        except AttributeError:
-            child_title = parent.parent().child_title
-        dname = getExistingDirectory(parent,
-                                     child_title(self.item),
-                                     os.path.basename(value))
+        child_title = _get_child_title_func(parent)
+        dname = getexistingdirectory(parent, child_title(self.item), value)
         if dname:
             self.edit.setText(dname)
 
@@ -669,9 +720,10 @@ class FloatArrayWidget(AbstractDataSetWidget):
 
     def edit_array(self):
         """Open an array editor dialog"""
+        parent = self.parent_layout.parent
         label = self.item.get_prop_value("display", "label")
-        from guidata.editors.arrayeditor import ArrayEditor
-        editor = ArrayEditor(self.parent_layout.parent)
+        from spyderlib.widgets.arrayeditor import ArrayEditor
+        editor = ArrayEditor(parent)
         if editor.setup_and_check(self.arr, title=label):
             if editor.exec_():
                 self.update(self.arr)
@@ -763,6 +815,9 @@ class ButtonWidget(AbstractDataSetWidget):
         layout.addWidget(self.group, row, label_column, row_span, column_span+1)
 
     def clicked(self, *args):
+        for widget in self.parent_layout.widgets:
+            # widget may have been modified, so we update the dataset
+            widget.set()
         callback = self.item.get_prop_value("display", "callback")
         inst = self.item.instance
         item = self.item.item

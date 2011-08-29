@@ -5,15 +5,16 @@
 # Licensed under the terms of the CECILL License
 # (see guidata/__init__.py for details)
 
-import sys
-import os
-import os.path as osp
-from subprocess import call
+import sys, os, os.path as osp, subprocess
 
-# Find pygettext.py source on a windows install
-pygettext=osp.join( sys.prefix, "Tools", "i18n", "pygettext.py" )
-msgfmt=osp.join( sys.prefix, "Tools", "i18n", "msgfmt.py" )
-
+if os.name == 'nt':
+    # Find pygettext.py source on a windows install
+    pygettext = ['python',
+                 osp.join(sys.prefix, "Tools", "i18n", "pygettext.py")]
+    msgfmt = ['python', osp.join(sys.prefix, "Tools", "i18n", "msgfmt.py")]
+else:
+    pygettext = ['pygettext']
+    msgfmt = ['msgfmt']
 
 def get_files(modname):
     if not osp.isdir(modname):
@@ -42,12 +43,11 @@ def do_rescan(modname):
 def do_rescan_files(files, modname, dirname):
     localedir = osp.join(dirname, "locale")
     potfile = modname+".pot"
-    call( ["python", pygettext,
-              ##"-D",   # Extract docstrings
+    subprocess.call(pygettext+[
+                    ##"-D",   # Extract docstrings
                     "-o", potfile,   # Nom du fichier pot
                     "-p", localedir, # dest
-                  ] + files
-            )
+                    ]+files)
     for lang in get_lang(dirname):
         pofilepath = osp.join(localedir, lang, "LC_MESSAGES", modname+".po")
         potfilepath = osp.join(localedir, potfile)
@@ -64,7 +64,8 @@ def do_rescan_files(files, modname, dirname):
             outf.write(data)
         else:
             print "merge..."
-            call([ "msgmerge", "-o", pofilepath, pofilepath, potfilepath] )
+            subprocess.call( ["msgmerge", "-o",
+                              pofilepath, pofilepath, potfilepath] )
 
 
 def do_compile(modname, dirname=None):
@@ -73,8 +74,7 @@ def do_compile(modname, dirname=None):
     localedir = osp.join(dirname, "locale")
     for lang in get_lang(dirname):
         pofilepath = osp.join(localedir, lang, "LC_MESSAGES", modname+".po")
-        call( ["python", msgfmt, pofilepath] )
-    
+        subprocess.call( msgfmt+[pofilepath] )
 
 def main( modname ):
     if len(sys.argv)<2:
@@ -95,11 +95,10 @@ def main( modname ):
         print "Traductions disponibles:"
         for i in get_lang(modname):
             print i
-        
     elif cmd=="help_gettext":
-        call(["python", pygettext, "--help"] )
+        subprocess.call( pygettext+["--help"] )
     elif cmd=="help_msgfmt":
-        call(["python", msgfmt, "--help"] )
+        subprocess.call( msgfmt+["--help"] )
     elif cmd=="scan":
         print "Updating pot files"
         do_rescan( modname )

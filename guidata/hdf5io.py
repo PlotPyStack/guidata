@@ -9,9 +9,8 @@
 Reader and Writer for the serialization of DataSets into HDF5 files
 """
 
-import h5py
+import sys, h5py, numpy as np
 from guidata.utils import utf8_to_unicode
-import numpy as np
 
 class TypeConverter(object):
     def __init__(self, to_type, from_type=None):
@@ -25,7 +24,7 @@ class TypeConverter(object):
         try:
             return self._to_type(value)
         except:
-            print "ERR", repr(value)
+            print >>sys.stderr, "ERR", repr(value)
             raise
 
     def from_hdf(self, value):
@@ -64,7 +63,7 @@ class Attr(object):
         try:
             group.attrs[self.hdf_name] = value
         except:
-            print "ERROR saving:", repr(value), "into", self.hdf_name
+            print >>sys.stderr, "ERROR saving:", repr(value), "into", self.hdf_name
             raise
     
     def load(self, group, struct):
@@ -73,7 +72,10 @@ class Attr(object):
             if self.hdf_name not in group.attrs:
                 setattr(struct, self.struct_name, None)
                 return
-        value = group.attrs[self.hdf_name]
+        try:
+            value = group.attrs[self.hdf_name]
+        except KeyError:
+            raise KeyError, 'Unable to locate attribute %s' % self.hdf_name
         if self.type is not None:
             value = self.type.from_hdf(value)
         setattr(struct, self.struct_name, value)
@@ -89,8 +91,9 @@ class Dset(Attr):
     Generic load/save for an hdf5 dataset:
     scalar=float -> used to convert the value when it is scalar
     """
-    def __init__(self, hdf_name, struct_name=None, type=None, scalar=None):
-        Attr.__init__(self, hdf_name, struct_name, type)
+    def __init__(self, hdf_name, struct_name=None, type=None, scalar=None,
+                 optional=False):
+        Attr.__init__(self, hdf_name, struct_name, type, optional)
         self.scalar = scalar
 
     def get_value(self, struct):
@@ -103,6 +106,8 @@ class Dset(Attr):
         value = self.get_value(struct)
         if isinstance(value, float):
             value = np.float64(value)
+        elif isinstance(value, int):
+            value = np.int32(value)
         if value is None or value.size==0:
             value = np.array([0.0])
         if value.shape == ():
@@ -135,8 +140,8 @@ class H5Store(object):
             return self.h5
         try:
             self.h5 = h5py.File(self.filename,mode=mode)
-        except Exception, _e:
-            print "Error trying to load:", self.filename, "in mode:", mode
+        except Exception:
+            print >>sys.stderr, "Error trying to load:", self.filename, "in mode:", mode
             raise
         return self.h5
 
@@ -166,8 +171,8 @@ class H5Store(object):
         for instr in structure:
             try:
                 instr.load(parent, dest)
-            except Exception, _e:
-                print "Error loading HDF5 item:", instr.hdf_name
+            except Exception:
+                print >>sys.stderr, "Error loading HDF5 item:", instr.hdf_name
                 raise
 
 class HDF5Writer(H5Store):

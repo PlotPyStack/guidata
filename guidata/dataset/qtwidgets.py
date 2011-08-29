@@ -26,21 +26,16 @@ try:
 except ImportError:
     pass
 
-from PyQt4.QtGui import (QDialog, QFileDialog, QMessageBox, QDialogButtonBox,
-                         QVBoxLayout, QGridLayout, QLabel, QSpacerItem, QColor,
-                         QTabWidget, QWidget, QIcon, QApplication, QPainter,
-                         QPicture, QBrush, QGroupBox, QPushButton)
-
-from PyQt4.QtCore import SIGNAL, SLOT, Qt, QRect
+from guidata.qt.QtGui import (QDialog, QMessageBox, QDialogButtonBox, QWidget,
+                              QVBoxLayout, QGridLayout, QLabel, QSpacerItem,
+                              QColor, QTabWidget, QIcon, QApplication, QPainter,
+                              QPicture, QBrush, QGroupBox, QPushButton)
+from guidata.qt.QtCore import SIGNAL, SLOT, Qt, QRect
+from guidata.qt.compat import getopenfilename, getopenfilenames, getsavefilename
 
 from guidata.configtools import get_icon
 from guidata.config import _
 
-from qtitemwidgets import (LineEditWidget, TextEditWidget, CheckBoxWidget,
-                           ColorWidget, FileWidget, DirectoryWidget,
-                           ChoiceWidget, MultipleChoiceWidget, FloatArrayWidget,
-                           GroupWidget, AbstractDataSetWidget, ButtonWidget,
-                           TabGroupWidget, DateWidget, DateTimeWidget)
 from guidata.dataset.datatypes import (BeginGroup, EndGroup, GroupItem,
                                        TabGroupItem)
 
@@ -138,7 +133,7 @@ class DataSetGroupEditDialog(DataSetEditDialog):
     Tabbed dialog box for DataSet editing
     """
     def setup_instance(self, instance):
-        """Re-implement DataSetEditDialog method"""
+        """Override DataSetEditDialog method"""
         from guidata.dataset.datatypes import DataSetGroup
         assert isinstance(instance, DataSetGroup)
         tabs = QTabWidget()
@@ -289,6 +284,11 @@ class DataSetEditLayout(object):
 
 
 # Enregistrement des correspondances avec les widgets
+from guidata.dataset.qtitemwidgets import (LineEditWidget, TextEditWidget,
+                CheckBoxWidget, ColorWidget, FileWidget, DirectoryWidget,
+                ChoiceWidget, MultipleChoiceWidget, FloatArrayWidget,
+                GroupWidget, AbstractDataSetWidget, ButtonWidget,
+                TabGroupWidget, DateWidget, DateTimeWidget, SliderWidget)
 from guidata.dataset.dataitems import (FloatItem, StringItem, TextItem, IntItem,
                 BoolItem, ColorItem, FileOpenItem, FilesOpenItem, FileSaveItem,
                 DirectoryItem, ChoiceItem, ImageChoiceItem, MultipleChoiceItem,
@@ -299,17 +299,17 @@ DataSetEditLayout.register(TabGroupItem, TabGroupWidget)
 DataSetEditLayout.register(FloatItem, LineEditWidget)
 DataSetEditLayout.register(StringItem, LineEditWidget)
 DataSetEditLayout.register(TextItem, TextEditWidget)
-DataSetEditLayout.register(IntItem, LineEditWidget)
+DataSetEditLayout.register(IntItem, SliderWidget)
 DataSetEditLayout.register(BoolItem, CheckBoxWidget)
 DataSetEditLayout.register(DateItem, DateWidget)
 DataSetEditLayout.register(DateTimeItem, DateTimeWidget)
 DataSetEditLayout.register(ColorItem, ColorWidget)
 DataSetEditLayout.register(FileOpenItem, lambda item,
-                parent: FileWidget(item, parent, QFileDialog.getOpenFileName) )
+                           parent: FileWidget(item, parent, getopenfilename) )
 DataSetEditLayout.register(FilesOpenItem, lambda item,
-                parent: FileWidget(item, parent, QFileDialog.getOpenFileNames) )
+                           parent: FileWidget(item, parent, getopenfilenames) )
 DataSetEditLayout.register(FileSaveItem, lambda item,
-                parent: FileWidget(item, parent, QFileDialog.getSaveFileName) )
+                           parent: FileWidget(item, parent, getsavefilename) )
 DataSetEditLayout.register(DirectoryItem, DirectoryWidget)
 DataSetEditLayout.register(ChoiceItem, ChoiceWidget)
 DataSetEditLayout.register(ImageChoiceItem, ChoiceWidget)
@@ -326,6 +326,7 @@ QLabel:disabled { font-weight: bold; color: grey }
 
 class DataSetShowWidget(AbstractDataSetWidget):
     """Read-only base widget"""
+    READ_ONLY = True
     def __init__(self, item, parent_layout):
         AbstractDataSetWidget.__init__(self, item, parent_layout)
         self.group = QLabel()
@@ -336,56 +337,23 @@ class DataSetShowWidget(AbstractDataSetWidget):
         #self.group.setEnabled(False)
 
     def get(self):
-        """Re-implement AbstractDataSetWidget method"""
+        """Override AbstractDataSetWidget method"""
         self.set_state()
-        text = self.display_value()
+        text = self.item.get_string_value()
         self.group.setText(text)
 
     def set(self):
         """Read only..."""
         pass
 
-    def display_value(self):
-        """Return a unicode representation of the item's value
-        obeying 'display' or 'repr' properties
-        """
-        value = self.item.get()
-        repval = self.item.get_prop_value("display", "repr", None)
-        if repval is not None:
-            return repval
-        else:
-            fmt = self.item.get_prop_value("display", "format", u"%s")
-            func = self.item.get_prop_value("display", "func", lambda x:x)
-            if callable(fmt) and value is not None:
-                return fmt(func(value))
-            elif isinstance(fmt, basestring):
-                fmt = unicode(fmt)
-
-            if value is not None:
-                text = fmt % (func(value), )
-            else:
-                text = u""
-            return text
-
-
-class DataSetShowLayout(DataSetEditLayout):
-    """Read-only layout"""
-    _widget_factory = {}
-
-class DataSetShowDialog(DataSetEditDialog):
-    """Read-only dialog box"""
-    def layout_factory(self, instance, grid ):
-        """Re-implement DataSetEditDialog method"""
-        return DataSetShowLayout( self, instance, grid )
-
 class ShowColorWidget(DataSetShowWidget):
-    """Read-only base widget"""
+    """Read-only color item widget"""
     def __init__(self, item, parent_layout):
         DataSetShowWidget.__init__(self, item, parent_layout)
         self.picture = None
         
     def get(self):
-        """Re-implement AbstractDataSetWidget method"""
+        """Override AbstractDataSetWidget method"""
         value = self.item.get()
         if value is not None:
             color = QColor(value)
@@ -396,31 +364,40 @@ class ShowColorWidget(DataSetShowWidget):
             painter.end()
             self.group.setPicture(self.picture)
 
-class ShowFloatArrayWidget(DataSetShowWidget):
-    """Represents a read-only view of an array"""
+class ShowBooleanWidget(DataSetShowWidget):
+    """Read-only bool item widget"""
+    def place_on_grid(self, layout, row, label_column, widget_column,
+                      row_span=1, column_span=1):
+        """Override AbstractDataSetWidget method"""
+        if not self.item.get_prop_value("display", "label"):
+            widget_column = label_column
+            column_span += 1
+        else:
+            self.place_label(layout, row, label_column)
+        layout.addWidget(self.group, row, widget_column, row_span, column_span)
+        
     def get(self):
-        """Re-implement AbstractDataSetWidget method"""
-        self.set_state()
+        """Override AbstractDataSetWidget method"""
+        DataSetShowWidget.get(self)
+        text = self.item.get_prop_value("display", "text")
+        self.group.setText(text)
+        font = self.group.font()
         value = self.item.get()
-        if value is not None:
-            self.group.setText(u"~= %f [%f .. %f]" \
-                               % (value.mean(), value.min(), value.max()))
+        state = bool(value)
+        font.setStrikeOut(not state)
+        self.group.setFont(font)
+        self.group.setEnabled(state)
 
-class ShowChoiceWidget(DataSetShowWidget):
-    """Represents a read-only view of a ChoiceItem"""
-    def get(self):
-        """Re-implement AbstractDataSetWidget method"""
-        value = self.item.get()
-        self.set_state()
-        if value is not None:
-            choices = self.item.get_prop_value("data", "choices")
-            #print "ShowChoiceWidget:", choices, value
-            for choice in choices:
-                if choice[0] == value:
-                    self.group.setText( unicode(choice[1]) )
-                    return
-            text = self.display_value()
-            self.group.setText( text )
+
+class DataSetShowLayout(DataSetEditLayout):
+    """Read-only layout"""
+    _widget_factory = {}
+
+class DataSetShowDialog(DataSetEditDialog):
+    """Read-only dialog box"""
+    def layout_factory(self, instance, grid ):
+        """Override DataSetEditDialog method"""
+        return DataSetShowLayout( self, instance, grid )
 
 DataSetShowLayout.register(GroupItem, GroupWidget)
 DataSetShowLayout.register(TabGroupItem, TabGroupWidget)
@@ -428,7 +405,7 @@ DataSetShowLayout.register(FloatItem, DataSetShowWidget)
 DataSetShowLayout.register(StringItem, DataSetShowWidget)
 DataSetShowLayout.register(TextItem, DataSetShowWidget)
 DataSetShowLayout.register(IntItem, DataSetShowWidget)
-DataSetShowLayout.register(BoolItem, DataSetShowWidget)
+DataSetShowLayout.register(BoolItem, ShowBooleanWidget)
 DataSetShowLayout.register(DateItem, DataSetShowWidget)
 DataSetShowLayout.register(DateTimeItem, DataSetShowWidget)
 DataSetShowLayout.register(ColorItem, ShowColorWidget)
@@ -436,10 +413,10 @@ DataSetShowLayout.register(FileOpenItem, DataSetShowWidget )
 DataSetShowLayout.register(FilesOpenItem, DataSetShowWidget )
 DataSetShowLayout.register(FileSaveItem, DataSetShowWidget )
 DataSetShowLayout.register(DirectoryItem, DataSetShowWidget)
-DataSetShowLayout.register(ChoiceItem, ShowChoiceWidget)
-DataSetShowLayout.register(ImageChoiceItem, ShowChoiceWidget)
-DataSetShowLayout.register(MultipleChoiceItem, ShowChoiceWidget)
-DataSetShowLayout.register(FloatArrayItem, ShowFloatArrayWidget)
+DataSetShowLayout.register(ChoiceItem, DataSetShowWidget)
+DataSetShowLayout.register(ImageChoiceItem, DataSetShowWidget)
+DataSetShowLayout.register(MultipleChoiceItem, DataSetShowWidget)
+DataSetShowLayout.register(FloatArrayItem, DataSetShowWidget)
 
 
 class DataSetShowGroupBox(QGroupBox):

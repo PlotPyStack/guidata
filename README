@@ -1,7 +1,7 @@
 guidata
 =======
 
-Copyright © 2009-2010 CEA
+Copyright Â© 2009-2011 CEA
 Pierre Raybaut
 Licensed under the terms of the CECILL License (see Licence_CeCILL_V2-en.txt)
 
@@ -27,9 +27,9 @@ Licensed under the terms of the CECILL License (see Licence_CeCILL_V2-en.txt)
     Dependencies
     
         Requirements
-            Python 2.x (x>=5)
+            Python >=v2.5
             PyQt4 4.x (x>=3 ; recommended x>=4)
-            QScintilla2 2.x (x>=1) (PyQt4 extension) for the test launcher
+            spyderlib >=v2.0.10 (test launcher and array/dictionnary editors)
 	    
 	Optional Python modules
 	    h5py (HDF5 files I/O)
