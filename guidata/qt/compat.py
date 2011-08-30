@@ -19,7 +19,7 @@ This module should be fully compatible with:
 
 import os, sys
 
-from spyderlib.qt.QtGui import QFileDialog
+from guidata.qt.QtGui import QFileDialog
 
 #===============================================================================
 # QVariant conversion utilities
@@ -107,7 +107,7 @@ def _qfiledialog_wrapper(attr, parent=None, caption='', basedir='',
         options = QFileDialog.Options(0)
     try:
         # PyQt <v4.6 (API #1)
-        from spyderlib.qt.QtCore import QString
+        from guidata.qt.QtCore import QString
     except ImportError:
         # PySide or PyQt >=v4.6
         QString = None
@@ -189,8 +189,8 @@ def getsavefilename(parent=None, caption='', basedir='', filters='',
                                 options=options)
 
 if __name__ == '__main__':
-    from spyderlib.utils.qthelpers import qapplication
-    app = qapplication()
+    import guidata
+    _app = guidata.qapplication()
     print repr(getexistingdirectory())
     print repr(getopenfilename(filters='*.py;;*.txt'))
     print repr(getopenfilenames(filters='*.py;;*.txt'))
