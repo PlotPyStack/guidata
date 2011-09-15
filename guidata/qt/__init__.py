@@ -11,7 +11,7 @@ import os, warnings
 _modname = os.environ.setdefault('QT_API', 'pyqt')
 assert _modname in ('pyqt', 'pyside')
 
-if _modname == 'PyQt4':
+if _modname == 'pyqt':
     # [June 2011]
     # For now, we do not force the QString, QVariant, (...) API number because 
     # `guidata` and its visualization counterpart `guiqwt` are compatible 
