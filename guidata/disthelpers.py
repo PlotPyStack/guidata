@@ -303,7 +303,8 @@ class Distribution(object):
                 self.add_matplotlib()
             elif module_name == 'h5py':
                 import h5py
-                for attr in ['_stub', '_sync', 'utils', '_conv', '_proxy']:
+                for attr in ['_stub', '_sync', 'utils', '_conv', '_proxy',
+                             'defs']:
                     if hasattr(h5py, attr):
                         self.includes.append('h5py.%s' % attr)
                 if self.bin_path_excludes is not None and os.name == 'nt':
