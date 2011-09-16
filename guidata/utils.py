@@ -256,21 +256,18 @@ def get_module_path(modname):
     return osp.abspath(osp.dirname(module.__file__))
 
 
-def is_program_installed(basename, get_path=False):
-    """Return True if program is installed and present in PATH"""
+def is_program_installed(basename):
+    """Return program absolute path if installed in PATH
+    Otherwise, return None"""
     for path in os.environ["PATH"].split(os.pathsep):
         abspath = osp.join(path, basename)
         if osp.isfile(abspath):
-            if get_path:
-                return abspath
-            else:
-                return True
-    else:
-        return False
+            return abspath
+
     
 def run_program(name, args='', cwd=None, shell=True, wait=False):
     """Run program in a separate process"""
-    path = is_program_installed(name, get_path=True)
+    path = is_program_installed(name)
     if not path:
         raise RuntimeError("Program %s was not found" % name)
     command = [path]
