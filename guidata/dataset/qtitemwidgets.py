@@ -393,6 +393,7 @@ class DateTimeWidget(AbstractDataSetWidget):
     def __init__(self, item, parent_layout):
         super(DateTimeWidget, self).__init__(item, parent_layout)
         self.dateedit = self.group = QDateTimeEdit()
+        self.dateedit.setCalendarPopup(True)
         self.dateedit.setToolTip(item.get_help())
         
     def get(self):
