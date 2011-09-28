@@ -187,6 +187,8 @@ class Distribution(object):
         self.vs2008 = os.name == 'nt'
         self._py2exe_is_loaded = False
         self._pyqt4_added = False
+        # Attributes relative to cx_Freeze:
+        self.executables = []
         
     def setup(self, name, version, description, script,
               target_name=None, icon=None,
@@ -218,6 +220,8 @@ class Distribution(object):
             self.vs2008 = vs2008
         if self.vs2008:
             self.data_files += create_vs2008_data_files()
+        # cx_Freeze:
+        self.add_executable(self.script, self.target_name, icon=self.icon)
 
     def add_text_data_file(self, filename, contents):
         """Create temporary data file *filename* with *contents*
@@ -322,6 +326,12 @@ class Distribution(object):
                     self.add_module_data_files("rst2pdf", ("styles", ),
                                                ('.json', '.style'),
                                                copy_to_root=True)
+                if module_name == 'sphinx':
+                    import sphinx.ext
+                    for fname in os.listdir(osp.dirname(sphinx.ext.__file__)):
+                        if osp.splitext(fname)[1] == '.py':
+                            modname = 'sphinx.ext.%s' % osp.splitext(fname)[0]
+                            self.includes.append(modname)
             elif module_name == 'guidata':
                 self.add_module_data_files('guidata', ("images", ),
                                        ('.png', '.svg'), copy_to_root=False)
@@ -419,17 +429,24 @@ class Distribution(object):
         setup(data_files=self.data_files, windows=[windows,],
               options=dict(py2exe=options))
 
+    def add_executable(self, script, target_name, icon=None):
+        """Add executable to the cx_Freeze distribution
+        Not supported for py2exe"""
+        from cx_Freeze import Executable
+        base = None
+        if script.endswith('.pyw') and os.name == 'nt':
+            base = 'win32gui'
+        self.executables += [Executable(self.script, base=base, icon=self.icon,
+                                        targetName=self.target_name)]
+
     def build_cx_freeze(self, cleanup=True):
         """Build executable with cx_Freeze
         cleanup: remove 'build' directory before building distribution"""
         assert not self._py2exe_is_loaded, \
                "cx_Freeze can't be executed after py2exe"
-        from cx_Freeze import setup, Executable
+        from cx_Freeze import setup
         if cleanup:
             remove_dir("build")
-        base = None
-        if self.script.endswith('.pyw') and os.name == 'nt':
-            base = 'win32gui'
         sys.argv += ["build"]
         build_exe = dict(include_files=to_include_files(self.data_files),
                          includes=self.includes, excludes=self.excludes,
@@ -438,7 +455,5 @@ class Distribution(object):
                          bin_path_includes=self.bin_path_includes,
                          bin_path_excludes=self.bin_path_excludes)
         setup(name=self.name, version=self.version,
-              description=self.description,
-              executables=[Executable(self.script, base=base, icon=self.icon,
-                                      targetName=self.target_name)],
+              description=self.description, executables=self.executables,
               options=dict(build_exe=build_exe))
