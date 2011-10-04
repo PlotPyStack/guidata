@@ -384,6 +384,7 @@ class UserConfigWriter(UserConfigBase):
 
     write_int = write_any
     write_float = write_any
+    write_bool = write_any
     def write_unicode(self, val):
         self.write_any(val.encode("utf-8"))
 
@@ -400,6 +401,7 @@ class UserConfigReader(UserConfigBase):
 
     read_int = read_any
     read_float = read_any
+    read_bool = read_any
     def read_unicode(self):
         val = self.read_any()
         return unicode(val, "utf-8")
