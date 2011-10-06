@@ -146,9 +146,8 @@ class H5Store(object):
         return self.h5
 
     def close(self):
-        if self.h5 is None:
-            return
-        self.h5.close()
+        if self.h5:
+            self.h5.close()
         self.h5 = None
         
     def generic_save(self, parent, source, structure):
