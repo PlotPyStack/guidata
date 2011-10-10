@@ -14,7 +14,9 @@ There is one widget type for each data item type.
 Example: ChoiceWidget <--> ChoiceItem, ImageChoiceItem
 """
 
-import os, sys, numpy
+import os
+import sys
+import numpy
 
 try:
     # PyQt4 4.3.3 on Windows (static DLLs) with py2exe installed:
@@ -29,7 +31,7 @@ from guidata.qt.QtGui import (QIcon, QPixmap, QHBoxLayout, QGridLayout,
                               QColorDialog, QPushButton, QLineEdit, QCheckBox,
                               QComboBox, QWidget, QTabWidget, QGroupBox,
                               QLabel, QTextEdit, QFrame, QDateEdit, QSlider,
-                              QDateTimeEdit)
+                              QDateTimeEdit, QColor)
 from guidata.qt.QtCore import Qt, QObject, SIGNAL
 from guidata.qt.compat import getexistingdirectory
 try:
@@ -239,8 +241,10 @@ class LineEditWidget(AbstractDataSetWidget):
         value = self.item.get()
         old_value = unicode(self.value())
         if value is not None:
+            if isinstance(value, QColor):  # if item is a ColorItem object
+                value = value.name()
             uvalue = utf8_to_unicode(value)
-            if uvalue!=old_value:
+            if uvalue != old_value:
                 self.edit.setText(utf8_to_unicode(value))
                 self.line_edit_changed(value)
         else:
