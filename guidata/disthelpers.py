@@ -216,7 +216,7 @@ class Distribution(object):
             self.bin_path_includes += bin_path_includes
         if bin_path_excludes is not None:
             self.bin_path_excludes += bin_path_excludes
-        if self.vs2008 is None:
+        if self.vs2008 is not None:
             self.vs2008 = vs2008
         if self.vs2008:
             self.data_files += create_vs2008_data_files()
@@ -314,7 +314,8 @@ class Distribution(object):
                 if self.bin_path_excludes is not None and os.name == 'nt':
                     # Specific to cx_Freeze on Windows: avoid including a zlib dll
                     # built with another version of Microsoft Visual Studio
-                    self.bin_path_excludes += [r'C:\Program Files']
+                    self.bin_path_excludes += [r'C:\Program Files',
+                                               r'C:\Program Files (x86)']
                     self.data_files.append(  # necessary for cx_Freeze only
                        ('', (osp.join(get_module_path('h5py'), 'zlib1.dll'), ))
                                            )
