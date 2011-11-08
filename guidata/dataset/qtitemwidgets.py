@@ -246,7 +246,6 @@ class LineEditWidget(AbstractDataSetWidget):
             uvalue = utf8_to_unicode(value)
             if uvalue != old_value:
                 self.edit.setText(utf8_to_unicode(value))
-                self.line_edit_changed(value)
         else:
             self.line_edit_changed(value)
             
@@ -260,6 +259,7 @@ class LineEditWidget(AbstractDataSetWidget):
             cb = self.item.get_prop_value("display", "callback", None)
             if cb is not None:
                 cb(self.item.instance, self.item.item, value)
+                self.parent_layout.update_widgets(except_this_one=self)
         self.update(value)
         
     def update(self, value):
@@ -449,7 +449,7 @@ class ColorWidget(HLayoutMixin, LineEditWidget):
         super(ColorWidget, self).__init__(item, parent_layout)
         self.button = QPushButton("")
         self.button.setMaximumWidth(32)
-        QObject.connect(self.button, SIGNAL("clicked()"), self.select_color )
+        QObject.connect(self.button, SIGNAL("clicked()"), self.select_color)
         self.group.addWidget(self.button)
         
     def update(self, value):
@@ -599,8 +599,20 @@ class ChoiceWidget(AbstractDataSetWidget):
         super(ChoiceWidget, self).__init__(item, parent_layout)
         self.combobox = self.group = QComboBox()
         self.combobox.setToolTip(item.get_help())
+        
+        QWidget.connect(self.combobox, SIGNAL("currentIndexChanged(int)"),
+                        self.index_changed)
+        
+    def index_changed(self, index):
+        cb = self.item.get_prop_value("display", "callback", None)
+        if cb is not None:
+            self.set()
+            cb(self.item.instance, self.item.item, self.value())
+            self.set()
+            self.parent_layout.update_widgets(except_this_one=self)
     
     def fill_combo(self):
+        self.combobox.blockSignals(True)
         while self.combobox.count():
             self.combobox.removeItem(0)
         _choices = self.item.get_prop_value("data", "choices")
@@ -615,6 +627,8 @@ class ChoiceWidget(AbstractDataSetWidget):
                 self.combobox.addItem(img, lbl)
             else:
                 self.combobox.addItem(lbl)
+        self.combobox.setCurrentIndex(-1)
+        self.combobox.blockSignals(False)
         
     def get(self):
         """Override AbstractDataSetWidget method"""
@@ -624,20 +638,23 @@ class ChoiceWidget(AbstractDataSetWidget):
             idx = 0
             _choices = self.item.get_prop_value("data", "choices")
             for key, _val, _img in _choices:
-                if key==value:
+                if key == value:
                     break
-                idx = idx+1
+                idx += 1
             self.combobox.setCurrentIndex(idx)
         
     def set(self):
         """Override AbstractDataSetWidget method"""
-        index = self.value()
-        choices = self.item.get_prop_value("data", "choices")
-        if index >= 0 and index < len(choices):
-            self.item.set(choices[index][0])
+        try:
+            value = self.value()
+        except IndexError:
+            return
+        self.item.set(value)
 
     def value(self):
-        return self.combobox.currentIndex()
+        index = self.combobox.currentIndex()
+        choices = self.item.get_prop_value("data", "choices")
+        return choices[index][0]
         
 class MultipleChoiceWidget(AbstractDataSetWidget):
     """
@@ -823,16 +840,10 @@ class ButtonWidget(AbstractDataSetWidget):
             # widget may have been modified, so we update the dataset
             widget.set()
         callback = self.item.get_prop_value("display", "callback")
-        inst = self.item.instance
-        item = self.item.item
-        value = self.cb_value
-        parent = self.button.parent()
-        self.cb_value = callback(inst, item, value, parent)
+        self.cb_value = callback(self.item.instance, self.item.item,
+                                 self.cb_value, self.button.parent())
         self.set()
-        for widget in self.parent_layout.widgets:
-            # instance may have been modified so we update all the
-            # widgets of the instance
-            widget.get()
+        self.parent_layout.update_widgets()
 
 
 class DataSetWidget(AbstractDataSetWidget):
