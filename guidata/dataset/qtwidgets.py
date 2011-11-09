@@ -210,9 +210,7 @@ class DataSetEditLayout(object):
     
     def accept_changes(self):
         """Accept changes made to widget inputs"""
-        for widget in self.widgets:
-            if widget.is_active():
-                widget.set()
+        self.update_dataitems()
 
     def setup_layout(self, items):
         """Place items on layout"""
@@ -275,6 +273,12 @@ class DataSetEditLayout(object):
         """Refresh the status of all widgets"""
         for widget in self.widgets:
             widget.set_state()
+
+    def update_dataitems(self):
+        """Refresh the content of all data items"""
+        for widget in self.widgets:
+            if widget.is_active():
+                widget.set()
 
     def update_widgets(self, except_this_one=None):
         """Refresh the content of all widgets"""

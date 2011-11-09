@@ -258,6 +258,7 @@ class LineEditWidget(AbstractDataSetWidget):
             self.edit.setStyleSheet("")
             cb = self.item.get_prop_value("display", "callback", None)
             if cb is not None:
+                self.parent_layout.update_dataitems()
                 cb(self.item.instance, self.item.item, value)
                 self.parent_layout.update_widgets(except_this_one=self)
         self.update(value)
@@ -600,15 +601,15 @@ class ChoiceWidget(AbstractDataSetWidget):
         self.combobox = self.group = QComboBox()
         self.combobox.setToolTip(item.get_help())
         
+        self.__first_call = True
         QWidget.connect(self.combobox, SIGNAL("currentIndexChanged(int)"),
                         self.index_changed)
         
     def index_changed(self, index):
         cb = self.item.get_prop_value("display", "callback", None)
         if cb is not None:
-            self.set()
+            self.parent_layout.update_dataitems()
             cb(self.item.instance, self.item.item, self.value())
-            self.set()
             self.parent_layout.update_widgets(except_this_one=self)
     
     def fill_combo(self):
@@ -627,7 +628,6 @@ class ChoiceWidget(AbstractDataSetWidget):
                 self.combobox.addItem(img, lbl)
             else:
                 self.combobox.addItem(lbl)
-        self.combobox.setCurrentIndex(-1)
         self.combobox.blockSignals(False)
         
     def get(self):
@@ -641,7 +641,12 @@ class ChoiceWidget(AbstractDataSetWidget):
                 if key == value:
                     break
                 idx += 1
+            self.combobox.blockSignals(True)
             self.combobox.setCurrentIndex(idx)
+            self.combobox.blockSignals(False)
+            if self.__first_call:
+                self.index_changed(idx)
+                self.__first_call = False
         
     def set(self):
         """Override AbstractDataSetWidget method"""
@@ -836,9 +841,7 @@ class ButtonWidget(AbstractDataSetWidget):
         layout.addWidget(self.group, row, label_column, row_span, column_span+1)
 
     def clicked(self, *args):
-        for widget in self.parent_layout.widgets:
-            # widget may have been modified, so we update the dataset
-            widget.set()
+        self.parent_layout.update_dataitems()
         callback = self.item.get_prop_value("display", "callback")
         self.cb_value = callback(self.item.instance, self.item.item,
                                  self.cb_value, self.button.parent())

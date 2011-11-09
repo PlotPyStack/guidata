@@ -19,9 +19,11 @@ from guidata.dataset.dataitems import (ChoiceItem, StringItem, TextItem,
 
 class TestParameters(DataSet):
     def cb_example(self, item, value):
+        print "\nitem: ", item, "\nvalue:", value
         if self.results is None:
             self.results = ''
         self.results += str(value)+'\n'
+        print "results:", self.results
 
     string = StringItem("String", default="foobar"
                         ).set_prop("display", callback=cb_example)
