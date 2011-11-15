@@ -280,11 +280,15 @@ class Distribution(object):
         """Include module Matplotlib to the distribution"""
         if 'matplotlib' in self.excludes:
             self.excludes.pop(self.excludes.index('matplotlib'))
-        self.includes += ['matplotlib.numerix.ma',
-                          'matplotlib.numerix.fft',
-                          'matplotlib.numerix.linear_algebra',
-                          'matplotlib.numerix.mlab',
-                          'matplotlib.numerix.random_array']
+        try:
+            import matplotlib.numerix  # analysis:ignore
+            self.includes += ['matplotlib.numerix.ma',
+                              'matplotlib.numerix.fft',
+                              'matplotlib.numerix.linear_algebra',
+                              'matplotlib.numerix.mlab',
+                              'matplotlib.numerix.random_array']
+        except ImportError:
+            pass
         self.add_module_data_files('matplotlib', ('mpl-data', ),
                                    ('.conf', '.glade', '', '.png', '.svg',
                                     '.xpm', '.ppm', '.npy', '.afm', '.ttf'))
