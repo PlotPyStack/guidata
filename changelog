@@ -1,3 +1,29 @@
+== Version 1.4.1 ==
+
+=== Bug fixes (since v1.4.0) ===
+
+  * !ColorItem for recent versions of Qt: in QLineEdit widget, the text representation of color was str(!QColor(...)) instead of str(!QColor(...).name())
+  * guidata.qt compat package: fixed _modname typo
+  * hdf5io:
+    * optional attribute mechanism generalized to both Attr and !DSet objects (for both saving and loading data)
+    * !H5Store/`close` method: now checking if h5 file has already been closed before trying to close it (see http://code.google.com/p/h5py/issues/detail?id=220)
+  * disthelpers:
+    * vs2008 option was ignored
+    * added 'C:\Program Files (x86)' to bin includes (cx_Freeze)
+  * Data items/callbacks: fixed callbacks for !ChoiceItem (or derived items) which were triggered when other widgets were triggering their own callbacks...
+
+=== Other changes (since v1.4.0) ===
+
+  * Added test for item callbacks
+  * dataset.datatypes.!FormatProp/new behavior: added `ignore_error` argument, default to True (ignores string formatting error: ValueError)
+  * disthelpers:
+    * cx_Freeze: added support for multiple executables
+    * added support for h5py 2.0
+    * added support for Maplotlib 1.1
+  * Allow !DateTime edit widgets to popup calendar
+
+----
+
 == Version 1.4.0 ==
 
 === Possible API compatibility issues (since v1.3.2) ===
@@ -15,6 +41,8 @@
     and added support for cx_Freeze (module remains compatible with py2exe),
     see the new disthelpers test for more details (tests/dishelpers.py)
   * reorganized utils and configtools modules
+
+----
 
 == Version 1.3.2 ==
 
