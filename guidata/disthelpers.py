@@ -176,6 +176,7 @@ class Distribution(object):
         self.version = None
         self.description = None
         self.target_name = None
+        self._target_dir = None
         self.icon = None
         self.data_files = []
         self.includes = self.DEFAULT_INCLUDES
@@ -189,9 +190,21 @@ class Distribution(object):
         self._pyqt4_added = False
         # Attributes relative to cx_Freeze:
         self.executables = []
+    
+    @property
+    def target_dir(self):
+        """Return target directory (default: 'dist')"""
+        dirname = self._target_dir
+        if dirname is None:
+            return 'dist'
+        else:
+            return dirname
+    @target_dir.setter  # analysis:ignore
+    def target_dir(self, value):
+        self._target_dir = value
         
     def setup(self, name, version, description, script,
-              target_name=None, icon=None,
+              target_name=None, target_dir=None, icon=None,
               data_files=None, includes=None, excludes=None,
               bin_includes=None, bin_excludes=None,
               bin_path_includes=None, bin_path_excludes=None, vs2008=None):
@@ -201,6 +214,7 @@ class Distribution(object):
         assert osp.isfile(script)
         self.script = script
         self.target_name = target_name
+        self.target_dir = target_dir
         self.icon = icon
         if data_files is not None:
             self.data_files += data_files
@@ -400,31 +414,46 @@ class Distribution(object):
             print "Adding module '%s' translation file: %s" % (module_name,
                                                osp.basename(translation_file))
 
-    def build(self, library, cleanup=True):
+    def build(self, library, cleanup=True, create_archive=False):
         """Build executable with given library.
         Supported libraries: 'py2exe', 'cx_Freeze'"""
         if library == 'py2exe':
-            self.build_py2exe(cleanup=cleanup)
+            self.build_py2exe(cleanup=cleanup,
+                              create_archive=create_archive)
         elif library == 'cx_Freeze':
-            self.build_cx_freeze(cleanup=cleanup)
+            self.build_cx_freeze(cleanup=cleanup,
+                                 create_archive=create_archive)
         else:
             raise RuntimeError, "Unsupported library %s" % library
+    
+    def __cleanup(self):
+        """Remove old build and dist directories"""
+        remove_dir("build")
+        if osp.isdir("dist"):
+            remove_dir("dist")
+        remove_dir(self.target_dir)
+    
+    def __create_archive(self):
+        """Create a ZIP archive"""
+        name = self.target_dir
+        os.system('zip "%s.zip" -r "%s"' % (name, name))
 
     def build_py2exe(self, cleanup=True, compressed=2, optimize=2,
-                     dist_dir='dist', company_name=None, copyright=None):
+                     company_name=None, copyright=None, create_archive=False):
         """Build executable with py2exe
         cleanup: remove 'build/dist' directories before building distribution
+        create_archive: create a ZIP archive (requires the executable `zip`)
         """
         from distutils.core import setup
         import py2exe  # Patching distutils -- analysis:ignore
         self._py2exe_is_loaded = True
         if cleanup:
-            remove_dir("build")
-            remove_dir(dist_dir)
+            self.__cleanup()
         sys.argv += ["py2exe"]
         options = dict(compressed=compressed, optimize=optimize,
                        includes=self.includes, excludes=self.excludes,
-                       dll_excludes=self.bin_excludes, dist_dir=dist_dir)
+                       dll_excludes=self.bin_excludes,
+                       dist_dir=self.target_dir)
         windows = dict(name=self.name, description=self.description,
                        script=self.script, icon_resources=[(0, self.icon)],
                        bitmap_resources=[], other_resources=[],
@@ -433,6 +462,8 @@ class Distribution(object):
                        company_name=company_name, copyright=copyright)
         setup(data_files=self.data_files, windows=[windows,],
               options=dict(py2exe=options))
+        if create_archive:
+            self.__create_archive()
 
     def add_executable(self, script, target_name, icon=None):
         """Add executable to the cx_Freeze distribution
@@ -444,21 +475,26 @@ class Distribution(object):
         self.executables += [Executable(self.script, base=base, icon=self.icon,
                                         targetName=self.target_name)]
 
-    def build_cx_freeze(self, cleanup=True):
+    def build_cx_freeze(self, cleanup=True, create_archive=False):
         """Build executable with cx_Freeze
-        cleanup: remove 'build' directory before building distribution"""
+        cleanup: remove 'build' directory before building distribution
+        create_archive: create a ZIP archive (requires the executable `zip`)
+        """
         assert not self._py2exe_is_loaded, \
                "cx_Freeze can't be executed after py2exe"
         from cx_Freeze import setup
         if cleanup:
-            remove_dir("build")
+            self.__cleanup()
         sys.argv += ["build"]
         build_exe = dict(include_files=to_include_files(self.data_files),
                          includes=self.includes, excludes=self.excludes,
                          bin_excludes=self.bin_excludes,
                          bin_includes=self.bin_includes,
                          bin_path_includes=self.bin_path_includes,
-                         bin_path_excludes=self.bin_path_excludes)
+                         bin_path_excludes=self.bin_path_excludes,
+                         build_exe=self.target_dir)
         setup(name=self.name, version=self.version,
               description=self.description, executables=self.executables,
               options=dict(build_exe=build_exe))
+        if create_archive:
+            self.__create_archive()
