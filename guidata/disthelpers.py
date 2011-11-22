@@ -414,9 +414,20 @@ class Distribution(object):
             print "Adding module '%s' translation file: %s" % (module_name,
                                                osp.basename(translation_file))
 
-    def build(self, library, cleanup=True, create_archive=False):
+    def build(self, library, cleanup=True, create_archive=None):
         """Build executable with given library.
-        Supported libraries: 'py2exe', 'cx_Freeze'"""
+
+        library:
+            * 'py2exe': deploy using the `py2exe` library
+            * 'cx_Freeze': deploy using the `cx_Freeze` library
+
+        cleanup: remove 'build/dist' directories before building distribution
+
+        create_archive (requires the executable `zip`):
+            * None or False: do nothing
+            * 'add': add target directory to a ZIP archive
+            * 'move': move target directory to a ZIP archive
+        """
         if library == 'py2exe':
             self.build_py2exe(cleanup=cleanup,
                               create_archive=create_archive)
@@ -433,16 +444,28 @@ class Distribution(object):
             remove_dir("dist")
         remove_dir(self.target_dir)
     
-    def __create_archive(self):
-        """Create a ZIP archive"""
+    def __create_archive(self, option):
+        """Create a ZIP archive
+
+        option:
+            * 'add': add target directory to a ZIP archive
+            * 'move': move target directory to a ZIP archive
+        """
         name = self.target_dir
         os.system('zip "%s.zip" -r "%s"' % (name, name))
+        if option == 'move':
+            shutil.rmtree(name)
 
     def build_py2exe(self, cleanup=True, compressed=2, optimize=2,
-                     company_name=None, copyright=None, create_archive=False):
+                     company_name=None, copyright=None, create_archive=None):
         """Build executable with py2exe
+
         cleanup: remove 'build/dist' directories before building distribution
-        create_archive: create a ZIP archive (requires the executable `zip`)
+
+        create_archive (requires the executable `zip`):
+            * None or False: do nothing
+            * 'add': add target directory to a ZIP archive
+            * 'move': move target directory to a ZIP archive
         """
         from distutils.core import setup
         import py2exe  # Patching distutils -- analysis:ignore
@@ -463,7 +486,7 @@ class Distribution(object):
         setup(data_files=self.data_files, windows=[windows,],
               options=dict(py2exe=options))
         if create_archive:
-            self.__create_archive()
+            self.__create_archive(create_archive)
 
     def add_executable(self, script, target_name, icon=None):
         """Add executable to the cx_Freeze distribution
@@ -475,10 +498,15 @@ class Distribution(object):
         self.executables += [Executable(self.script, base=base, icon=self.icon,
                                         targetName=self.target_name)]
 
-    def build_cx_freeze(self, cleanup=True, create_archive=False):
+    def build_cx_freeze(self, cleanup=True, create_archive=None):
         """Build executable with cx_Freeze
-        cleanup: remove 'build' directory before building distribution
-        create_archive: create a ZIP archive (requires the executable `zip`)
+
+        cleanup: remove 'build/dist' directories before building distribution
+
+        create_archive (requires the executable `zip`):
+            * None or False: do nothing
+            * 'add': add target directory to a ZIP archive
+            * 'move': move target directory to a ZIP archive
         """
         assert not self._py2exe_is_loaded, \
                "cx_Freeze can't be executed after py2exe"
@@ -497,4 +525,4 @@ class Distribution(object):
               description=self.description, executables=self.executables,
               options=dict(build_exe=build_exe))
         if create_archive:
-            self.__create_archive()
+            self.__create_archive(create_archive)
