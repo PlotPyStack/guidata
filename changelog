@@ -17,6 +17,8 @@
   * Added test for item callbacks
   * dataset.datatypes.!FormatProp/new behavior: added `ignore_error` argument, default to True (ignores string formatting error: ValueError)
   * disthelpers:
+    * Distribution.setup: added `target_dir` option
+    * Distribution.build: added `create_archive` option to create a ZIP archive after building the package
     * cx_Freeze: added support for multiple executables
     * added support for h5py 2.0
     * added support for Maplotlib 1.1
