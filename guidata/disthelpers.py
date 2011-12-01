@@ -101,6 +101,9 @@ def create_vs2008_data_files(verbose=False):
             for dllname in os.listdir(path):
                 filelist.append(osp.join(path, dllname))
             break
+    else:
+        raise RuntimeError, "Microsoft Visual C++ DLLs version %s "\
+                            "were not found" % version
 
     print create_vs2008_data_files.__doc__
     if verbose:
