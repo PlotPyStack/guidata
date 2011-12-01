@@ -80,18 +80,38 @@ def prepend_modules_to_path(module_base_path):
 #==============================================================================
 # Distribution helpers
 #==============================================================================
-def create_vs2008_data_files(verbose=False):
-    """Including Microsoft Visual C++ 2008 DLLs"""    
-    filelist = []
-    manifest = osp.join(sys.prefix, "Microsoft.VC90.CRT.manifest")
-    filelist.append(manifest)
-    
-    from xml.etree import ElementTree
-    assembly = ElementTree.fromstring(file(manifest).read())
-    assid = assembly.find("{urn:schemas-microsoft-com:asm.v1}assemblyIdentity")
-    version = assid.get("version")
-    arch = assid.get("processorArchitecture")
-    key = assid.get("publicKeyToken")
+def create_vs2008_data_files(verbose=False, version=None, key=None):
+    """Including Microsoft Visual C++ 2008 DLLs"""
+    if version is None:
+        # Python 2.6-2.7 were built with Visual Studio 9.0.21022.8
+        # (i.e. Visual Studio 2008, not Visual Studio 2008 SP1!)
+        version = "9.0.21022.8"
+        key = "1fc8b3b9a1e18e3b"
+    is_64bits = sys.maxsize > 2**32
+    atype = "" if is_64bits else "win32"
+    arch = "amd64" if is_64bits else "x86"
+    manifest = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- Copyright (c) Microsoft Corporation.  All rights reserved. -->
+<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
+    <noInheritable/>
+    <assemblyIdentity
+        type="%(atype)s"
+        name="Microsoft.VC90.CRT"
+        version="%(version)s"
+        processorArchitecture="%(arch)s"
+        publicKeyToken="%(key)s"
+    />
+    <file name="msvcr90.dll" />
+    <file name="msvcp90.dll" />
+    <file name="msvcm90.dll" />
+</assembly>
+""" % dict(version=version, key=key, atype=atype, arch=arch)
+
+    vc90man = "Microsoft.VC90.CRT.manifest"
+    file(vc90man, 'w').write(manifest)
+    atexit.register(os.remove, vc90man)
+
+    filelist = [vc90man]
 
     vc_str = '%s_Microsoft.VC90.CRT_%s_%s' % (arch, key, version)
     winsxs = osp.join(os.environ['windir'], 'WinSxS')
@@ -150,11 +170,6 @@ def remove_dir(dirname):
     except Exception:
         print "Failed!"
         traceback.print_exc()
-
-
-def remove_at_exit(fname):
-    """Remove temporary file *fname* at exit"""
-    atexit.register(os.remove, fname)
 
 
 class Distribution(object):
@@ -257,7 +272,7 @@ class Distribution(object):
         and add it to *data_files*"""
         file(filename, 'wb').write(contents)
         self.data_files += [("", (filename, ))]
-        remove_at_exit(filename)
+        atexit.register(os.remove, filename)
     
     def add_data_file(self, filename, destdir=''):
         self.data_files += [(destdir, (filename, ))]
@@ -281,10 +296,11 @@ class Distribution(object):
         # Including plugins (.svg icons support, QtDesigner support, ...)
         if self.vs2008:
             vc90man = "Microsoft.VC90.CRT.manifest"
-            shutil.copy(osp.join(sys.prefix, vc90man), vc90man)
+            os.mkdir('pyqt_tmp')
+            vc90man_pyqt = osp.join('pyqt_tmp', vc90man)
             man = file(vc90man, "r").read().replace('<file name="',
                                         '<file name="Microsoft.VC90.CRT\\')
-            file(vc90man, 'w').write(man)
+            file(vc90man_pyqt, 'w').write(man)
         for dirpath, _, filenames in os.walk(osp.join(pyqt_path,
                                                       "plugins")):
             filelist = [osp.join(dirpath, f) for f in filenames
@@ -294,11 +310,11 @@ class Distribution(object):
                 # Where there is a DLL build with Microsoft Visual C++ 2008,
                 # there must be a manifest file as well...
                 # ...congrats to Microsoft for this great simplification!
-                filelist.append(vc90man)
+                filelist.append(vc90man_pyqt)
             self.data_files.append( (dirpath[len(pyqt_path)+len(os.pathsep):],
                                      filelist) )
         if self.vs2008:
-            remove_at_exit(vc90man)
+            atexit.register(remove_dir, 'pyqt_tmp')
         
         # Including french translation
         self.data_files.append(('translations',
