@@ -208,6 +208,13 @@ class Distribution(object):
               data_files=None, includes=None, excludes=None,
               bin_includes=None, bin_excludes=None,
               bin_path_includes=None, bin_path_excludes=None, vs2008=None):
+        """Setup distribution object
+        
+        Notes:
+          * bin_path_excludes is specific to cx_Freeze (ignored if it's None)
+          * if vs2008 is None, it's set to True by default on Windows 
+            platforms, False on non-Windows platforms
+        """
         self.name = name
         self.version = strip_version(version) if os.name == 'nt' else version
         self.description = description
@@ -230,10 +237,15 @@ class Distribution(object):
             self.bin_path_includes += bin_path_includes
         if bin_path_excludes is not None:
             self.bin_path_excludes += bin_path_excludes
-        if self.vs2008 is not None:
+        if vs2008 is not None:
             self.vs2008 = vs2008
         if self.vs2008:
-            self.data_files += create_vs2008_data_files()
+            try:
+                self.data_files += create_vs2008_data_files()
+            except IOError:
+                print >>sys.stderr, "Setting the vs2008 option to False "\
+                                    "will avoid this error"
+                raise
         # cx_Freeze:
         self.add_executable(self.script, self.target_name, icon=self.icon)
 
@@ -308,13 +320,7 @@ class Distribution(object):
                                     '.xpm', '.ppm', '.npy', '.afm', '.ttf'))
 
     def add_modules(self, *module_names):
-        """Include module *module_name*
-        
-        Notes:
-          * bin_path_excludes is specific to cx_Freeze (ignored if it's None)
-          * if vs2008 is None, it's set to True by default on Windows platforms,
-            False on non-Windows platforms
-        """
+        """Include module *module_name*"""
         for module_name in module_names:
             print "Configuring module '%s'" % module_name
             if module_name == 'PyQt4':
