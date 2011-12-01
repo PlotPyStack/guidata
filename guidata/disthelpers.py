@@ -117,7 +117,7 @@ def create_vs2008_data_files(verbose=False, version=None, key=None):
     winsxs = osp.join(os.environ['windir'], 'WinSxS')
     for fname in os.listdir(winsxs):
         path = osp.join(winsxs, fname)
-        if osp.isdir(path) and fname.startswith(vc_str):
+        if osp.isdir(path) and fname.lower().startswith(vc_str.lower()):
             for dllname in os.listdir(path):
                 filelist.append(osp.join(path, dllname))
             break
