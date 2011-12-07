@@ -44,13 +44,15 @@ class DataSetEditDialog(QDialog):
     """
     Dialog box for DataSet editing
     """
-    def __init__(self, instance, icon='', parent=None, apply=None):
+    def __init__(self, instance, icon='', parent=None, apply=None,
+                 wordwrap=True):
         QDialog.__init__(self, parent)
+        self.wordwrap = wordwrap
         self.apply_func = apply
         self.layout = QVBoxLayout()
         if instance.get_comment():
             label = QLabel(instance.get_comment())
-            label.setWordWrap(True)
+            label.setWordWrap(wordwrap)
             self.layout.addWidget(label)
         self.instance = instance
         self.edit_layout = [  ]
@@ -144,7 +146,7 @@ class DataSetGroupEditDialog(DataSetEditDialog):
             layout.setAlignment(Qt.AlignTop)
             if dataset.get_comment():
                 label = QLabel(dataset.get_comment())
-                label.setWordWrap(True)
+                label.setWordWrap(self.wordwrap)
                 layout.addWidget(label)
             grid = QGridLayout()
             self.edit_layout.append( self.layout_factory(dataset, grid) )
@@ -335,7 +337,6 @@ class DataSetShowWidget(AbstractDataSetWidget):
     def __init__(self, item, parent_layout):
         AbstractDataSetWidget.__init__(self, item, parent_layout)
         self.group = QLabel()
-        self.group.setWordWrap(True)
         self.group.setToolTip(item.get_help())
         self.group.setStyleSheet( LABEL_CSS )
         self.group.setTextInteractionFlags(Qt.TextSelectableByMouse)
@@ -426,14 +427,14 @@ DataSetShowLayout.register(FloatArrayItem, DataSetShowWidget)
 
 class DataSetShowGroupBox(QGroupBox):
     """Group box widget showing a read-only DataSet"""
-    def __init__(self, label, klass, **kwargs):
+    def __init__(self, label, klass, wordwrap=False, **kwargs):
         QGroupBox.__init__(self, label)
         self.klass = klass
         self.dataset = klass(**kwargs)
         self.layout = QVBoxLayout()
         if self.dataset.get_comment():
             label = QLabel(self.dataset.get_comment())
-            label.setWordWrap(True)
+            label.setWordWrap(wordwrap)
             self.layout.addWidget(label)
         self.grid_layout = QGridLayout()
         self.layout.addLayout(self.grid_layout)
@@ -460,8 +461,9 @@ class DataSetEditGroupBox(DataSetShowGroupBox):
     button_icon: QIcon object or string (default "apply.png")
     """
     def __init__(self, label, klass, button_text=None, button_icon=None,
-                 show_button=True, **kwargs):
-        DataSetShowGroupBox.__init__(self, label, klass, **kwargs)
+                 show_button=True, wordwrap=False, **kwargs):
+        DataSetShowGroupBox.__init__(self, label, klass, wordwrap=wordwrap,
+                                     **kwargs)
         if show_button:
             if button_text is None:
                 button_text = _("Apply")
@@ -492,4 +494,3 @@ class DataSetEditGroupBox(DataSetShowGroupBox):
         if not app_name:
             app_name = unicode(self.title())
         return "%s - %s" % ( app_name, item.label() )
-
