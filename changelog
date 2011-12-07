@@ -1,3 +1,15 @@
+== Version 1.4.2 ==
+
+=== Bug fixes (since v1.4.1) ===
+
+  * disthelpers:
+    * vs2008 option was accidently turned off by default on Windows platform
+    * raising an exception when the right version of Ms Visual C++ DLLs was not found
+    * now creating the manifest and distributing from the redistribuable package installed in WinSxS
+  * Datasets GUI: QLabel widgets word wrapping is now disabled for read-only items and may be disabled for dataset comments (this is necessary because when the parent widget height is constrained, Qt is unexpectedly reducing the height of word-wrapped QLabel widgets below their minimum size, hence truncating their contents)
+
+----
+
 == Version 1.4.1 ==
 
 === Bug fixes (since v1.4.0) ===
