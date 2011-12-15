@@ -337,6 +337,8 @@ class DataSetShowWidget(AbstractDataSetWidget):
     def __init__(self, item, parent_layout):
         AbstractDataSetWidget.__init__(self, item, parent_layout)
         self.group = QLabel()
+        wordwrap = item.get_prop_value("display", "wordwrap", False)
+        self.group.setWordWrap(wordwrap)
         self.group.setToolTip(item.get_help())
         self.group.setStyleSheet( LABEL_CSS )
         self.group.setTextInteractionFlags(Qt.TextSelectableByMouse)

@@ -157,13 +157,15 @@ class StringItem(DataItem):
         * label [string]: name
         * default [string]: default value (optional)
         * help [string]: text shown in tooltip (optional)
-    notempty [bool]: if True, empty string is not a valid value (optional)
+        * notempty [bool]: if True, empty string is not a valid value (opt.)
+        * wordwrap [bool]: toggle word wrapping (optional)
     """
     type = (unicode, str)
-    def __init__(self, label, default=None,
-                 notempty=None, help=''):
+    def __init__(self, label, default=None, notempty=None,
+                 wordwrap=False, help=''):
         DataItem.__init__(self, label, default=default, help=help)
         self.set_prop("data", notempty=notempty)
+        self.set_prop("display", wordwrap=wordwrap)
 
     def check_value(self, value):
         """Override DataItem method"""
@@ -184,8 +186,13 @@ class TextItem(StringItem):
         * label [string]: name
         * default [string]: default value (optional)
         * help [string]: text shown in tooltip (optional)
+        * notempty [bool]: if True, empty string is not a valid value (opt.)
+        * wordwrap [bool]: toggle word wrapping (optional)
     """
-    pass
+    def __init__(self, label, default=None, notempty=None,
+                 wordwrap=True,help=''):
+        StringItem.__init__(self, label, default=default, notempty=notempty,
+                            wordwrap=wordwrap, help=help)
 
 
 class BoolItem(DataItem):
