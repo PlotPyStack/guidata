@@ -48,6 +48,7 @@ class SubDataSetItem(ObjectItem):
 DataSetEditLayout.register(SubDataSetItem, SubDataSetWidget)
 DataSetShowLayout.register(SubDataSetItem, SubDataSetWidget)
 
+
 class TestParameters(DataSet):
     """
     DataSet test
@@ -66,7 +67,7 @@ class TestParameters(DataSet):
     bool1 = BoolItem("Boolean option without label")
     bool2 = BoolItem("Boolean option with label", "Label").set_pos(col=1,
                                                                    colspan=2)
-    color = ColorItem("Color")
+    color = ColorItem("Color", default="red")
     choice = ChoiceItem("Single choice",
                         [(16, "first choice"), (32, "second choice"),
                          (64, "third choice")]

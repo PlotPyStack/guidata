@@ -93,12 +93,13 @@ FMT_GROUPS=re.compile(r"(?<!%)%\((\w+)\)")
 class FormatProp(ItemProperty):
     """A Property that returns a string to help
     custom read-only representation of items"""
-    def __init__(self, fmt):
+    def __init__(self, fmt, ignore_error=True):
         """fmt is a format string
         it can contain a single anonymous substition or
         several named substitions.
         """
         self.fmt = fmt
+        self.ignore_error = ignore_error
         self.attrs = FMT_GROUPS.findall(fmt)
 
     def __call__(self, instance, item, value):
@@ -110,8 +111,10 @@ class FormatProp(ItemProperty):
         try:
             return self.fmt % dic
         except TypeError:
-            print "Wrong Format for %s : %r %% %r" % (item._name, self.fmt, dic)
-            raise
+            if not self.ignore_error:
+                print "Wrong Format for %s : %r %% %r"\
+                      % (item._name, self.fmt, dic)
+                raise
 
 class GetAttrProp(ItemProperty):
     """A property that matches the value of

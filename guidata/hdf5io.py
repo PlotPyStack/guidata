@@ -9,8 +9,12 @@
 Reader and Writer for the serialization of DataSets into HDF5 files
 """
 
-import sys, h5py, numpy as np
+import sys
+import h5py
+import numpy as np
+
 from guidata.utils import utf8_to_unicode
+
 
 class TypeConverter(object):
     def __init__(self, to_type, from_type=None):
@@ -30,8 +34,10 @@ class TypeConverter(object):
     def from_hdf(self, value):
         return self._from_type(value)
 
+
 unicode_hdf = TypeConverter(lambda x: x.encode("utf-8"), utf8_to_unicode)
 int_hdf = TypeConverter(int)
+
 
 class Attr(object):
     """Helper class representing class attribute that
@@ -49,9 +55,18 @@ class Attr(object):
         self.struct_name = struct_name
         self.type = type
         self.optional = optional
-        
+
+    def get_value(self, struct):
+        if self.optional:
+            return getattr(struct, self.struct_name, None)
+        else:
+            return getattr(struct, self.struct_name)
+
+    def set_value(self, struct, value):
+        setattr(struct, self.struct_name, value)
+
     def save(self, group, struct):
-        value = getattr(struct, self.struct_name)
+        value = self.get_value(struct)
         if self.optional and value is None:
             #print ".-", self.hdf_name, value
             if self.hdf_name in group.attrs:
@@ -70,7 +85,7 @@ class Attr(object):
         #print "LoadAttr:", group, self.hdf_name
         if self.optional:
             if self.hdf_name not in group.attrs:
-                setattr(struct, self.struct_name, None)
+                self.set_value(struct, None)
                 return
         try:
             value = group.attrs[self.hdf_name]
@@ -78,13 +93,15 @@ class Attr(object):
             raise KeyError, 'Unable to locate attribute %s' % self.hdf_name
         if self.type is not None:
             value = self.type.from_hdf(value)
-        setattr(struct, self.struct_name, value)
+        self.set_value(struct, value)
+
 
 def createdset(group,name,value):
     group.create_dataset(name,
                          compression=None,
                          #compression_opts=3,
                          data=value)
+
 
 class Dset(Attr):
     """
@@ -95,12 +112,6 @@ class Dset(Attr):
                  optional=False):
         Attr.__init__(self, hdf_name, struct_name, type, optional)
         self.scalar = scalar
-
-    def get_value(self, struct):
-        return getattr(struct, self.struct_name)
-
-    def set_value(self, struct, value):
-        setattr(struct, self.struct_name, value)
 
     def save(self, group, struct):
         value = self.get_value(struct)
@@ -117,10 +128,18 @@ class Dset(Attr):
                               compression="gzip", compression_opts=1)
     
     def load(self, group, struct):
-        value = group[self.hdf_name][...]
+        if self.optional:
+            if self.hdf_name not in group:
+                self.set_value(struct, None)
+                return
+        try:
+            value = group[self.hdf_name][...]
+        except KeyError:
+            raise KeyError, 'Unable to locate dataset %s' % self.hdf_name
         if self.scalar is not None:
             value = self.scalar(value)
         self.set_value(struct, value)
+
 
 class Dlist(Dset):
     def get_value(self, struct):
@@ -128,6 +147,7 @@ class Dlist(Dset):
 
     def set_value(self, struct, value):
         setattr(struct, self.struct_name, list(value))
+
 
 class H5Store(object):
     def __init__(self, filename):
@@ -146,9 +166,8 @@ class H5Store(object):
         return self.h5
 
     def close(self):
-        if self.h5 is None:
-            return
-        self.h5.close()
+        if self.h5:
+            self.h5.close()
         self.h5 = None
         
     def generic_save(self, parent, source, structure):
@@ -174,6 +193,7 @@ class H5Store(object):
             except Exception:
                 print >>sys.stderr, "Error loading HDF5 item:", instr.hdf_name
                 raise
+
 
 class HDF5Writer(H5Store):
     """Writer for HDF5 files"""
@@ -220,6 +240,7 @@ class HDF5Writer(H5Store):
     def end(self, section):
         sect = self.option.pop(-1)
         assert sect == section
+
 
 class HDF5Reader(H5Store):
     """Writer for HDF5 files"""
