@@ -488,6 +488,7 @@ class FloatArrayItem(DataItem):
         * help [string]: text shown in tooltip (optional)
         * format [string]: formatting string (example: '%.3f') (optional)
         * transpose [bool]: transpose matrix (display only)
+        * large [bool]: view all float of the array
         * minmax [string]: "all" (default), "columns", "rows"
     """
     def __init__(self, label, default=None, help='', format='%.3f',
@@ -498,9 +499,21 @@ class FloatArrayItem(DataItem):
         
     def format_string(self, instance, value, fmt, func):
         """Override DataItem method"""
-        v = func(value)
-        return u"~= %g [%g .. %g]" % (v.mean(), v.min(), v.max())
-
+        larg = self.get_prop_value("display", instance, "large", False)
+        fmt = self.get_prop_value("display", instance, "format", u"%s")
+        v = func(value)        
+        if larg:
+            text = u"= ["
+            for flt in v[:-1]:
+                text += fmt % flt + "; "
+            text += fmt % v[-1] + "]"
+            return unicode(text)
+        else:
+            text = u"~= " + fmt % v.mean()
+            text += " [" + fmt % v.min()
+            text += " .. " + fmt % v.max()
+            text += "]"
+            return unicode(text)
 
 class ButtonItem(DataItem):
     """
