@@ -602,10 +602,14 @@ class ChoiceWidget(AbstractDataSetWidget):
         self.combobox.setToolTip(item.get_help())
         
         self.__first_call = True
+        self.store = self.item.get_prop("display", "store", None)
         QWidget.connect(self.combobox, SIGNAL("currentIndexChanged(int)"),
                         self.index_changed)
         
     def index_changed(self, index):
+        if self.store:
+            self.store.set(self.item.instance, self.item.item, self.value())
+            self.parent_layout.refresh_widgets()
         cb = self.item.get_prop_value("display", "callback", None)
         if cb is not None:
             self.parent_layout.update_dataitems()

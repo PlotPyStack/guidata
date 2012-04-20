@@ -1,12 +1,33 @@
+== Version 1.4.3 ==
+
+=== Possible API compatibility issues (since v1.4.2) ===
+
+  * datatypes.!OperatorProperty was renamed to !FuncProp
+
+=== Other changes (since v1.4.2) ===
+
+  * Added test for the !FuncProp item property: how to change an item active state depending on another item's value
+  * Added support for dictionaries for `update_dataset` and `restore_dataset` (functions of `guidata.utils`):
+    * `update_dataset` may update the destination dataset from a source dictionary
+    * `restore_dataset` may update the destination dictionary from a source dataset
+
+----
+
 == Version 1.4.2 ==
 
 === Bug fixes (since v1.4.1) ===
 
   * disthelpers:
-    * vs2008 option was accidently turned off by default on Windows platform
+    * the vs2008 option was accidently turned off by default on Windows platforms
+    * build_chm.bat: added support for Windows x64
+
+=== Other changes (since v1.4.2) ===
+
+  * dataset.qtwidgets:
+    * !QLabel widgets word wrapping is now disabled for read-only items and may be disabled for dataset comments: this is necessary because when the parent widget height is constrained, Qt is unexpectedly reducing the height of word-wrapped QLabel widgets below their minimum size, hence truncating their contents...
+  * disthelpers:
     * raising an exception when the right version of Ms Visual C++ DLLs was not found
     * now creating the manifest and distributing from the redistribuable package installed in WinSxS
-  * Datasets GUI: QLabel widgets word wrapping is now disabled for read-only items and may be disabled for dataset comments (this is necessary because when the parent widget height is constrained, Qt is unexpectedly reducing the height of word-wrapped QLabel widgets below their minimum size, hence truncating their contents)
 
 ----
 
