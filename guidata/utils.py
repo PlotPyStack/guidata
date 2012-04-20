@@ -122,8 +122,9 @@ def update_dataset(dest, source, visible_only=False):
     """
     Update `dest` dataset items from `source` dataset
     
-    dest should inherit from DataSet, whereas source can be any
-    Python object containing matching attribute names.
+    dest should inherit from DataSet, whereas source can be:
+        * any Python object containing matching attribute names
+        * or a dictionary with matching key names
     
     For each DataSet item, the function will try to get the attribute
     of the same name from the source. 
@@ -131,7 +132,8 @@ def update_dataset(dest, source, visible_only=False):
     visible_only: if True, update only visible items
     """
     for item in dest._items:
-        if hasattr(source, item._name):
+        key = item._name
+        if hasattr(source, key):
             try:
                 hide = item.get_prop_value("display", source, "hide", False)
             except AttributeError:
@@ -139,7 +141,9 @@ def update_dataset(dest, source, visible_only=False):
                 hide = False
             if visible_only and hide:
                 continue
-            setattr(dest, item._name, getattr(source, item._name))
+            setattr(dest, key, getattr(source, key))
+        elif isinstance(source, dict) and key in source:
+            setattr(dest, key, source[key])
 
 def restore_dataset(source, dest):
     """
@@ -147,10 +151,16 @@ def restore_dataset(source, dest):
     
     This function is almost the same as update_dataset but requires
     the source to be a DataSet instead of the destination.
+
+    Symetrically from update_dataset, `dest` may also be a dictionary.
     """
     for item in source._items:
-        if hasattr(dest, item._name):
-            setattr(dest, item._name, getattr(source, item._name))
+        key = item._name
+        value = getattr(source, key)
+        if hasattr(dest, key):
+            setattr(dest, key, value)
+        elif isinstance(dest, dict):
+            dest[key] = value
 
 
 #==============================================================================
