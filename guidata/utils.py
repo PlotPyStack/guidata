@@ -158,7 +158,11 @@ def restore_dataset(source, dest):
         key = item._name
         value = getattr(source, key)
         if hasattr(dest, key):
-            setattr(dest, key, value)
+            try:
+                setattr(dest, key, value)
+            except AttributeError:
+                # This attribute is a property, skipping this iteration
+                continue
         elif isinstance(dest, dict):
             dest[key] = value
 
