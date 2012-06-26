@@ -75,7 +75,7 @@ class DataSetEditDialog(QDialog):
         
         if parent is None:
             if not isinstance(icon, QIcon):
-                icon = get_icon(icon, default="guidata.png")
+                icon = get_icon(icon, default="guidata.svg")
             self.setWindowIcon(icon)
         
         self.setModal(True)

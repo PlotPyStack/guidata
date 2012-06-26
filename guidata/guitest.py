@@ -117,7 +117,7 @@ class TestLauncherWindow(QSplitter):
     def __init__(self, package, parent=None):
         QSplitter.__init__(self, parent)
         self.setWindowTitle(_("Tests - %s module") % package.__name__)
-        self.setWindowIcon(get_icon("%s.png" % package.__name__, "guidata.png"))
+        self.setWindowIcon(get_icon("%s.svg" % package.__name__, "guidata.svg"))
         
         test_package_name = '%s.tests' % package.__name__
         _temp = __import__(test_package_name)
