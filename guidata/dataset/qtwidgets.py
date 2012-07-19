@@ -450,7 +450,9 @@ class DataSetShowGroupBox(QGroupBox):
     def get(self):
         """Update group box contents from data item values"""
         for widget in self.edit.widgets:
+            widget.build_mode = True
             widget.get()
+            widget.build_mode = False
 
 
 class DataSetEditGroupBox(DataSetShowGroupBox):

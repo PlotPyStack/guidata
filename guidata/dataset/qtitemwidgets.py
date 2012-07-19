@@ -73,6 +73,7 @@ class AbstractDataSetWidget(object):
         self.parent_layout = parent_layout
         self.group = None # Layout/Widget grouping items
         self.label = None
+        self.build_mode = False
 
     def place_label(self, layout, row, column):
         """
@@ -258,7 +259,10 @@ class LineEditWidget(AbstractDataSetWidget):
             self.edit.setStyleSheet("")
             cb = self.item.get_prop_value("display", "callback", None)
             if cb is not None:
-                self.parent_layout.update_dataitems()
+                if self.build_mode:
+                    self.set()
+                else:
+                    self.parent_layout.update_dataitems()
                 cb(self.item.instance, self.item.item, value)
                 self.parent_layout.update_widgets(except_this_one=self)
         self.update(value)
@@ -612,7 +616,10 @@ class ChoiceWidget(AbstractDataSetWidget):
             self.parent_layout.refresh_widgets()
         cb = self.item.get_prop_value("display", "callback", None)
         if cb is not None:
-            self.parent_layout.update_dataitems()
+            if self.build_mode:
+                self.set()
+            else:
+                self.parent_layout.update_dataitems()
             cb(self.item.instance, self.item.item, self.value())
             self.parent_layout.update_widgets(except_this_one=self)
     
