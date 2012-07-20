@@ -75,7 +75,7 @@ class DataSetEditDialog(QDialog):
         
         if parent is None:
             if not isinstance(icon, QIcon):
-                icon = get_icon(icon, default="guidata.png")
+                icon = get_icon(icon, default="guidata.svg")
             self.setWindowIcon(icon)
         
         self.setModal(True)
@@ -450,7 +450,9 @@ class DataSetShowGroupBox(QGroupBox):
     def get(self):
         """Update group box contents from data item values"""
         for widget in self.edit.widgets:
+            widget.build_mode = True
             widget.get()
+            widget.build_mode = False
 
 
 class DataSetEditGroupBox(DataSetShowGroupBox):
