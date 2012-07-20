@@ -22,6 +22,7 @@ import os.path as osp
 import shutil
 import traceback
 import atexit
+import imp
 from subprocess import Popen, PIPE
 
 # Local imports
@@ -206,6 +207,7 @@ class Distribution(object):
         self.vs2008 = os.name == 'nt'
         self._py2exe_is_loaded = False
         self._pyqt4_added = False
+        self._pyside_added = False
         # Attributes relative to cx_Freeze:
         self.executables = []
     
@@ -317,9 +319,73 @@ class Distribution(object):
             atexit.register(remove_dir, 'pyqt_tmp')
         
         # Including french translation
-        self.data_files.append(('translations',
-                                (osp.join(pyqt_path, "translations",
-                                 "qt_fr.qm"), )))
+        fr_trans = osp.join(pyqt_path, "translations", "qt_fr.qm")
+        if osp.exists(fr_trans):
+            self.data_files.append(('translations', (fr_trans, )))
+
+    def add_pyside(self):
+        """Include module PySide to the distribution"""
+        if self._pyside_added:
+            return
+        self._pyside_added = True
+        
+        self.includes += ['PySide.QtDeclarative', 'PySide.QtHelp',
+                          'PySide.QtMultimedia', 'PySide.QtNetwork',
+                          'PySide.QtOpenGL', 'PySide.QtScript',
+                          'PySide.QtScriptTools', 'PySide.QtSql',
+                          'PySide.QtSvg', 'PySide.QtTest',
+                          'PySide.QtUiTools', 'PySide.QtWebKit',
+                          'PySide.QtXml', 'PySide.QtXmlPatterns']
+        
+        import PySide
+        pyside_path = osp.dirname(PySide.__file__)
+        
+        # Configuring PySide
+        conf = os.linesep.join(["[Paths]", "Prefix = .", "Binaries = ."])
+        self.add_text_data_file('qt.conf', conf)
+        
+        # Including plugins (.svg icons support, QtDesigner support, ...)
+        if self.vs2008:
+            vc90man = "Microsoft.VC90.CRT.manifest"
+            os.mkdir('pyside_tmp')
+            vc90man_pyside = osp.join('pyside_tmp', vc90man)
+            man = file(vc90man, "r").read().replace('<file name="',
+                                        '<file name="Microsoft.VC90.CRT\\')
+            file(vc90man_pyside, 'w').write(man)
+        for dirpath, _, filenames in os.walk(osp.join(pyside_path, "plugins")):
+            filelist = [osp.join(dirpath, f) for f in filenames
+                        if osp.splitext(f)[1] in ('.dll', '.py')]
+            if self.vs2008 and [f for f in filelist
+                           if osp.splitext(f)[1] == '.dll']:
+                # Where there is a DLL build with Microsoft Visual C++ 2008,
+                # there must be a manifest file as well...
+                # ...congrats to Microsoft for this great simplification!
+                filelist.append(vc90man_pyside)
+            self.data_files.append(
+                    (dirpath[len(pyside_path)+len(os.pathsep):], filelist) )
+
+        # Replacing dlls found by cx_Freeze by the real PySide Qt dlls:
+        # (http://qt-project.org/wiki/Packaging_PySide_applications_on_Windows)
+        dlls = [osp.join(pyside_path, fname)
+                for fname in os.listdir(pyside_path)
+                if osp.splitext(fname)[1] == '.dll']
+        self.data_files.append( ('', dlls) )
+
+        if self.vs2008:
+            atexit.register(remove_dir, 'pyside_tmp')
+        
+        # Including french translation
+        fr_trans = osp.join(pyside_path, "translations", "qt_fr.qm")
+        if osp.exists(fr_trans):
+            self.data_files.append(('translations', (fr_trans, )))
+    
+    def add_qt_bindings(self):
+        """Include Qt bindings, i.e. PyQt4 or PySide"""
+        try:
+            imp.find_module('PyQt4')
+            self.add_modules('PyQt4')
+        except ImportError:
+            self.add_modules('PySide')
 
     def add_matplotlib(self):
         """Include module Matplotlib to the distribution"""
@@ -344,6 +410,8 @@ class Distribution(object):
             print "Configuring module '%s'" % module_name
             if module_name == 'PyQt4':
                 self.add_pyqt4()
+            elif module_name == 'PySide':
+                self.add_pyside()
             elif module_name == 'scipy.io':
                 self.includes += ['scipy.io.matlab.streams']
             elif module_name == 'matplotlib':
@@ -379,7 +447,11 @@ class Distribution(object):
             elif module_name == 'guidata':
                 self.add_module_data_files('guidata', ("images", ),
                                        ('.png', '.svg'), copy_to_root=False)
-                self.add_pyqt4()
+                try:
+                    imp.find_module('PyQt4')
+                    self.add_pyqt4()
+                except ImportError:
+                    self.add_pyside()
             elif module_name == 'guiqwt':
                 self.add_module_data_files('guiqwt', ("images", ),
                                        ('.png', '.svg'), copy_to_root=False)
