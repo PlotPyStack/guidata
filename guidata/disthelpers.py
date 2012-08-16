@@ -81,16 +81,28 @@ def prepend_modules_to_path(module_base_path):
 #==============================================================================
 # Distribution helpers
 #==============================================================================
-def create_vs2008_data_files(verbose=False, version=None, key=None):
-    """Including Microsoft Visual C++ 2008 DLLs"""
-    if version is None:
+def get_visual_studio_dlls(architecture=None, python_version=None):
+    """Get the list of Microsoft Visual C++ 2008 DLLs associated to 
+    architecture and Python version, create the manifest file.
+    
+    architecture: integer (32 or 64) -- if None, take the Python build arch
+    python_version: X.Y"""
+    if python_version is None:
+        python_version = '2.7'
+        print >>sys.stderr, "Warning/disthelpers: assuming Python 2.7 target"
+    if python_version in ('2.6', '2.7'):
         # Python 2.6-2.7 were built with Visual Studio 9.0.21022.8
         # (i.e. Visual Studio 2008, not Visual Studio 2008 SP1!)
         version = "9.0.21022.8"
         key = "1fc8b3b9a1e18e3b"
-    is_64bits = sys.maxsize > 2**32
-    atype = "" if is_64bits else "win32"
-    arch = "amd64" if is_64bits else "x86"
+    #TODO: add here the future version of Python (including Python 3)
+    else:
+        raise RuntimeError,\
+              "Unsupported Python version %s" % python_version
+    if architecture is None:
+        architecture = 64 if sys.maxsize > 2**32 else 32
+    atype = "" if architecture == 64 else "win32"
+    arch = "amd64" if architecture == 64 else "x86"
     manifest = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <!-- Copyright (c) Microsoft Corporation.  All rights reserved. -->
 <assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
@@ -125,12 +137,18 @@ def create_vs2008_data_files(verbose=False, version=None, key=None):
     else:
         raise RuntimeError, "Microsoft Visual C++ DLLs version %s "\
                             "were not found" % version
+    
+    return filelist
 
+def create_vs2008_data_files(architecture=None, python_version=None,
+                             verbose=False):
+    """Including Microsoft Visual C++ 2008 DLLs"""
+    filelist = get_visual_studio_dlls(architecture=architecture,
+                                      python_version=python_version)
     print create_vs2008_data_files.__doc__
     if verbose:
         for name in filelist:
             print "  ", name
-        
     return [("Microsoft.VC90.CRT", filelist),]
 
 
