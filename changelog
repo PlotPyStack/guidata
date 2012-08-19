@@ -1,4 +1,10 @@
-== Version 1.4.3 ==
+== Version 1.5.0 ==
+
+=== Bug fixes (since v1.4.2) ===
+
+  * Fixed 'callback' property related issue: when updating a !DataSetShowGroupBox or
+!DataSetEditGroupBox internal dataset, the callback property was causing a reset
+of the data items to their default values
 
 === Possible API compatibility issues (since v1.4.2) ===
 
@@ -10,7 +16,12 @@
   * Added support for dictionaries for `update_dataset` and `restore_dataset` (functions of `guidata.utils`):
     * `update_dataset` may update the destination dataset from a source dictionary
     * `restore_dataset` may update the destination dictionary from a source dataset
-
+  * Added new guidata svg logo
+  * disthelpers:
+    * added support for PySide
+	* disthelpers: new function 'get_visual_studio_dlls' -- returns the list of Visual
+Studio DLLs (and create manifest) associated to Python architecture and version
+	
 ----
 
 == Version 1.4.2 ==
