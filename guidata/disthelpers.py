@@ -81,6 +81,13 @@ def prepend_modules_to_path(module_base_path):
 #==============================================================================
 # Distribution helpers
 #==============================================================================
+def _remove_later(fname):
+    """Try to remove file later (at exit)"""
+    def try_to_remove(fname):
+        if osp.exists(fname):
+            os.remove(fname)
+    atexit.register(try_to_remove, osp.abspath(fname))
+
 def get_visual_studio_dlls(architecture=None, python_version=None):
     """Get the list of Microsoft Visual C++ 2008 DLLs associated to 
     architecture and Python version, create the manifest file.
@@ -122,7 +129,7 @@ def get_visual_studio_dlls(architecture=None, python_version=None):
 
     vc90man = "Microsoft.VC90.CRT.manifest"
     file(vc90man, 'w').write(manifest)
-    atexit.register(os.remove, vc90man)
+    _remove_later(vc90man)
 
     filelist = [vc90man]
 
@@ -292,7 +299,7 @@ class Distribution(object):
         and add it to *data_files*"""
         file(filename, 'wb').write(contents)
         self.data_files += [("", (filename, ))]
-        atexit.register(os.remove, filename)
+        _remove_later(filename)
     
     def add_data_file(self, filename, destdir=''):
         self.data_files += [(destdir, (filename, ))]
