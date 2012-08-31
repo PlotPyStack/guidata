@@ -152,7 +152,7 @@ class NotProp(ItemProperty):
     def set(self, instance, item, value):
         self.property.set(instance, item, not value)
 
-class OperatorProperty(ItemProperty):
+class FuncProp(ItemProperty):
     """An 'operator property'
     prop: ItemProperty instance
     func: function

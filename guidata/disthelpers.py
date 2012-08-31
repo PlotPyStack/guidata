@@ -22,6 +22,7 @@ import os.path as osp
 import shutil
 import traceback
 import atexit
+import imp
 from subprocess import Popen, PIPE
 
 # Local imports
@@ -80,33 +81,81 @@ def prepend_modules_to_path(module_base_path):
 #==============================================================================
 # Distribution helpers
 #==============================================================================
-def create_vs2008_data_files(verbose=False):
-    """Including Microsoft Visual C++ 2008 DLLs"""    
-    filelist = []
-    manifest = osp.join(sys.prefix, "Microsoft.VC90.CRT.manifest")
-    filelist.append(manifest)
+def _remove_later(fname):
+    """Try to remove file later (at exit)"""
+    def try_to_remove(fname):
+        if osp.exists(fname):
+            os.remove(fname)
+    atexit.register(try_to_remove, osp.abspath(fname))
+
+def get_visual_studio_dlls(architecture=None, python_version=None):
+    """Get the list of Microsoft Visual C++ 2008 DLLs associated to 
+    architecture and Python version, create the manifest file.
     
-    from xml.etree import ElementTree
-    assembly = ElementTree.fromstring(file(manifest).read())
-    assid = assembly.find("{urn:schemas-microsoft-com:asm.v1}assemblyIdentity")
-    version = assid.get("version")
-    arch = assid.get("processorArchitecture")
-    key = assid.get("publicKeyToken")
+    architecture: integer (32 or 64) -- if None, take the Python build arch
+    python_version: X.Y"""
+    if python_version is None:
+        python_version = '2.7'
+        print >>sys.stderr, "Warning/disthelpers: assuming Python 2.7 target"
+    if python_version in ('2.6', '2.7'):
+        # Python 2.6-2.7 were built with Visual Studio 9.0.21022.8
+        # (i.e. Visual Studio 2008, not Visual Studio 2008 SP1!)
+        version = "9.0.21022.8"
+        key = "1fc8b3b9a1e18e3b"
+    #TODO: add here the future version of Python (including Python 3)
+    else:
+        raise RuntimeError,\
+              "Unsupported Python version %s" % python_version
+    if architecture is None:
+        architecture = 64 if sys.maxsize > 2**32 else 32
+    atype = "" if architecture == 64 else "win32"
+    arch = "amd64" if architecture == 64 else "x86"
+    manifest = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- Copyright (c) Microsoft Corporation.  All rights reserved. -->
+<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
+    <noInheritable/>
+    <assemblyIdentity
+        type="%(atype)s"
+        name="Microsoft.VC90.CRT"
+        version="%(version)s"
+        processorArchitecture="%(arch)s"
+        publicKeyToken="%(key)s"
+    />
+    <file name="msvcr90.dll" />
+    <file name="msvcp90.dll" />
+    <file name="msvcm90.dll" />
+</assembly>
+""" % dict(version=version, key=key, atype=atype, arch=arch)
+
+    vc90man = "Microsoft.VC90.CRT.manifest"
+    file(vc90man, 'w').write(manifest)
+    _remove_later(vc90man)
+
+    filelist = [vc90man]
 
     vc_str = '%s_Microsoft.VC90.CRT_%s_%s' % (arch, key, version)
     winsxs = osp.join(os.environ['windir'], 'WinSxS')
     for fname in os.listdir(winsxs):
         path = osp.join(winsxs, fname)
-        if osp.isdir(path) and fname.startswith(vc_str):
+        if osp.isdir(path) and fname.lower().startswith(vc_str.lower()):
             for dllname in os.listdir(path):
                 filelist.append(osp.join(path, dllname))
             break
+    else:
+        raise RuntimeError, "Microsoft Visual C++ DLLs version %s "\
+                            "were not found" % version
+    
+    return filelist
 
+def create_vs2008_data_files(architecture=None, python_version=None,
+                             verbose=False):
+    """Including Microsoft Visual C++ 2008 DLLs"""
+    filelist = get_visual_studio_dlls(architecture=architecture,
+                                      python_version=python_version)
     print create_vs2008_data_files.__doc__
     if verbose:
         for name in filelist:
             print "  ", name
-        
     return [("Microsoft.VC90.CRT", filelist),]
 
 
@@ -149,11 +198,6 @@ def remove_dir(dirname):
         traceback.print_exc()
 
 
-def remove_at_exit(fname):
-    """Remove temporary file *fname* at exit"""
-    atexit.register(os.remove, fname)
-
-
 class Distribution(object):
     """Distribution object
     
@@ -188,6 +232,7 @@ class Distribution(object):
         self.vs2008 = os.name == 'nt'
         self._py2exe_is_loaded = False
         self._pyqt4_added = False
+        self._pyside_added = False
         # Attributes relative to cx_Freeze:
         self.executables = []
     
@@ -208,6 +253,13 @@ class Distribution(object):
               data_files=None, includes=None, excludes=None,
               bin_includes=None, bin_excludes=None,
               bin_path_includes=None, bin_path_excludes=None, vs2008=None):
+        """Setup distribution object
+        
+        Notes:
+          * bin_path_excludes is specific to cx_Freeze (ignored if it's None)
+          * if vs2008 is None, it's set to True by default on Windows 
+            platforms, False on non-Windows platforms
+        """
         self.name = name
         self.version = strip_version(version) if os.name == 'nt' else version
         self.description = description
@@ -230,10 +282,15 @@ class Distribution(object):
             self.bin_path_includes += bin_path_includes
         if bin_path_excludes is not None:
             self.bin_path_excludes += bin_path_excludes
-        if self.vs2008 is not None:
+        if vs2008 is not None:
             self.vs2008 = vs2008
         if self.vs2008:
-            self.data_files += create_vs2008_data_files()
+            try:
+                self.data_files += create_vs2008_data_files()
+            except IOError:
+                print >>sys.stderr, "Setting the vs2008 option to False "\
+                                    "will avoid this error"
+                raise
         # cx_Freeze:
         self.add_executable(self.script, self.target_name, icon=self.icon)
 
@@ -242,7 +299,7 @@ class Distribution(object):
         and add it to *data_files*"""
         file(filename, 'wb').write(contents)
         self.data_files += [("", (filename, ))]
-        remove_at_exit(filename)
+        _remove_later(filename)
     
     def add_data_file(self, filename, destdir=''):
         self.data_files += [(destdir, (filename, ))]
@@ -266,10 +323,11 @@ class Distribution(object):
         # Including plugins (.svg icons support, QtDesigner support, ...)
         if self.vs2008:
             vc90man = "Microsoft.VC90.CRT.manifest"
-            shutil.copy(osp.join(sys.prefix, vc90man), vc90man)
+            os.mkdir('pyqt_tmp')
+            vc90man_pyqt = osp.join('pyqt_tmp', vc90man)
             man = file(vc90man, "r").read().replace('<file name="',
                                         '<file name="Microsoft.VC90.CRT\\')
-            file(vc90man, 'w').write(man)
+            file(vc90man_pyqt, 'w').write(man)
         for dirpath, _, filenames in os.walk(osp.join(pyqt_path,
                                                       "plugins")):
             filelist = [osp.join(dirpath, f) for f in filenames
@@ -279,16 +337,80 @@ class Distribution(object):
                 # Where there is a DLL build with Microsoft Visual C++ 2008,
                 # there must be a manifest file as well...
                 # ...congrats to Microsoft for this great simplification!
-                filelist.append(vc90man)
+                filelist.append(vc90man_pyqt)
             self.data_files.append( (dirpath[len(pyqt_path)+len(os.pathsep):],
                                      filelist) )
         if self.vs2008:
-            remove_at_exit(vc90man)
+            atexit.register(remove_dir, 'pyqt_tmp')
         
         # Including french translation
-        self.data_files.append(('translations',
-                                (osp.join(pyqt_path, "translations",
-                                 "qt_fr.qm"), )))
+        fr_trans = osp.join(pyqt_path, "translations", "qt_fr.qm")
+        if osp.exists(fr_trans):
+            self.data_files.append(('translations', (fr_trans, )))
+
+    def add_pyside(self):
+        """Include module PySide to the distribution"""
+        if self._pyside_added:
+            return
+        self._pyside_added = True
+        
+        self.includes += ['PySide.QtDeclarative', 'PySide.QtHelp',
+                          'PySide.QtMultimedia', 'PySide.QtNetwork',
+                          'PySide.QtOpenGL', 'PySide.QtScript',
+                          'PySide.QtScriptTools', 'PySide.QtSql',
+                          'PySide.QtSvg', 'PySide.QtTest',
+                          'PySide.QtUiTools', 'PySide.QtWebKit',
+                          'PySide.QtXml', 'PySide.QtXmlPatterns']
+        
+        import PySide
+        pyside_path = osp.dirname(PySide.__file__)
+        
+        # Configuring PySide
+        conf = os.linesep.join(["[Paths]", "Prefix = .", "Binaries = ."])
+        self.add_text_data_file('qt.conf', conf)
+        
+        # Including plugins (.svg icons support, QtDesigner support, ...)
+        if self.vs2008:
+            vc90man = "Microsoft.VC90.CRT.manifest"
+            os.mkdir('pyside_tmp')
+            vc90man_pyside = osp.join('pyside_tmp', vc90man)
+            man = file(vc90man, "r").read().replace('<file name="',
+                                        '<file name="Microsoft.VC90.CRT\\')
+            file(vc90man_pyside, 'w').write(man)
+        for dirpath, _, filenames in os.walk(osp.join(pyside_path, "plugins")):
+            filelist = [osp.join(dirpath, f) for f in filenames
+                        if osp.splitext(f)[1] in ('.dll', '.py')]
+            if self.vs2008 and [f for f in filelist
+                           if osp.splitext(f)[1] == '.dll']:
+                # Where there is a DLL build with Microsoft Visual C++ 2008,
+                # there must be a manifest file as well...
+                # ...congrats to Microsoft for this great simplification!
+                filelist.append(vc90man_pyside)
+            self.data_files.append(
+                    (dirpath[len(pyside_path)+len(os.pathsep):], filelist) )
+
+        # Replacing dlls found by cx_Freeze by the real PySide Qt dlls:
+        # (http://qt-project.org/wiki/Packaging_PySide_applications_on_Windows)
+        dlls = [osp.join(pyside_path, fname)
+                for fname in os.listdir(pyside_path)
+                if osp.splitext(fname)[1] == '.dll']
+        self.data_files.append( ('', dlls) )
+
+        if self.vs2008:
+            atexit.register(remove_dir, 'pyside_tmp')
+        
+        # Including french translation
+        fr_trans = osp.join(pyside_path, "translations", "qt_fr.qm")
+        if osp.exists(fr_trans):
+            self.data_files.append(('translations', (fr_trans, )))
+    
+    def add_qt_bindings(self):
+        """Include Qt bindings, i.e. PyQt4 or PySide"""
+        try:
+            imp.find_module('PyQt4')
+            self.add_modules('PyQt4')
+        except ImportError:
+            self.add_modules('PySide')
 
     def add_matplotlib(self):
         """Include module Matplotlib to the distribution"""
@@ -308,17 +430,13 @@ class Distribution(object):
                                     '.xpm', '.ppm', '.npy', '.afm', '.ttf'))
 
     def add_modules(self, *module_names):
-        """Include module *module_name*
-        
-        Notes:
-          * bin_path_excludes is specific to cx_Freeze (ignored if it's None)
-          * if vs2008 is None, it's set to True by default on Windows platforms,
-            False on non-Windows platforms
-        """
+        """Include module *module_name*"""
         for module_name in module_names:
             print "Configuring module '%s'" % module_name
             if module_name == 'PyQt4':
                 self.add_pyqt4()
+            elif module_name == 'PySide':
+                self.add_pyside()
             elif module_name == 'scipy.io':
                 self.includes += ['scipy.io.matlab.streams']
             elif module_name == 'matplotlib':
@@ -354,7 +472,11 @@ class Distribution(object):
             elif module_name == 'guidata':
                 self.add_module_data_files('guidata', ("images", ),
                                        ('.png', '.svg'), copy_to_root=False)
-                self.add_pyqt4()
+                try:
+                    imp.find_module('PyQt4')
+                    self.add_pyqt4()
+                except ImportError:
+                    self.add_pyside()
             elif module_name == 'guiqwt':
                 self.add_module_data_files('guiqwt', ("images", ),
                                        ('.png', '.svg'), copy_to_root=False)

@@ -60,7 +60,7 @@ class ExampleMultiGroupDataSet(DataSet):
 class OtherDataSet(DataSet):
     title = StringItem("Title", default="Title")
     icon = ChoiceItem("Icon", (("python.png", "Python"),
-                               ("guidata.png", "guidata"),
+                               ("guidata.svg", "guidata"),
                                ("settings.png", "Settings")))
     opacity = FloatItem("Opacity", default=1., min=.1, max=1)
 
