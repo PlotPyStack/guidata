@@ -9,7 +9,11 @@
 GUI-based test launcher
 """
 
-import sys, os, os.path as osp, subprocess
+import sys
+import os
+import os.path as osp
+import subprocess
+
 from spyderlib.widgets.sourcecode.codeeditor import CodeEditor
 
 # Local imports
@@ -60,6 +64,10 @@ class TestModule(object):
             return '<br>'.join(lines)
     
     def run(self, args=''):
+        # Keep the same sys.path environment in child process:
+        # (useful when the program is executed from Spyder, for example)
+        os.environ['PYTHONPATH'] = os.pathsep.join(sys.path)
+        
         command = [sys.executable, '"'+self.filename+'"']
         if args:
             command.append(args)
