@@ -16,6 +16,7 @@ of the data items to their default values
   * Added support for dictionaries for `update_dataset` and `restore_dataset` (functions of `guidata.utils`):
     * `update_dataset` may update the destination dataset from a source dictionary
     * `restore_dataset` may update the destination dictionary from a source dataset
+  * FloatArrayItem: added option "large" to show all the array values in read-only mode
   * Added new guidata svg logo
   * disthelpers:
     * added support for PySide
