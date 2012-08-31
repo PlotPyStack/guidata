@@ -1,6 +1,7 @@
 del MANIFEST
 rmdir /S /Q build
 rmdir /S /Q dist
-python setup.py build -c mingw32 bdist_wininst
+python setup.py build bdist_wininst --plat-name=win32
+python setup.py build bdist_wininst --plat-name=win-amd64
 python setup.py build sdist
 pause
