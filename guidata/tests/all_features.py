@@ -62,7 +62,7 @@ class TestParameters(DataSet):
     _bg = BeginGroup("A sub group")
     fl1 = FloatItem("Current", default=10., min=1, max=30, unit="mA",
                     help="Threshold current")
-    fl2 = FloatItem("Float (col=1)", min=1, max=1,
+    fl2 = FloatItem("Float (col=1)", default=1., min=1, max=1,
                     help="Help on float item").set_pos(col=1)
     bool1 = BoolItem("Boolean option without label")
     bool2 = BoolItem("Boolean option with label", "Label").set_pos(col=1,

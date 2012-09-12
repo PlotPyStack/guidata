@@ -21,12 +21,12 @@ class TestBasic(unittest.TestCase):
     def test_save(self):
         eta = TestParameters()
         eta.write_config(CONF, "TestParameters", "")
-        print "fin test_save"
+        #print "fin test_save"
     
     def test_load(self):
         eta = TestParameters()
         eta.read_config(CONF, "TestParameters", "")
-        print "fin test_load"
+        #print "fin test_load"
 
     def test_default(self):
         eta = TestParameters()
@@ -36,7 +36,7 @@ class TestBasic(unittest.TestCase):
         
         self.assertEqual(eta.fl2, 1.)
         self.assertEqual(eta.integer, 5)
-        print "fin test_default"
+        #print "fin test_default"
                          
     def test_restore(self):
         eta = TestParameters()
@@ -49,7 +49,7 @@ class TestBasic(unittest.TestCase):
         
         self.assertEqual(eta.fl2, 2.)
         self.assertEqual(eta.integer, 6)
-        print "fin test_restore"
+        #print "fin test_restore"
         
 if __name__=="__main__":
     CONF = UserConfig({})
