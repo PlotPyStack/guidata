@@ -17,55 +17,14 @@ ValueProp, ...).
 # pylint: disable-msg=W0622
 # pylint: disable-msg=W0212
 
-import sys, re
+import sys
+import re
 
 from guidata.utils import utf8_to_unicode, update_dataset
 
 
 DEBUG_DESERIALIZE = False
 
-
-class IDataItemWriter(object):
-    """An interface for dataitem/dataset serialization"""
-    def write_int(self, ival):
-        pass
-    def write_float(self, fval):
-        pass
-    def write_unicode(self, uval):
-        pass
-    def write_array(self, aval):
-        pass
-    def write_sequence(self, seq):
-        pass
-    def write_any(self, any):
-        """try to write any python object,
-        could resort to using pickle"""
-        pass
-    def write_none(self):
-        pass
-    def begin(self, section):
-        pass
-    def end(self, section):
-        pass
-
-class IDataItemReader(object):
-    """An interface for dataitem/dataset serialization"""
-    def read_int(self):
-        pass
-    def read_float(self):
-        pass
-    def read_unicode(self):
-        pass
-    def read_array(self):
-        pass
-    def read_sequence(self):
-        pass
-    def read_any(self):
-        pass
-    def begin(self, section):
-        pass
-    def end(self, section):
-        pass
  
 class NoDefault:
     pass

@@ -37,8 +37,10 @@ if __name__ == '__main__':
     if e.edit():
         writer = HDF5Writer("test.h5")
         e.serialize(writer)
+        writer.close()
     
         e = TestParameters()
         reader = HDF5Reader("test.h5")
         e.deserialize(reader)
+        reader.close()
         e.edit()

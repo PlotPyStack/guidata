@@ -326,6 +326,16 @@ class FilesOpenItem(FileSaveItem):
             value = [value]
         return [add_extension(self, path) for path in value]
 
+    def serialize(self, instance, writer):
+        """Serialize this item"""
+        value = self.get_value(instance)
+        writer.write_sequence([fname.encode("utf-8") for fname in value])
+
+    def deserialize(self, instance, reader):
+        """Deserialize this item"""
+        value = [unicode(fname, "utf-8") for fname in reader.read_sequence()]
+        self.__set__(instance, value)
+
 
 class DirectoryItem(StringItem):
     """
@@ -432,8 +442,7 @@ class MultipleChoiceItem(ChoiceItem):
         return self
 
     def serialize(self, instance, writer):
-        """Deserialize this item 
-        """
+        """Serialize this item"""
         value = self.get_value(instance)
         seq = []
         _choices = self.get_prop_value("data", instance, "choices")
@@ -442,8 +451,7 @@ class MultipleChoiceItem(ChoiceItem):
         writer.write_sequence( seq )
 
     def deserialize(self, instance, reader):
-        """Deserialize this item 
-        """
+        """Deserialize this item"""
         flags = reader.read_sequence()
         # We could have trouble with objects providing their own choice
         # function which depend on not yet deserialized values
@@ -514,6 +522,17 @@ class FloatArrayItem(DataItem):
             text += " .. " + fmt % v.max()
             text += "]"
             return unicode(text)
+
+    def serialize(self, instance, writer):
+        """Serialize this item"""
+        value = self.get_value(instance)
+        writer.write_array(value)
+
+    def deserialize(self, instance, reader):
+        """Deserialize this item"""
+        value = reader.read_array()
+        self.__set__(instance, value)
+
 
 class ButtonItem(DataItem):
     """

@@ -204,19 +204,15 @@ class HDF5Writer(H5Store):
         
     def get_parent_group(self):
         parent = self.h5
-        for p in self.option[:-1]:
-            parent = parent.require_group( p )
+        for option in self.option[:-1]:
+            parent = parent.require_group(option)
         return parent
 
     def write_any(self, val):
         group = self.get_parent_group()
         group.attrs[self.option[-1]] = val
-
-    def write_float(self, val):
-        group = self.get_parent_group()
-        group.attrs[self.option[-1]] = val
     
-    write_int = write_float
+    write_int = write_float = write_any
     
     def write_bool(self, val):
         self.write_int( int(val))
@@ -230,6 +226,7 @@ class HDF5Writer(H5Store):
         group[self.option[-1]] = val
     
     write_sequence = write_any
+    
     def write_none(self):
         group = self.get_parent_group()
         group.attrs[self.option[-1]] = ""
@@ -243,7 +240,7 @@ class HDF5Writer(H5Store):
 
 
 class HDF5Reader(H5Store):
-    """Writer for HDF5 files"""
+    """Reader for HDF5 files"""
     def __init__(self, filename):
         super(HDF5Reader, self).__init__(filename)
         self.open("r")
@@ -251,13 +248,12 @@ class HDF5Reader(H5Store):
         
     def get_parent_group(self):
         parent = self.h5
-        for p in self.option[:-1]:
-            parent = parent.require_group( p )
+        for option in self.option[:-1]:
+            parent = parent.require_group(option)
         return parent
 
     def read_any(self):
         group = self.get_parent_group()
-        print self.option
         return group.attrs[self.option[-1]]
 
     def begin(self, section):
