@@ -319,29 +319,8 @@ class DataItem(object):
         this is a default implementation that should work for
         everything but new datatypes
         """
-        from numpy import ndarray
         value = self.get_value(instance)
-        if isinstance(value, bool):
-            writer.write_bool(value)
-        elif isinstance(value, int):
-            writer.write_int(value)
-        elif isinstance(value, float):
-            writer.write_int(value)
-        elif isinstance(value, unicode):
-            writer.write_unicode(value)
-        elif isinstance(value, str):
-            writer.write_any(value)
-        elif isinstance(value, ndarray):
-            writer.write_array(value)
-        elif isinstance(value, DataSet):
-            value.serialize(writer)
-        elif value is None:
-            writer.write_none()
-        elif isinstance(value, (list, tuple)):
-            writer.write_sequence(value)
-        else:
-            raise NotImplementedError("cannot serialize %r of type %r" %
-                                      (value, type(value)))
+        writer.write(value)
 
     def deserialize(self, instance, reader):
         """Deserialize this item using the reader object
@@ -357,9 +336,9 @@ class DataItem(object):
                 print >>sys.stderr, "DEBUG_DESERIALIZE enabled in datatypes.py"
                 traceback.print_stack()
                 print >>sys.stderr, e
-            self.set_default( instance )
+            self.set_default(instance)
             return
-        self.__set__( instance, value)
+        self.__set__(instance, value)
         
 
 class Obj(object):
@@ -751,15 +730,22 @@ class DataSet(object):
 
     def serialize(self, writer):
         for item in self._items:
-            writer.begin(item._name)
-            item.serialize(self, writer)
-            writer.end(item._name)
+            with writer.group(item._name):
+                item.serialize(self, writer)
 
     def deserialize(self, reader):
         for item in self._items:
-            reader.begin(item._name)
-            item.deserialize(self, reader)
-            reader.end(item._name)
+            with reader.group(item._name):
+                try:
+                    item.deserialize(self, reader)
+                except RuntimeError, error:
+                    if DEBUG_DESERIALIZE:
+                        import traceback
+                        print >>sys.stderr,\
+                            "DEBUG_DESERIALIZE enabled in datatypes.py"
+                        traceback.print_stack()
+                        print >>sys.stderr, error
+                    item.set_default(self)
             
     def read_config(self, conf, section, option):
         from guidata.userconfig import UserConfigReader 

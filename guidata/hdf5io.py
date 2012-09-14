@@ -149,6 +149,10 @@ class Dlist(Dset):
         setattr(struct, self.struct_name, list(value))
 
 
+#==============================================================================
+# Base HDF5 Store object: do not break API compatibility here as this class is 
+# used in various critical projects for saving/loading application data
+#==============================================================================
 class H5Store(object):
     def __init__(self, filename):
         self.filename = filename
@@ -195,11 +199,15 @@ class H5Store(object):
                 raise
 
 
-class HDF5Writer(H5Store):
-    """Writer for HDF5 files"""
+#==============================================================================
+# HDF5 reader/writer: do not break API compatibility here as this class is 
+# used in various critical projects for saving/loading application data and 
+# in guiqwt for saving/loading plot items.
+#==============================================================================
+class HDF5Handler(H5Store):
+    """Base HDF5 I/O Handler object"""
     def __init__(self, filename):
-        super(HDF5Writer, self).__init__(filename)
-        self.open("w")
+        super(HDF5Handler, self).__init__(filename)
         self.option = []
         
     def get_parent_group(self):
@@ -207,6 +215,50 @@ class HDF5Writer(H5Store):
         for option in self.option[:-1]:
             parent = parent.require_group(option)
         return parent
+    
+    def group(self, group_name):
+        """Enter a HDF5 group. This returns a context manager, to be used with 
+        the `with` statement"""
+        from guidata.userconfig import GroupContext
+        return GroupContext(self, group_name)
+
+class HDF5Writer(HDF5Handler):
+    """Writer for HDF5 files"""
+    def __init__(self, filename):
+        super(HDF5Writer, self).__init__(filename)
+        self.open("w")
+    
+    def write(self, val, group_name=None):
+        """Write value using the appropriate routine depending on value type
+        
+        group_name: if None, writing the value in current group"""
+        from numpy import ndarray
+        from guidata.dataset.datatypes import DataSet
+        if group_name:
+            self.begin(group_name)
+        if isinstance(val, bool):
+            self.write_bool(val)
+        elif isinstance(val, int):
+            self.write_int(val)
+        elif isinstance(val, float):
+            self.write_int(val)
+        elif isinstance(val, unicode):
+            self.write_unicode(val)
+        elif isinstance(val, str):
+            self.write_any(val)
+        elif isinstance(val, ndarray):
+            self.write_array(val)
+        elif isinstance(val, DataSet):
+            val.serialize(self)
+        elif val is None:
+            self.write_none()
+        elif isinstance(val, (list, tuple)):
+            self.write_sequence(val)
+        else:
+            raise NotImplementedError("cannot serialize %r of type %r" %
+                                      (val, type(val)))
+        if group_name:
+            self.end(group_name)
 
     def write_any(self, val):
         group = self.get_parent_group()
@@ -215,7 +267,7 @@ class HDF5Writer(H5Store):
     write_int = write_float = write_any
     
     def write_bool(self, val):
-        self.write_int( int(val))
+        self.write_int(int(val))
     
     def write_unicode(self, val):
         group = self.get_parent_group()
@@ -238,19 +290,26 @@ class HDF5Writer(H5Store):
         sect = self.option.pop(-1)
         assert sect == section
 
-
-class HDF5Reader(H5Store):
+class HDF5Reader(HDF5Handler):
     """Reader for HDF5 files"""
     def __init__(self, filename):
         super(HDF5Reader, self).__init__(filename)
         self.open("r")
-        self.option = []
-        
-    def get_parent_group(self):
-        parent = self.h5
-        for option in self.option[:-1]:
-            parent = parent.require_group(option)
-        return parent
+
+    def read(self, group_name=None, func=None, dataset=None):
+        """Read value within current group or group_name"""
+        if group_name:
+            self.begin(group_name)
+        if dataset is None:
+            if func is None:
+                func = self.read_any
+            val = func()
+        else:
+            dataset.deserialize(self)
+            val = dataset
+        if group_name:
+            self.end(group_name)
+        return val
 
     def read_any(self):
         group = self.get_parent_group()
@@ -268,6 +327,10 @@ class HDF5Reader(H5Store):
 
     def read_float(self):
         return float(self.read_any())
+
+    def read_str(self):
+        # Convert `numpy.string_` to `str`
+        return str(self.read_any())
 
     def read_unicode(self):
         return unicode(self.read_any(), "utf-8")
