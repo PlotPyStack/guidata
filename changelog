@@ -1,3 +1,11 @@
+== Version 1.5.1 ==
+
+=== Possible API compatibility issues (since v1.5.0) ===
+
+  * guidata now requires Python 2.6 (Python 2.5 support has been dropped)
+	
+----
+
 == Version 1.5.0 ==
 
 === Bug fixes (since v1.4.2) ===
