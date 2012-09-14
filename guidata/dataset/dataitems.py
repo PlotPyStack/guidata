@@ -179,6 +179,11 @@ class StringItem(DataItem):
         # QString -> str
         return unicode(value)
 
+    def deserialize(self, instance, reader):
+        """Deserialize this item"""
+        value = reader.read_unicode()
+        self.__set__(instance, value)
+
 
 class TextItem(StringItem):
     """
@@ -238,6 +243,14 @@ class ColorItem(StringItem):
             return False
         from guidata.qthelpers import text_to_qcolor
         return text_to_qcolor(value).isValid()
+
+    def deserialize(self, instance, reader):
+        """Deserialize this item"""
+        # Using read_str converts `numpy.string_` to `str` -- otherwise,
+        # when passing the string to a QColor Qt object, any numpy.string_ will
+        # be interpreted as no color (black)
+        value = reader.read_str()
+        self.__set__(instance, value)
 
 
 class FileSaveItem(StringItem):
