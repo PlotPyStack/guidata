@@ -4,7 +4,7 @@
 #    userconfig License Agreement (MIT License)
 #    ------------------------------------------
 #    
-#    Copyright © 2009 Pierre Raybaut
+#    Copyright © 2009-2012 Pierre Raybaut
 #    
 #    Permission is hereby granted, free of charge, to any person
 #    obtaining a copy of this software and associated documentation
@@ -34,11 +34,14 @@ userconfig
 
 The ``guidata.userconfig`` module provides user configuration file (.ini file) 
 management features based on ``ConfigParser`` (standard Python library).
+
+It is the exact copy of the open-source package `userconfig` (MIT license).
 """
 
-__version__ = '1.0.6b'
+__version__ = '1.0.7'
 
-import os, re
+import os
+import re
 import os.path as osp
 import sys
 from ConfigParser import ConfigParser, MissingSectionHeaderError
@@ -365,67 +368,3 @@ class UserConfig(ConfigParser):
         if save:
             self.__save()
 
-
-#==============================================================================
-# UserConfig reader/writer objects
-# (see guidata.hdf5io for another example of reader/writer)
-#==============================================================================
-class GroupContext(object):
-    """Group context object"""
-    def __init__(self, handler, group_name):
-        self.handler = handler
-        self.group_name = group_name
-        
-    def __enter__(self):
-        self.handler.begin(self.group_name)
-    
-    def __exit__(self, exc_type, exc_value, traceback):
-        self.handler.end(self.group_name)
-
-class UserConfigBase(object):
-    def __init__(self, conf, section, option):
-        self.conf = conf
-        self.section = section
-        self.option = [option]
-
-    def begin(self, section):
-        self.option.append(section)
-
-    def end(self, section):
-        sect = self.option.pop(-1)
-        assert sect == section
-    
-    def group(self, option):
-        """Enter a HDF5 group. This returns a context manager, to be used with 
-        the `with` statement"""
-        return GroupContext(self, option)
-
-class UserConfigWriter(UserConfigBase):
-    def write_any(self, val):
-        option = "/".join(self.option)
-        self.conf.set(self.section, option, val)
-
-    def write_unicode(self, val):
-        self.write_any(val.encode("utf-8"))
-
-    def write_none(self):
-        self.write_any(None)
-
-    write_bool = write_int = write_float = write_any
-    write_array = write_sequence = write_any
-
-class UserConfigReader(UserConfigBase):
-    def read_any(self):
-        option = "/".join(self.option)
-        val = self.conf.get(self.section, option)
-        return val
-
-    def read_unicode(self):
-        val = self.read_any()
-        if isinstance(val, unicode):
-            return val
-        else:
-            return unicode(val, "utf-8")
-
-    read_bool = read_int = read_float = read_any
-    read_array = read_sequence = read_none = read_str = read_any

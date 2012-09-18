@@ -748,12 +748,12 @@ class DataSet(object):
                     item.set_default(self)
             
     def read_config(self, conf, section, option):
-        from guidata.userconfig import UserConfigReader 
+        from guidata.userconfigio import UserConfigReader 
         reader = UserConfigReader(conf, section, option)
         self.deserialize(reader)
         
     def write_config(self, conf, section, option):
-        from guidata.userconfig import UserConfigWriter 
+        from guidata.userconfigio import UserConfigWriter 
         writer = UserConfigWriter(conf, section, option)
         self.serialize(writer)
 

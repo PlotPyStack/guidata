@@ -10,10 +10,13 @@ Reader and Writer for the serialization of DataSets into HDF5 files
 """
 
 import sys
+from uuid import uuid1
+
 import h5py
 import numpy as np
 
 from guidata.utils import utf8_to_unicode
+from guidata.userconfigio import BaseIOHandler
 
 
 class TypeConverter(object):
@@ -204,10 +207,10 @@ class H5Store(object):
 # used in various critical projects for saving/loading application data and 
 # in guiqwt for saving/loading plot items.
 #==============================================================================
-class HDF5Handler(H5Store):
+class HDF5Handler(H5Store, BaseIOHandler):
     """Base HDF5 I/O Handler object"""
     def __init__(self, filename):
-        super(HDF5Handler, self).__init__(filename)
+        H5Store.__init__(self, filename)
         self.option = []
         
     def get_parent_group(self):
@@ -215,12 +218,6 @@ class HDF5Handler(H5Store):
         for option in self.option[:-1]:
             parent = parent.require_group(option)
         return parent
-    
-    def group(self, group_name):
-        """Enter a HDF5 group. This returns a context manager, to be used with 
-        the `with` statement"""
-        from guidata.userconfig import GroupContext
-        return GroupContext(self, group_name)
 
 class HDF5Writer(HDF5Handler):
     """Writer for HDF5 files"""
@@ -233,7 +230,6 @@ class HDF5Writer(HDF5Handler):
         
         group_name: if None, writing the value in current group"""
         from numpy import ndarray
-        from guidata.dataset.datatypes import DataSet
         if group_name:
             self.begin(group_name)
         if isinstance(val, bool):
@@ -248,12 +244,13 @@ class HDF5Writer(HDF5Handler):
             self.write_any(val)
         elif isinstance(val, ndarray):
             self.write_array(val)
-        elif isinstance(val, DataSet):
-            val.serialize(self)
         elif val is None:
             self.write_none()
         elif isinstance(val, (list, tuple)):
             self.write_sequence(val)
+        elif hasattr(val, 'serialize') and callable(val.serialize):
+            # The object has a DataSet-like `serialize` method
+            val.serialize(self)
         else:
             raise NotImplementedError("cannot serialize %r of type %r" %
                                       (val, type(val)))
@@ -273,6 +270,8 @@ class HDF5Writer(HDF5Handler):
         group = self.get_parent_group()
         group.attrs[self.option[-1]] = val.encode("utf-8")
 
+    write_str = write_any
+
     def write_array(self, val):
         group = self.get_parent_group()
         group[self.option[-1]] = val
@@ -283,12 +282,17 @@ class HDF5Writer(HDF5Handler):
         group = self.get_parent_group()
         group.attrs[self.option[-1]] = ""
 
-    def begin(self, section):
-        self.option.append(section)
-        
-    def end(self, section):
-        sect = self.option.pop(-1)
-        assert sect == section
+    def write_object_list(self, seq, group_name):
+        """Write object sequence in group.
+        Objects must implement the DataSet-like `serialize` method"""
+        with self.group(group_name):
+            ids = []
+            for obj in seq:
+                guid = str(uuid1())
+                ids.append(guid)
+                with self.group(guid):
+                    obj.serialize(self)
+            self.write(ids, 'IDs')
 
 class HDF5Reader(HDF5Handler):
     """Reader for HDF5 files"""
@@ -296,17 +300,26 @@ class HDF5Reader(HDF5Handler):
         super(HDF5Reader, self).__init__(filename)
         self.open("r")
 
-    def read(self, group_name=None, func=None, dataset=None):
-        """Read value within current group or group_name"""
+    def read(self, group_name=None, func=None, instance=None):
+        """Read value within current group or group_name.
+
+        Optional argument `instance` is an object which 
+        implements the DataSet-like `deserialize` method."""
         if group_name:
             self.begin(group_name)
-        if dataset is None:
+        if instance is None:
             if func is None:
                 func = self.read_any
             val = func()
         else:
-            dataset.deserialize(self)
-            val = dataset
+            group = self.get_parent_group()
+            if group_name in group.attrs:
+                # This is an attribute (not a group), meaning that the object 
+                # was None when deserializing it
+                val = None
+            else:
+                instance.deserialize(self)
+                val = instance
         if group_name:
             self.end(group_name)
         return val
@@ -315,18 +328,16 @@ class HDF5Reader(HDF5Handler):
         group = self.get_parent_group()
         return group.attrs[self.option[-1]]
 
-    def begin(self, section):
-        self.option.append(section)
-        
-    def end(self, section):
-        sect = self.option.pop(-1)
-        assert sect == section
+    def read_bool(self):
+        return bool(self.read_any())
 
     def read_int(self):
         return int(self.read_any())
 
     def read_float(self):
-        return float(self.read_any())
+        val = self.read_any()
+        if val != '':
+            return float(val)
 
     def read_str(self):
         # Convert `numpy.string_` to `str`
@@ -342,5 +353,19 @@ class HDF5Reader(HDF5Handler):
     def read_sequence(self):
         group = self.get_parent_group()
         return list(group.attrs[self.option[-1]])
+    
+    def read_object_list(self, group_name, klass):
+        """Read object sequence in group.
+        Objects must implement the DataSet-like `deserialize` method.
+        `klass` is the object class which constructor requires no argument."""
+        with self.group(group_name):
+            ids = self.read('IDs', func=self.read_sequence)
+            seq = []
+            for name in ids:
+                with self.group(name):
+                    obj = klass()
+                    obj.deserialize(self)
+                    seq.append(obj)
+        return seq
 
     read_none = read_any
