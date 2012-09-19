@@ -291,7 +291,10 @@ class HDF5Writer(HDF5Handler):
                 guid = str(uuid1())
                 ids.append(guid)
                 with self.group(guid):
-                    obj.serialize(self)
+                    if obj is None:
+                        self.write_none()
+                    else:
+                        obj.serialize(self)
             self.write(ids, 'IDs')
 
 class HDF5Reader(HDF5Handler):
@@ -314,8 +317,8 @@ class HDF5Reader(HDF5Handler):
         else:
             group = self.get_parent_group()
             if group_name in group.attrs:
-                # This is an attribute (not a group), meaning that the object 
-                # was None when deserializing it
+                # This is an attribute (not a group), meaning that 
+                # the object was None when deserializing it
                 val = None
             else:
                 instance.deserialize(self)
@@ -363,9 +366,15 @@ class HDF5Reader(HDF5Handler):
             seq = []
             for name in ids:
                 with self.group(name):
-                    obj = klass()
-                    obj.deserialize(self)
-                    seq.append(obj)
+                    group = self.get_parent_group()
+                    if name in group.attrs:
+                        # This is an attribute (not a group), meaning that 
+                        # the object was None when deserializing it
+                        obj = None
+                    else:
+                        obj = klass()
+                        obj.deserialize(self)
+                seq.append(obj)
         return seq
 
     read_none = read_any
