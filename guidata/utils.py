@@ -91,9 +91,12 @@ def trace(fct):
 #==============================================================================
 # Strings
 #==============================================================================
-FS_ENCODING = sys.getfilesystemencoding()
-if FS_ENCODING is None:
-    FS_ENCODING = locale.getpreferredencoding()
+def fs_to_unicode(string):
+    """Convert string from file system charset to unicode"""
+    fs_encoding = sys.getfilesystemencoding()
+    if fs_encoding is None:
+        fs_encoding = locale.getpreferredencoding()
+    return string.decode(fs_encoding)
 
 def utf8_to_unicode(string):
     """Convert UTF-8 string to Unicode"""
@@ -105,7 +108,7 @@ def utf8_to_unicode(string):
         except UnicodeDecodeError:
             # This is border line... but we admit here string which has been 
             # erroneously encoded in file system charset instead of UTF-8
-            string = string.decode(FS_ENCODING)
+            string = fs_to_unicode(string)
     return string
 
 

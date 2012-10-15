@@ -21,7 +21,7 @@ from guidata.qt.QtGui import (QFont, QLabel, QPixmap, QIcon, QHBoxLayout,
                               QColor, QPen, QBrush, QFontDatabase)
 from guidata.qt.QtCore import Qt
 
-from guidata.utils import get_module_path
+from guidata.utils import get_module_path, fs_to_unicode
 
 IMG_PATH = []
 
@@ -78,6 +78,8 @@ def get_module_locale_path(modname):
 
 def add_image_path(path, subfolders=True):
     """Append image path (opt. with its subfolders) to global list IMG_PATH"""
+    if not isinstance(path, unicode):
+        path = fs_to_unicode(path)
     global IMG_PATH
     IMG_PATH.append(path)
     if subfolders:
