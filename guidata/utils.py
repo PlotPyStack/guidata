@@ -20,6 +20,7 @@ import time
 import subprocess
 import os
 import os.path as osp
+import locale
 
 
 #==============================================================================
@@ -90,6 +91,10 @@ def trace(fct):
 #==============================================================================
 # Strings
 #==============================================================================
+FS_ENCODING = sys.getfilesystemencoding()
+if FS_ENCODING is None:
+    FS_ENCODING = locale.getpreferredencoding()
+
 def utf8_to_unicode(string):
     """Convert UTF-8 string to Unicode"""
     if not isinstance(string, basestring):
@@ -97,9 +102,10 @@ def utf8_to_unicode(string):
     if not isinstance(string, unicode):
         try:
             string = unicode(string, "utf-8")
-        except UnicodeDecodeError, error:
-            message = "String %r is not UTF-8 encoded"
-            raise UnicodeDecodeError(message % string, *error.args[1:])
+        except UnicodeDecodeError:
+            # This is border line... but we admit here string which has been 
+            # erroneously encoded in file system charset instead of UTF-8
+            string = string.decode(FS_ENCODING)
     return string
 
 
