@@ -286,16 +286,19 @@ class HDF5Writer(HDF5Handler):
         """Write object sequence in group.
         Objects must implement the DataSet-like `serialize` method"""
         with self.group(group_name):
-            ids = []
-            for obj in seq:
-                guid = str(uuid1())
-                ids.append(guid)
-                with self.group(guid):
-                    if obj is None:
-                        self.write_none()
-                    else:
-                        obj.serialize(self)
-            self.write(ids, 'IDs')
+            if seq is None:
+                self.write_none()
+            else:
+                ids = []
+                for obj in seq:
+                    guid = str(uuid1())
+                    ids.append(guid)
+                    with self.group(guid):
+                        if obj is None:
+                            self.write_none()
+                        else:
+                            obj.serialize(self)
+                self.write(ids, 'IDs')
 
 class HDF5Reader(HDF5Handler):
     """Reader for HDF5 files"""
@@ -366,7 +369,12 @@ class HDF5Reader(HDF5Handler):
         Objects must implement the DataSet-like `deserialize` method.
         `klass` is the object class which constructor requires no argument."""
         with self.group(group_name):
-            ids = self.read('IDs', func=self.read_sequence)
+            try:
+                ids = self.read('IDs', func=self.read_sequence)
+            except ValueError:
+                # None was saved instead of list of objects
+                self.end('IDs')
+                return
             seq = []
             for name in ids:
                 with self.group(name):
