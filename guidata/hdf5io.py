@@ -332,10 +332,14 @@ class HDF5Reader(HDF5Handler):
         return group.attrs[self.option[-1]]
 
     def read_bool(self):
-        return bool(self.read_any())
+        val = self.read_any()
+        if val != '':
+            return bool(val)
 
     def read_int(self):
-        return int(self.read_any())
+        val = self.read_any()
+        if val != '':
+            return int(val)
 
     def read_float(self):
         val = self.read_any()

@@ -322,6 +322,13 @@ class DataItem(object):
         value = self.get_value(instance)
         writer.write(value)
 
+    def get_value_from_reader(self, reader):
+        """Reads value from the reader object, inside the try...except 
+        statement defined in the base item `deserialize` method
+        
+        This method is reimplemented in some child classes"""
+        return reader.read_any()
+
     def deserialize(self, instance, reader):
         """Deserialize this item using the reader object
         
@@ -329,7 +336,7 @@ class DataItem(object):
         detect expected datatype from the stream
         """
         try:
-            value = reader.read_any()
+            value = self.get_value_from_reader(reader)
         except RuntimeError, e:
             if DEBUG_DESERIALIZE:
                 import traceback

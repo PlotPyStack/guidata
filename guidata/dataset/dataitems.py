@@ -102,8 +102,13 @@ class FloatItem(NumericTypeItem):
         * help [string]: text shown in tooltip (optional)
     """
     type = float
-    
-    
+
+    def get_value_from_reader(self, reader):
+        """Reads value from the reader object, inside the try...except 
+        statement defined in the base item `deserialize` method"""
+        return reader.read_float()
+
+
 class IntItem(NumericTypeItem):
     """
     Construct an integer data item
@@ -150,6 +155,11 @@ class IntItem(NumericTypeItem):
                 return False
         return True
 
+    def get_value_from_reader(self, reader):
+        """Reads value from the reader object, inside the try...except 
+        statement defined in the base item `deserialize` method"""
+        return reader.read_int()
+
 
 class StringItem(DataItem):
     """
@@ -179,10 +189,10 @@ class StringItem(DataItem):
         # QString -> str
         return unicode(value)
 
-    def deserialize(self, instance, reader):
-        """Deserialize this item"""
-        value = reader.read_unicode()
-        self.__set__(instance, value)
+    def get_value_from_reader(self, reader):
+        """Reads value from the reader object, inside the try...except 
+        statement defined in the base item `deserialize` method"""
+        return reader.read_unicode()
 
 
 class TextItem(StringItem):
@@ -212,6 +222,11 @@ class BoolItem(DataItem):
     def __init__(self, text='', label='', default=None, help=''):
         DataItem.__init__(self, label, default=default, help=help)
         self.set_prop("display", text=text)
+
+    def get_value_from_reader(self, reader):
+        """Reads value from the reader object, inside the try...except 
+        statement defined in the base item `deserialize` method"""
+        return reader.read_bool()
 
 
 class DateItem(DataItem):
@@ -244,13 +259,13 @@ class ColorItem(StringItem):
         from guidata.qthelpers import text_to_qcolor
         return text_to_qcolor(value).isValid()
 
-    def deserialize(self, instance, reader):
-        """Deserialize this item"""
+    def get_value_from_reader(self, reader):
+        """Reads value from the reader object, inside the try...except 
+        statement defined in the base item `deserialize` method"""
         # Using read_str converts `numpy.string_` to `str` -- otherwise,
         # when passing the string to a QColor Qt object, any numpy.string_ will
         # be interpreted as no color (black)
-        value = reader.read_str()
-        self.__set__(instance, value)
+        return reader.read_str()
 
 
 class FileSaveItem(StringItem):
@@ -344,10 +359,10 @@ class FilesOpenItem(FileSaveItem):
         value = self.get_value(instance)
         writer.write_sequence([fname.encode("utf-8") for fname in value])
 
-    def deserialize(self, instance, reader):
-        """Deserialize this item"""
-        value = [unicode(fname, "utf-8") for fname in reader.read_sequence()]
-        self.__set__(instance, value)
+    def get_value_from_reader(self, reader):
+        """Reads value from the reader object, inside the try...except 
+        statement defined in the base item `deserialize` method"""
+        return [unicode(fname, "utf-8") for fname in reader.read_sequence()]
 
 
 class DirectoryItem(StringItem):
@@ -541,10 +556,10 @@ class FloatArrayItem(DataItem):
         value = self.get_value(instance)
         writer.write_array(value)
 
-    def deserialize(self, instance, reader):
-        """Deserialize this item"""
-        value = reader.read_array()
-        self.__set__(instance, value)
+    def get_value_from_reader(self, reader):
+        """Reads value from the reader object, inside the try...except 
+        statement defined in the base item `deserialize` method"""
+        return reader.read_array()
 
 
 class ButtonItem(DataItem):
