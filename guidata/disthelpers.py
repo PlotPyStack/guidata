@@ -323,8 +323,11 @@ class Distribution(object):
         # Including plugins (.svg icons support, QtDesigner support, ...)
         if self.vs2008:
             vc90man = "Microsoft.VC90.CRT.manifest"
-            os.mkdir('pyqt_tmp')
-            vc90man_pyqt = osp.join('pyqt_tmp', vc90man)
+            pyqt_tmp = 'pyqt_tmp'
+            if osp.isdir(pyqt_tmp):
+                shutil.rmtree(pyqt_tmp)
+            os.mkdir(pyqt_tmp)
+            vc90man_pyqt = osp.join(pyqt_tmp, vc90man)
             man = file(vc90man, "r").read().replace('<file name="',
                                         '<file name="Microsoft.VC90.CRT\\')
             file(vc90man_pyqt, 'w').write(man)
@@ -341,7 +344,7 @@ class Distribution(object):
             self.data_files.append( (dirpath[len(pyqt_path)+len(os.pathsep):],
                                      filelist) )
         if self.vs2008:
-            atexit.register(remove_dir, 'pyqt_tmp')
+            atexit.register(remove_dir, pyqt_tmp)
         
         # Including french translation
         fr_trans = osp.join(pyqt_path, "translations", "qt_fr.qm")
@@ -493,7 +496,8 @@ class Distribution(object):
                     raise RuntimeError("Module not supported: %s" % module_name)
 
     def add_module_data_dir(self, module_name, data_dir_name, extensions,
-                            copy_to_root=True, verbose=False):
+                            copy_to_root=True, verbose=False,
+                            exclude_dirs=[]):
         """
         Collect data files in *data_dir_name* for module *module_name*
         and add them to *data_files*
@@ -506,17 +510,20 @@ class Distribution(object):
             raise IOError, "Directory not found: %s" % data_dir
         for dirpath, _dirnames, filenames in os.walk(data_dir):
             dirname = dirpath[nstrip:]
+            if osp.basename(dirpath) in exclude_dirs:
+                continue
             if not copy_to_root:
                 dirname = osp.join(module_name, dirname)
             pathlist = [osp.join(dirpath, f) for f in filenames
-                        if osp.splitext(f)[1] in extensions]
+                        if osp.splitext(f)[1].lower() in extensions]
             self.data_files.append( (dirname, pathlist) )
             if verbose:
                 for name in pathlist:
                     print "  ", name
     
     def add_module_data_files(self, module_name, data_dir_names, extensions,
-                              copy_to_root=True, verbose=False):
+                              copy_to_root=True, verbose=False,
+                              exclude_dirs=[]):
         """
         Collect data files for module *module_name* and add them to *data_files*
         *data_dir_names*: list of dirnames, e.g. ('images', )
@@ -527,7 +534,7 @@ class Distribution(object):
         module_dir = get_module_path(module_name)
         for data_dir_name in data_dir_names:
             self.add_module_data_dir(module_name, data_dir_name, extensions,
-                                     copy_to_root, verbose)
+                                     copy_to_root, verbose, exclude_dirs)
         translation_file = osp.join(module_dir, "locale", "fr", "LC_MESSAGES",
                                     "%s.mo" % module_name)
         if osp.isfile(translation_file):
