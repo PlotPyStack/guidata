@@ -309,3 +309,32 @@ def is_module_available(module_name):
         return True
     except ImportError:
         return False
+
+
+#==============================================================================
+# Utilities for setup.py scripts
+#==============================================================================
+
+def get_package_data(name, extlist, exclude_dirs=[]):
+    """
+    Return data files for package *name* with extensions in *extlist*
+    (search recursively in package directories)
+    """
+    assert isinstance(extlist, (list, tuple))
+    flist = []
+    # Workaround to replace os.path.relpath (not available until Python 2.6):
+    offset = len(name)+len(os.pathsep)
+    for dirpath, _dirnames, filenames in os.walk(name):
+        if dirpath not in exclude_dirs:
+            for fname in filenames:
+                if osp.splitext(fname)[1].lower() in extlist:
+                    flist.append(osp.join(dirpath, fname)[offset:])
+    return flist
+
+def get_subpackages(name):
+    """Return subpackages of package *name*"""
+    splist = []
+    for dirpath, _dirnames, _filenames in os.walk(name):
+        if osp.isfile(osp.join(dirpath, '__init__.py')):
+            splist.append(".".join(dirpath.split(os.sep)))
+    return splist

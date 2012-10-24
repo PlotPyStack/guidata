@@ -21,31 +21,9 @@ Licensed under the terms of the CECILL License
 """
 
 from distutils.core import setup
-import os, os.path as osp
+import os
 
-
-def get_package_data(name, extlist):
-    """
-    Return data files for package *name* with extensions in *extlist*
-    (search recursively in package directories)
-    """
-    assert isinstance(extlist, (list, tuple))
-    flist = []
-    # Workaround to replace os.path.relpath (not available until Python 2.6):
-    offset = len(name)+len(os.pathsep)
-    for dirpath, _dirnames, filenames in os.walk(name):
-        for fname in filenames:
-            if osp.splitext(fname)[1] in extlist:
-                flist.append(osp.join(dirpath, fname)[offset:])
-    return flist
-
-def get_subpackages(name):
-    """Return subpackages of package *name*"""
-    splist = []
-    for dirpath, _dirnames, _filenames in os.walk(name):
-        if osp.isfile(osp.join(dirpath, '__init__.py')):
-            splist.append(".".join(dirpath.split(os.sep)))
-    return splist
+from guidata.utils import get_subpackages, get_package_data
 
 
 LIBNAME = 'guidata'
