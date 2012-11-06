@@ -51,8 +51,7 @@ def prepend_module_to_path(module_path):
     
     Use this function:
     1) In your application to import local frozen copies of internal libraries
-    2) In your py2exe distributed package to add a text file containing the 
-       returned string
+    2) In your py2exe distributed package to add a text file containing the returned string
     """
     if not osp.isdir(module_path):
         # Assuming py2exe distribution

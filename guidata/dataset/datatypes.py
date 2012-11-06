@@ -137,8 +137,7 @@ class DataItem(object):
     
     `label` : (str, unicode)
     `default` : any type, optional
-    `help` : (str, unicode)
-        Text displayed on data item's tooltip
+    `help` : (str, unicode) Text displayed on data item's tooltip
     """
     count = 0
 

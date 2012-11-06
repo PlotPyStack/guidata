@@ -281,7 +281,7 @@ class FileSaveItem(StringItem):
     """
     Construct a path data item for a file to be saved
         * label [string]: name
-        * formats [string (or string list)]: wildcard filter (e.g. '*.txt')
+        * formats [string (or string list)]: wildcard filter
         * default [string]: default value (optional)
         * basedir [string]: default base directory (optional)
         * help [string]: text shown in tooltip (optional)
@@ -316,7 +316,7 @@ class FileOpenItem(FileSaveItem):
     """
     Construct a path data item for a file to be opened
         * label [string]: name
-        * formats [string (or string list)]: wildcard filter (e.g. '*.txt')
+        * formats [string (or string list)]: wildcard filter
         * default [string]: default value (optional)
         * basedir [string]: default base directory (optional)
         * help [string]: text shown in tooltip (optional)
@@ -332,7 +332,7 @@ class FilesOpenItem(FileSaveItem):
     """
     Construct a path data item for multiple files to be opened.
         * label [string]: name
-        * formats [string (or string list)]: wildcard filter (e.g. '*.txt')
+        * formats [string (or string list)]: wildcard filter
         * default [string]: default value (optional)
         * basedir [string]: default base directory (optional)
         * help [string]: text shown in tooltip (optional)
@@ -447,8 +447,7 @@ class ChoiceItem(DataItem):
         
 class MultipleChoiceItem(ChoiceItem):
     """
-    Construct a data item for a list of choices -- multiple choices can be 
-    selected
+    Construct a data item for a list of choices -- multiple choices can be selected
         * label [string]: name
         * choices [list or tuple]: string list or (key, label) list
         * default [-]: default label or default key (optional)
