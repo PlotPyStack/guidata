@@ -60,6 +60,8 @@ class TestParameters(DataSet):
     string = StringItem("String")
     text = TextItem("Text")
     _bg = BeginGroup("A sub group")
+    float_slider = FloatItem("Float (with slider)",
+                             default=0.5, min=0, max=1, step=0.01, slider=True)                             
     fl1 = FloatItem("Current", default=10., min=1, max=30, unit="mA",
                     help="Threshold current")
     fl2 = FloatItem("Float (col=1)", default=1., min=1, max=1,

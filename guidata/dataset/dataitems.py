@@ -97,11 +97,20 @@ class FloatItem(NumericTypeItem):
         * default [float]: default value (optional)
         * min [float]: minimum value (optional)
         * max [float]: maximum value (optional)
+        * slider [bool]: if True, shows a slider widget right after the line 
+          edit widget (default is False)
+        * step [float]: step between tick values with a slider widget (optional)
         * nonzero [bool]: if True, zero is not a valid value (optional)
         * unit [string]: physical unit (optional)
         * help [string]: text shown in tooltip (optional)
     """
     type = float
+    def __init__(self, label, default=None, min=None, max=None,
+                 nonzero=None, unit='', step=0.1, slider=False, help=''):
+        super(FloatItem, self).__init__(label, default=default, min=min,
+                                max=max, nonzero=nonzero, unit=unit, help=help)
+        self.set_prop("display", slider=slider)
+        self.set_prop("data", step=step)
 
     def get_value_from_reader(self, reader):
         """Reads value from the reader object, inside the try...except 

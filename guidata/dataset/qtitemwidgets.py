@@ -483,7 +483,7 @@ class ColorWidget(HLayoutMixin, LineEditWidget):
 
 class SliderWidget(HLayoutMixin, LineEditWidget):
     """
-    IntItem with Slider
+    NumericTypeItem with Slider
     """
     def __init__(self, item, parent_layout):
         super(SliderWidget, self).__init__(item, parent_layout)
@@ -492,8 +492,12 @@ class SliderWidget(HLayoutMixin, LineEditWidget):
             self.slider.setOrientation(Qt.Horizontal)
             vmin = item.get_prop_value("data", "min")
             vmax = item.get_prop_value("data", "max")
-            assert vmin is not None and vmax is not None, "SliderWidget requires that IntItem min/max have been defined"
-            self.slider.setRange(vmin, vmax)
+            vstep = item.get_prop_value("data", "step", 1)
+            assert vmin is not None and vmax is not None, "SliderWidget requires that NumericTypeItem min/max have been defined"
+            
+            self.slider.setRange(0, int((vmax-vmin)/vstep))
+            self.convert_value = lambda v: v*vstep + vmin
+            
             QObject.connect(self.slider, SIGNAL("valueChanged(int)"),
                             self.value_changed)
             self.group.addWidget(self.slider)
@@ -510,7 +514,7 @@ class SliderWidget(HLayoutMixin, LineEditWidget):
             
     def value_changed(self, ivalue):
         """Update the lineedit"""
-        value = str(ivalue)
+        value = str(self.convert_value(ivalue))
         self.edit.setText(value)
         self.update(value)
 

@@ -48,7 +48,8 @@ class TestParameters(DataSet):
     fname_s = FileSaveItem("Save file", "eta", FILE_ETA.name)
     string = StringItem("String")
     text = TextItem("Text")
-    fl1 = FloatItem("Float", min=1, max=30, help="Help on float item")
+    float_slider = FloatItem("Float (with slider)",
+                             default=0.5, min=0, max=1, step=0.01, slider=True)                             
     integer = IntItem("Integer", default=5, min=3, max=16, slider=True
                       ).set_pos(col=1)
     dtime = DateTimeItem("Date/time", default=datetime.datetime(2010, 10, 10))
