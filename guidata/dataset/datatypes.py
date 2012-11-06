@@ -661,21 +661,27 @@ class DataSet(object):
         import textedit
         self.accept(textedit.TextEditVisitor(self))
 
-    def edit(self, parent=None, apply=None):
+    def edit(self, parent=None, apply=None, size=None):
         """
         Open a dialog box to edit data set
+            * parent: parent widget (default is None, meaning no parent)
+            * apply: apply callback (default is None)
+            * size: dialog size (QSize object or integer tuple (width, height))
         """
         from guidata.dataset.qtwidgets import DataSetEditDialog
         win = DataSetEditDialog(self, icon=self.__icon, parent=parent,
-                                apply=apply)
+                                apply=apply, size=size)
         return win.exec_()
     
-    def view(self, parent=None):
+    def view(self, parent=None, size=None):
         """
         Open a dialog box to view data set
+            * parent: parent widget (default is None, meaning no parent)
+            * size: dialog size (QSize object or integer tuple (width, height))
         """
         from guidata.dataset.qtwidgets import DataSetShowDialog
-        win = DataSetShowDialog(self, icon=self.__icon, parent=parent)
+        win = DataSetShowDialog(self, icon=self.__icon, parent=parent,
+                                size=size)
         return win.exec_()
         
     def to_string(self, debug=False, indent=None, align=False):

@@ -30,7 +30,7 @@ from guidata.qt.QtGui import (QDialog, QMessageBox, QDialogButtonBox, QWidget,
                               QVBoxLayout, QGridLayout, QLabel, QSpacerItem,
                               QColor, QTabWidget, QIcon, QApplication, QPainter,
                               QPicture, QBrush, QGroupBox, QPushButton)
-from guidata.qt.QtCore import SIGNAL, SLOT, Qt, QRect
+from guidata.qt.QtCore import SIGNAL, SLOT, Qt, QRect, QSize
 from guidata.qt.compat import getopenfilename, getopenfilenames, getsavefilename
 
 from guidata.configtools import get_icon
@@ -45,7 +45,7 @@ class DataSetEditDialog(QDialog):
     Dialog box for DataSet editing
     """
     def __init__(self, instance, icon='', parent=None, apply=None,
-                 wordwrap=True):
+                 wordwrap=True, size=None):
         QDialog.__init__(self, parent)
         self.wordwrap = wordwrap
         self.apply_func = apply
@@ -80,6 +80,12 @@ class DataSetEditDialog(QDialog):
         
         self.setModal(True)
         self.setWindowTitle(instance.get_title())
+        
+        if size is not None:
+            if isinstance(size, QSize):
+                self.resize(size)
+            else:
+                self.resize(*size)
 
     def button_clicked(self, button):
         role = self.bbox.buttonRole(button)
