@@ -77,7 +77,7 @@ class MainWindow(QMainWindow):
                                              AnotherDataSet, comment='')
         self.groupbox3 = DataSetEditGroupBox("Standard dataset",
                                              OtherDataSet, comment='')
-        self.groupbox4 = DataSetShowGroupBox("Standard dataset",
+        self.groupbox4 = DataSetEditGroupBox("Standard dataset",
                                              ExampleMultiGroupDataSet, comment='')
         self.connect(self.groupbox3, SIGNAL("apply_button_clicked()"),
                      self.update_window)
