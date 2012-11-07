@@ -1,9 +1,29 @@
 == Version 1.5.1 ==
 
+=== New features (since v1.5.0) ===
+
+  * HDF5 serialization (HDF5 reader/writer):
+    * Added context manager
+    * Added convenience methods `read` and `write`
+    * Added convenience methods `write_object_list` and `read_object_list` to save/restore objects implementing DataSet-like `serialize` and `deserialize` methods
+  * Datasets I/O (HDF5/ini): None values (unset items) can now be saved/loaded for FloatItem, IntItem and BoolItem objects
+  * disthelpers: added option 'exclude_dirs' to 'add_module_data_files' and 'add_module_data_dir' methods
+  * Added slider support for FloatItem objects (contributor: julien.jaeck)
+  * (Issue 21) Added option 'size' in dataset `edit` and `view` methods to resize the generated dialog box (size may be a tuple of integers (width, height) or a QSize object)
+
 === Possible API compatibility issues (since v1.5.0) ===
 
   * guidata now requires Python 2.6 (Python 2.5 support has been dropped)
-	
+
+=== Bug fixes (since v1.5.0) ===
+
+  * DataSet objects (de)serialization: fixed HDF5 reader/writer for FilesOpenItem and FloatArrayItem serialize/deserialize methods
+  * Fixed DataSet userconfig read/write test
+  * StringItem/ColorItem: fixed unicode/str issues in deserialization methods
+  * Added support for strings encoded in file system charset to avoid an error like "String %r is not UTF-8 encoded" when trying to set an item to a string value (path) obtained with a file system command
+  * configtools/image paths: handling file system encoded paths
+  * (Issue 14) Restored compatiblity with PyQt v4.4
+
 ----
 
 == Version 1.5.0 ==
