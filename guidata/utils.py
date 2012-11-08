@@ -338,3 +338,10 @@ def get_subpackages(name):
         if osp.isfile(osp.join(dirpath, '__init__.py')):
             splist.append(".".join(dirpath.split(os.sep)))
     return splist
+
+def cythonize_all(relpath):
+    """Cythonize all Cython modules in relative path"""
+    from Cython.Compiler import Main
+    for fname in os.listdir(relpath):
+        if osp.splitext(fname)[1] == '.pyx':
+            Main.compile(osp.join(relpath, fname))
