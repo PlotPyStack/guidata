@@ -96,12 +96,16 @@ def get_visual_studio_dlls(architecture=None, python_version=None):
     if python_version is None:
         python_version = '2.7'
         print >>sys.stderr, "Warning/disthelpers: assuming Python 2.7 target"
-    if python_version in ('2.6', '2.7'):
-        # Python 2.6-2.7 were built with Visual Studio 9.0.21022.8
-        # (i.e. Visual Studio 2008, not Visual Studio 2008 SP1!)
+    if python_version in ('2.6', '2.7', '3.0', '3.1', '3.2'):
+        # Python 2.6-2.7, 3.0-3.2 were built with Visual Studio 9.0.21022.8
+        # (i.e. Visual C++ 2008, not Visual C++ 2008 SP1!)
         version = "9.0.21022.8"
         key = "1fc8b3b9a1e18e3b"
-    #TODO: add here the future version of Python (including Python 3)
+    elif python_version in ('3.3', '3.4'):
+        # Python 3.3+ were built with Visual Studio 10.0.30319.1
+        # (i.e. Visual C++ 2010)
+        version = "10.0.30319.1"
+        key = "b03f5f7f11d50a3a"
     else:
         raise RuntimeError,\
               "Unsupported Python version %s" % python_version
