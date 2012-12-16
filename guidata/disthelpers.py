@@ -93,27 +93,23 @@ def get_visual_studio_dlls(architecture=None, python_version=None):
     
     architecture: integer (32 or 64) -- if None, take the Python build arch
     python_version: X.Y"""
+    if architecture is None:
+        architecture = 64 if sys.maxsize > 2**32 else 32
+
     if python_version is None:
         python_version = '2.7'
         print >>sys.stderr, "Warning/disthelpers: assuming Python 2.7 target"
+
+    filelist = []
+
     if python_version in ('2.6', '2.7', '3.0', '3.1', '3.2'):
         # Python 2.6-2.7, 3.0-3.2 were built with Visual Studio 9.0.21022.8
         # (i.e. Visual C++ 2008, not Visual C++ 2008 SP1!)
         version = "9.0.21022.8"
         key = "1fc8b3b9a1e18e3b"
-    elif python_version in ('3.3', '3.4'):
-        # Python 3.3+ were built with Visual Studio 10.0.30319.1
-        # (i.e. Visual C++ 2010)
-        version = "10.0.30319.1"
-        key = "b03f5f7f11d50a3a"
-    else:
-        raise RuntimeError,\
-              "Unsupported Python version %s" % python_version
-    if architecture is None:
-        architecture = 64 if sys.maxsize > 2**32 else 32
-    atype = "" if architecture == 64 else "win32"
-    arch = "amd64" if architecture == 64 else "x86"
-    manifest = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+        atype = "" if architecture == 64 else "win32"
+        arch = "amd64" if architecture == 64 else "x86"
+        manifest = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <!-- Copyright (c) Microsoft Corporation.  All rights reserved. -->
 <assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
     <noInheritable/>
@@ -130,23 +126,40 @@ def get_visual_studio_dlls(architecture=None, python_version=None):
 </assembly>
 """ % dict(version=version, key=key, atype=atype, arch=arch)
 
-    vc90man = "Microsoft.VC90.CRT.manifest"
-    file(vc90man, 'w').write(manifest)
-    _remove_later(vc90man)
+        vc90man = "Microsoft.VC90.CRT.manifest"
+        file(vc90man, 'w').write(manifest)
+        _remove_later(vc90man)
+        filelist += [vc90man]
 
-    filelist = [vc90man]
+        vc_str = '%s_Microsoft.VC90.CRT_%s_%s' % (arch, key, version)
+        winsxs = osp.join(os.environ['windir'], 'WinSxS')
+        for fname in os.listdir(winsxs):
+            path = osp.join(winsxs, fname)
+            if osp.isdir(path) and fname.lower().startswith(vc_str.lower()):
+                for dllname in os.listdir(path):
+                    filelist.append(osp.join(path, dllname))
+                break
+        else:
+            raise RuntimeError, "Microsoft Visual C++ DLLs version %s "\
+                                "were not found" % version
 
-    vc_str = '%s_Microsoft.VC90.CRT_%s_%s' % (arch, key, version)
-    winsxs = osp.join(os.environ['windir'], 'WinSxS')
-    for fname in os.listdir(winsxs):
-        path = osp.join(winsxs, fname)
-        if osp.isdir(path) and fname.lower().startswith(vc_str.lower()):
-            for dllname in os.listdir(path):
-                filelist.append(osp.join(path, dllname))
-            break
+    elif python_version in ('3.3', '3.4'):
+        # Python 3.3+ were built with Visual Studio 10.0.30319.1
+        # (i.e. Visual C++ 2010)
+        version = '10.0'
+        namelist = ['msvcp100.dll', 'msvcr100.dll']
+        sysdir = "SysWOW64" if architecture == 64 else "System32"
+        for dllname in namelist:
+            fname = osp.join(os.environ['windir'], sysdir, dllname)
+            if osp.exists(fname):
+                filelist.append(fname)
+            else:
+                raise RuntimeError, "Microsoft Visual C++ DLLs version %s "\
+                                    "were not found" % version
+
     else:
-        raise RuntimeError, "Microsoft Visual C++ DLLs version %s "\
-                            "were not found" % version
+        raise RuntimeError,\
+              "Unsupported Python version %s" % python_version
     
     return filelist
 
