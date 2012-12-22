@@ -15,6 +15,8 @@ The ``guidata.utils`` module provides various utility helper functions
 (pure python).
 """
 
+from __future__ import print_function
+
 import sys
 import time
 import subprocess
@@ -81,9 +83,9 @@ def trace(fct):
     @wraps(fct)
     def wrapper(*args, **kwargs):
         """Tracing function entry/exit (debugging only)"""
-        print "enter:", fct.__name__
+        print("enter:", fct.__name__)
         res = fct(*args, **kwargs)
-        print "leave:", fct.__name__
+        print("leave:", fct.__name__)
         return res
     return wrapper
 
@@ -259,11 +261,11 @@ class Timer(object):
         self.t0_dict = {}
     def tic(self, cat):
         """Starting timer"""
-        print ">", cat
+        print(">", cat)
         self.t0_dict[cat] = time.clock()
     def toc(self, cat, msg="delta:"):
         """Stopping timer"""
-        print "<", cat, ":", msg, time.clock() - self.t0_dict[cat]
+        print("<", cat, ":", msg, time.clock() - self.t0_dict[cat])
 
 _TIMER = Timer()
 tic = _TIMER.tic

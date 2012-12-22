@@ -17,6 +17,8 @@ This module should be fully compatible with:
     * PySide
 """
 
+from __future__ import print_function
+
 import os, sys
 
 from guidata.qt.QtGui import QFileDialog
@@ -191,8 +193,8 @@ def getsavefilename(parent=None, caption='', basedir='', filters='',
 if __name__ == '__main__':
     import guidata
     _app = guidata.qapplication()
-    print repr(getexistingdirectory())
-    print repr(getopenfilename(filters='*.py;;*.txt'))
-    print repr(getopenfilenames(filters='*.py;;*.txt'))
-    print repr(getsavefilename(filters='*.py;;*.txt'))
+    print(repr(getexistingdirectory()))
+    print(repr(getopenfilename(filters='*.py;;*.txt')))
+    print(repr(getopenfilenames(filters='*.py;;*.txt')))
+    print(repr(getsavefilename(filters='*.py;;*.txt')))
     import sys; sys.exit()

@@ -14,6 +14,8 @@ There is one widget type for each data item type.
 Example: ChoiceWidget <--> ChoiceItem, ImageChoiceItem
 """
 
+from __future__ import print_function
+
 import os
 import sys
 import numpy
@@ -198,7 +200,7 @@ class TabGroupWidget(AbstractDataSetWidget):
             try:
                 widget.get()
             except Exception:
-                print "Error building item :", item.item._name
+                print("Error building item :", item.item._name)
                 raise
             self.widgets.append(widget)
 

@@ -12,6 +12,8 @@ configtools
 The ``guidata.configtools`` module provides configuration related tools.
 """
 
+from __future__ import print_function
+
 import os
 import os.path as osp
 import sys
@@ -173,7 +175,7 @@ def get_family(families):
         if font_is_installed(family):
             return family
     else:
-        print "Warning: None of the following fonts is installed: %r" % families
+        print("Warning: None of the following fonts is installed: %r" % families)
         return ""
 
 

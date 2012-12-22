@@ -16,6 +16,8 @@ package distribution on Microsoft Windows platforms with ``py2exe`` or on
 all platforms thanks to ``cx_Freeze``.
 """
 
+from __future__ import print_function
+
 import sys
 import os
 import os.path as osp
@@ -62,7 +64,7 @@ def prepend_module_to_path(module_path):
     prefix = "Prepending module to sys.path"
     message = prefix + ("%s [revision %s]" % (name, changeset)
                         ).rjust(80 - len(prefix), ".")
-    print >> sys.stderr, message
+    print(message, file=sys.stderr)
     return message
 
 def prepend_modules_to_path(module_base_path):
@@ -98,7 +100,7 @@ def get_visual_studio_dlls(architecture=None, python_version=None):
 
     if python_version is None:
         python_version = '2.7'
-        print >>sys.stderr, "Warning/disthelpers: assuming Python 2.7 target"
+        print("Warning/disthelpers: assuming Python 2.7 target", file=sys.stderr)
 
     filelist = []
 
@@ -168,10 +170,10 @@ def create_vs2008_data_files(architecture=None, python_version=None,
     """Including Microsoft Visual C++ 2008 DLLs"""
     filelist = get_visual_studio_dlls(architecture=architecture,
                                       python_version=python_version)
-    print create_vs2008_data_files.__doc__
+    print(create_vs2008_data_files.__doc__)
     if verbose:
         for name in filelist:
-            print "  ", name
+            print("  ", name)
     return [("Microsoft.VC90.CRT", filelist),]
 
 
@@ -205,12 +207,12 @@ def strip_version(version):
 def remove_dir(dirname):
     """Remove directory *dirname* and all its contents
     Print details about the operation (progress, success/failure)"""
-    print "Removing directory '%s'..." % dirname,
+    print("Removing directory '%s'..." % dirname, end=' ')
     try:
         shutil.rmtree(dirname, ignore_errors=True)
-        print "OK"
+        print("OK")
     except Exception:
-        print "Failed!"
+        print("Failed!")
         traceback.print_exc()
 
 
@@ -304,8 +306,8 @@ class Distribution(object):
             try:
                 self.data_files += create_vs2008_data_files()
             except IOError:
-                print >>sys.stderr, "Setting the vs2008 option to False "\
-                                    "will avoid this error"
+                print("Setting the vs2008 option to False "\
+                                    "will avoid this error", file=sys.stderr)
                 raise
         # cx_Freeze:
         self.add_executable(self.script, self.target_name, icon=self.icon)
@@ -451,7 +453,7 @@ class Distribution(object):
     def add_modules(self, *module_names):
         """Include module *module_name*"""
         for module_name in module_names:
-            print "Configuring module '%s'" % module_name
+            print("Configuring module '%s'" % module_name)
             if module_name == 'PyQt4':
                 self.add_pyqt4()
             elif module_name == 'PySide':
@@ -535,7 +537,7 @@ class Distribution(object):
             self.data_files.append( (dirname, pathlist) )
             if verbose:
                 for name in pathlist:
-                    print "  ", name
+                    print("  ", name)
     
     def add_module_data_files(self, module_name, data_dir_names, extensions,
                               copy_to_root=True, verbose=False,
@@ -545,8 +547,8 @@ class Distribution(object):
         *data_dir_names*: list of dirnames, e.g. ('images', )
         *extensions*: list of file extensions, e.g. ('.png', '.svg')
         """
-        print "Adding module '%s' data files in %s (%s)"\
-              % (module_name, ", ".join(data_dir_names), ", ".join(extensions))
+        print("Adding module '%s' data files in %s (%s)"\
+              % (module_name, ", ".join(data_dir_names), ", ".join(extensions)))
         module_dir = get_module_path(module_name)
         for data_dir_name in data_dir_names:
             self.add_module_data_dir(module_name, data_dir_name, extensions,
@@ -556,8 +558,8 @@ class Distribution(object):
         if osp.isfile(translation_file):
             self.data_files.append((osp.join(module_name, "locale", "fr",
                                          "LC_MESSAGES"), (translation_file, )))
-            print "Adding module '%s' translation file: %s" % (module_name,
-                                               osp.basename(translation_file))
+            print("Adding module '%s' translation file: %s" % (module_name,
+                                               osp.basename(translation_file)))
 
     def build(self, library, cleanup=True, create_archive=None):
         """Build executable with given library.

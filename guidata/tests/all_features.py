@@ -9,6 +9,8 @@
 All guidata item/group features demo
 """
 
+from __future__ import print_function
+
 SHOW = True # Show test in GUI-based test launcher
 
 import tempfile, atexit, shutil
@@ -102,7 +104,7 @@ if __name__ == "__main__":
     
     e = TestParameters()
     e.floatarray[:, 0] = np.linspace( -5, 5, 50)
-    print e
+    print(e)
     if e.edit():
-        print e
+        print(e)
     e.view()

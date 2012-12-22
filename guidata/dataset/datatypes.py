@@ -17,6 +17,8 @@ ValueProp, ...).
 # pylint: disable-msg=W0622
 # pylint: disable-msg=W0212
 
+from __future__ import print_function
+
 import sys
 import re
 
@@ -71,8 +73,8 @@ class FormatProp(ItemProperty):
             return self.fmt % dic
         except TypeError:
             if not self.ignore_error:
-                print "Wrong Format for %s : %r %% %r"\
-                      % (item._name, self.fmt, dic)
+                print("Wrong Format for %s : %r %% %r"\
+                      % (item._name, self.fmt, dic))
                 raise
 
 class GetAttrProp(ItemProperty):
@@ -339,9 +341,9 @@ class DataItem(object):
         except RuntimeError, e:
             if DEBUG_DESERIALIZE:
                 import traceback
-                print >>sys.stderr, "DEBUG_DESERIALIZE enabled in datatypes.py"
+                print("DEBUG_DESERIALIZE enabled in datatypes.py", file=sys.stderr)
                 traceback.print_stack()
-                print >>sys.stderr, e
+                print(e, file=sys.stderr)
             self.set_default(instance)
             return
         self.__set__(instance, value)
@@ -753,10 +755,9 @@ class DataSet(object):
                 except RuntimeError, error:
                     if DEBUG_DESERIALIZE:
                         import traceback
-                        print >>sys.stderr,\
-                            "DEBUG_DESERIALIZE enabled in datatypes.py"
+                        print("DEBUG_DESERIALIZE enabled in datatypes.py", file=sys.stderr)
                         traceback.print_stack()
-                        print >>sys.stderr, error
+                        print(error, file=sys.stderr)
                     item.set_default(self)
             
     def read_config(self, conf, section, option):

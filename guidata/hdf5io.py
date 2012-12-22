@@ -9,6 +9,8 @@
 Reader and Writer for the serialization of DataSets into HDF5 files
 """
 
+from __future__ import print_function
+
 import sys
 from uuid import uuid1
 
@@ -31,7 +33,7 @@ class TypeConverter(object):
         try:
             return self._to_type(value)
         except:
-            print >>sys.stderr, "ERR", repr(value)
+            print("ERR", repr(value), file=sys.stderr)
             raise
 
     def from_hdf(self, value):
@@ -81,7 +83,7 @@ class Attr(object):
         try:
             group.attrs[self.hdf_name] = value
         except:
-            print >>sys.stderr, "ERROR saving:", repr(value), "into", self.hdf_name
+            print("ERROR saving:", repr(value), "into", self.hdf_name, file=sys.stderr)
             raise
     
     def load(self, group, struct):
@@ -168,7 +170,7 @@ class H5Store(object):
         try:
             self.h5 = h5py.File(self.filename,mode=mode)
         except Exception:
-            print >>sys.stderr, "Error trying to load:", self.filename, "in mode:", mode
+            print("Error trying to load:", self.filename, "in mode:", mode, file=sys.stderr)
             raise
         return self.h5
 
@@ -198,7 +200,7 @@ class H5Store(object):
             try:
                 instr.load(parent, dest)
             except Exception:
-                print >>sys.stderr, "Error loading HDF5 item:", instr.hdf_name
+                print("Error loading HDF5 item:", instr.hdf_name, file=sys.stderr)
                 raise
 
 

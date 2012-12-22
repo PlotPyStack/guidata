@@ -5,7 +5,12 @@
 # Licensed under the terms of the CECILL License
 # (see guidata/__init__.py for details)
 
-import sys, os, os.path as osp, subprocess
+from __future__ import print_function
+
+import sys
+import os
+import os.path as osp
+import subprocess
 
 if os.name == 'nt':
     # Find pygettext.py source on a windows install
@@ -51,7 +56,7 @@ def do_rescan_files(files, modname, dirname):
     for lang in get_lang(dirname):
         pofilepath = osp.join(localedir, lang, "LC_MESSAGES", modname+".po")
         potfilepath = osp.join(localedir, potfile)
-        print "Updating...", pofilepath
+        print("Updating...", pofilepath)
         if not osp.exists( osp.join(localedir, lang, "LC_MESSAGES") ):
             os.mkdir( osp.join(localedir, lang, "LC_MESSAGES") )
         if not osp.exists( pofilepath ):
@@ -63,7 +68,7 @@ def do_rescan_files(files, modname, dirname):
                                 "Content-Transfer-Encoding: utf-8")
             outf.write(data)
         else:
-            print "merge..."
+            print("merge...")
             subprocess.call( ["msgmerge", "-o",
                               pofilepath, pofilepath, potfilepath] )
 
@@ -83,25 +88,25 @@ def main( modname ):
         cmd = sys.argv[1]
 #    lang = get_lang( modname )
     if cmd=="help":
-        print "Available commands:"
-        print "   help : this message"
-        print "   help_gettext : pygettext --help"
-        print "   help_msgfmt : msgfmt --help"
-        print "   scan : rescan .py files and updates existing .po files"
-        print "   compile : recompile .po files"
-        print
-        print "Pour fonctionner ce programme doit être lancé depuis"
-        print "la racine du module"
-        print "Traductions disponibles:"
+        print("Available commands:")
+        print("   help : this message")
+        print("   help_gettext : pygettext --help")
+        print("   help_msgfmt : msgfmt --help")
+        print("   scan : rescan .py files and updates existing .po files")
+        print("   compile : recompile .po files")
+        print()
+        print("Pour fonctionner ce programme doit être lancé depuis")
+        print("la racine du module")
+        print("Traductions disponibles:")
         for i in get_lang(modname):
-            print i
+            print(i)
     elif cmd=="help_gettext":
         subprocess.call( pygettext+["--help"] )
     elif cmd=="help_msgfmt":
         subprocess.call( msgfmt+["--help"] )
     elif cmd=="scan":
-        print "Updating pot files"
+        print("Updating pot files")
         do_rescan( modname )
     elif cmd=="compile":
-        print "Builtin .mo files"
+        print("Builtin .mo files")
         do_compile( modname )

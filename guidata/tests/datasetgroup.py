@@ -12,6 +12,8 @@ DataSet objects may be grouped into DataSetGroup, allowing them to be edited
 in a single dialog box (with one tab per DataSet object).
 """
 
+from __future__ import print_function
+
 SHOW = True # Show test in GUI-based test launcher
 
 from all_features import TestParameters
@@ -26,5 +28,5 @@ if __name__ == "__main__":
     e2 = TestParameters("DataSet #2")
     g = DataSetGroup( [e1,e2], title='Parameters group' )
     g.edit()
-    print e1
+    print(e1)
     g.edit()

@@ -9,6 +9,8 @@
 Demonstrates how items may trigger callbacks when activated
 """
 
+from __future__ import print_function
+
 SHOW = True # Show test in GUI-based test launcher
 
 
@@ -19,14 +21,14 @@ from guidata.dataset.dataitems import (ChoiceItem, StringItem, TextItem,
 
 class TestParameters(DataSet):
     def cb_example(self, item, value):
-        print "\nitem: ", item, "\nvalue:", value
+        print("\nitem: ", item, "\nvalue:", value)
         if self.results is None:
             self.results = ''
         self.results += str(value)+'\n'
-        print "results:", self.results
+        print("results:", self.results)
 
     def update_x1plusx2(self, item, value):
-        print "\nitem: ", item, "\nvalue:", value
+        print("\nitem: ", item, "\nvalue:", value)
         if self.x1 is not None and self.x2 is not None:
             self.x1plusx2 = self.x1 + self.x2
         else:
@@ -53,7 +55,7 @@ if __name__ == "__main__":
     _app = guidata.qapplication()
     
     e = TestParameters()
-    print e
+    print(e)
     if e.edit():
-        print e
+        print(e)
     e.view()

@@ -20,6 +20,8 @@ Licensed under the terms of the CECILL License
 (see guidata/__init__.py for details)
 """
 
+from __future__ import print_function
+
 from distutils.core import setup
 import os
 
@@ -74,7 +76,7 @@ if sphinx:
             try:
                 sphinx.setup_command.BuildDoc.run(self)
             except UnicodeDecodeError:
-                print >>sys.stderr, "ERROR: unable to build documentation because Sphinx do not handle source path with non-ASCII characters. Please try to move the source package to another location (path with *only* ASCII characters)."
+                print("ERROR: unable to build documentation because Sphinx do not handle source path with non-ASCII characters. Please try to move the source package to another location (path with *only* ASCII characters).", file=sys.stderr)
             sys.path.pop(0)
 
     cmdclass['build_doc'] = build_doc

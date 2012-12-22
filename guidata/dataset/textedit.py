@@ -10,6 +10,8 @@ Text visitor for DataItem objects
 (for test purpose only)
 """
 
+from __future__ import print_function
+
 def prompt(item):
     """Get item value"""
     return raw_input(item.get_prop("display","label")+" ? ")
@@ -26,7 +28,7 @@ class TextEditVisitor:
             item.set_from_string(self.instance, value)
             if item.check_item(self.instance):
                 break
-            print "Incorrect value!"
+            print("Incorrect value!")
 
     visit_FloatItem = visit_generic
     visit_IntItem = visit_generic

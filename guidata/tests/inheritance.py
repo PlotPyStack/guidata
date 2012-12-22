@@ -12,6 +12,8 @@ From time to time, it may be useful to derive a DataSet from another. The main
 application is to extend a parameter set with additionnal parameters.
 """
 
+from __future__ import print_function
+
 SHOW = True # Show test in GUI-based test launcher
 
 from all_features import TestParameters
@@ -35,4 +37,4 @@ if __name__ == '__main__':
     
     e = TestParameters2()
     e.edit()
-    print e
+    print(e)

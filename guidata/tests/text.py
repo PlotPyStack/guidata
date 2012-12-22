@@ -7,6 +7,8 @@
 
 """Test in text mode"""
 
+from __future__ import print_function
+
 SHOW = False # Do not show test in GUI-based test launcher
 
 from guidata.dataset.datatypes import DataSet
@@ -20,4 +22,4 @@ class Parameters(DataSet):
 if __name__ == '__main__':
     p = Parameters()
     p.text_edit()
-    print p
+    print(p)

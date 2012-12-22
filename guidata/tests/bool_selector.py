@@ -13,6 +13,8 @@ box widgets in the editing dialog box) and item groups may be enabled/disabled
 using one group parameter (a boolean item).
 """
 
+from __future__ import print_function
+
 SHOW = True # Show test in GUI-based test launcher
 
 from guidata.dataset.datatypes import DataSet, BeginGroup, EndGroup, ValueProp
@@ -52,4 +54,4 @@ if __name__ == '__main__':
     
     prm = GroupSelection()
     prm.edit()
-    print prm
+    print(prm)

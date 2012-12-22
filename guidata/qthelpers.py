@@ -13,6 +13,8 @@ The ``guidata.qthelpers`` module provides helper functions for developing
 easily Qt-based graphical user interfaces.
 """
 
+from __future__ import print_function
+
 import sys
 from guidata.qt.QtGui import (QAction, QApplication, QColor, QHBoxLayout, QIcon,
                               QKeySequence, QLabel, QLineEdit, QMenu,
@@ -191,5 +193,5 @@ def show_std_icons():
 
 if __name__ == "__main__":
     from guidata.utils import pairs
-    print list( pairs( range(5) ) )
+    print(list( pairs( range(5) ) ))
     show_std_icons()

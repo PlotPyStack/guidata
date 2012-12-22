@@ -38,6 +38,8 @@ management features based on ``ConfigParser`` (standard Python library).
 It is the exact copy of the open-source package `userconfig` (MIT license).
 """
 
+from __future__ import print_function
+
 __version__ = '1.0.7'
 
 import os
@@ -54,14 +56,14 @@ def _check_values(sections):
             try:
                 _s = str(value)
             except Exception, _e:
-                print "Can't convert:"
-                print section, key, repr(value)
+                print("Can't convert:")
+                print(section, key, repr(value))
                 err = True
     if err:
         assert False
     else:
         import traceback
-        print "-"*30
+        print("-"*30)
         traceback.print_stack()
 
 def get_home_dir():
@@ -173,7 +175,7 @@ class UserConfig(ConfigParser):
                     _check(key, value)
         if errors:
             for err in errors:
-                print err
+                print(err)
             raise ValueError("Invalid default values")
 
     def get_version(self, version='0.0.0'):
@@ -191,7 +193,7 @@ class UserConfig(ConfigParser):
         try:
             self.read(self.filename())
         except MissingSectionHeaderError:
-            print "Warning: File contains no section headers."
+            print("Warning: File contains no section headers.")
         
     def __remove_deprecated_options(self):
         """
@@ -330,7 +332,7 @@ class UserConfig(ConfigParser):
         if not isinstance(value, (str, unicode)):
             value = repr( value )
         if verbose:
-            print '%s[ %s ] = %s' % (section, option, value)
+            print('%s[ %s ] = %s' % (section, option, value))
         if isinstance(value, unicode):
             value = utf8(value)
         ConfigParser.set(self, section, option, value)
