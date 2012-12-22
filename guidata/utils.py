@@ -183,12 +183,12 @@ def restore_dataset(source, dest):
 #==============================================================================
 def assert_interface_supported(klass, iface):
     """Makes sure a class supports an interface"""
-    for name, func in iface.__dict__.items():
+    for name, func in list(iface.__dict__.items()):
         if name == '__inherits__':
             continue
         if callable(func):
             assert hasattr(klass, name), \
-                   "Attribute %s missing from %r" % (name,klass)
+                   "Attribute %s missing from %r" % (name, klass)
             imp_func = getattr(klass, name)
             imp_code = imp_func.func_code
             code = func.func_code

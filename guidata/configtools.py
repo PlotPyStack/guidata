@@ -63,7 +63,7 @@ def get_translation(modname, dirname=None):
                 x = x.encode("utf-8")
             return unicode(lgettext(x), "utf-8")
         return translate_gettext
-    except IOError, _e:
+    except IOError as _e:
         #print "Not using translations (%s)" % _e
         def translate_dumb(x):
             if not isinstance(x, unicode):

@@ -338,7 +338,7 @@ class DataItem(object):
         """
         try:
             value = self.get_value_from_reader(reader)
-        except RuntimeError, e:
+        except RuntimeError as e:
             if DEBUG_DESERIALIZE:
                 import traceback
                 print("DEBUG_DESERIALIZE enabled in datatypes.py", file=sys.stderr)
@@ -556,13 +556,13 @@ class DataSetMeta(type):
                 for item in base._items:
                     items[item._name] = item
                 
-        for attrname, value in dct.items():
+        for attrname, value in list(dct.items()):
             if isinstance( value, DataItem ):
                 value.set_name(attrname)
                 if attrname in items:
                     value._order = items[attrname]._order
                 items[attrname] = value
-        items_list = items.values()
+        items_list = list(items.values())
         items_list.sort(key=lambda x:x._order)
         dct["_items"] = items_list
         return type.__new__(cls, name, bases, dct)
@@ -598,7 +598,7 @@ class DataSet(object):
         cannot be translated at the time they are created.
         """
         module = sys.modules[self.__class__.__module__]
-        if hasattr(module,"_"):
+        if hasattr(module, "_"):
             return module._
         else:
             return lambda x:x
@@ -752,7 +752,7 @@ class DataSet(object):
             with reader.group(item._name):
                 try:
                     item.deserialize(self, reader)
-                except RuntimeError, error:
+                except RuntimeError as error:
                     if DEBUG_DESERIALIZE:
                         import traceback
                         print("DEBUG_DESERIALIZE enabled in datatypes.py", file=sys.stderr)

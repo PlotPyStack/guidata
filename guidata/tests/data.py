@@ -42,7 +42,7 @@ class TestCheck(unittest.TestCase):
         e1 = Parameters()
         e2 = Parameters()
         e1.float1 = 23
-        update_dataset(e2,e1)
+        update_dataset(e2, e1)
         self.assertEquals( e2.float1, 23 )
 
 if __name__ == "__main__":

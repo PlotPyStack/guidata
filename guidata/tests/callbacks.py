@@ -44,7 +44,7 @@ class TestParameters(DataSet):
     choice = ChoiceItem("Single choice",
                         [(16, "first choice"), (32, "second choice"),
                          (64, "third choice")], default=64
-                        ).set_pos(col=1,colspan=2
+                        ).set_pos(col=1, colspan=2
                         ).set_prop("display", callback=cb_example)
     results = TextItem("Results")
 

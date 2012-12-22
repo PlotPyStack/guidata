@@ -193,5 +193,5 @@ def show_std_icons():
 
 if __name__ == "__main__":
     from guidata.utils import pairs
-    print(list( pairs( range(5) ) ))
+    print(list( pairs( list(range(5)) ) ))
     show_std_icons()

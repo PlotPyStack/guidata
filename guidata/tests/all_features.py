@@ -75,9 +75,9 @@ class TestParameters(DataSet):
     choice = ChoiceItem("Single choice",
                         [(16, "first choice"), (32, "second choice"),
                          (64, "third choice")]
-                        ).set_pos(col=1,colspan=2)
+                        ).set_pos(col=1, colspan=2)
     _eg = EndGroup("A sub group")
-    floatarray = FloatArrayItem("Float array", default=np.ones( (50,5), float),
+    floatarray = FloatArrayItem("Float array", default=np.ones( (50, 5), float),
                                 format=" %.2e ").set_pos(col=1)
     g0 = BeginTabGroup("group")
     mchoice1 = MultipleChoiceItem("MC type 1",

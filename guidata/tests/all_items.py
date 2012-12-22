@@ -69,7 +69,7 @@ class TestParameters(DataSet):
                                 ("qcq", "third choice", "file.png" )]
                                )
     _eg = EndGroup("A sub group")
-    floatarray = FloatArrayItem("Float array", default=np.ones( (50,5), float),
+    floatarray = FloatArrayItem("Float array", default=np.ones( (50, 5), float),
                                 format=" %.2e ").set_pos(col=1)
     mchoice3 = MultipleChoiceItem("MC type 1",
                                   [ str(i) for i in range(12)]

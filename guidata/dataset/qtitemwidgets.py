@@ -744,7 +744,7 @@ class FloatArrayWidget(AbstractDataSetWidget):
         
         self.first_line, self.dim_label = get_image_layout("shape.png",
                                    _("Number of rows x Number of columns"))
-        edit_button = QPushButton(get_icon("arredit.png"),"")
+        edit_button = QPushButton(get_icon("arredit.png"), "")
         edit_button.setToolTip(_("Edit array contents"))
         edit_button.setMaximumWidth(32)
         self.first_line.addWidget(edit_button)
@@ -793,9 +793,9 @@ class FloatArrayWidget(AbstractDataSetWidget):
                 mint = format % arr.min()
                 maxt = format % arr.max()
             elif minmax == "columns":
-                mint = ", ".join([format % arr[r, :].min()
+                mint = ", ".join([format % arr[r,:].min()
                                   for r in range(arr.shape[0])])
-                maxt = ", ".join([format % arr[r, :].max()
+                maxt = ", ".join([format % arr[r,:].max()
                                   for r in range(arr.shape[0])])
             else:
                 mint = ", ".join([format % arr[:, r].min()

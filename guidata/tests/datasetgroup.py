@@ -26,7 +26,7 @@ if __name__ == "__main__":
 
     e1 = TestParameters("DataSet #1")
     e2 = TestParameters("DataSet #2")
-    g = DataSetGroup( [e1,e2], title='Parameters group' )
+    g = DataSetGroup( [e1, e2], title='Parameters group' )
     g.edit()
     print(e1)
     g.edit()

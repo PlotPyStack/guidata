@@ -14,7 +14,7 @@ from __future__ import print_function
 
 def prompt(item):
     """Get item value"""
-    return raw_input(item.get_prop("display","label")+" ? ")
+    return raw_input(item.get_prop("display", "label")+" ? ")
 
 class TextEditVisitor:
     """Text visitor"""

@@ -423,7 +423,7 @@ class ChoiceItem(DataItem):
             key = idx
             value = choice_tuple
 
-        if isinstance(value,str):
+        if isinstance(value, str):
             value = utf8_to_unicode(value)
         return (key, value, None)
             

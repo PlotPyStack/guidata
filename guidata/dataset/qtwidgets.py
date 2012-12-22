@@ -270,7 +270,7 @@ class DataSetEditLayout(object):
         item = widget.item
         line, col, span = self.items_pos[item.item]
         if col > 0:
-            self.layout.addItem( QSpacerItem(20, 1) , line, col*3-1 )
+            self.layout.addItem( QSpacerItem(20, 1), line, col*3-1 )
             
         widget.place_on_grid( self.layout, line, col*3, col*3 + 1, 1, 3*span-2)
         try:

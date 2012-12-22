@@ -51,11 +51,11 @@ from ConfigParser import ConfigParser, MissingSectionHeaderError
 def _check_values(sections):
     # Checks if all key/value pairs are writable
     err = False
-    for section, data in sections.items():
-        for key, value in data.items():
+    for section, data in list(sections.items()):
+        for key, value in list(data.items()):
             try:
                 _s = str(value)
-            except Exception, _e:
+            except Exception as _e:
                 print("Can't convert:")
                 print(section, key, repr(value))
                 err = True
@@ -114,7 +114,7 @@ class UserConfig(ConfigParser):
         self.name = "none"
         self.raw = 0 # 0=substitutions are enabled / 1=raw config parser
         assert isinstance(defaults, dict)
-        for _key, val in defaults.items():
+        for _key, val in list(defaults.items()):
             assert isinstance(val, dict)
         if self.default_section_name not in defaults:
             defaults[self.default_section_name] = {}
@@ -123,7 +123,7 @@ class UserConfig(ConfigParser):
         self.check_default_values()
 
     def update_defaults(self, defaults):
-        for key, sectdict in defaults.items():
+        for key, sectdict in list(defaults.items()):
             if key not in self.defaults:
                 self.defaults[key] = sectdict
             else:
@@ -160,18 +160,18 @@ class UserConfig(ConfigParser):
             if value is None:
                 return
             if isinstance(value, dict):
-                for k, v in value.items():
+                for k, v in list(value.items()):
                     _check(key+"{}", k)
                     _check(key+"/"+k, v)
             elif isinstance(value, (list, tuple)):
                 for v in value:
                     _check(key+"[]", v)
             else:
-                if not isinstance(value, (bool,int,float,str)):
-                    errors.append("Invalid value for %s: %r" % (key,value))
-        for name, section in self.defaults.items():
+                if not isinstance(value, (bool, int, float, str)):
+                    errors.append("Invalid value for %s: %r" % (key, value))
+        for name, section in list(self.defaults.items()):
             assert isinstance(name, str)
-            for key, value in section.items():
+            for key, value in list(section.items()):
                     _check(key, value)
         if errors:
             for err in errors:
@@ -210,7 +210,7 @@ class UserConfig(ConfigParser):
         """
         Save config into the associated .ini file
         """
-        conf_file = file(self.filename(),'w')
+        conf_file = file(self.filename(), 'w')
         self.write(conf_file)
         conf_file.close()
                 
@@ -241,7 +241,7 @@ class UserConfig(ConfigParser):
         """
         Reset config to Default values
         """
-        for section, options in self.defaults.items():
+        for section, options in list(self.defaults.items()):
             for option in options:
                 value = options[ option ]
                 self.__set(section, option, value, verbose)
@@ -255,9 +255,9 @@ class UserConfig(ConfigParser):
         if section is None:
             section = self.default_section_name
         elif not isinstance(section, basestring):
-            raise RuntimeError, "Argument 'section' must be a string"
+            raise RuntimeError("Argument 'section' must be a string")
         if not isinstance(option, basestring):
-            raise RuntimeError, "Argument 'option' must be a string"
+            raise RuntimeError("Argument 'option' must be a string")
         return section
 
     def get_default(self, section, option):
@@ -286,7 +286,7 @@ class UserConfig(ConfigParser):
         
         if not self.has_option(section, option):
             if default is NoDefault:
-                raise RuntimeError("Unknown option %r/%r" % (section,option))
+                raise RuntimeError("Unknown option %r/%r" % (section, option))
             else:
                 self.set(section, option, default)
                 return default

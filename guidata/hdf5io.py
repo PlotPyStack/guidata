@@ -95,13 +95,13 @@ class Attr(object):
         try:
             value = group.attrs[self.hdf_name]
         except KeyError:
-            raise KeyError, 'Unable to locate attribute %s' % self.hdf_name
+            raise KeyError('Unable to locate attribute %s' % self.hdf_name)
         if self.type is not None:
             value = self.type.from_hdf(value)
         self.set_value(struct, value)
 
 
-def createdset(group,name,value):
+def createdset(group, name, value):
     group.create_dataset(name,
                          compression=None,
                          #compression_opts=3,
@@ -140,7 +140,7 @@ class Dset(Attr):
         try:
             value = group[self.hdf_name][...]
         except KeyError:
-            raise KeyError, 'Unable to locate dataset %s' % self.hdf_name
+            raise KeyError('Unable to locate dataset %s' % self.hdf_name)
         if self.scalar is not None:
             value = self.scalar(value)
         self.set_value(struct, value)
@@ -168,7 +168,7 @@ class H5Store(object):
         if self.h5:
             return self.h5
         try:
-            self.h5 = h5py.File(self.filename,mode=mode)
+            self.h5 = h5py.File(self.filename, mode=mode)
         except Exception:
             print("Error trying to load:", self.filename, "in mode:", mode, file=sys.stderr)
             raise

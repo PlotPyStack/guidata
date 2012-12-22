@@ -142,8 +142,8 @@ def get_visual_studio_dlls(architecture=None, python_version=None):
                     filelist.append(osp.join(path, dllname))
                 break
         else:
-            raise RuntimeError, "Microsoft Visual C++ DLLs version %s "\
-                                "were not found" % version
+            raise RuntimeError("Microsoft Visual C++ DLLs version %s "\
+                                "were not found" % version)
 
     elif python_version in ('3.3', '3.4'):
         # Python 3.3+ were built with Visual Studio 10.0.30319.1
@@ -156,12 +156,11 @@ def get_visual_studio_dlls(architecture=None, python_version=None):
             if osp.exists(fname):
                 filelist.append(fname)
             else:
-                raise RuntimeError, "Microsoft Visual C++ DLLs version %s "\
-                                    "were not found" % version
+                raise RuntimeError("Microsoft Visual C++ DLLs version %s "\
+                                    "were not found" % version)
 
     else:
-        raise RuntimeError,\
-              "Unsupported Python version %s" % python_version
+        raise RuntimeError("Unsupported Python version %s" % python_version)
     
     return filelist
 
@@ -525,7 +524,7 @@ class Distribution(object):
         nstrip = len(module_dir) + len(osp.sep)
         data_dir = osp.join(module_dir, data_dir_name)
         if not osp.isdir(data_dir):
-            raise IOError, "Directory not found: %s" % data_dir
+            raise IOError("Directory not found: %s" % data_dir)
         for dirpath, _dirnames, filenames in os.walk(data_dir):
             dirname = dirpath[nstrip:]
             if osp.basename(dirpath) in exclude_dirs:
@@ -582,7 +581,7 @@ class Distribution(object):
             self.build_cx_freeze(cleanup=cleanup,
                                  create_archive=create_archive)
         else:
-            raise RuntimeError, "Unsupported library %s" % library
+            raise RuntimeError("Unsupported library %s" % library)
     
     def __cleanup(self):
         """Remove old build and dist directories"""
