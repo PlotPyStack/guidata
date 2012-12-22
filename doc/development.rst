@@ -66,3 +66,32 @@ that the following recommendations should be followed:
   `QString` (or `QStringList`) objects (API #1 compatibility) and so be 
   converted systematically to the Python equivalent object, i.e. unicode 
   (or list).
+
+
+Python 3 compatibility
+======================
+
+Regarding Python 3 compatibility, we chose to handle it by maintaining a single
+source branch being compatible with both Python 2.6-7 and Python 3.
+
+Here is what we have done.
+
+Fixing trivial things with 2to3
+-------------------------------
+
+The first step is to run the `2to3` script (see Python documentation) to 
+convert print statements to print function calls -- note that your source 
+directory (named `directory_name`) has to be version controlled (no backup is 
+done thanks to the `-n` option flag).
+`python 2to3.py -w -n -f print directory_name`
+
+Open each modified source file and add the following line at the beginning:
+from __future__ import print_function
+
+Then run again `2to3` with all other Python 2/3 compatible fixers:
+`python 2to3.py -w -n -f apply -f dict -f except -f exitfunc -f filter -f has_key -f map -f ne -f raise -f ws_comma -f xrange -f xreadlines -f zip directory_name`
+
+After these two steps, your code should be compatible with Python 2.6, 2.7 
+and 3.x, but only with respect to the simplest changes that occured between 
+Python 2 and Python 3. However, this a step forward to Python 3 compatibility 
+without breaking Python 2.6+ compatibility.
