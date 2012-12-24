@@ -18,8 +18,8 @@ from guidata.disthelpers import Distribution
 
 if __name__ == '__main__':
     dist = Distribution()
-    dist.setup(name=u"Application demo", version='1.0.0',
-               description=u"Application demo based on editgroupbox.py",
+    dist.setup(name="Application demo", version='1.0.0',
+               description="Application demo based on editgroupbox.py",
                script="editgroupbox.py", target_name="demo.exe")
     dist.add_modules('guidata')
     dist.build('cx_Freeze')

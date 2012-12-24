@@ -29,31 +29,31 @@ from guidata.qthelpers import create_action, add_actions, get_std_icon
 from activable_dataset import ExampleDataSet
 
 class AnotherDataSet(DataSet):
-    u"""
+    """
     Example 2
     <b>Simple dataset example</b>
     """
-    param0 = ChoiceItem(u"Choice", ['deazdazk', 'aeazee', '87575757'])
-    param1 = FloatItem(u"Foobar 1", default=0, min=0)
+    param0 = ChoiceItem("Choice", ['deazdazk', 'aeazee', '87575757'])
+    param1 = FloatItem("Foobar 1", default=0, min=0)
     a_group = BeginGroup("A group")
-    param2 = FloatItem(u"Foobar 2", default=.93)
-    param3 = FloatItem(u"Foobar 3", default=123)
+    param2 = FloatItem("Foobar 2", default=.93)
+    param3 = FloatItem("Foobar 3", default=123)
     _a_group = EndGroup("A group")
 
 class ExampleMultiGroupDataSet(DataSet):
-    param0 = ChoiceItem(u"Choice", ['deazdazk', 'aeazee', '87575757'])
-    param1 = FloatItem(u"Foobar 1", default=0, min=0)
+    param0 = ChoiceItem("Choice", ['deazdazk', 'aeazee', '87575757'])
+    param1 = FloatItem("Foobar 1", default=0, min=0)
     t_group = BeginTabGroup("T group")
     a_group = BeginGroup("A group")
-    param2 = FloatItem(u"Foobar 2", default=.93)
-    dir1 = DirectoryItem(u"Directory 1")
-    file1 = FileOpenItem(u"File 1")
+    param2 = FloatItem("Foobar 2", default=.93)
+    dir1 = DirectoryItem("Directory 1")
+    file1 = FileOpenItem("File 1")
     _a_group = EndGroup("A group")
     b_group = BeginGroup("B group")
-    param3 = FloatItem(u"Foobar 3", default=123)
+    param3 = FloatItem("Foobar 3", default=123)
     _b_group = EndGroup("B group")
     c_group = BeginGroup("C group")
-    param4 = FloatItem(u"Foobar 4", default=250)
+    param4 = FloatItem("Foobar 4", default=250)
     _c_group = EndGroup("C group")
     _t_group = EndTabGroup("T group")
     

@@ -16,6 +16,7 @@ SHOW = True # Show test in GUI-based test launcher
 from guidata.qt.QtGui import QFrame, QGridLayout
 from guidata.qt.QtCore import Qt
 from guidata.qtwidgets import RotatedLabel
+from guidata.py3compat import u
 
 class Frame(QFrame):
     def __init__(self, parent=None):
@@ -25,7 +26,7 @@ class Frame(QFrame):
         angle = 0
         for row in range(7):
             for column in range(7):
-                layout.addWidget(RotatedLabel(u"Label %03d°" % angle,
+                layout.addWidget(RotatedLabel(u("Label %03d°" % angle),
                                               angle=angle, color=Qt.blue,
                                               bold=True),
                                  row, column, Qt.AlignCenter)

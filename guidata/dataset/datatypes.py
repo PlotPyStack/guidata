@@ -23,7 +23,7 @@ import sys
 import re
 
 from guidata.utils import utf8_to_unicode, update_dataset
-from guidata.py3compat import to_text_string, is_text_string
+from guidata.py3compat import to_text_string, is_text_string, u
 
 
 DEBUG_DESERIALIZE = False
@@ -203,7 +203,7 @@ class DataItem(object):
         help = self._help
         if auto_help:
             if help:
-                help = help + u"\n(" + auto_help + u")"
+                help = help + u("\n(") + auto_help + u(")")
             else:
                 help = auto_help.capitalize()
         return help
@@ -212,7 +212,7 @@ class DataItem(object):
         """
         Return the automatically generated part of data item's tooltip
         """
-        return u""
+        return u("")
         
     def format_string(self, instance, value, fmt, func):
         """Apply format to string representation of the item's value"""
@@ -228,7 +228,7 @@ class DataItem(object):
         if repval is not None:
             return repval
         else:
-            fmt = self.get_prop_value("display", instance, "format", u"%s")
+            fmt = self.get_prop_value("display", instance, "format", u("%s"))
             func = self.get_prop_value("display", instance, "func", lambda x:x)
             if callable(fmt) and value is not None:
                 return fmt(func(value))
@@ -239,7 +239,7 @@ class DataItem(object):
             if value is not None:
                 text = self.format_string(instance, value, fmt, func)
             else:
-                text = u""
+                text = u("")
             return text
 
     def set_name(self, new_name):

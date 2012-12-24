@@ -24,16 +24,16 @@ from guidata.dataset.dataitems import BoolItem, FloatItem, ChoiceItem, ColorItem
 
 
 class ExampleDataSet(ActivableDataSet):
-    u"""
+    """
     Example
     <b>Activable dataset example</b>
     """
-    enable = BoolItem(u"Enable parameter set",
-                      help=u"If disabled, the following parameters will be ignored",
+    enable = BoolItem("Enable parameter set",
+                      help="If disabled, the following parameters will be ignored",
                       default=False)
-    param0 = ChoiceItem(u"Param 0", ['choice #1', 'choice #2', 'choice #3'])
-    param1 = FloatItem(u"Param 1", default=0, min=0)
-    param2 = FloatItem(u"Param 2", default=.93)
+    param0 = ChoiceItem("Param 0", ['choice #1', 'choice #2', 'choice #3'])
+    param1 = FloatItem("Param 1", default=0, min=0)
+    param2 = FloatItem("Param 2", default=.93)
     color = ColorItem("Color", default="red")
 
 ExampleDataSet.active_setup()

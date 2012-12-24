@@ -22,7 +22,7 @@ import datetime
 from guidata.dataset.datatypes import DataItem, ItemProperty
 from guidata.utils import utf8_to_unicode, add_extension
 from guidata.config import _
-from guidata.py3compat import to_text_string, is_text_string, text_types
+from guidata.py3compat import to_text_string, is_text_string, text_types, u
 
 
 class NumericTypeItem(DataItem):
@@ -548,16 +548,16 @@ class FloatArrayItem(DataItem):
     def format_string(self, instance, value, fmt, func):
         """Override DataItem method"""
         larg = self.get_prop_value("display", instance, "large", False)
-        fmt = self.get_prop_value("display", instance, "format", u"%s")
+        fmt = self.get_prop_value("display", instance, "format", u("%s"))
         v = func(value)        
         if larg:
-            text = u"= ["
+            text = u("= [")
             for flt in v[:-1]:
                 text += fmt % flt + "; "
             text += fmt % v[-1] + "]"
             return to_text_string(text)
         else:
-            text = u"~= " + fmt % v.mean()
+            text = u("~= ") + fmt % v.mean()
             text += " [" + fmt % v.min()
             text += " .. " + fmt % v.max()
             text += "]"

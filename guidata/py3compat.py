@@ -74,14 +74,20 @@ def is_binary_string(obj):
         # Python 3
         return isinstance(obj, bytes)
 
-def to_text_string(obj, encoding='utf-8'):
+def to_text_string(obj, encoding=None):
     """Convert `obj` to (unicode) text string"""
     if is_python2:
         # Python 2
-        return unicode(obj, encoding)
+        if encoding is None:
+            return unicode(obj)
+        else:
+            return unicode(obj, encoding)
     else:
         # Python 3
-        return str(obj, encoding)
+        if encoding is None:
+            return str(obj)
+        else:
+            return str(obj, encoding)
 
 def is_unicode(obj):
     """Return True if `obj` is unicode"""

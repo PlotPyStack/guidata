@@ -12,6 +12,7 @@
 # serve to show the default.
 
 from __future__ import print_function
+from guidata.py3compat import u
 
 import sys, os
 
@@ -44,10 +45,10 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'guidata'
+project = u('guidata')
 import time
 this_year = time.strftime("%Y", time.localtime())
-copyright = u"2009-%s, CEA - Commissariat à l'Energie Atomique et aux Energies Alternatives" % this_year
+copyright = u("2009-%s, CEA - Commissariat à l'Energie Atomique et aux Energies Alternatives" % this_year)
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -183,8 +184,8 @@ htmlhelp_basename = 'guidatadoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'guidata.tex', u'guidata Documentation',
-   u'Pierre Raybaut', 'manual'),
+  ('index', 'guidata.tex', u('guidata Documentation'),
+   u('Pierre Raybaut'), 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
