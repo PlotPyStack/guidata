@@ -30,9 +30,11 @@ is_python3 = sys.version[0] == '3'
 if is_python2:
     # Python 2
     import ConfigParser as configparser
+    import _winreg as winreg
 else:
     # Python 3
     import configparser
+    import winreg
 
 #==============================================================================
 # Strings
