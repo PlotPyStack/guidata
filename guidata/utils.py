@@ -44,9 +44,9 @@ def pairs(iterable):
     pairs [ (l[0],l[1]), ..., (l[n-2], l[n-1])]
     """
     iterator = iter(iterable)
-    first = iterator.next()
+    first = next(iterator)
     while True:
-        second = iterator.next()
+        second = next(iterator)
         yield (first, second)
         first = second
 
