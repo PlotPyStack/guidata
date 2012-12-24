@@ -19,6 +19,7 @@ This module should be fully compatible with:
 from __future__ import print_function
 
 import sys
+import os
 
 is_python2 = sys.version[0] == '2'
 is_python3 = sys.version[0] == '3'
@@ -140,6 +141,13 @@ if is_python2:
 else:
     # Python 3
     input = input
+
+if is_python2:
+    # Python 2
+    getcwd = os.getcwdu
+else:
+    # Python 3
+    getcwd = os.getcwd
 
 
 if __name__ == '__main__':
