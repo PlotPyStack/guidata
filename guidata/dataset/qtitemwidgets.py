@@ -17,6 +17,7 @@ Example: ChoiceWidget <--> ChoiceItem, ImageChoiceItem
 from __future__ import print_function
 
 import os
+import os.path as osp
 import sys
 import numpy
 
@@ -46,6 +47,7 @@ from guidata.utils import update_dataset, restore_dataset, utf8_to_unicode
 from guidata.qthelpers import text_to_qcolor, get_std_icon
 from guidata.configtools import get_icon, get_image_layout, get_image_file_path
 from guidata.config import _
+from guidata.py3compat import to_text_string, is_text_string, u
 
 # ========================== <!> IMPORTANT <!> =================================
 #
@@ -242,7 +244,7 @@ class LineEditWidget(AbstractDataSetWidget):
     def get(self):
         """Override AbstractDataSetWidget method"""
         value = self.item.get()
-        old_value = unicode(self.value())
+        old_value = to_text_string(self.value())
         if value is not None:
             if isinstance(value, QColor):  # if item is a ColorItem object
                 value = value.name()
@@ -254,7 +256,7 @@ class LineEditWidget(AbstractDataSetWidget):
             
     def line_edit_changed(self, qvalue):
         """QLineEdit validator"""
-        value = self.item.from_string(unicode(qvalue))
+        value = self.item.from_string(to_text_string(qvalue))
         if not self.item.check_value(value):
             self.edit.setStyleSheet("background-color:rgb(255, 175, 90);")
         else:
@@ -276,11 +278,11 @@ class LineEditWidget(AbstractDataSetWidget):
             cb(value)
 
     def value(self):
-        return unicode(self.edit.text())
+        return to_text_string(self.edit.text())
 
     def check(self):
         """Override AbstractDataSetWidget method"""
-        value = self.item.from_string(unicode(self.edit.text()))
+        value = self.item.from_string(to_text_string(self.edit.text()))
         return self.item.check_value(value)
 
 
@@ -300,7 +302,8 @@ class TextEditWidget(AbstractDataSetWidget):
 
     def __get_text(self):
         """Get QTextEdit text, replacing UTF-8 EOL chars by os.linesep"""
-        return unicode(self.edit.toPlainText()).replace(u'\u2029', os.linesep)
+        return to_text_string(self.edit.toPlainText()).replace(u('\u2029'),
+                                                               os.linesep)
 
     def get(self):
         """Override AbstractDataSetWidget method"""
@@ -551,16 +554,16 @@ class FileWidget(HLayoutMixin, LineEditWidget):
 
     def select_file(self):
         """Open a file selection dialog box"""
-        fname = self.item.from_string(unicode(self.edit.text()))
+        fname = self.item.from_string(to_text_string(self.edit.text()))
         if isinstance(fname, list):
-            fname = os.path.dirname(fname[0])
+            fname = osp.dirname(fname[0])
         parent = self.parent_layout.parent
         _temp = sys.stdout
         sys.stdout = None
         if len(fname) == 0:
             fname = self.basedir
         _formats = self.item.get_prop_value("data", "formats")
-        formats = [unicode(format).lower() for format in _formats]
+        formats = [to_text_string(format).lower() for format in _formats]
         filter_lines = [(_("%s files")+" (*.%s)") % (format.upper(), format)
                         for format in formats]
         all_filter = _("All supported files")+" (*.%s)" % " *.".join(formats)
@@ -577,7 +580,7 @@ class FileWidget(HLayoutMixin, LineEditWidget):
         sys.stdout = _temp
         if fname:
             if isinstance(fname, list):
-                fname = unicode(fname)
+                fname = to_text_string(fname)
             self.edit.setText(fname)
 
 
@@ -594,7 +597,7 @@ class DirectoryWidget(HLayoutMixin, LineEditWidget):
 
     def select_directory(self):
         """Open a directory selection dialog box"""
-        value = self.item.from_string(unicode(self.edit.text()))
+        value = self.item.from_string(to_text_string(self.edit.text()))
         parent = self.parent_layout.parent
         child_title = _get_child_title_func(parent)
         dname = getexistingdirectory(parent, child_title(self.item), value)
@@ -636,8 +639,8 @@ class ChoiceWidget(AbstractDataSetWidget):
         _choices = self.item.get_prop_value("data", "choices")
         for key, lbl, img in _choices:
             if img:
-                if isinstance(img, (str, unicode)):
-                    if not os.path.isfile(img):
+                if is_text_string(img):
+                    if not osp.isfile(img):
                         img = get_image_file_path(img)
                     img = QIcon(img)
                 elif callable(img):
@@ -835,7 +838,7 @@ class ButtonWidget(AbstractDataSetWidget):
         self.button.setToolTip(item.get_help())
         _icon = self.item.get_prop_value("display", "icon")
         if _icon is not None:
-            if isinstance(_icon, basestring):
+            if is_text_string(_icon):
                 _icon = get_icon(_icon)
             self.button.setIcon(_icon)
         QObject.connect(self.button, SIGNAL("clicked()"), self.clicked)

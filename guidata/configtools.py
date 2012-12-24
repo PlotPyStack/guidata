@@ -23,7 +23,9 @@ from guidata.qt.QtGui import (QFont, QLabel, QPixmap, QIcon, QHBoxLayout,
                               QColor, QPen, QBrush, QFontDatabase)
 from guidata.qt.QtCore import Qt
 
-from guidata.utils import get_module_path, fs_to_unicode
+from guidata.utils import get_module_path, decode_fs_string
+
+from guidata.py3compat import is_unicode, decode_string, to_text_string
 
 IMG_PATH = []
 
@@ -59,15 +61,15 @@ def get_translation(modname, dirname=None):
                                      codeset="utf-8")
         lgettext = _trans.lgettext
         def translate_gettext(x):
-            if isinstance(x, unicode):
+            if is_unicode(x):
                 x = x.encode("utf-8")
-            return unicode(lgettext(x), "utf-8")
+            return decode_string(lgettext(x), "utf-8")
         return translate_gettext
     except IOError as _e:
         #print "Not using translations (%s)" % _e
         def translate_dumb(x):
-            if not isinstance(x, unicode):
-                return unicode(x, "utf-8")
+            if not is_unicode(x):
+                return decode_string(x, "utf-8")
             return x
         return translate_dumb
 
@@ -80,8 +82,8 @@ def get_module_locale_path(modname):
 
 def add_image_path(path, subfolders=True):
     """Append image path (opt. with its subfolders) to global list IMG_PATH"""
-    if not isinstance(path, unicode):
-        path = fs_to_unicode(path)
+    if not is_unicode(path):
+        path = decode_fs_string(path)
     global IMG_PATH
     IMG_PATH.append(path)
     if subfolders:
@@ -157,10 +159,9 @@ def get_image_layout(imagename, text="", tooltip="", alignment=Qt.AlignLeft):
 
 
 def font_is_installed(font):
-    """
-    Check if font is installed
-    """
-    return [fam for fam in QFontDatabase().families() if unicode(fam)==font]
+    """Check if font is installed"""
+    return [fam for fam in QFontDatabase().families()
+            if to_text_string(fam)==font]
 
 
 MONOSPACE = ['Courier New', 'Bitstream Vera Sans Mono', 'Andale Mono',

@@ -46,7 +46,9 @@ import os
 import re
 import os.path as osp
 import sys
-from ConfigParser import ConfigParser, MissingSectionHeaderError
+
+from guidata.py3compat import configparser as cp
+from guidata.py3compat import is_text_string, is_unicode
 
 def _check_values(sections):
     # Checks if all key/value pairs are writable
@@ -96,7 +98,7 @@ def get_config_dir():
 class NoDefault:
     pass
 
-class UserConfig(ConfigParser):
+class UserConfig(cp.ConfigParser):
     """
     UserConfig class, based on ConfigParser
     name: name of the config
@@ -110,7 +112,7 @@ class UserConfig(ConfigParser):
     default_section_name = 'main'
     
     def __init__(self, defaults):
-        ConfigParser.__init__(self)
+        cp.ConfigParser.__init__(self)
         self.name = "none"
         self.raw = 0 # 0=substitutions are enabled / 1=raw config parser
         assert isinstance(defaults, dict)
@@ -192,7 +194,7 @@ class UserConfig(ConfigParser):
         """
         try:
             self.read(self.filename())
-        except MissingSectionHeaderError:
+        except cp.MissingSectionHeaderError:
             print("Warning: File contains no section headers.")
         
     def __remove_deprecated_options(self):
@@ -210,7 +212,7 @@ class UserConfig(ConfigParser):
         """
         Save config into the associated .ini file
         """
-        conf_file = file(self.filename(), 'w')
+        conf_file = open(self.filename(), 'w')
         self.write(conf_file)
         conf_file.close()
                 
@@ -254,9 +256,9 @@ class UserConfig(ConfigParser):
         """
         if section is None:
             section = self.default_section_name
-        elif not isinstance(section, basestring):
+        elif not is_text_string(section):
             raise RuntimeError("Argument 'section' must be a string")
-        if not isinstance(option, basestring):
+        if not is_text_string(option):
             raise RuntimeError("Argument 'option' must be a string")
         return section
 
@@ -297,7 +299,7 @@ class UserConfig(ConfigParser):
 
     def __get(self, section, option):
         """Get and convert value to the type of the default value"""
-        value = ConfigParser.get(self, section, option, self.raw)
+        value = cp.ConfigParser.get(self, section, option, self.raw)
         default_value = self.get_default(section, option)
         if isinstance(default_value, bool):
             value = eval(value)
@@ -313,7 +315,7 @@ class UserConfig(ConfigParser):
                 value = eval(value)
             except:
                 pass
-        if isinstance(value, unicode):
+        if is_unicode(value):
             value = utf8(value)
         return value
 
@@ -329,13 +331,12 @@ class UserConfig(ConfigParser):
         """
         if not self.has_section(section):
             self.add_section( section )
-        if not isinstance(value, (str, unicode)):
+        if not is_text_string(value):
             value = repr( value )
         if verbose:
             print('%s[ %s ] = %s' % (section, option, value))
-        if isinstance(value, unicode):
+        if is_unicode(value):
             value = utf8(value)
-        ConfigParser.set(self, section, option, value)
 
     def set_default(self, section, option, default_value):
         """
@@ -344,7 +345,7 @@ class UserConfig(ConfigParser):
         """
         section = self.__check_section_option(section, option)
         options = self.defaults.setdefault(section, {})
-        if isinstance(default_value, unicode):
+        if is_unicode(default_value):
             default_value = utf8(default_value)
         options[option] = default_value
 
@@ -364,7 +365,7 @@ class UserConfig(ConfigParser):
             value = float(value)
         elif isinstance(default_value, int):
             value = int(value)
-        elif not isinstance(default_value, (str, unicode)):
+        elif not is_text_string(default_value):
             value = repr(value)
         self.__set(section, option, value, verbose)
         if save:

@@ -6,7 +6,8 @@
 
 """Transitional package (PyQt4 --> PySide)"""
 
-import os, warnings
+import os
+import warnings
 
 _modname = os.environ.setdefault('QT_API', 'pyqt')
 assert _modname in ('pyqt', 'pyside')

@@ -129,7 +129,7 @@ def get_visual_studio_dlls(architecture=None, python_version=None):
 """ % dict(version=version, key=key, atype=atype, arch=arch)
 
         vc90man = "Microsoft.VC90.CRT.manifest"
-        file(vc90man, 'w').write(manifest)
+        open(vc90man, 'w').write(manifest)
         _remove_later(vc90man)
         filelist += [vc90man]
 
@@ -314,7 +314,7 @@ class Distribution(object):
     def add_text_data_file(self, filename, contents):
         """Create temporary data file *filename* with *contents*
         and add it to *data_files*"""
-        file(filename, 'wb').write(contents)
+        open(filename, 'wb').write(contents)
         self.data_files += [("", (filename, ))]
         _remove_later(filename)
     
@@ -345,9 +345,9 @@ class Distribution(object):
                 shutil.rmtree(pyqt_tmp)
             os.mkdir(pyqt_tmp)
             vc90man_pyqt = osp.join(pyqt_tmp, vc90man)
-            man = file(vc90man, "r").read().replace('<file name="',
+            man = open(vc90man, "r").read().replace('<file name="',
                                         '<file name="Microsoft.VC90.CRT\\')
-            file(vc90man_pyqt, 'w').write(man)
+            open(vc90man_pyqt, 'w').write(man)
         for dirpath, _, filenames in os.walk(osp.join(pyqt_path,
                                                       "plugins")):
             filelist = [osp.join(dirpath, f) for f in filenames
@@ -394,9 +394,9 @@ class Distribution(object):
             vc90man = "Microsoft.VC90.CRT.manifest"
             os.mkdir('pyside_tmp')
             vc90man_pyside = osp.join('pyside_tmp', vc90man)
-            man = file(vc90man, "r").read().replace('<file name="',
+            man = open(vc90man, "r").read().replace('<file name="',
                                         '<file name="Microsoft.VC90.CRT\\')
-            file(vc90man_pyside, 'w').write(man)
+            open(vc90man_pyside, 'w').write(man)
         for dirpath, _, filenames in os.walk(osp.join(pyside_path, "plugins")):
             filelist = [osp.join(dirpath, f) for f in filenames
                         if osp.splitext(f)[1] in ('.dll', '.py')]

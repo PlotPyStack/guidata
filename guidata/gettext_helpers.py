@@ -60,9 +60,9 @@ def do_rescan_files(files, modname, dirname):
         if not osp.exists( osp.join(localedir, lang, "LC_MESSAGES") ):
             os.mkdir( osp.join(localedir, lang, "LC_MESSAGES") )
         if not osp.exists( pofilepath ):
-            outf = file(pofilepath, "w")
+            outf = open(pofilepath, "w")
             outf.write("# -*- coding: utf-8 -*-\n")
-            data = file( potfilepath ).read()
+            data = open( potfilepath ).read()
             data = data.replace("charset=CHARSET", "charset=utf-8")
             data = data.replace("Content-Transfer-Encoding: ENCODING",
                                 "Content-Transfer-Encoding: utf-8")

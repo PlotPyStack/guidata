@@ -37,6 +37,7 @@ from guidata.qt.compat import getopenfilename, getopenfilenames, getsavefilename
 
 from guidata.configtools import get_icon
 from guidata.config import _
+from guidata.py3compat import to_text_string, is_text_string
 
 from guidata.dataset.datatypes import (BeginGroup, EndGroup, GroupItem,
                                        TabGroupItem)
@@ -482,7 +483,7 @@ class DataSetEditGroupBox(DataSetShowGroupBox):
                 button_text = _("Apply")
             if button_icon is None:
                 button_icon = get_icon("apply.png")
-            elif isinstance(button_icon, basestring):
+            elif is_text_string(button_icon):
                 button_icon = get_icon(button_icon)
             apply_btn = QPushButton(button_icon, button_text, self)
             self.connect(apply_btn, SIGNAL("clicked()"), self.set)
@@ -505,5 +506,5 @@ class DataSetEditGroupBox(DataSetShowGroupBox):
         """Return data item title combined with QApplication title"""
         app_name = QApplication.applicationName()
         if not app_name:
-            app_name = unicode(self.title())
+            app_name = to_text_string(self.title())
         return "%s - %s" % ( app_name, item.label() )

@@ -15,11 +15,14 @@ concrete DataItems.
 
 from __future__ import division
 
-import os, re, datetime
+import os
+import re
+import datetime
 
 from guidata.dataset.datatypes import DataItem, ItemProperty
 from guidata.utils import utf8_to_unicode, add_extension
 from guidata.config import _
+from guidata.py3compat import to_text_string, is_text_string, text_types
 
 
 class NumericTypeItem(DataItem):
@@ -80,7 +83,7 @@ class NumericTypeItem(DataItem):
 
     def from_string(self, value):
         """Override DataItem method"""
-        value = unicode(value) # necessary if value is a QString
+        value = to_text_string(value) # necessary if value is a QString
         # String may contains numerical operands:
         if re.match(r'^([\d\(\)\+/\-\*.]|e)+$', value):
             try:
@@ -179,7 +182,7 @@ class StringItem(DataItem):
         * notempty [bool]: if True, empty string is not a valid value (opt.)
         * wordwrap [bool]: toggle word wrapping (optional)
     """
-    type = (unicode, str)
+    type = text_types
     def __init__(self, label, default=None, notempty=None,
                  wordwrap=False, help=''):
         DataItem.__init__(self, label, default=default, help=help)
@@ -196,7 +199,7 @@ class StringItem(DataItem):
     def from_string(self, value):
         """Override DataItem method"""
         # QString -> str
-        return unicode(value)
+        return to_text_string(value)
 
     def get_value_from_reader(self, reader):
         """Reads value from the reader object, inside the try...except 
@@ -214,7 +217,7 @@ class TextItem(StringItem):
         * wordwrap [bool]: toggle word wrapping (optional)
     """
     def __init__(self, label, default=None, notempty=None,
-                 wordwrap=True,help=''):
+                 wordwrap=True, help=''):
         StringItem.__init__(self, label, default=default, notempty=notempty,
                             wordwrap=wordwrap, help=help)
 
@@ -340,7 +343,7 @@ class FilesOpenItem(FileSaveItem):
     type = list
     def __init__(self, label, formats='*', default=None,
                  basedir=None, all_files_first=False, help=''):
-        if isinstance(default, (unicode, str)):
+        if is_text_string(default):
             default = [default]
         FileSaveItem.__init__(self, label, formats=formats,
                               default=default, basedir=basedir,
@@ -356,7 +359,7 @@ class FilesOpenItem(FileSaveItem):
 
     def from_string(self, value):        
         """Override DataItem method"""
-        value = unicode(value)
+        value = to_text_string(value)
         if value.endswith("']"):
             value = eval(value)
         else:
@@ -371,7 +374,8 @@ class FilesOpenItem(FileSaveItem):
     def get_value_from_reader(self, reader):
         """Reads value from the reader object, inside the try...except 
         statement defined in the base item `deserialize` method"""
-        return [unicode(fname, "utf-8") for fname in reader.read_sequence()]
+        return [to_text_string(fname, "utf-8")
+                for fname in reader.read_sequence()]
 
 
 class DirectoryItem(StringItem):
@@ -440,7 +444,7 @@ class ChoiceItem(DataItem):
         #print "ShowChoiceWidget:", choices, value
         for choice in choices:
             if choice[0] == value:
-                return unicode(choice[1])
+                return to_text_string(choice[1])
         else:
             return DataItem.get_string_value(self, instance)
         
@@ -551,13 +555,13 @@ class FloatArrayItem(DataItem):
             for flt in v[:-1]:
                 text += fmt % flt + "; "
             text += fmt % v[-1] + "]"
-            return unicode(text)
+            return to_text_string(text)
         else:
             text = u"~= " + fmt % v.mean()
             text += " [" + fmt % v.min()
             text += " .. " + fmt % v.max()
             text += "]"
-            return unicode(text)
+            return to_text_string(text)
 
     def serialize(self, instance, writer):
         """Serialize this item"""

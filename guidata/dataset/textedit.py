@@ -12,9 +12,11 @@ Text visitor for DataItem objects
 
 from __future__ import print_function
 
+from guidata.py3compat import input
+
 def prompt(item):
     """Get item value"""
-    return raw_input(item.get_prop("display", "label")+" ? ")
+    return input(item.get_prop("display", "label")+" ? ")
 
 class TextEditVisitor:
     """Text visitor"""

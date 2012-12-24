@@ -24,6 +24,8 @@ import os
 import os.path as osp
 import locale
 
+from guidata.py3compat import is_unicode, to_text_string, is_text_string
+
 
 #==============================================================================
 # Misc.
@@ -49,12 +51,10 @@ def pairs(iterable):
 
 
 def add_extension(item, value):
-    """
-    Add extension to filename
+    """Add extension to filename
     `item`: data item representing a file path
-    `value`: possible value for data item
-    """
-    value = unicode(value)
+    `value`: possible value for data item"""
+    value = to_text_string(value)
     formats = item.get_prop("data", "formats")
     if len(formats) == 1 and formats[0] != '*':
         if not value.endswith('.' + formats[0]) and len(value) > 0:
@@ -93,24 +93,24 @@ def trace(fct):
 #==============================================================================
 # Strings
 #==============================================================================
-def fs_to_unicode(string):
+def decode_fs_string(string):
     """Convert string from file system charset to unicode"""
-    fs_encoding = sys.getfilesystemencoding()
-    if fs_encoding is None:
-        fs_encoding = locale.getpreferredencoding()
-    return string.decode(fs_encoding)
+    charset = sys.getfilesystemencoding()
+    if charset is None:
+        charset = locale.getpreferredencoding()
+    return string.decode(charset)
 
 def utf8_to_unicode(string):
     """Convert UTF-8 string to Unicode"""
-    if not isinstance(string, basestring):
-        string = unicode(string)
-    if not isinstance(string, unicode):
+    if not is_text_string(string):
+        string = to_text_string(string)
+    if not is_unicode(string):
         try:
-            string = unicode(string, "utf-8")
+            string = to_text_string(string, "utf-8")
         except UnicodeDecodeError:
             # This is border line... but we admit here string which has been 
             # erroneously encoded in file system charset instead of UTF-8
-            string = fs_to_unicode(string)
+            string = decode_fs_string(string)
     return string
 
 

@@ -23,6 +23,7 @@ import sys
 import re
 
 from guidata.utils import utf8_to_unicode, update_dataset
+from guidata.py3compat import to_text_string, is_text_string
 
 
 DEBUG_DESERIALIZE = False
@@ -231,8 +232,9 @@ class DataItem(object):
             func = self.get_prop_value("display", instance, "func", lambda x:x)
             if callable(fmt) and value is not None:
                 return fmt(func(value))
-            elif isinstance(fmt, basestring):
-                fmt = unicode(fmt)
+            elif is_text_string(fmt):
+                # This is only necessary with Python 2: converting to unicode
+                fmt = to_text_string(fmt)
 
             if value is not None:
                 text = self.format_string(instance, value, fmt, func)

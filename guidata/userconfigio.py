@@ -13,6 +13,8 @@ UserConfig reader/writer objects
 (see guidata.hdf5io for another example of reader/writer)
 """
 
+from guidata.py3compat import to_text_string, is_unicode
+
 
 class GroupContext(object):
     """Group context object"""
@@ -87,10 +89,10 @@ class UserConfigReader(UserConfigIOHandler):
 
     def read_unicode(self):
         val = self.read_any()
-        if isinstance(val, unicode):
+        if is_unicode(val):
             return val
         else:
-            return unicode(val, "utf-8")
+            return to_text_string(val, "utf-8")
 
     read_bool = read_int = read_float = read_any
     read_array = read_sequence = read_none = read_str = read_any

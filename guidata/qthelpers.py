@@ -24,15 +24,14 @@ from guidata.qt.QtCore import SIGNAL, Qt
 
 # Local imports:
 from guidata.configtools import get_icon
+from guidata.py3compat import is_text_string
 
 
 def text_to_qcolor(text):
     """Create a QColor from specified string"""
     color = QColor()
-    if not isinstance(text, basestring): # testing for QString (PyQt API#1)
+    if not is_text_string(text): # testing for QString (PyQt API#1)
         text = str(text)
-    if not isinstance(text, (unicode, str)):
-        return color
     if text.startswith('#') and len(text)==7:
         correct = '#0123456789abcdef'
         for char in text:
@@ -82,7 +81,7 @@ def create_toolbutton(parent, icon=None, text=None, triggered=None, tip=None,
     if text is not None:
         button.setText(text)
     if icon is not None:
-        if isinstance(icon, (str, unicode)):
+        if is_text_string(icon):
             icon = get_icon(icon)
         button.setIcon(icon)
     if text is not None or tip is not None:

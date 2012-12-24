@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright © 2011 Pierre Raybaut
+# Copyright © 2011-2012 Pierre Raybaut
 # Licensed under the terms of the MIT License
 # (see spyderlib/__init__.py for details)
 
@@ -19,9 +19,12 @@ This module should be fully compatible with:
 
 from __future__ import print_function
 
-import os, sys
+import os
+import sys
 
 from guidata.qt.QtGui import QFileDialog
+
+from guidata.py3compat import is_text_string, to_text_string
 
 #===============================================================================
 # QVariant conversion utilities
@@ -53,7 +56,7 @@ if os.environ['QT_API'] == 'pyqt':
         if PYQT_API_1:
             # PyQt API #1
             assert callable(convfunc)
-            if convfunc in (unicode, str):
+            if convfunc in (unicode, str):  #FIXME: later...
                 return convfunc(qobj.toString())
             elif convfunc is bool:
                 return qobj.toBool()
@@ -98,9 +101,9 @@ def getexistingdirectory(parent=None, caption='', basedir='',
         if sys.platform == "win32":
             # On Windows platforms: restore standard outputs
             sys.stdout, sys.stderr = _temp1, _temp2
-    if not isinstance(result, basestring):
+    if not is_text_string(result):
         # PyQt API #1
-        result = unicode(result)
+        result = to_text_string(result)
     return result
 
 def _qfiledialog_wrapper(attr, parent=None, caption='', basedir='',
@@ -146,13 +149,13 @@ def _qfiledialog_wrapper(attr, parent=None, caption='', basedir='',
         output = result
     if QString is not None:
         # PyQt API #1: conversions needed from QString/QStringList
-        selectedfilter = unicode(selectedfilter)
+        selectedfilter = to_text_string(selectedfilter)
         if isinstance(output, QString):
             # Single filename
-            output = unicode(output)
+            output = to_text_string(output)
         else:
             # List of filenames
-            output = [unicode(fname) for fname in output]
+            output = [to_text_string(fname) for fname in output]
             
     # Always returns the tuple (output, selectedfilter)
     return output, selectedfilter
@@ -197,4 +200,4 @@ if __name__ == '__main__':
     print(repr(getopenfilename(filters='*.py;;*.txt')))
     print(repr(getopenfilenames(filters='*.py;;*.txt')))
     print(repr(getsavefilename(filters='*.py;;*.txt')))
-    import sys; sys.exit()
+    sys.exit()
