@@ -569,7 +569,9 @@ class DataSetMeta(type):
         dct["_items"] = items_list
         return type.__new__(cls, name, bases, dct)
 
-class DataSet(object):
+Meta_Py3Compat = DataSetMeta('Meta_Py3Compat', (object, ), {})
+
+class DataSet(Meta_Py3Compat):
     """
     Construct a DataSet object is a set of DataItem objects
         * title [string]
