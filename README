@@ -27,7 +27,7 @@ Licensed under the terms of the CECILL License (see Licence_CeCILL_V2-en.txt)
     Dependencies
     
         Requirements
-            Python >=v2.6
+            Python >=2.6 or Python >=3.0
             PyQt4 4.x (x>=3 ; recommended x>=4)
             spyderlib >=v2.0.10 (test launcher and array/dictionnary editors)
 	    
