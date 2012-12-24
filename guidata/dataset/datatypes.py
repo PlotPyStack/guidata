@@ -21,6 +21,7 @@ from __future__ import print_function
 
 import sys
 import re
+import collections
 
 from guidata.utils import utf8_to_unicode, update_dataset
 from guidata.py3compat import to_text_string, is_text_string, u
@@ -230,7 +231,7 @@ class DataItem(object):
         else:
             fmt = self.get_prop_value("display", instance, "format", u("%s"))
             func = self.get_prop_value("display", instance, "func", lambda x:x)
-            if callable(fmt) and value is not None:
+            if isinstance(fmt, collections.Callable) and value is not None:
                 return fmt(func(value))
             elif is_text_string(fmt):
                 # This is only necessary with Python 2: converting to unicode

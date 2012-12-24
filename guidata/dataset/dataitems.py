@@ -18,6 +18,7 @@ from __future__ import division
 import os
 import re
 import datetime
+import collections
 
 from guidata.dataset.datatypes import DataItem, ItemProperty
 from guidata.utils import utf8_to_unicode, add_extension
@@ -407,13 +408,14 @@ class ChoiceItem(DataItem):
         * help [string]: text shown in tooltip (optional)
     """
     def __init__(self, label, choices, default=FirstChoice, help=''):
-        if callable(choices):
+        if isinstance(choices, collections.Callable):
             _choices_data = ItemProperty(choices)
         else:
             _choices_data = []
             for idx, choice in enumerate(choices):
                 _choices_data.append( self._normalize_choice(idx, choice) )
-        if default is FirstChoice and not callable(choices):
+        if default is FirstChoice and\
+           not isinstance(choices, collections.Callable):
             default = _choices_data[0][0]
         elif default is FirstChoice:
             default = None

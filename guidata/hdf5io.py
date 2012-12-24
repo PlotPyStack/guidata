@@ -13,6 +13,7 @@ from __future__ import print_function
 
 import sys
 from uuid import uuid1
+import collections
 
 import h5py
 import numpy as np
@@ -252,7 +253,8 @@ class HDF5Writer(HDF5Handler):
             self.write_none()
         elif isinstance(val, (list, tuple)):
             self.write_sequence(val)
-        elif hasattr(val, 'serialize') and callable(val.serialize):
+        elif hasattr(val, 'serialize') and isinstance(val.serialize,
+                                                      collections.Callable):
             # The object has a DataSet-like `serialize` method
             val.serialize(self)
         else:

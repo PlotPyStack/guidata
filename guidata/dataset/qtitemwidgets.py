@@ -20,6 +20,7 @@ import os
 import os.path as osp
 import sys
 import numpy
+import collections
 
 try:
     # PyQt4 4.3.3 on Windows (static DLLs) with py2exe installed:
@@ -643,7 +644,7 @@ class ChoiceWidget(AbstractDataSetWidget):
                     if not osp.isfile(img):
                         img = get_image_file_path(img)
                     img = QIcon(img)
-                elif callable(img):
+                elif isinstance(img, collections.Callable):
                     img = img(key)
                 self.combobox.addItem(img, lbl)
             else:

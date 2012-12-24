@@ -23,6 +23,7 @@ import subprocess
 import os
 import os.path as osp
 import locale # Warning: 2to3 false alarm ('import' fixer)
+import collections
 
 from guidata.py3compat import is_unicode, to_text_string, is_text_string
 
@@ -186,7 +187,7 @@ def assert_interface_supported(klass, iface):
     for name, func in list(iface.__dict__.items()):
         if name == '__inherits__':
             continue
-        if callable(func):
+        if isinstance(func, collections.Callable):
             assert hasattr(klass, name), \
                    "Attribute %s missing from %r" % (name, klass)
             imp_func = getattr(klass, name)

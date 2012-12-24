@@ -21,6 +21,7 @@ from __future__ import print_function
 
 import os
 import sys
+import collections
 
 from guidata.qt.QtGui import QFileDialog
 
@@ -55,7 +56,7 @@ if os.environ['QT_API'] == 'pyqt':
         to PyQt API #2 and Pyside (QVariant does not exist)"""
         if PYQT_API_1:
             # PyQt API #1
-            assert callable(convfunc)
+            assert isinstance(convfunc, collections.Callable)
             if convfunc in (unicode, str):  #FIXME: later...
                 return convfunc(qobj.toString())
             elif convfunc is bool:
