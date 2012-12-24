@@ -110,6 +110,28 @@ def decode_string(obj, encoding):
 
 
 #==============================================================================
+# Function attributes
+#==============================================================================
+def get_func_code(func):
+    """Return function code object"""
+    if is_python2:
+        # Python 2
+        return func.func_code
+    else:
+        # Python 3
+        return func.__code__
+
+def get_func_name(func):
+    """Return function name"""
+    if is_python2:
+        # Python 2
+        return func.func_name
+    else:
+        # Python 3
+        return func.__name__
+
+
+#==============================================================================
 # Misc.
 #==============================================================================
 if is_python2:
