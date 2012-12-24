@@ -52,7 +52,7 @@ def get_translation(modname, dirname=None):
         dirname = modname
     # fixup environment var LANG in case it's unknown
     if "LANG" not in os.environ:
-        import locale
+        import locale # Warning: 2to3 false alarm ('import' fixer)
         lang = locale.getdefaultlocale()[0]
         if lang is not None:
             os.environ["LANG"] = lang

@@ -22,7 +22,7 @@ import time
 import subprocess
 import os
 import os.path as osp
-import locale
+import locale # Warning: 2to3 false alarm ('import' fixer)
 
 from guidata.py3compat import is_unicode, to_text_string, is_text_string
 

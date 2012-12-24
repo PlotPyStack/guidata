@@ -16,7 +16,7 @@ from __future__ import print_function
 
 SHOW = True # Show test in GUI-based test launcher
 
-from all_features import TestParameters
+from guidata.tests.all_features import TestParameters
 from guidata.dataset.datatypes import BeginGroup, EndGroup
 from guidata.dataset.dataitems import FloatItem, BoolItem
 

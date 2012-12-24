@@ -26,7 +26,7 @@ from guidata.configtools import get_icon
 from guidata.qthelpers import create_action, add_actions, get_std_icon
 
 # Local test import:
-from activable_dataset import ExampleDataSet
+from guidata.tests.activable_dataset import ExampleDataSet
 
 class AnotherDataSet(DataSet):
     """

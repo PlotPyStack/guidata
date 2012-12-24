@@ -664,7 +664,7 @@ class DataSet(Meta_Py3Compat):
         """
         Edit data set with text input only
         """
-        import textedit
+        from guidata.dataset import textedit
         self.accept(textedit.TextEditVisitor(self))
 
     def edit(self, parent=None, apply=None, size=None):
