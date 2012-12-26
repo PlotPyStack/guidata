@@ -31,10 +31,17 @@ if is_python2:
     # Python 2
     import ConfigParser as configparser
     import _winreg as winreg
+    from sys import maxint as maxsize
+    try:
+        import CStringIO as io
+    except ImportError:
+        import StringIO as io
 else:
     # Python 3
     import configparser
     import winreg
+    from sys import maxsize
+    import io
 
 #==============================================================================
 # Strings
