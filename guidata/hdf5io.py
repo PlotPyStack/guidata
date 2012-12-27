@@ -13,15 +13,14 @@ from __future__ import print_function
 
 import sys
 from uuid import uuid1
-import collections
 
 import h5py
 import numpy as np
 
 from guidata.utils import utf8_to_unicode
-from guidata.userconfigio import BaseIOHandler
+from guidata.userconfigio import BaseIOHandler, WriterMixin
 
-from guidata.py3compat import to_text_string, is_unicode
+from guidata.py3compat import to_text_string
 
 
 class TypeConverter(object):
@@ -224,44 +223,11 @@ class HDF5Handler(H5Store, BaseIOHandler):
             parent = parent.require_group(option)
         return parent
 
-class HDF5Writer(HDF5Handler):
+class HDF5Writer(HDF5Handler, WriterMixin):
     """Writer for HDF5 files"""
     def __init__(self, filename):
         super(HDF5Writer, self).__init__(filename)
         self.open("w")
-    
-    def write(self, val, group_name=None):
-        """Write value using the appropriate routine depending on value type
-        
-        group_name: if None, writing the value in current group"""
-        from numpy import ndarray
-        if group_name:
-            self.begin(group_name)
-        if isinstance(val, bool):
-            self.write_bool(val)
-        elif isinstance(val, int):
-            self.write_int(val)
-        elif isinstance(val, float):
-            self.write_int(val)
-        elif is_unicode(val):
-            self.write_unicode(val)
-        elif isinstance(val, str):
-            self.write_any(val)
-        elif isinstance(val, ndarray):
-            self.write_array(val)
-        elif val is None:
-            self.write_none()
-        elif isinstance(val, (list, tuple)):
-            self.write_sequence(val)
-        elif hasattr(val, 'serialize') and isinstance(val.serialize,
-                                                      collections.Callable):
-            # The object has a DataSet-like `serialize` method
-            val.serialize(self)
-        else:
-            raise NotImplementedError("cannot serialize %r of type %r" %
-                                      (val, type(val)))
-        if group_name:
-            self.end(group_name)
 
     def write_any(self, val):
         group = self.get_parent_group()

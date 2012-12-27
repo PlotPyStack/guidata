@@ -13,6 +13,8 @@ UserConfig reader/writer objects
 (see guidata.hdf5io for another example of reader/writer)
 """
 
+import collections
+
 from guidata.py3compat import to_text_string, is_unicode
 
 
@@ -67,7 +69,41 @@ class UserConfigIOHandler(BaseIOHandler):
         the `with` statement"""
         return GroupContext(self, option)
 
-class UserConfigWriter(UserConfigIOHandler):
+class WriterMixin(object):
+    def write(self, val, group_name=None):
+        """Write value using the appropriate routine depending on value type
+        
+        group_name: if None, writing the value in current group"""
+        from numpy import ndarray
+        if group_name:
+            self.begin(group_name)
+        if isinstance(val, bool):
+            self.write_bool(val)
+        elif isinstance(val, int):
+            self.write_int(val)
+        elif isinstance(val, float):
+            self.write_int(val)
+        elif is_unicode(val):
+            self.write_unicode(val)
+        elif isinstance(val, str):
+            self.write_any(val)
+        elif isinstance(val, ndarray):
+            self.write_array(val)
+        elif val is None:
+            self.write_none()
+        elif isinstance(val, (list, tuple)):
+            self.write_sequence(val)
+        elif hasattr(val, 'serialize') and isinstance(val.serialize,
+                                                      collections.Callable):
+            # The object has a DataSet-like `serialize` method
+            val.serialize(self)
+        else:
+            raise NotImplementedError("cannot serialize %r of type %r" %
+                                      (val, type(val)))
+        if group_name:
+            self.end(group_name)
+
+class UserConfigWriter(UserConfigIOHandler, WriterMixin):
     def write_any(self, val):
         option = "/".join(self.option)
         self.conf.set(self.section, option, val)
@@ -89,7 +125,7 @@ class UserConfigReader(UserConfigIOHandler):
 
     def read_unicode(self):
         val = self.read_any()
-        if is_unicode(val):
+        if is_unicode(val) or val is None:
             return val
         else:
             return to_text_string(val, "utf-8")
