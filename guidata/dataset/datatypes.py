@@ -580,6 +580,8 @@ class DataSet(Meta_Py3Compat):
         * icon [QIcon or string]: icon show on the button (optional)
           (string: icon filename as in guidata/guiqwt image search paths)
     """
+    __metaclass__ = DataSetMeta # keep it even with Python 3 (see DataSetMeta)
+    
     def __init__(self, title=None, comment=None, icon=''):
         self.__title = title
         self.__comment = comment
