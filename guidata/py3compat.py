@@ -106,7 +106,7 @@ def is_unicode(obj):
         return isinstance(obj, unicode)
     else:
         # Python 3
-        return True
+        return isinstance(obj, str)
 
 def decode_string(obj, encoding):
     """Decode string object to text string using passed encoding.
