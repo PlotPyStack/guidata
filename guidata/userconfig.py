@@ -337,6 +337,7 @@ class UserConfig(cp.ConfigParser):
             print('%s[ %s ] = %s' % (section, option, value))
         if is_unicode(value):
             value = utf8(value)
+        cp.ConfigParser.set(self, section, option, value)
 
     def set_default(self, section, option, default_value):
         """
