@@ -48,7 +48,7 @@ import os.path as osp
 import sys
 
 from guidata.py3compat import configparser as cp
-from guidata.py3compat import is_text_string, is_unicode
+from guidata.py3compat import is_text_string, is_unicode, is_python2
 
 def _check_values(sections):
     # Checks if all key/value pairs are writable
@@ -85,12 +85,15 @@ def get_home_dir():
     else:
         raise RuntimeError('Please define environment variable $HOME')
 
-def utf8(x):
-    """Encode unicode string in UTF-8"""
-    return x.encode("utf-8")
+def encode_to_utf8(x):
+    """Encode unicode string in UTF-8 -- but only with Python 2"""
+    if is_python2 and is_unicode(x):
+        return x.encode("utf-8")
+    else:
+        return x
     
 def get_config_dir():
-    if sys.platform=="win32":
+    if sys.platform == "win32":
         # TODO: on windows config files usually go in
         return get_home_dir()
     return osp.join(get_home_dir(), ".config")
@@ -293,13 +296,13 @@ class UserConfig(cp.ConfigParser):
                 self.set(section, option, default)
                 return default
         value = self.__get(section, option)
-        if isinstance(value, str):
+        if is_python2 and isinstance(value, str):
             return value.decode("utf-8")
         return value
 
     def __get(self, section, option):
         """Get and convert value to the type of the default value"""
-        value = cp.ConfigParser.get(self, section, option, self.raw)
+        value = cp.ConfigParser.get(self, section, option, raw=self.raw)
         default_value = self.get_default(section, option)
         if isinstance(default_value, bool):
             value = eval(value)
@@ -315,9 +318,7 @@ class UserConfig(cp.ConfigParser):
                 value = eval(value)
             except:
                 pass
-        if is_unicode(value):
-            value = utf8(value)
-        return value
+        return encode_to_utf8(value)
 
     def get_section(self, section):
         sect = self.defaults.get(section, {}).copy()
@@ -335,9 +336,7 @@ class UserConfig(cp.ConfigParser):
             value = repr( value )
         if verbose:
             print('%s[ %s ] = %s' % (section, option, value))
-        if is_unicode(value):
-            value = utf8(value)
-        cp.ConfigParser.set(self, section, option, value)
+        cp.ConfigParser.set(self, section, option, encode_to_utf8(value))
 
     def set_default(self, section, option, default_value):
         """
@@ -346,9 +345,7 @@ class UserConfig(cp.ConfigParser):
         """
         section = self.__check_section_option(section, option)
         options = self.defaults.setdefault(section, {})
-        if is_unicode(default_value):
-            default_value = utf8(default_value)
-        options[option] = default_value
+        options[option] = encode_to_utf8(default_value)
 
     def set(self, section, option, value, verbose=False, save=True):
         """

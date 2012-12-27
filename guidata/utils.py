@@ -102,6 +102,7 @@ def decode_fs_string(string):
         charset = locale.getpreferredencoding()
     return string.decode(charset)
 
+#TODO: Py3/I'm really not satisfied with this code even if it's compatible with Py3
 def utf8_to_unicode(string):
     """Convert UTF-8 string to Unicode"""
     if not is_text_string(string):

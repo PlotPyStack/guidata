@@ -20,7 +20,7 @@ import numpy as np
 from guidata.utils import utf8_to_unicode
 from guidata.userconfigio import BaseIOHandler, WriterMixin
 
-from guidata.py3compat import to_text_string
+from guidata.py3compat import to_text_string, is_python3
 
 
 class TypeConverter(object):
@@ -42,6 +42,7 @@ class TypeConverter(object):
         return self._from_type(value)
 
 
+#TODO: Py3/Test if the 'unicode_hdf' type converter is working with Python 3
 unicode_hdf = TypeConverter(lambda x: x.encode("utf-8"), utf8_to_unicode)
 int_hdf = TypeConverter(int)
 
@@ -238,11 +239,13 @@ class HDF5Writer(HDF5Handler, WriterMixin):
     def write_bool(self, val):
         self.write_int(int(val))
     
+    write_str = write_any
+
     def write_unicode(self, val):
         group = self.get_parent_group()
         group.attrs[self.option[-1]] = val.encode("utf-8")
-
-    write_str = write_any
+    if is_python3:
+        write_unicode = write_str
 
     def write_array(self, val):
         group = self.get_parent_group()
@@ -327,6 +330,8 @@ class HDF5Reader(HDF5Handler):
 
     def read_unicode(self):
         return to_text_string(self.read_any(), "utf-8")
+    if is_python3:
+        read_unicode = read_str
     
     def read_array(self):
         group = self.get_parent_group()

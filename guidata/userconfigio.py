@@ -15,7 +15,7 @@ UserConfig reader/writer objects
 
 import collections
 
-from guidata.py3compat import to_text_string, is_unicode
+from guidata.py3compat import is_unicode, is_python3
 
 
 class GroupContext(object):
@@ -108,14 +108,16 @@ class UserConfigWriter(UserConfigIOHandler, WriterMixin):
         option = "/".join(self.option)
         self.conf.set(self.section, option, val)
 
+    write_bool = write_int = write_float = write_any
+    write_array = write_sequence = write_str = write_any
+
     def write_unicode(self, val):
         self.write_any(val.encode("utf-8"))
+    if is_python3:
+        write_unicode = write_str
 
     def write_none(self):
         self.write_any(None)
-
-    write_bool = write_int = write_float = write_any
-    write_array = write_sequence = write_any
 
 class UserConfigReader(UserConfigIOHandler):
     def read_any(self):
@@ -123,12 +125,14 @@ class UserConfigReader(UserConfigIOHandler):
         val = self.conf.get(self.section, option)
         return val
 
+    read_bool = read_int = read_float = read_any
+    read_array = read_sequence = read_none = read_str = read_any
+
     def read_unicode(self):
         val = self.read_any()
         if is_unicode(val) or val is None:
             return val
         else:
-            return to_text_string(val, "utf-8")
-
-    read_bool = read_int = read_float = read_any
-    read_array = read_sequence = read_none = read_str = read_any
+            return self.read_str()
+    if is_python3:
+        read_unicode = read_str
