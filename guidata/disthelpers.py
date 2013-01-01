@@ -89,8 +89,21 @@ def _remove_later(fname):
             os.remove(fname)
     atexit.register(try_to_remove, osp.abspath(fname))
 
-def get_visual_studio_dlls(architecture=None, python_version=None):
-    """Get the list of Microsoft Visual C++ 2008 DLLs associated to 
+def get_msvc_version(python_version):
+    """Return Microsoft Visual C++ version used to build this Python version"""
+    if python_version in ('2.6', '2.7', '3.0', '3.1', '3.2'):
+        # Python 2.6-2.7, 3.0-3.2 were built with Visual Studio 9.0.21022.8
+        # (i.e. Visual C++ 2008, not Visual C++ 2008 SP1!)
+        return "9.0.21022.8"
+    elif python_version in ('3.3', '3.4'):
+        # Python 3.3+ were built with Visual Studio 10.0.30319.1
+        # (i.e. Visual C++ 2010)
+        return '10.0'
+    else:
+        raise RuntimeError("Unsupported Python version %s" % python_version)
+
+def get_msvc_dlls(architecture=None, python_version=None):
+    """Get the list of Microsoft Visual C++ DLLs associated to 
     architecture and Python version, create the manifest file.
     
     architecture: integer (32 or 64) -- if None, take the Python build arch
@@ -104,10 +117,9 @@ def get_visual_studio_dlls(architecture=None, python_version=None):
 
     filelist = []
 
-    if python_version in ('2.6', '2.7', '3.0', '3.1', '3.2'):
-        # Python 2.6-2.7, 3.0-3.2 were built with Visual Studio 9.0.21022.8
-        # (i.e. Visual C++ 2008, not Visual C++ 2008 SP1!)
-        version = "9.0.21022.8"
+    msvc_version = get_msvc_version(python_version)
+    msvc_major = msvc_version.split('.')[0]
+    if msvc_major == '9':
         key = "1fc8b3b9a1e18e3b"
         atype = "" if architecture == 64 else "win32"
         arch = "amd64" if architecture == 64 else "x86"
@@ -126,14 +138,14 @@ def get_visual_studio_dlls(architecture=None, python_version=None):
     <file name="msvcp90.dll" />
     <file name="msvcm90.dll" />
 </assembly>
-""" % dict(version=version, key=key, atype=atype, arch=arch)
+""" % dict(version=msvc_version, key=key, atype=atype, arch=arch)
 
         vc90man = "Microsoft.VC90.CRT.manifest"
         open(vc90man, 'w').write(manifest)
         _remove_later(vc90man)
         filelist += [vc90man]
 
-        vc_str = '%s_Microsoft.VC90.CRT_%s_%s' % (arch, key, version)
+        vc_str = '%s_Microsoft.VC90.CRT_%s_%s' % (arch, key, msvc_version)
         winsxs = osp.join(os.environ['windir'], 'WinSxS')
         for fname in os.listdir(winsxs):
             path = osp.join(winsxs, fname)
@@ -143,12 +155,9 @@ def get_visual_studio_dlls(architecture=None, python_version=None):
                 break
         else:
             raise RuntimeError("Microsoft Visual C++ DLLs version %s "\
-                                "were not found" % version)
+                                "were not found" % msvc_version)
 
-    elif python_version in ('3.3', '3.4'):
-        # Python 3.3+ were built with Visual Studio 10.0.30319.1
-        # (i.e. Visual C++ 2010)
-        version = '10.0'
+    elif msvc_major == '10':
         namelist = ['msvcp100.dll', 'msvcr100.dll']
         sysdir = "SysWOW64" if architecture == 64 else "System32"
         for dllname in namelist:
@@ -157,23 +166,28 @@ def get_visual_studio_dlls(architecture=None, python_version=None):
                 filelist.append(fname)
             else:
                 raise RuntimeError("Microsoft Visual C++ DLLs version %s "\
-                                    "were not found" % version)
+                                   "were not found" % msvc_version)
 
     else:
-        raise RuntimeError("Unsupported Python version %s" % python_version)
+        raise RuntimeError("Unsupported MSVC version %s" % msvc_version)
     
     return filelist
 
-def create_vs2008_data_files(architecture=None, python_version=None,
-                             verbose=False):
-    """Including Microsoft Visual C++ 2008 DLLs"""
-    filelist = get_visual_studio_dlls(architecture=architecture,
-                                      python_version=python_version)
-    print(create_vs2008_data_files.__doc__)
+def create_msvc_data_files(architecture=None, python_version=None,
+                           verbose=False):
+    """Including Microsoft Visual C++ DLLs"""
+    filelist = get_msvc_dlls(architecture=architecture,
+                             python_version=python_version)
+    print(create_msvc_data_files.__doc__)
     if verbose:
         for name in filelist:
             print("  ", name)
-    return [("Microsoft.VC90.CRT", filelist),]
+    msvc_version = get_msvc_version(python_version)
+    msvc_major = msvc_version.split('.')[0]
+    if msvc_major == '9':
+        return [("Microsoft.VC90.CRT", filelist),]
+    else:
+        return [("", filelist),]
 
 
 def to_include_files(data_files):
@@ -226,7 +240,7 @@ class Distribution(object):
                         'pywin.debugger', 'pywin.debugger.dbgcon',
                         'matplotlib']
     DEFAULT_INCLUDES = []
-    DEFAULT_BIN_EXCLUDES = ['MSVCP90.dll', 'w9xpopen.exe',
+    DEFAULT_BIN_EXCLUDES = ['MSVCP100.dll', 'MSVCP90.dll', 'w9xpopen.exe',
                             'MSVCP80.dll', 'MSVCR80.dll']
     DEFAULT_BIN_INCLUDES = []
     DEFAULT_BIN_PATH_INCLUDES = []
@@ -246,7 +260,7 @@ class Distribution(object):
         self.bin_excludes = self.DEFAULT_BIN_EXCLUDES
         self.bin_path_includes = self.DEFAULT_BIN_PATH_INCLUDES
         self.bin_path_excludes = self.DEFAULT_BIN_PATH_EXCLUDES
-        self.vs2008 = os.name == 'nt'
+        self.msvc = os.name == 'nt'
         self._py2exe_is_loaded = False
         self._pyqt4_added = False
         self._pyside_added = False
@@ -269,12 +283,12 @@ class Distribution(object):
               target_name=None, target_dir=None, icon=None,
               data_files=None, includes=None, excludes=None,
               bin_includes=None, bin_excludes=None,
-              bin_path_includes=None, bin_path_excludes=None, vs2008=None):
+              bin_path_includes=None, bin_path_excludes=None, msvc=None):
         """Setup distribution object
         
         Notes:
           * bin_path_excludes is specific to cx_Freeze (ignored if it's None)
-          * if vs2008 is None, it's set to True by default on Windows 
+          * if msvc is None, it's set to True by default on Windows 
             platforms, False on non-Windows platforms
         """
         self.name = name
@@ -299,14 +313,14 @@ class Distribution(object):
             self.bin_path_includes += bin_path_includes
         if bin_path_excludes is not None:
             self.bin_path_excludes += bin_path_excludes
-        if vs2008 is not None:
-            self.vs2008 = vs2008
-        if self.vs2008:
+        if msvc is not None:
+            self.msvc = msvc
+        if self.msvc:
             try:
-                self.data_files += create_vs2008_data_files()
+                self.data_files += create_msvc_data_files()
             except IOError:
-                print("Setting the vs2008 option to False "\
-                                    "will avoid this error", file=sys.stderr)
+                print("Setting the msvc option to False "\
+                      "will avoid this error", file=sys.stderr)
                 raise
         # cx_Freeze:
         self.add_executable(self.script, self.target_name, icon=self.icon)
@@ -338,7 +352,7 @@ class Distribution(object):
         self.add_text_data_file('qt.conf', conf)
         
         # Including plugins (.svg icons support, QtDesigner support, ...)
-        if self.vs2008:
+        if self.msvc:
             vc90man = "Microsoft.VC90.CRT.manifest"
             pyqt_tmp = 'pyqt_tmp'
             if osp.isdir(pyqt_tmp):
@@ -352,7 +366,7 @@ class Distribution(object):
                                                       "plugins")):
             filelist = [osp.join(dirpath, f) for f in filenames
                         if osp.splitext(f)[1] in ('.dll', '.py')]
-            if self.vs2008 and [f for f in filelist
+            if self.msvc and [f for f in filelist
                            if osp.splitext(f)[1] == '.dll']:
                 # Where there is a DLL build with Microsoft Visual C++ 2008,
                 # there must be a manifest file as well...
@@ -360,7 +374,7 @@ class Distribution(object):
                 filelist.append(vc90man_pyqt)
             self.data_files.append( (dirpath[len(pyqt_path)+len(os.pathsep):],
                                      filelist) )
-        if self.vs2008:
+        if self.msvc:
             atexit.register(remove_dir, pyqt_tmp)
         
         # Including french translation
@@ -390,7 +404,7 @@ class Distribution(object):
         self.add_text_data_file('qt.conf', conf)
         
         # Including plugins (.svg icons support, QtDesigner support, ...)
-        if self.vs2008:
+        if self.msvc:
             vc90man = "Microsoft.VC90.CRT.manifest"
             os.mkdir('pyside_tmp')
             vc90man_pyside = osp.join('pyside_tmp', vc90man)
@@ -400,8 +414,8 @@ class Distribution(object):
         for dirpath, _, filenames in os.walk(osp.join(pyside_path, "plugins")):
             filelist = [osp.join(dirpath, f) for f in filenames
                         if osp.splitext(f)[1] in ('.dll', '.py')]
-            if self.vs2008 and [f for f in filelist
-                           if osp.splitext(f)[1] == '.dll']:
+            if self.msvc and [f for f in filelist
+                              if osp.splitext(f)[1] == '.dll']:
                 # Where there is a DLL build with Microsoft Visual C++ 2008,
                 # there must be a manifest file as well...
                 # ...congrats to Microsoft for this great simplification!
@@ -416,7 +430,7 @@ class Distribution(object):
                 if osp.splitext(fname)[1] == '.dll']
         self.data_files.append( ('', dlls) )
 
-        if self.vs2008:
+        if self.msvc:
             atexit.register(remove_dir, 'pyside_tmp')
         
         # Including french translation
