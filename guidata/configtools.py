@@ -25,7 +25,7 @@ from guidata.qt.QtCore import Qt
 
 from guidata.utils import get_module_path, decode_fs_string
 
-from guidata.py3compat import (is_unicode, decode_string, to_text_string,
+from guidata.py3compat import (is_unicode, to_text_string,
                                is_python3, is_text_string)
 
 IMG_PATH = []
@@ -68,13 +68,13 @@ def get_translation(modname, dirname=None):
             if is_text_string(y) and is_python3:
                 return y
             else:
-                return decode_string(y, "utf-8")
+                return to_text_string(y, "utf-8")
         return translate_gettext
     except IOError as _e:
         #print "Not using translations (%s)" % _e
         def translate_dumb(x):
             if not is_unicode(x):
-                return decode_string(x, "utf-8")
+                return to_text_string(x, "utf-8")
             return x
         return translate_dumb
 

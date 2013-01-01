@@ -29,6 +29,7 @@ is_python3 = sys.version[0] == '3'
 #==============================================================================
 if is_python2:
     # Python 2
+    import __builtin__ as builtins
     import ConfigParser as configparser
     import _winreg as winreg
     from sys import maxint as maxsize
@@ -36,12 +37,20 @@ if is_python2:
         import CStringIO as io
     except ImportError:
         import StringIO as io
+    try:
+        import cPickle as pickle
+    except ImportError:
+        import pickle
+    from UserDict import DictMixin as MutableMapping
 else:
     # Python 3
+    import builtins
     import configparser
     import winreg
     from sys import maxsize
     import io
+    import pickle
+    from collections import MutableMapping
 
 #==============================================================================
 # Strings
@@ -49,9 +58,12 @@ else:
 if is_python2:
     # Python 2
     text_types = (str, unicode)
+    int_types = (int, long)
 else:
     # Python 3
     text_types = (str,)
+    int_types = (int,)
+numeric_types = tuple(list(int_types) + [float, complex])
 
 if is_python2:
     # Python 2
@@ -84,6 +96,20 @@ def is_binary_string(obj):
         # Python 3
         return isinstance(obj, bytes)
 
+def is_string(obj):
+    """Return True if `obj` is a text or binary Python string object,
+    False if it is anything else, like a QString (Python 2, PyQt API #1)"""
+    return is_text_string(obj) or is_binary_string(obj)
+
+def is_unicode(obj):
+    """Return True if `obj` is unicode"""
+    if is_python2:
+        # Python 2
+        return isinstance(obj, unicode)
+    else:
+        # Python 3
+        return isinstance(obj, str)
+
 def to_text_string(obj, encoding=None):
     """Convert `obj` to (unicode) text string"""
     if is_python2:
@@ -96,27 +122,20 @@ def to_text_string(obj, encoding=None):
         # Python 3
         if encoding is None:
             return str(obj)
+        elif isinstance(obj, str):
+            # In case this function is not used properly, this could happen
+            return obj
         else:
             return str(obj, encoding)
 
-def is_unicode(obj):
-    """Return True if `obj` is unicode"""
+def to_binary_string(obj):
+    """Convert `obj` to binary string (bytes in Python 3, str in Python 2)"""
     if is_python2:
         # Python 2
-        return isinstance(obj, unicode)
+        return str(obj)
     else:
         # Python 3
-        return isinstance(obj, str)
-
-def decode_string(obj, encoding):
-    """Decode string object to text string using passed encoding.
-    Python 2 will return unicode."""
-    if is_python2:
-        # Python 2
-        return unicode(obj, encoding)
-    else:
-        # Python 3
-        return obj.decode(encoding)
+        return bytes(obj)
 
 
 #==============================================================================
@@ -140,6 +159,46 @@ def get_func_name(func):
         # Python 3
         return func.__name__
 
+def get_func_defaults(func):
+    """Return function default argument values"""
+    if is_python2:
+        # Python 2
+        return func.func_defaults
+    else:
+        # Python 3
+        return func.__defaults__
+
+
+#==============================================================================
+# Special method attributes
+#==============================================================================
+def get_meth_func(obj):
+    """Return method function object"""
+    if is_python2:
+        # Python 2
+        return obj.im_func
+    else:
+        # Python 3
+        return obj.__func__
+
+def get_meth_class_inst(obj):
+    """Return method class instance"""
+    if is_python2:
+        # Python 2
+        return obj.im_self
+    else:
+        # Python 3
+        return obj.__self__
+
+def get_meth_class(obj):
+    """Return method class"""
+    if is_python2:
+        # Python 2
+        return obj.im_class
+    else:
+        # Python 3
+        return obj.__self__.__class__
+
 
 #==============================================================================
 # Misc.
@@ -147,16 +206,21 @@ def get_func_name(func):
 if is_python2:
     # Python 2
     input = raw_input
+    getcwd = os.getcwdu
+    cmp = cmp
+    import string
+    str_lower = string.lower
 else:
     # Python 3
     input = input
-
-if is_python2:
-    # Python 2
-    getcwd = os.getcwdu
-else:
-    # Python 3
     getcwd = os.getcwd
+    def cmp(a, b):
+        return (a > b) - (a < b)
+    str_lower = str.lower
+
+def qbytearray_to_str(qba):
+    """Convert QByteArray object to str in a way compatible with Python 2/3"""
+    return str(bytes(qba.toHex()).decode())
 
 
 if __name__ == '__main__':
