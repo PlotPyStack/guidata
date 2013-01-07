@@ -161,6 +161,9 @@ def get_msvc_dlls(architecture=None, python_version=None):
     elif msvc_major == '10':
         namelist = ['msvcp100.dll', 'msvcr100.dll']
         
+        windir = os.environ['windir']
+        is_64bit_windows = osp.isdir(osp.join(windir, "SysWOW64"))
+
         # Reminder: WoW64 (*W*indows 32-bit *o*n *W*indows *64*-bit) is a 
         # subsystem of the Windows operating system capable of running 32-bit 
         # applications and is included on all 64-bit versions of Windows
@@ -170,13 +173,13 @@ def get_msvc_dlls(architecture=None, python_version=None):
         # whereas "System32" contains 64-bit DLL and applications on a 64-bit 
         # system.
         sysdir = "System32"
-        if current_architecture == 32 and architecture == 64:
+        if not is_64bit_windows and architecture == 64:
             raise RuntimeError("Can't find 64-bit MSVC DLLs on a 32-bit OS")
-        if current_architecture == 64 and architecture == 32:
+        if is_64bit_windows and architecture == 32:
             sysdir = "SysWOW64"
 
         for dllname in namelist:
-            fname = osp.join(os.environ['windir'], sysdir, dllname)
+            fname = osp.join(windir, sysdir, dllname)
             if osp.exists(fname):
                 filelist.append(fname)
             else:
