@@ -128,14 +128,17 @@ def to_text_string(obj, encoding=None):
         else:
             return str(obj, encoding)
 
-def to_binary_string(obj):
+def to_binary_string(obj, encoding=None):
     """Convert `obj` to binary string (bytes in Python 3, str in Python 2)"""
     if is_python2:
         # Python 2
-        return str(obj)
+        if encoding is None:
+            return str(obj)
+        else:
+            return obj.encode(encoding)
     else:
         # Python 3
-        return bytes(obj)
+        return bytes(obj, 'utf-8' if encoding is None else encoding)
 
 
 #==============================================================================
