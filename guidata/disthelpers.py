@@ -26,6 +26,7 @@ import traceback
 import atexit
 import imp
 from subprocess import Popen, PIPE
+import warnings
 
 # Local imports
 from guidata.configtools import get_module_path
@@ -91,6 +92,9 @@ def _remove_later(fname):
 
 def get_msvc_version(python_version):
     """Return Microsoft Visual C++ version used to build this Python version"""
+    if python_version is None:
+        python_version = '2.7'
+        warnings.warn("assuming Python 2.7 target")
     if python_version in ('2.6', '2.7', '3.0', '3.1', '3.2'):
         # Python 2.6-2.7, 3.0-3.2 were built with Visual Studio 9.0.21022.8
         # (i.e. Visual C++ 2008, not Visual C++ 2008 SP1!)
@@ -111,10 +115,6 @@ def get_msvc_dlls(architecture=None, python_version=None):
     current_architecture = 64 if sys.maxsize > 2**32 else 32
     if architecture is None:
         architecture = current_architecture
-
-    if python_version is None:
-        python_version = '2.7'
-        print("Warning/disthelpers: assuming Python 2.7 target", file=sys.stderr)
 
     filelist = []
 
