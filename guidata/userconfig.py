@@ -196,7 +196,12 @@ class UserConfig(cp.ConfigParser):
         Load config from the associated .ini file
         """
         try:
-            self.read(self.filename())
+            if is_python2:
+                # Python 2
+                self.read(self.filename())
+            else:
+                # Python 3
+                self.read(self.filename(), encoding='utf-8')
         except cp.MissingSectionHeaderError:
             print("Warning: File contains no section headers.")
         
@@ -215,9 +220,17 @@ class UserConfig(cp.ConfigParser):
         """
         Save config into the associated .ini file
         """
-        conf_file = open(self.filename(), 'w')
-        self.write(conf_file)
-        conf_file.close()
+        fname = self.filename()
+        if osp.isfile(fname):
+            os.remove(fname)
+        if is_python2:
+            # Python 2
+            with open(fname, 'w') as configfile:
+                self.write(configfile)
+        else:
+            # Python 3
+            with open(fname, 'w', encoding='utf-8') as configfile:
+                self.write(configfile)
                 
     def filename(self):
         """
