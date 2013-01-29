@@ -20,7 +20,7 @@ import numpy as np
 from guidata.utils import utf8_to_unicode
 from guidata.userconfigio import BaseIOHandler, WriterMixin
 
-from guidata.py3compat import to_text_string, is_python3
+from guidata.py3compat import to_text_string, PY3
 
 
 class TypeConverter(object):
@@ -244,7 +244,7 @@ class HDF5Writer(HDF5Handler, WriterMixin):
     def write_unicode(self, val):
         group = self.get_parent_group()
         group.attrs[self.option[-1]] = val.encode("utf-8")
-    if is_python3:
+    if PY3:
         write_unicode = write_str
 
     def write_array(self, val):
@@ -330,7 +330,7 @@ class HDF5Reader(HDF5Handler):
 
     def read_unicode(self):
         return to_text_string(self.read_any(), "utf-8")
-    if is_python3:
+    if PY3:
         read_unicode = read_str
     
     def read_array(self):

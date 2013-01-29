@@ -48,7 +48,7 @@ import os.path as osp
 import sys
 
 from guidata.py3compat import configparser as cp
-from guidata.py3compat import is_text_string, is_unicode, is_python2
+from guidata.py3compat import is_text_string, is_unicode, PY2
 
 def _check_values(sections):
     # Checks if all key/value pairs are writable
@@ -87,7 +87,7 @@ def get_home_dir():
 
 def encode_to_utf8(x):
     """Encode unicode string in UTF-8 -- but only with Python 2"""
-    if is_python2 and is_unicode(x):
+    if PY2 and is_unicode(x):
         return x.encode("utf-8")
     else:
         return x
@@ -196,7 +196,7 @@ class UserConfig(cp.ConfigParser):
         Load config from the associated .ini file
         """
         try:
-            if is_python2:
+            if PY2:
                 # Python 2
                 self.read(self.filename())
             else:
@@ -223,7 +223,7 @@ class UserConfig(cp.ConfigParser):
         fname = self.filename()
         if osp.isfile(fname):
             os.remove(fname)
-        if is_python2:
+        if PY2:
             # Python 2
             with open(fname, 'w') as configfile:
                 self.write(configfile)
@@ -309,7 +309,7 @@ class UserConfig(cp.ConfigParser):
                 self.set(section, option, default)
                 return default
         value = self.__get(section, option)
-        if is_python2 and isinstance(value, str):
+        if PY2 and isinstance(value, str):
             return value.decode("utf-8")
         return value
 

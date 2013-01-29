@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright © 2012 Pierre Raybaut
+# Copyright © 2012-2013 Pierre Raybaut
 # Licensed under the terms of the MIT License
 # (see spyderlib/__init__.py for details)
 
 """
-spyderlib.py3compat
--------------------
+guidata.py3compat (exact copy of spyderlib.py3compat)
+-----------------------------------------------------
 
 Transitional module providing compatibility functions intended to help 
 migrating from Python 2 to Python 3.
@@ -21,13 +21,28 @@ from __future__ import print_function
 import sys
 import os
 
-is_python2 = sys.version[0] == '2'
-is_python3 = sys.version[0] == '3'
+PY2 = sys.version[0] == '2'
+PY3 = sys.version[0] == '3'
+
+
+#==============================================================================
+# Data types
+#==============================================================================
+if PY2:
+    # Python 2
+    TEXT_TYPES = (str, unicode)
+    INT_TYPES = (int, long)
+else:
+    # Python 3
+    TEXT_TYPES = (str,)
+    INT_TYPES = (int,)
+NUMERIC_TYPES = tuple(list(INT_TYPES) + [float, complex])
+
 
 #==============================================================================
 # Renamed/Reorganized modules
 #==============================================================================
-if is_python2:
+if PY2:
     # Python 2
     import __builtin__ as builtins
     import ConfigParser as configparser
@@ -52,20 +67,11 @@ else:
     import pickle
     from collections import MutableMapping
 
+
 #==============================================================================
 # Strings
 #==============================================================================
-if is_python2:
-    # Python 2
-    text_types = (str, unicode)
-    int_types = (int, long)
-else:
-    # Python 3
-    text_types = (str,)
-    int_types = (int,)
-numeric_types = tuple(list(int_types) + [float, complex])
-
-if is_python2:
+if PY2:
     # Python 2
     import codecs
     def u(obj):
@@ -80,7 +86,7 @@ else:
 def is_text_string(obj):
     """Return True if `obj` is a text string, False if it is anything else,
     like binary data (Python 3) or QString (Python 2, PyQt API #1)"""
-    if is_python2:
+    if PY2:
         # Python 2
         return isinstance(obj, basestring)
     else:
@@ -89,7 +95,7 @@ def is_text_string(obj):
 
 def is_binary_string(obj):
     """Return True if `obj` is a binary string, False if it is anything else"""
-    if is_python2:
+    if PY2:
         # Python 2
         return isinstance(obj, str)
     else:
@@ -103,7 +109,7 @@ def is_string(obj):
 
 def is_unicode(obj):
     """Return True if `obj` is unicode"""
-    if is_python2:
+    if PY2:
         # Python 2
         return isinstance(obj, unicode)
     else:
@@ -112,7 +118,7 @@ def is_unicode(obj):
 
 def to_text_string(obj, encoding=None):
     """Convert `obj` to (unicode) text string"""
-    if is_python2:
+    if PY2:
         # Python 2
         if encoding is None:
             return unicode(obj)
@@ -130,7 +136,7 @@ def to_text_string(obj, encoding=None):
 
 def to_binary_string(obj, encoding=None):
     """Convert `obj` to binary string (bytes in Python 3, str in Python 2)"""
-    if is_python2:
+    if PY2:
         # Python 2
         if encoding is None:
             return str(obj)
@@ -146,7 +152,7 @@ def to_binary_string(obj, encoding=None):
 #==============================================================================
 def get_func_code(func):
     """Return function code object"""
-    if is_python2:
+    if PY2:
         # Python 2
         return func.func_code
     else:
@@ -155,7 +161,7 @@ def get_func_code(func):
 
 def get_func_name(func):
     """Return function name"""
-    if is_python2:
+    if PY2:
         # Python 2
         return func.func_name
     else:
@@ -164,7 +170,7 @@ def get_func_name(func):
 
 def get_func_defaults(func):
     """Return function default argument values"""
-    if is_python2:
+    if PY2:
         # Python 2
         return func.func_defaults
     else:
@@ -177,7 +183,7 @@ def get_func_defaults(func):
 #==============================================================================
 def get_meth_func(obj):
     """Return method function object"""
-    if is_python2:
+    if PY2:
         # Python 2
         return obj.im_func
     else:
@@ -186,7 +192,7 @@ def get_meth_func(obj):
 
 def get_meth_class_inst(obj):
     """Return method class instance"""
-    if is_python2:
+    if PY2:
         # Python 2
         return obj.im_self
     else:
@@ -195,7 +201,7 @@ def get_meth_class_inst(obj):
 
 def get_meth_class(obj):
     """Return method class"""
-    if is_python2:
+    if PY2:
         # Python 2
         return obj.im_class
     else:
@@ -206,7 +212,7 @@ def get_meth_class(obj):
 #==============================================================================
 # Misc.
 #==============================================================================
-if is_python2:
+if PY2:
     # Python 2
     input = raw_input
     getcwd = os.getcwdu

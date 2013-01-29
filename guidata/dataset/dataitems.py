@@ -23,7 +23,7 @@ import collections
 from guidata.dataset.datatypes import DataItem, ItemProperty
 from guidata.utils import utf8_to_unicode, add_extension
 from guidata.config import _
-from guidata.py3compat import to_text_string, is_text_string, text_types, u
+from guidata.py3compat import to_text_string, is_text_string, TEXT_TYPES, u
 
 
 class NumericTypeItem(DataItem):
@@ -183,7 +183,7 @@ class StringItem(DataItem):
         * notempty [bool]: if True, empty string is not a valid value (opt.)
         * wordwrap [bool]: toggle word wrapping (optional)
     """
-    type = text_types
+    type = TEXT_TYPES
     def __init__(self, label, default=None, notempty=None,
                  wordwrap=False, help=''):
         DataItem.__init__(self, label, default=default, help=help)
