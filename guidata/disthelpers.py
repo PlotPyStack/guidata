@@ -46,7 +46,6 @@ def get_changeset(path, rev=None):
     except IndexError:
         raise RuntimeError(process.stderr.read())
 
-
 def prepend_module_to_path(module_path):
     """
     Prepend to sys.path module located in *module_path*
@@ -66,6 +65,18 @@ def prepend_module_to_path(module_path):
     message = prefix + ("%s [revision %s]" % (name, changeset)
                         ).rjust(80 - len(prefix), ".")
     print(message, file=sys.stderr)
+    if name in sys.modules:
+        sys.modules.pop(name)
+        nbsp = 0
+        for modname in sys.modules.keys():
+            if modname.startswith(name + '.'):
+                sys.modules.pop(modname)
+                nbsp += 1
+        warning = '(removed %s from sys.modules' % name
+        if nbsp:
+            warning += ' and %d subpackages' % nbsp
+        warning += ')'
+        print(warning.rjust(80), file=sys.stderr)
     return message
 
 def prepend_modules_to_path(module_base_path):
