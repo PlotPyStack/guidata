@@ -25,11 +25,11 @@ import collections
 
 from guidata.qt.QtGui import QFileDialog
 
-from guidata.py3compat import is_text_string, to_text_string
+from guidata.py3compat import is_text_string, to_text_string, TEXT_TYPES
 
-#===============================================================================
+#==============================================================================
 # QVariant conversion utilities
-#===============================================================================
+#==============================================================================
 
 PYQT_API_1 = False
 if os.environ['QT_API'] == 'pyqt':
@@ -57,7 +57,7 @@ if os.environ['QT_API'] == 'pyqt':
         if PYQT_API_1:
             # PyQt API #1
             assert isinstance(convfunc, collections.Callable)
-            if convfunc in (to_text_string, str):
+            if convfunc in TEXT_TYPES or convfunc is to_text_string:
                 return convfunc(qobj.toString())
             elif convfunc is bool:
                 return qobj.toBool()
@@ -82,9 +82,9 @@ else:
         to PyQt API #2 and Pyside (QVariant does not exist)"""
         return qobj
 
-#===============================================================================
+#==============================================================================
 # Wrappers around QFileDialog static methods
-#===============================================================================
+#==============================================================================
 
 def getexistingdirectory(parent=None, caption='', basedir='',
                          options=QFileDialog.ShowDirsOnly):
