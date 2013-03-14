@@ -532,6 +532,14 @@ class Distribution(object):
                         if osp.splitext(fname)[1] == '.py':
                             modname = 'sphinx.ext.%s' % osp.splitext(fname)[0]
                             self.includes.append(modname)
+            elif module_name == 'pygments':
+                self.includes += ['pygments', 'pygments.formatters',
+                                  'pygments.lexers', 'pygments.lexers.agile']
+            elif module_name == 'zmq':
+                # FIXME: this is not working, yet... (missing DLL)
+                self.includes += ['zmq', 'zmq.core._poll', 'zmq.core._version', 'zmq.core.constants', 'zmq.core.context', 'zmq.core.device', 'zmq.core.error', 'zmq.core.message', 'zmq.core.socket', 'zmq.core.stopwatch']
+                if os.name == 'nt':
+                    self.bin_includes += ['libzmq.dll']
             elif module_name == 'guidata':
                 self.add_module_data_files('guidata', ("images", ),
                                        ('.png', '.svg'), copy_to_root=False)
