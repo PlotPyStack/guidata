@@ -551,19 +551,20 @@ class FloatArrayItem(DataItem):
         """Override DataItem method"""
         larg = self.get_prop_value("display", instance, "large", False)
         fmt = self.get_prop_value("display", instance, "format", u("%s"))
+        unit = self.get_prop_value("display", instance, "unit", "")
         v = func(value)        
         if larg:
             text = u("= [")
             for flt in v[:-1]:
                 text += fmt % flt + "; "
             text += fmt % v[-1] + "]"
-            return to_text_string(text)
         else:
             text = u("~= ") + fmt % v.mean()
             text += " [" + fmt % v.min()
             text += " .. " + fmt % v.max()
-            text += "]"
-            return to_text_string(text)
+            text += "]"            
+        text += " %s" % unit
+        return to_text_string(text)
 
     def serialize(self, instance, writer):
         """Serialize this item"""
