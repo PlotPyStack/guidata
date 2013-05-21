@@ -139,9 +139,9 @@ class DataItem(object):
     """
     DataSet data item
     
-    `label` : (str, unicode)
+    `label` : string
     `default` : any type, optional
-    `help` : (str, unicode) Text displayed on data item's tooltip
+    `help` : string Text displayed on data item's tooltip
     """
     count = 0
 
@@ -570,7 +570,7 @@ class DataSetMeta(type):
         dct["_items"] = items_list
         return type.__new__(cls, name, bases, dct)
 
-Meta_Py3Compat = DataSetMeta('Meta_Py3Compat', (object, ), {})
+Meta_Py3Compat = DataSetMeta(b'Meta_Py3Compat', (object, ), {})
 
 class DataSet(Meta_Py3Compat):
     """
