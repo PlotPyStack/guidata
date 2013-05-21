@@ -2,6 +2,17 @@
 
 Added support for Python 3 (see module `guidata.py3compat`).
 
+=== New features (since v1.5.1) ===
+
+  * disthelpers:
+    * Added support for Python 3.3
+    * Added support for pygments (and partial support for zmq: still failing)
+  * FloatArrayItem: added support for `unit` property value
+
+=== Bug fixes (since v1.5.1) ===
+
+  * disthelpers.prepend_module_to_path: unload modules which were already imported to be able to replace them by other versions (mostly `guidata` should be concerned by this if the function is used -as it should be- in package's __init__.py script)
+
 ----
 
 == Version 1.5.1 ==

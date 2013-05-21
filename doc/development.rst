@@ -72,7 +72,7 @@ Python 3 compatibility
 ======================
 
 Regarding Python 3 compatibility, we chose to handle it by maintaining a single
-source branch being compatible with both Python 2.6-7 and Python 3.
+source branch being compatible with both Python 2.6-2.7 and Python 3.
 
 Here is what we have done.
 
@@ -95,3 +95,29 @@ After these two steps, your code should be compatible with Python 2.6, 2.7
 and 3.x, but only with respect to the simplest changes that occured between 
 Python 2 and Python 3. However, this a step forward to Python 3 compatibility 
 without breaking Python 2.6+ compatibility.
+
+Fixing unicode issues
+---------------------
+
+In Python 3, `unicode` and `str` strings have been replaced by `str` and 
+`bytes` strings:
+
+  * `str` is the text string type, supporting unicode characters natively
+  * `bytes` is the binary string type.
+
+As a consequence, Python 2 code involving strings may cause compatibility 
+issues with Python 3. For example:
+
+  * file I/O may return `bytes` instead of `str` in Python 3 (depending on the 
+open mode): this can be solved by calling the `decode` method on the `bytes` 
+object (this will work on both Python 2 `str` and Python 3 `bytes objects)
+  * in Python 3.0-3.2, the `u'unicode text'` or `u"unicode text"` syntax is 
+not allowed and will raise a SyntaxError: this can be solved by inserting the 
+`from __future__ import unicode_literals` at the beginning of the script and 
+by removing all the `u` string prefixes
+  * in Python 3 `isinstance(text, basestring)` can be replaced by 
+`is_text_string(text)` (function of the `guidata.py3compat` module)
+  * in Python 3 `isinstance(text, unicode)` can be replaced by 
+`is_unicode(text)` (function of the `guidata.py3compat` module)
+  * in Python 3 `unicode(text)` can be replaced by `to_text_string(text)` 
+(function of the `guidata.py3compat` module)
