@@ -14,7 +14,7 @@ There is one widget type for each data item type.
 Example: ChoiceWidget <--> ChoiceItem, ImageChoiceItem
 """
 
-from __future__ import print_function
+from __future__ import print_function, unicode_literals
 
 import os
 import os.path as osp
@@ -48,7 +48,7 @@ from guidata.utils import update_dataset, restore_dataset, utf8_to_unicode
 from guidata.qthelpers import text_to_qcolor, get_std_icon
 from guidata.configtools import get_icon, get_image_layout, get_image_file_path
 from guidata.config import _
-from guidata.py3compat import to_text_string, is_text_string, u
+from guidata.py3compat import to_text_string, is_text_string
 
 # ========================== <!> IMPORTANT <!> =================================
 #
@@ -303,7 +303,7 @@ class TextEditWidget(AbstractDataSetWidget):
 
     def __get_text(self):
         """Get QTextEdit text, replacing UTF-8 EOL chars by os.linesep"""
-        return to_text_string(self.edit.toPlainText()).replace(u('\u2029'),
+        return to_text_string(self.edit.toPlainText()).replace('\u2029',
                                                                os.linesep)
 
     def get(self):

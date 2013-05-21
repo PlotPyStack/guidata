@@ -13,7 +13,7 @@ The ``guidata.dataset.dataitems`` module contains implementation for
 concrete DataItems.
 """
 
-from __future__ import division
+from __future__ import division, unicode_literals
 
 import os
 import re
@@ -23,7 +23,7 @@ import collections
 from guidata.dataset.datatypes import DataItem, ItemProperty
 from guidata.utils import utf8_to_unicode, add_extension
 from guidata.config import _
-from guidata.py3compat import to_text_string, is_text_string, TEXT_TYPES, u
+from guidata.py3compat import to_text_string, is_text_string, TEXT_TYPES
 
 
 class NumericTypeItem(DataItem):
@@ -550,16 +550,16 @@ class FloatArrayItem(DataItem):
     def format_string(self, instance, value, fmt, func):
         """Override DataItem method"""
         larg = self.get_prop_value("display", instance, "large", False)
-        fmt = self.get_prop_value("display", instance, "format", u("%s"))
+        fmt = self.get_prop_value("display", instance, "format", "%s")
         unit = self.get_prop_value("display", instance, "unit", "")
         v = func(value)        
         if larg:
-            text = u("= [")
+            text = "= ["
             for flt in v[:-1]:
                 text += fmt % flt + "; "
             text += fmt % v[-1] + "]"
         else:
-            text = u("~= ") + fmt % v.mean()
+            text = "~= " + fmt % v.mean()
             text += " [" + fmt % v.min()
             text += " .. " + fmt % v.max()
             text += "]"            
