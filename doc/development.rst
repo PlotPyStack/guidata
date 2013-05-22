@@ -103,21 +103,26 @@ In Python 3, `unicode` and `str` strings have been replaced by `str` and
 `bytes` strings:
 
   * `str` is the text string type, supporting unicode characters natively
+
   * `bytes` is the binary string type.
 
 As a consequence, Python 2 code involving strings may cause compatibility 
 issues with Python 3. For example:
 
   * file I/O may return `bytes` instead of `str` in Python 3 (depending on the 
-open mode): this can be solved by calling the `decode` method on the `bytes` 
-object (this will work on both Python 2 `str` and Python 3 `bytes objects)
+    open mode): this can be solved by calling the `decode` method on the `bytes` 
+    object (this will work on both Python 2 `str` and Python 3 `bytes objects)
+
   * in Python 3.0-3.2, the `u'unicode text'` or `u"unicode text"` syntax is 
-not allowed and will raise a SyntaxError: this can be solved by inserting the 
-`from __future__ import unicode_literals` at the beginning of the script and 
-by removing all the `u` string prefixes
+    not allowed and will raise a SyntaxError: this can be solved by inserting the 
+    `from __future__ import unicode_literals` at the beginning of the script and 
+    by removing all the `u` string prefixes
+
   * in Python 3 `isinstance(text, basestring)` can be replaced by 
-`is_text_string(text)` (function of the `guidata.py3compat` module)
+    `is_text_string(text)` (function of the `guidata.py3compat` module)
+
   * in Python 3 `isinstance(text, unicode)` can be replaced by 
-`is_unicode(text)` (function of the `guidata.py3compat` module)
+    `is_unicode(text)` (function of the `guidata.py3compat` module)
+
   * in Python 3 `unicode(text)` can be replaced by `to_text_string(text)` 
-(function of the `guidata.py3compat` module)
+    (function of the `guidata.py3compat` module)
