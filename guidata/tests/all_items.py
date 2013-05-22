@@ -59,10 +59,10 @@ class TestParameters(DataSet):
     bool1 = BoolItem("Boolean option without label")
     bool2 = BoolItem("Boolean option with label", "Label")
     _bg = BeginGroup("A sub group")
-    color = ColorItem("Color")
+    color = ColorItem("Color", default="red")
     choice = ChoiceItem("Single choice 1",
-                        [(16, "first choice"), (32, "second choice"),
-                         (64, "third choice")])
+                        [('16', "first choice"), ('32', "second choice"),
+                         ('64', "third choice")])
     mchoice2 = ImageChoiceItem("Single choice 2",
                                [("rect", "first choice", "gif.png" ),
                                 ("ell", "second choice", "txt.png" ),

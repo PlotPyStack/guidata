@@ -20,7 +20,7 @@ import numpy as np
 from guidata.utils import utf8_to_unicode
 from guidata.userconfigio import BaseIOHandler, WriterMixin
 
-from guidata.py3compat import to_text_string, PY3
+from guidata.py3compat import to_text_string, PY3, is_binary_string
 
 
 class TypeConverter(object):
@@ -307,7 +307,11 @@ class HDF5Reader(HDF5Handler):
 
     def read_any(self):
         group = self.get_parent_group()
-        return group.attrs[self.option[-1]]
+        value = group.attrs[self.option[-1]]
+        if is_binary_string(value):
+            return value.decode("utf-8")
+        else:
+            return value
 
     def read_bool(self):
         val = self.read_any()
@@ -324,14 +328,7 @@ class HDF5Reader(HDF5Handler):
         if val != '':
             return float(val)
 
-    def read_str(self):
-        # Convert `numpy.string_` to `str`
-        return str(self.read_any())
-
-    def read_unicode(self):
-        return to_text_string(self.read_any(), "utf-8")
-    if PY3:
-        read_unicode = read_str
+    read_unicode = read_str = read_any
     
     def read_array(self):
         group = self.get_parent_group()

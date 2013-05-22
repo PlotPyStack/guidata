@@ -82,7 +82,7 @@ class WriterMixin(object):
         elif isinstance(val, int):
             self.write_int(val)
         elif isinstance(val, float):
-            self.write_int(val)
+            self.write_float(val)
         elif is_unicode(val):
             self.write_unicode(val)
         elif isinstance(val, str):

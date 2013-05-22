@@ -24,7 +24,7 @@ import re
 import collections
 
 from guidata.utils import utf8_to_unicode, update_dataset
-from guidata.py3compat import to_text_string, is_text_string
+from guidata.py3compat import to_text_string, is_text_string, PY2
 
 
 DEBUG_DESERIALIZE = False
@@ -344,7 +344,8 @@ class DataItem(object):
         except RuntimeError as e:
             if DEBUG_DESERIALIZE:
                 import traceback
-                print("DEBUG_DESERIALIZE enabled in datatypes.py", file=sys.stderr)
+                print("DEBUG_DESERIALIZE enabled in datatypes.py",
+                      file=sys.stderr)
                 traceback.print_stack()
                 print(e, file=sys.stderr)
             self.set_default(instance)
@@ -570,7 +571,11 @@ class DataSetMeta(type):
         dct["_items"] = items_list
         return type.__new__(cls, name, bases, dct)
 
-Meta_Py3Compat = DataSetMeta(b'Meta_Py3Compat', (object, ), {})
+if PY2:
+    CLS_NAME = b'Meta_Py3Compat'
+else:
+    CLS_NAME = 'Meta_Py3Compat'
+Meta_Py3Compat = DataSetMeta(CLS_NAME, (object, ), {})
 
 class DataSet(Meta_Py3Compat):
     """

@@ -23,7 +23,12 @@ SHOW = hdf5_is_available # Show test in GUI-based test launcher
 
 import os
 from guidata.hdf5io import HDF5Reader, HDF5Writer
-from guidata.tests.all_features import TestParameters
+from guidata.tests.all_items import TestParameters
+from guidata.dataset.dataitems import StringItem
+
+class TestParameters_Light(TestParameters):
+    date = StringItem("D1", default="Replacement for unsupported DateItem")
+    dtime = StringItem("D2", default="Replacement for unsupported DateTimeItem")
 
 if __name__ == '__main__':
     # Create QApplication
