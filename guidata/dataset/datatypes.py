@@ -572,10 +572,9 @@ class DataSetMeta(type):
         return type.__new__(cls, name, bases, dct)
 
 if PY2:
-    CLS_NAME = b'Meta_Py3Compat'
+    Meta_Py3Compat = DataSetMeta(b'Meta_Py3Compat', (object, ), {})
 else:
-    CLS_NAME = 'Meta_Py3Compat'
-Meta_Py3Compat = DataSetMeta(CLS_NAME, (object, ), {})
+    Meta_Py3Compat = DataSetMeta('Meta_Py3Compat', (object, ), {})
 
 class DataSet(Meta_Py3Compat):
     """
