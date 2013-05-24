@@ -137,8 +137,10 @@ def get_msvc_dlls(msvc_version, architecture=None):
         atype = "" if architecture == 64 else "win32"
         arch = "amd64" if architecture == 64 else "x86"
         
-        groups = {'CRT': ('msvcr90.dll', 'msvcp90.dll', 'msvcm90.dll'),
-                  'OPENMP': ('vcomp90.dll',)}
+        groups = {
+                  'CRT': ('msvcr90.dll', 'msvcp90.dll', 'msvcm90.dll'),
+#                  'OPENMP': ('vcomp90.dll',)
+                  }
 
         for group, dll_list in groups.items():
             dlls = ''
@@ -181,7 +183,10 @@ def get_msvc_dlls(msvc_version, architecture=None):
 
     elif msvc_major == '10':
         namelist = [name % (msvc_major + msvc_minor) for name in 
-                    ('msvcp%s.dll', 'msvcr%s.dll', 'vcomp%s.dll')]
+                    (
+                     'msvcp%s.dll', 'msvcr%s.dll',
+                     'vcomp%s.dll',
+                     )]
         
         windir = os.environ['windir']
         is_64bit_windows = osp.isdir(osp.join(windir, "SysWOW64"))

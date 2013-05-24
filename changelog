@@ -1,10 +1,5 @@
 == Version 1.6.1 ==
 
-=== New features (since v1.6.0) ===
-
-  * disthelpers:
-    * Added support for Microsoft Visual C++ OpenMP DLLs
-
 === Possible API compatibility issues (since v1.6.0) ===
 
   * disthelpers:
