@@ -530,7 +530,7 @@ External resources:
 #    Version 2.0 dated 2006-09-05.
 
 
-__version__ = '1.6.0'
+__version__ = '1.6.1'
 
 # Dear (Debian, RPM, ...) package makers, please feel free to customize the
 # following path to module's data (images) and translations:

@@ -117,7 +117,7 @@ def get_msvc_version(python_version):
     else:
         raise RuntimeError("Unsupported Python version %s" % python_version)
 
-def get_msvc_dlls(architecture=None, python_version=None):
+def get_msvc_dlls(msvc_version, architecture=None):
     """Get the list of Microsoft Visual C++ DLLs associated to 
     architecture and Python version, create the manifest file.
     
@@ -129,48 +129,59 @@ def get_msvc_dlls(architecture=None, python_version=None):
 
     filelist = []
 
-    msvc_version = get_msvc_version(python_version)
     msvc_major = msvc_version.split('.')[0]
+    msvc_minor = msvc_version.split('.')[1]
+
     if msvc_major == '9':
         key = "1fc8b3b9a1e18e3b"
         atype = "" if architecture == 64 else "win32"
         arch = "amd64" if architecture == 64 else "x86"
-        manifest = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+        
+        groups = {'CRT': ('msvcr90.dll', 'msvcp90.dll', 'msvcm90.dll'),
+                  'OPENMP': ('vcomp90.dll',)}
+
+        for group, dll_list in groups.items():
+            dlls = ''
+            for dll in dll_list:
+                dlls += '    <file name="%s" />%s' % (dll, os.linesep)
+        
+            manifest =\
+"""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <!-- Copyright (c) Microsoft Corporation.  All rights reserved. -->
 <assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
     <noInheritable/>
     <assemblyIdentity
         type="%(atype)s"
-        name="Microsoft.VC90.CRT"
+        name="Microsoft.VC90.%(group)s"
         version="%(version)s"
         processorArchitecture="%(arch)s"
         publicKeyToken="%(key)s"
     />
-    <file name="msvcr90.dll" />
-    <file name="msvcp90.dll" />
-    <file name="msvcm90.dll" />
-</assembly>
-""" % dict(version=msvc_version, key=key, atype=atype, arch=arch)
+%(dlls)s</assembly>
+""" % dict(version=msvc_version, key=key, atype=atype, arch=arch,
+           group=group, dlls=dlls)
 
-        vc90man = "Microsoft.VC90.CRT.manifest"
-        open(vc90man, 'w').write(manifest)
-        _remove_later(vc90man)
-        filelist += [vc90man]
-
-        vc_str = '%s_Microsoft.VC90.CRT_%s_%s' % (arch, key, msvc_version)
-        winsxs = osp.join(os.environ['windir'], 'WinSxS')
-        for fname in os.listdir(winsxs):
-            path = osp.join(winsxs, fname)
-            if osp.isdir(path) and fname.lower().startswith(vc_str.lower()):
-                for dllname in os.listdir(path):
-                    filelist.append(osp.join(path, dllname))
-                break
-        else:
-            raise RuntimeError("Microsoft Visual C++ DLLs version %s "\
-                                "were not found" % msvc_version)
+            vc90man = "Microsoft.VC90.%s.manifest" % group
+            open(vc90man, 'w').write(manifest)
+            _remove_later(vc90man)
+            filelist += [vc90man]
+    
+            winsxs = osp.join(os.environ['windir'], 'WinSxS')
+            vcstr = '%s_Microsoft.VC90.%s_%s_%s' % (arch, group,
+                                                    key, msvc_version)
+            for fname in os.listdir(winsxs):
+                path = osp.join(winsxs, fname)
+                if osp.isdir(path) and fname.lower().startswith(vcstr.lower()):
+                    for dllname in os.listdir(path):
+                        filelist.append(osp.join(path, dllname))
+                    break
+            else:
+                raise RuntimeError("Microsoft Visual C++ %s DLLs version %s "\
+                                    "were not found" % (group, msvc_version))
 
     elif msvc_major == '10':
-        namelist = ['msvcp100.dll', 'msvcr100.dll']
+        namelist = [name % (msvc_major + msvc_minor) for name in 
+                    ('msvcp%s.dll', 'msvcr%s.dll', 'vcomp%s.dll')]
         
         windir = os.environ['windir']
         is_64bit_windows = osp.isdir(osp.join(windir, "SysWOW64"))
@@ -205,13 +216,12 @@ def get_msvc_dlls(architecture=None, python_version=None):
 def create_msvc_data_files(architecture=None, python_version=None,
                            verbose=False):
     """Including Microsoft Visual C++ DLLs"""
-    filelist = get_msvc_dlls(architecture=architecture,
-                             python_version=python_version)
+    msvc_version = get_msvc_version(python_version)
+    filelist = get_msvc_dlls(msvc_version, architecture=architecture)
     print(create_msvc_data_files.__doc__)
     if verbose:
         for name in filelist:
             print("  ", name)
-    msvc_version = get_msvc_version(python_version)
     msvc_major = msvc_version.split('.')[0]
     if msvc_major == '9':
         return [("Microsoft.VC90.CRT", filelist),]

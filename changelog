@@ -1,3 +1,17 @@
+== Version 1.6.1 ==
+
+=== New features (since v1.6.0) ===
+
+  * disthelpers:
+    * Added support for Microsoft Visual C++ OpenMP DLLs
+
+=== Possible API compatibility issues (since v1.6.0) ===
+
+  * disthelpers:
+    * Changed arguments from "architecture=None, python_version=None" to "msvc_version, architecture=None"
+
+----
+
 == Version 1.6.0 ==
 
 Added support for Python 3 (see module `guidata.py3compat`).
