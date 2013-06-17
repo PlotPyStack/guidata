@@ -117,6 +117,22 @@ def get_msvc_version(python_version):
     else:
         raise RuntimeError("Unsupported Python version %s" % python_version)
 
+def get_dll_architecture(path):
+    """Return DLL architecture (32 or 64bit) using Microsoft dumpbin.exe"""
+    os.environ['PATH'] += r';C:\Program Files (x86)\Microsoft Visual Studio 9.0\Common7\IDE\;C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\BIN;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Common7\IDE\;C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\BIN'
+    process = Popen(['dumpbin', '/HEADERS', osp.basename(path)], stdout=PIPE,
+                     stderr=PIPE, cwd=osp.dirname(path), shell=True)
+    output = process.stdout.read()
+    error = process.stderr.read()
+    if error:
+        raise RuntimeError(error)
+    elif 'x86' in output:
+        return 32
+    elif 'x64' in output:
+        return 64
+    else:
+        raise ValueError('Unable to get DLL architecture')
+
 def get_msvc_dlls(msvc_version, architecture=None):
     """Get the list of Microsoft Visual C++ DLLs associated to 
     architecture and Python version, create the manifest file.
@@ -215,8 +231,19 @@ def get_msvc_dlls(msvc_version, architecture=None):
 
     else:
         raise RuntimeError("Unsupported MSVC version %s" % msvc_version)
-    
+
+    for path in filelist:
+        if path.endswith('.dll'):
+            try:
+                arch = get_dll_architecture(path)
+            except RuntimeError:
+                return
+            if arch != architecture:
+                raise RuntimeError("%s: expecting %dbit, found %dbit"\
+                                   % (osp.basename(path), architecture, arch))
+
     return filelist
+
 
 def create_msvc_data_files(architecture=None, python_version=None,
                            verbose=False):
@@ -738,3 +765,15 @@ class Distribution(object):
               options=dict(build_exe=build_exe))
         if create_archive:
             self.__create_archive(create_archive)
+
+
+if __name__ == '__main__':
+    for python_version in ('2.7', '3.3'):
+        for arch in (32, 64):
+            print('Python %s %dbit' % (python_version, arch))
+            msvc_version = get_msvc_version(python_version)
+            filelist = get_msvc_dlls(msvc_version, architecture=arch)
+            for fname in filelist:
+                if '.dll' in fname:
+                    print(get_dll_architecture(fname))
+            print()
