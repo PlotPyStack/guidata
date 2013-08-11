@@ -133,7 +133,7 @@ def get_dll_architecture(path):
     else:
         raise ValueError('Unable to get DLL architecture')
 
-def get_msvc_dlls(msvc_version, architecture=None, check_architecture=True):
+def get_msvc_dlls(msvc_version, architecture=None, check_architecture=False):
     """Get the list of Microsoft Visual C++ DLLs associated to 
     architecture and Python version, create the manifest file.
     
