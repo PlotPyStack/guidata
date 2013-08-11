@@ -133,7 +133,7 @@ def get_dll_architecture(path):
     else:
         raise ValueError('Unable to get DLL architecture')
 
-def get_msvc_dlls(msvc_version, architecture=None):
+def get_msvc_dlls(msvc_version, architecture=None, check_architecture=True):
     """Get the list of Microsoft Visual C++ DLLs associated to 
     architecture and Python version, create the manifest file.
     
@@ -142,6 +142,7 @@ def get_msvc_dlls(msvc_version, architecture=None):
     current_architecture = 64 if sys.maxsize > 2**32 else 32
     if architecture is None:
         architecture = current_architecture
+    assert architecture in (32, 64)
 
     filelist = []
 
@@ -212,14 +213,22 @@ def get_msvc_dlls(msvc_version, architecture=None):
         # applications and is included on all 64-bit versions of Windows
         # (source: http://en.wikipedia.org/wiki/WoW64)
         #
-        # In other words, "SysWOW64" contains 64-bit DLL and applications, 
+        # In other words, "SysWOW64" contains 32-bit DLL and applications, 
         # whereas "System32" contains 64-bit DLL and applications on a 64-bit 
         # system.
-        sysdir = "System32"
-        if not is_64bit_windows and architecture == 64:
-            raise RuntimeError("Can't find 64-bit MSVC DLLs on a 32-bit OS")
-        if is_64bit_windows and architecture == 32:
-            sysdir = "SysWOW64"
+        if architecture == 64:
+            # 64-bit DLLs are located in...
+            if is_64bit_windows:
+                sysdir = "System32"  # on a 64-bit OS
+            else:
+                # ...no directory to be found!
+                raise RuntimeError("Can't find 64-bit DLLs on a 32-bit OS")
+        else:
+            # 32-bit DLLs are located in...
+            if is_64bit_windows:
+                sysdir = "SysWOW64"  # on a 64-bit OS
+            else:
+                sysdir = "System32"  # on a 32-bit OS
 
         for dllname in namelist:
             fname = osp.join(windir, sysdir, dllname)
@@ -232,15 +241,16 @@ def get_msvc_dlls(msvc_version, architecture=None):
     else:
         raise RuntimeError("Unsupported MSVC version %s" % msvc_version)
 
-    for path in filelist:
-        if path.endswith('.dll'):
-            try:
-                arch = get_dll_architecture(path)
-            except RuntimeError:
-                return
-            if arch != architecture:
-                raise RuntimeError("%s: expecting %dbit, found %dbit"\
-                                   % (osp.basename(path), architecture, arch))
+    if check_architecture:
+        for path in filelist:
+            if path.endswith('.dll'):
+                try:
+                    arch = get_dll_architecture(path)
+                except RuntimeError:
+                    return
+                if arch != architecture:
+                    raise RuntimeError("%s: expecting %dbit, found %dbit"\
+                                       % (path, architecture, arch))
 
     return filelist
 
