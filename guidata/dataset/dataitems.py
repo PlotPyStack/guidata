@@ -32,9 +32,10 @@ class NumericTypeItem(DataItem):
     """
     type = None
     def __init__(self, label, default=None, min=None, max=None,
-                 nonzero=None, unit='', help=''):
+                 nonzero=None, unit='', help='', check=True):
         DataItem.__init__(self, label, default=default, help=help)
-        self.set_prop("data", min=min, max=max, nonzero=nonzero)
+        self.set_prop("data", min=min, max=max, nonzero=nonzero,
+                      check_value=check)
         self.set_prop("display", unit=unit)
         
     def get_auto_help(self, instance):
@@ -109,12 +110,13 @@ class FloatItem(NumericTypeItem):
         * nonzero [bool]: if True, zero is not a valid value (optional)
         * unit [string]: physical unit (optional)
         * help [string]: text shown in tooltip (optional)
+        * check [bool]: if False, value is not checked (optional, default=True)
     """
     type = float
-    def __init__(self, label, default=None, min=None, max=None,
-                 nonzero=None, unit='', step=0.1, slider=False, help=''):
+    def __init__(self, label, default=None, min=None, max=None, nonzero=None,
+                 unit='', step=0.1, slider=False, help='', check=True):
         super(FloatItem, self).__init__(label, default=default, min=min,
-                                max=max, nonzero=nonzero, unit=unit, help=help)
+                max=max, nonzero=nonzero, unit=unit, help=help, check=check)
         self.set_prop("display", slider=slider)
         self.set_prop("data", step=step)
 
@@ -138,12 +140,13 @@ class IntItem(NumericTypeItem):
         * slider [bool]: if True, shows a slider widget right after the line 
           edit widget (default is False)
         * help [string]: text shown in tooltip (optional)
+        * check [bool]: if False, value is not checked (optional, default=True)
     """
     type = int
-    def __init__(self, label, default=None, min=None, max=None,
-                 nonzero=None, unit='', even=None, slider=False, help=''):
+    def __init__(self, label, default=None, min=None, max=None, nonzero=None,
+                 unit='', even=None, slider=False, help='', check=True):
         super(IntItem, self).__init__(label, default=default, min=min, max=max,
-                                      nonzero=nonzero, unit=unit, help=help)
+                            nonzero=nonzero, unit=unit, help=help, check=check)
         self.set_prop("data", even=even)
         self.set_prop("display", slider=slider)
         
@@ -188,16 +191,14 @@ class StringItem(DataItem):
         * wordwrap [bool]: toggle word wrapping (optional)
     """
     type = TEXT_TYPES
-    def __init__(self, label, default=None, notempty=None,
-                 wordwrap=False, help=''):
+    def __init__(self, label, default=None, notempty=None, wordwrap=False,
+                 help=''):
         DataItem.__init__(self, label, default=default, help=help)
         self.set_prop("data", notempty=notempty)
         self.set_prop("display", wordwrap=wordwrap)
 
     def check_value(self, value):
         """Override DataItem method"""        
-        if not self.get_prop('data', 'check_value', True):
-            return True 
         notempty = self.get_prop("data", "notempty")
         if notempty and not value:
             return False
@@ -236,10 +237,11 @@ class BoolItem(DataItem):
         * label [string]: name
         * default [string]: default value (optional)
         * help [string]: text shown in tooltip (optional)
+        * check [bool]: if False, value is not checked (optional, default=True)
     """
     type = bool
-    def __init__(self, text='', label='', default=None, help=''):
-        DataItem.__init__(self, label, default=default, help=help)
+    def __init__(self, text='', label='', default=None, help='', check=True):
+        DataItem.__init__(self, label, default=default, help=help, check=check)
         self.set_prop("display", text=text)
 
     def get_value_from_reader(self, reader):
@@ -268,6 +270,7 @@ class ColorItem(StringItem):
         * label [string]: name
         * default [string]: default value (optional)
         * help [string]: text shown in tooltip (optional)
+        * check [bool]: if False, value is not checked (optional, default=True)
     
     Color values are encoded as hexadecimal strings or Qt color names
     """
@@ -297,10 +300,11 @@ class FileSaveItem(StringItem):
         * default [string]: default value (optional)
         * basedir [string]: default base directory (optional)
         * help [string]: text shown in tooltip (optional)
+        * check [bool]: if False, value is not checked (optional, default=True)
     """
     def __init__(self, label, formats='*', default=None,
-                 basedir=None, all_files_first=False, help=''):
-        DataItem.__init__(self, label, default=default, help=help)
+                 basedir=None, all_files_first=False, help='', check=True):
+        DataItem.__init__(self, label, default=default, help=help, check=check)
         if isinstance(formats, str):
             formats = [formats]
         self.set_prop("data", formats=formats)
@@ -334,6 +338,7 @@ class FileOpenItem(FileSaveItem):
         * default [string]: default value (optional)
         * basedir [string]: default base directory (optional)
         * help [string]: text shown in tooltip (optional)
+        * check [bool]: if False, value is not checked (optional, default=True)
     """
     def check_value(self, value):
         """Override DataItem method"""
@@ -352,15 +357,16 @@ class FilesOpenItem(FileSaveItem):
         * default [string]: default value (optional)
         * basedir [string]: default base directory (optional)
         * help [string]: text shown in tooltip (optional)
+        * check [bool]: if False, value is not checked (optional, default=True)
     """
     type = list
     def __init__(self, label, formats='*', default=None,
-                 basedir=None, all_files_first=False, help=''):
+                 basedir=None, all_files_first=False, help='', check=True):
         if is_text_string(default):
             default = [default]
-        FileSaveItem.__init__(self, label, formats=formats,
-                              default=default, basedir=basedir,
-                              all_files_first=all_files_first, help=help)
+        FileSaveItem.__init__(self, label, formats=formats, default=default,
+                              basedir=basedir, all_files_first=all_files_first,
+                              help=help, check=check)
 
     def check_value(self, value):
         """Override DataItem method"""
@@ -399,6 +405,7 @@ class DirectoryItem(StringItem):
         * label [string]: name
         * default [string]: default value (optional)
         * help [string]: text shown in tooltip (optional)
+        * check [bool]: if False, value is not checked (optional, default=True)
     """
     def check_value(self, value):
         """Override DataItem method"""        
@@ -422,8 +429,10 @@ class ChoiceItem(DataItem):
           or a function of one argument (key) returning a QIcon instance
         * default [-]: default label or default key (optional)
         * help [string]: text shown in tooltip (optional)
+        * check [bool]: if False, value is not checked (optional, default=True)
     """
-    def __init__(self, label, choices, default=FirstChoice, help=''):
+    def __init__(self, label, choices, default=FirstChoice, help='',
+                 check=True):
         if isinstance(choices, collections.Callable):
             _choices_data = ItemProperty(choices)
         else:
@@ -435,7 +444,7 @@ class ChoiceItem(DataItem):
             default = _choices_data[0][0]
         elif default is FirstChoice:
             default = None
-        DataItem.__init__(self, label, default=default, help=help)
+        DataItem.__init__(self, label, default=default, help=help, check=check)
         self.set_prop("data", choices=_choices_data )
 
     def _normalize_choice(self, idx, choice_tuple):
@@ -474,9 +483,10 @@ class MultipleChoiceItem(ChoiceItem):
         * choices [list or tuple]: string list or (key, label) list
         * default [-]: default label or default key (optional)
         * help [string]: text shown in tooltip (optional)
+        * check [bool]: if False, value is not checked (optional, default=True)
     """
-    def __init__(self, label, choices, default=(), help=''):
-        ChoiceItem.__init__(self, label, choices, default, help)
+    def __init__(self, label, choices, default=(), help='', check=True):
+        ChoiceItem.__init__(self, label, choices, default, help, check=check)
         self.set_prop("display", shape = (1, -1))
         
     def horizontal(self, row_nb=1):
@@ -532,6 +542,7 @@ class ImageChoiceItem(ChoiceItem):
           returning a QIcon instance
         * default [-]: default label or default key (optional)
         * help [string]: text shown in tooltip (optional)
+        * check [bool]: if False, value is not checked (optional, default=True)
     """
     def _normalize_choice(self, idx, choice_tuple):
         assert isinstance(choice_tuple, tuple)
@@ -556,10 +567,11 @@ class FloatArrayItem(DataItem):
         * transpose [bool]: transpose matrix (display only)
         * large [bool]: view all float of the array
         * minmax [string]: "all" (default), "columns", "rows"
+        * check [bool]: if False, value is not checked (optional, default=True)
     """
     def __init__(self, label, default=None, help='', format='%.3f',
-                 transpose=False, minmax="all"):
-        DataItem.__init__(self, label, default=default, help=help)
+                 transpose=False, minmax="all", check=True):
+        DataItem.__init__(self, label, default=default, help=help, check=check)
         self.set_prop("display", format=format, transpose=transpose,
                       minmax=minmax)
         
@@ -607,12 +619,14 @@ class ButtonItem(DataItem):
           (string: icon filename as in guidata/guiqwt image search paths)
         * default [unspecified]: default value passed to the callback (optional)
         * help [string]: text shown in button's tooltip (optional)
+        * check [bool]: if False, value is not checked (optional, default=True)
     
     The value of this item is unspecified but is passed to the callback along 
     with the whole dataset. The value is assigned the callback`s return value.
     """
-    def __init__(self, label, callback, icon=None, default=None, help=''):
-        DataItem.__init__(self, label, default=default, help=help)
+    def __init__(self, label, callback, icon=None, default=None, help='',
+                 check=True):
+        DataItem.__init__(self, label, default=default, help=help, check=check)
         self.set_prop("display", callback=callback)
         self.set_prop("display", icon=icon)
 
@@ -630,8 +644,9 @@ class DictItem(ButtonItem):
         * label [string]: name
         * default [dict]: default value (optional)
         * help [string]: text shown in tooltip (optional)
+        * check [bool]: if False, value is not checked (optional, default=True)
     """
-    def __init__(self, label, default=None, help=''):
+    def __init__(self, label, default=None, help='', check=True):
         def dictedit(instance, item, value, parent):
             from spyderlib.widgets.dicteditor import DictEditor
             editor = DictEditor(parent)
@@ -645,8 +660,8 @@ class DictItem(ButtonItem):
                 if value_was_none:
                     return
                 return value
-        ButtonItem.__init__(self, label, dictedit,
-                            icon='dictedit.png', default=default, help=help)
+        ButtonItem.__init__(self, label, dictedit, icon='dictedit.png',
+                            default=default, help=help, check=check)
 
 
 class FontFamilyItem(StringItem):

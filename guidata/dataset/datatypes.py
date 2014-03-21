@@ -145,7 +145,7 @@ class DataItem(object):
     """
     count = 0
 
-    def __init__(self, label, default=None, help=''):
+    def __init__(self, label, default=None, help='', check=True):
         self._order = DataItem.count
         DataItem.count += 1
         self._name = None
@@ -154,6 +154,7 @@ class DataItem(object):
         self._props = {} # a dict realm->dict containing realm-specific properties
         self.set_prop("display", col=0, colspan=None,
                       label=utf8_to_unicode(label))
+        self.set_prop('data', check_value=check)
 
     def get_prop(self, realm, name, default=NoDefault):
         """Get one property of this item"""
