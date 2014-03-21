@@ -68,6 +68,7 @@ class TestParameters(DataSet):
                     help="Threshold current")
     fl2 = FloatItem("Float (col=1)", default=1., min=1, max=1,
                     help="Help on float item").set_pos(col=1)
+    fl3 = FloatItem("Not checked float").set_prop('data', check_value=False)
     bool1 = BoolItem("Boolean option without label")
     bool2 = BoolItem("Boolean option with label", "Label").set_pos(col=1,
                                                                    colspan=2)

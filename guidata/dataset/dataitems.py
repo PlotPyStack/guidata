@@ -67,7 +67,9 @@ class NumericTypeItem(DataItem):
         return text
 
     def check_value(self, value):
-        """Override DataItem method"""
+        """Override DataItem method"""        
+        if not self.get_prop('data', 'check_value', True):
+            return True 
         if not isinstance(value, self.type):
             return False
         if self.get_prop("data", "nonzero") and value == 0:
@@ -157,7 +159,9 @@ class IntItem(NumericTypeItem):
         return auto_help
         
     def check_value(self, value):
-        """Override DataItem method"""
+        """Override DataItem method"""        
+        if not self.get_prop('data', 'check_value', True):
+            return True 
         valid = super(IntItem, self).check_value(value)
         if not valid:
             return False
@@ -191,7 +195,9 @@ class StringItem(DataItem):
         self.set_prop("display", wordwrap=wordwrap)
 
     def check_value(self, value):
-        """Override DataItem method"""
+        """Override DataItem method"""        
+        if not self.get_prop('data', 'check_value', True):
+            return True 
         notempty = self.get_prop("data", "notempty")
         if notempty and not value:
             return False
@@ -266,7 +272,9 @@ class ColorItem(StringItem):
     Color values are encoded as hexadecimal strings or Qt color names
     """
     def check_value(self, value):
-        """Override DataItem method"""
+        """Override DataItem method"""        
+        if not self.get_prop('data', 'check_value', True):
+            return True 
         if not isinstance(value, self.type):
             return False
         from guidata.qthelpers import text_to_qcolor
@@ -306,7 +314,9 @@ class FileSaveItem(StringItem):
                else _("supported file types:") + " *.%s" % ", *.".join(formats)
     
     def check_value(self, value):
-        """Override DataItem method"""
+        """Override DataItem method"""        
+        if not self.get_prop('data', 'check_value', True):
+            return True 
         if not isinstance(value, self.type):
             return False
         return len(value)>0
@@ -327,6 +337,8 @@ class FileOpenItem(FileSaveItem):
     """
     def check_value(self, value):
         """Override DataItem method"""
+        if not self.get_prop('data', 'check_value', True):
+            return True        
         if not isinstance(value, self.type):
             return False
         return os.path.exists(value) and os.path.isfile(value)
@@ -352,6 +364,8 @@ class FilesOpenItem(FileSaveItem):
 
     def check_value(self, value):
         """Override DataItem method"""
+        if not self.get_prop('data', 'check_value', True):
+            return True 
         allexist = True
         for path in value:
             allexist = allexist and os.path.exists(path) \
@@ -387,7 +401,9 @@ class DirectoryItem(StringItem):
         * help [string]: text shown in tooltip (optional)
     """
     def check_value(self, value):
-        """Override DataItem method"""
+        """Override DataItem method"""        
+        if not self.get_prop('data', 'check_value', True):
+            return True 
         if not isinstance(value, self.type):
             return False
         return os.path.exists(value) and os.path.isdir(value)
