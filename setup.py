@@ -22,7 +22,7 @@ Licensed under the terms of the CECILL License
 
 from __future__ import print_function
 
-import setuptools
+import setuptools  # analysis:ignore
 from distutils.core import setup
 import os
 
@@ -38,8 +38,13 @@ LONG_DESCRIPTION = """Set of basic GUIs to edit and display objects of many kind
     - ndarrays (NumPy's n-dimensional arrays) ;
     - etc."""
 KEYWORDS = ''
-CLASSIFIERS = ['Development Status :: 5 - Production/Stable',
-               'Topic :: Scientific/Engineering']
+CLASSIFIERS = ['Topic :: Scientific/Engineering']
+if 'beta' in version or 'b' in version:
+    CLASSIFIERS += ['Development Status :: 4 - Beta']
+elif 'alpha' in version or 'a' in version:
+    CLASSIFIERS += ['Development Status :: 3 - Alpha']
+else:
+    CLASSIFIERS += ['Development Status :: 5 - Production/Stable']
 
 if os.name == 'nt':
     SCRIPTS = ['guidata-tests', 'guidata-tests.bat']
@@ -84,8 +89,6 @@ if sphinx:
 
 
 setup(name=LIBNAME, version=version,
-      download_url='http://%s.googlecode.com/files/%s-%s.zip' % (
-                                                  LIBNAME, LIBNAME, version),
       description=DESCRIPTION, long_description=LONG_DESCRIPTION,
       packages=get_subpackages(LIBNAME),
       package_data={LIBNAME:
@@ -93,8 +96,9 @@ setup(name=LIBNAME, version=version,
       scripts=SCRIPTS,
       requires=["PyQt4 (>4.3)",],
       author = "Pierre Raybaut",
-      author_email = 'pierre.raybaut@cea.fr',
-      url = 'http://www.cea.fr',
+      author_email = 'pierre.raybaut@gmail.com',
+      url = 'https://github.com/PierreRaybaut/%s' % LIBNAME,
+      license = 'CeCILL V2',
       classifiers=CLASSIFIERS + [
         'Operating System :: MacOS',
         'Operating System :: Microsoft :: Windows',
