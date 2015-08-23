@@ -25,6 +25,7 @@ if API == 'pyqt5':
         PYQT5 = True
     except ImportError:
         pass
+    from PyQt5 import uic  # analysis:ignore
 elif API == 'pyqt':
     # Spyder 2.3 is compatible with both #1 and #2 PyQt API,
     # but to avoid issues with IPython and other Qt plugins
@@ -52,6 +53,7 @@ elif API == 'pyqt':
             API_NAME += (" (API v%d)" % sip.getapi('QString'))
         except AttributeError:
             pass
+    from PyQt4 import uic  # analysis:ignore
 
 
 if API == 'pyside':
