@@ -20,7 +20,7 @@ from guidata.qt.QtGui import (QAction, QApplication, QColor, QHBoxLayout, QIcon,
                               QKeySequence, QLabel, QLineEdit, QMenu,
                               QPushButton, QStyle, QToolButton, QVBoxLayout,
                               QWidget, QGroupBox)
-from guidata.qt.QtCore import SIGNAL, Qt
+from guidata.qt.QtCore import Qt
 
 # Local imports:
 from guidata.configtools import get_icon
@@ -50,12 +50,12 @@ def create_action(parent, title, triggered=None, toggled=None,
     """
     action = QAction(title, parent)
     if triggered:
-        parent.connect(action, SIGNAL("triggered(bool)"), triggered)
+        action.triggered.connect(triggered)
     if checkable is not None:
         # Action may be checkable even if the toggled signal is not connected
         action.setCheckable(checkable)
     if toggled:
-        parent.connect(action, SIGNAL("toggled(bool)"), toggled)
+        action.toggled.connect(toggled)
         action.setCheckable(True)
     if icon is not None:
         assert isinstance(icon, QIcon)
@@ -90,9 +90,9 @@ def create_toolbutton(parent, icon=None, text=None, triggered=None, tip=None,
         button.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
         button.setAutoRaise(True)
     if triggered is not None:
-        parent.connect(button, SIGNAL('clicked()'), triggered)
+        button.clicked.connect(triggered)
     if toggled is not None:
-        parent.connect(button, SIGNAL("toggled(bool)"), toggled)
+        button.toggled.connect(toggled)
         button.setCheckable(True)
     if shortcut is not None:
         button.setShortcut(shortcut)
@@ -112,7 +112,7 @@ def create_groupbox(parent, title=None, toggled=None, checked=None,
         group.setCheckable(True)
         if checked is not None:
             group.setChecked(checked)
-        parent.connect(group, SIGNAL("toggled(bool)"), toggled)
+        group.toggled.connect(toggled)
     if layout is not None:
         group.setLayout(layout)
     return group

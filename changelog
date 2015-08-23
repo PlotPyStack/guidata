@@ -1,3 +1,11 @@
+== Version 1.7.0 ==
+
+=== Possible API compatibility issues (since v1.6.2) ===
+
+  * Added PyQt5 support (there may be side effects).
+
+----
+
 == Version 1.6.1 ==
 
 === Possible API compatibility issues (since v1.6.0) ===

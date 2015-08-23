@@ -5,24 +5,25 @@
 # (copied from Spyder source code [spyderlib.qt])
 
 import os
-if os.environ['QT_API'] == 'pyqt':
-    from PyQt4.QtCore import *
-    from PyQt4.Qt import QCoreApplication
-    from PyQt4.Qt import Qt
 
-    # <!> WARNING <!>
-    # try...except statement for compatibility with PyQt 4.4 (see Issue 14)
-    try:
-        from PyQt4.QtCore import pyqtSignal as Signal
-        from PyQt4.QtCore import pyqtSlot as Slot
-    except ImportError:
-        # PyQt v4.4: not a problem for guidata as Signal and Slot are not used
-        # but it would be a problem for spyderlib for example
-        pass
-
-    from PyQt4.QtCore import pyqtProperty as Property
-    from PyQt4.QtCore import QT_VERSION_STR as __version__
+if os.environ['QT_API'] == 'pyqt5':
+    from PyQt5.QtCore import *                                # analysis:ignore
+    from PyQt5.QtCore import QCoreApplication
+    from PyQt5.QtCore import pyqtSignal as Signal
+    from PyQt5.QtCore import pyqtSlot as Slot
+    from PyQt5.QtCore import pyqtProperty as Property
+    from PyQt5.QtCore import QT_VERSION_STR as __version__
+elif os.environ['QT_API'] == 'pyqt':
+    from PyQt4.QtCore import *                                # analysis:ignore
+    from PyQt4.Qt import QCoreApplication                     # analysis:ignore
+    from PyQt4.Qt import Qt                                   # analysis:ignore
+    from PyQt4.QtCore import pyqtSignal as Signal             # analysis:ignore
+    from PyQt4.QtCore import pyqtSlot as Slot                 # analysis:ignore
+    from PyQt4.QtCore import pyqtProperty as Property         # analysis:ignore
+    from PyQt4.QtCore import QT_VERSION_STR as __version__    # analysis:ignore
+    # Forces new modules written by PyQt4 developers to be PyQt5-compatible
+    del SIGNAL, SLOT
 else:
     import PySide.QtCore
-    __version__ = PySide.QtCore.__version__
-    from PySide.QtCore import *
+    __version__ = PySide.QtCore.__version__                   # analysis:ignore
+    from PySide.QtCore import *                               # analysis:ignore

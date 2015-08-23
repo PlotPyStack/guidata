@@ -15,7 +15,6 @@ layout, showing read-only parameter sets or allowing to edit parameter values.
 SHOW = True # Show test in GUI-based test launcher
 
 from guidata.qt.QtGui import QMainWindow, QSplitter
-from guidata.qt.QtCore import SIGNAL
 
 from guidata.dataset.datatypes import (DataSet, BeginGroup, EndGroup,
                                        BeginTabGroup, EndTabGroup)
@@ -79,8 +78,7 @@ class MainWindow(QMainWindow):
                                              OtherDataSet, comment='')
         self.groupbox4 = DataSetEditGroupBox("Standard dataset",
                                              ExampleMultiGroupDataSet, comment='')
-        self.connect(self.groupbox3, SIGNAL("apply_button_clicked()"),
-                     self.update_window)
+        self.groupbox3.SIG_APPLY_BUTTON_CLICKED.connect(self.update_window)
         self.update_groupboxes()
         
         splitter = QSplitter(self)

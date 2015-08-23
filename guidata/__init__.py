@@ -15,6 +15,12 @@ External resources:
 .. _GoogleGroup: http://groups.google.fr/group/guidata_guiqwt
 """
 
+__version__ = '1.7.0beta1'
+
+# Dear (Debian, RPM, ...) package makers, please feel free to customize the
+# following path to module's data (images) and translations:
+DATAPATH = LOCALEPATH = ''
+
 
 #    Copyright © 2009-2010 CEA
 #    Pierre Raybaut
@@ -528,13 +534,6 @@ External resources:
 #    
 #    
 #    Version 2.0 dated 2006-09-05.
-
-
-__version__ = '1.6.2'
-
-# Dear (Debian, RPM, ...) package makers, please feel free to customize the
-# following path to module's data (images) and translations:
-DATAPATH = LOCALEPATH = ''
 
 import guidata.config
 

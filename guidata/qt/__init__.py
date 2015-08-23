@@ -1,60 +1,63 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright © 2011 Pierre Raybaut
+# Copyright © 2011-2012 Pierre Raybaut
+#           © 2012-2014 anatoly techtonik
 # Licensed under the terms of the MIT License
-# (copied from Spyder source code [spyderlib.qt])
+# (see spyderlib/__init__.py for details)
 
 """Transitional package (PyQt4 --> PySide)"""
 
 import os
-import warnings
 
-_modname = os.environ.setdefault('QT_API', 'pyqt')
-assert _modname in ('pyqt', 'pyside')
+os.environ.setdefault('QT_API', 'pyqt')
+assert os.environ['QT_API'] in ('pyqt5', 'pyqt', 'pyside')
 
-if _modname == 'pyqt':
-    # [June 2011]
-    # For now, we do not force the QString, QVariant, (...) API number because 
-    # `guidata` and its visualization counterpart `guiqwt` are compatible 
-    # with both API #1 and API #2. Moreover, `guiqwt` is currently based on 
-    # PyQwt, so unless we switch to Python 3 (probably not until 2012-2013), 
-    # there is absolutely no point forcing API to #2 because it wouldn't work 
-    # with PySide anyway (because a PySideQwt library would be needed).
-    # But note that `guidata` itself already works with PySide (a few things 
-    # need to be done to officially support PySide, like the file dialogs 
-    # compatibility issues).
-    #
-    # As a consequence, with Python 2.x, the default PyQt API will be API #1 
-    # (i.e. with QString and QVariant objects), unless the API has been set 
-    # before importing this module.
-    #
-#    try:
-#        import sip
-#        sip.setapi('QString', 2)
-#        sip.setapi('QVariant', 2)
-#    except AttributeError:
-#        warnings.warn("PyQt version is < v4.6\n"
-#                      "We try to keep guidata compatible with PyQt >=4.4, "
-#                      "so please report any compatibility issue.",
-#                      PendingDeprecationWarning, stacklevel=2)
-#    except ValueError, error:
-#        warnings.warn("PyQt has been set to API#1\n"
-#                      "Note that, even if guidata is designed for API#2, "
-#                      "we try to keep it compatible with API#1, "
-#                      "so please report any compatibility issue.",
-#                      PendingDeprecationWarning, stacklevel=2)
+API = os.environ['QT_API']
+API_NAME = {'pyqt5': 'PyQt5', 'pyqt': 'PyQt4', 'pyside': 'PySide'}[API]
+
+PYQT5 = False
+
+if API == 'pyqt5':
     try:
-        from PyQt4.QtCore import PYQT_VERSION_STR as __version__
-        __version_info__ = tuple(__version__.split('.')+['final', 1])
-        is_pyqt46 = __version__.startswith('4.6')
+        from PyQt5.QtCore import PYQT_VERSION_STR as __version__
+        is_old_pyqt = False
+        is_pyqt46 = False
+        PYQT5 = True
+    except ImportError:
+        pass
+elif API == 'pyqt':
+    # Spyder 2.3 is compatible with both #1 and #2 PyQt API,
+    # but to avoid issues with IPython and other Qt plugins
+    # we choose to support only API #2 for 2.4+
+    import sip
+    try:
+        sip.setapi('QString', 2)
+        sip.setapi('QVariant', 2)
+    except AttributeError:
+        # PyQt < v4.6. The actual check is done by requirements.check_qt()
+        # call from spyder.py
+        pass
+
+    try:
+        from PyQt4.QtCore import PYQT_VERSION_STR as __version__ # analysis:ignore
     except ImportError:
         # Switching to PySide
-        os.environ['QT_API'] = _modname = 'pyside'
+        API = os.environ['QT_API'] = 'pyside'
+        API_NAME = 'PySide'
+    else:
+        is_old_pyqt = __version__.startswith(('4.4', '4.5', '4.6', '4.7'))
+        is_pyqt46 = __version__.startswith('4.6')
+        import sip
+        try:
+            API_NAME += (" (API v%d)" % sip.getapi('QString'))
+        except AttributeError:
+            pass
 
-if _modname == 'pyside':
-    warnings.warn("guidata is still not fully compatible with PySide",
-                  RuntimeWarning)
-    import PySide
-    __version__ = PySide.__version__
-    from PySide import *
-    is_pyqt46 = False
+
+if API == 'pyside':
+    try:
+        from PySide import __version__  # analysis:ignore
+    except ImportError:
+        raise ImportError("Spyder requires PySide or PyQt to be installed")
+    else:
+        is_old_pyqt = is_pyqt46 = False
