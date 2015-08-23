@@ -22,6 +22,7 @@ Licensed under the terms of the CECILL License
 
 from __future__ import print_function
 
+import setuptools
 from distutils.core import setup
 import os
 
