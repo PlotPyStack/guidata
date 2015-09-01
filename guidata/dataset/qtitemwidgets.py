@@ -31,12 +31,11 @@ try:
 except ImportError:
     pass
 
-from guidata.qt.QtGui import (QIcon, QPixmap, QHBoxLayout, QGridLayout,
+from guidata.qt.QtGui import (QIcon, QPixmap, QHBoxLayout, QGridLayout, QColor,
                               QColorDialog, QPushButton, QLineEdit, QCheckBox,
-                              QComboBox, QWidget, QTabWidget, QGroupBox,
-                              QLabel, QTextEdit, QFrame, QDateEdit, QSlider,
-                              QDateTimeEdit, QColor)
-from guidata.qt.QtCore import Qt, QObject, SIGNAL
+                              QComboBox, QTabWidget, QGroupBox, QDateTimeEdit,
+                              QLabel, QTextEdit, QFrame, QDateEdit, QSlider)
+from guidata.qt.QtCore import Qt
 from guidata.qt.compat import getexistingdirectory
 try:
     from guidata.qt.QtCore import QStringList
@@ -239,8 +238,7 @@ class LineEditWidget(AbstractDataSetWidget):
             if item.check_item():
                 self.edit.setEnabled(False)
             self.edit.setToolTip(_("Value is forced to %d") % item.get_max())
-        QObject.connect(self.edit, SIGNAL("textChanged(QString)"),
-                        self.line_edit_changed)
+        self.edit.textChanged.connect(self.line_edit_changed)
 
     def get(self):
         """Override AbstractDataSetWidget method"""
@@ -299,7 +297,7 @@ class TextEditWidget(AbstractDataSetWidget):
             if item.check_item():
                 self.edit.setEnabled(False)
             self.edit.setToolTip(_("Value is forced to %d") % item.get_max())
-        QObject.connect(self.edit, SIGNAL("textChanged()"), self.text_changed)
+        self.edit.textChanged.connect(self.text_changed)
 
     def __get_text(self):
         """Get QTextEdit text, replacing UTF-8 EOL chars by os.linesep"""
@@ -347,8 +345,7 @@ class CheckBoxWidget(AbstractDataSetWidget):
         
         self.store = self.item.get_prop("display", "store", None)
         if self.store:
-            QWidget.connect(self.checkbox, SIGNAL("stateChanged(int)"),
-                            self.do_store)
+            self.checkbox.stateChanged.connect(self.do_store)
         
     def get(self):
         """Override AbstractDataSetWidget method"""
@@ -460,7 +457,7 @@ class ColorWidget(HLayoutMixin, LineEditWidget):
         super(ColorWidget, self).__init__(item, parent_layout)
         self.button = QPushButton("")
         self.button.setMaximumWidth(32)
-        QObject.connect(self.button, SIGNAL("clicked()"), self.select_color)
+        self.button.clicked.connect(self.select_color)
         self.group.addWidget(self.button)
         
     def update(self, value):
@@ -504,8 +501,7 @@ class SliderWidget(HLayoutMixin, LineEditWidget):
             self.slider.setRange(0, int((vmax-vmin)/vstep))
             self.convert_value = lambda v: v*vstep + vmin
             
-            QObject.connect(self.slider, SIGNAL("valueChanged(int)"),
-                            self.value_changed)
+            self.slider.valueChanged.connect(self.value_changed)
             self.group.addWidget(self.slider)
         else:
             self.slider = None
@@ -548,7 +544,7 @@ class FileWidget(HLayoutMixin, LineEditWidget):
         button = QPushButton()
         fmt = item.get_prop_value("data", "formats")
         button.setIcon(get_icon('%s.png' % fmt[0].lower(), default='file.png'))
-        QObject.connect(button, SIGNAL("clicked()"), self.select_file)
+        button.clicked.connect(self.select_file)
         self.group.addWidget(button)
         self.basedir = item.get_prop_value("data", "basedir")
         self.all_files_first = item.get_prop_value("data", "all_files_first")
@@ -593,7 +589,7 @@ class DirectoryWidget(HLayoutMixin, LineEditWidget):
         super(DirectoryWidget, self).__init__(item, parent_layout)
         button = QPushButton()
         button.setIcon(get_std_icon('DirOpenIcon'))
-        QObject.connect(button, SIGNAL("clicked()"), self.select_directory)
+        button.clicked.connect(self.select_directory)
         self.group.addWidget(button)
 
     def select_directory(self):
@@ -617,8 +613,7 @@ class ChoiceWidget(AbstractDataSetWidget):
         
         self.__first_call = True
         self.store = self.item.get_prop("display", "store", None)
-        QWidget.connect(self.combobox, SIGNAL("currentIndexChanged(int)"),
-                        self.index_changed)
+        self.combobox.currentIndexChanged.connect(self.index_changed)
         
     def index_changed(self, index):
         if self.store:
@@ -761,7 +756,7 @@ class FloatArrayWidget(AbstractDataSetWidget):
                                                  _("Largest element in array"))
         self.layout.addLayout(self.max_line, 2, 0)
         
-        QObject.connect(edit_button, SIGNAL("clicked()"), self.edit_array )
+        edit_button.clicked.connect(self.edit_array)
         self.arr = None # le tableau si il a été modifié
         self.instance = None
 
@@ -842,7 +837,7 @@ class ButtonWidget(AbstractDataSetWidget):
             if is_text_string(_icon):
                 _icon = get_icon(_icon)
             self.button.setIcon(_icon)
-        QObject.connect(self.button, SIGNAL("clicked()"), self.clicked)
+        self.button.clicked.connect(self.clicked)
         self.cb_value = None
 
     def get(self):

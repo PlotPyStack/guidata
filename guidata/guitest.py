@@ -20,7 +20,7 @@ from spyderlib.widgets.sourcecode.codeeditor import CodeEditor
 from guidata.qt.QtGui import (QWidget, QVBoxLayout, QSplitter, QFont,
                               QListWidget, QPushButton, QLabel, QGroupBox,
                               QHBoxLayout, QShortcut, QKeySequence)
-from guidata.qt.QtCore import SIGNAL, Qt, QSize
+from guidata.qt.QtCore import Qt, QSize
 
 from guidata.config import _
 from guidata.configtools import get_icon, get_family, MONOSPACE
@@ -140,14 +140,13 @@ class TestLauncherWindow(QSplitter):
         self.addWidget(listwidget)
         self.addWidget(self.properties)
         
-        self.connect(self.properties.run_button, SIGNAL("clicked()"),
-                     lambda: tests[listwidget.currentRow()].run())
-        self.connect(self.properties.quit_button, SIGNAL("clicked()"),
-                     self.close)
-        self.connect(listwidget, SIGNAL('currentRowChanged(int)'),
-                     lambda row: self.properties.set_item(tests[row]))
-        self.connect(listwidget, SIGNAL('itemActivated(QListWidgetItem*)'),
-                     lambda: tests[listwidget.currentRow()].run())
+        self.properties.run_button.clicked.connect(
+                                lambda: tests[listwidget.currentRow()].run())
+        self.properties.quit_button.clicked.connect(self.close)
+        listwidget.currentRowChanged.connect(
+                            lambda row: self.properties.set_item(tests[row]))
+        listwidget.itemActivated.connect(
+                            lambda: tests[listwidget.currentRow()].run())
         listwidget.setCurrentRow(0)
         
         QShortcut(QKeySequence("Escape"), self, self.close)

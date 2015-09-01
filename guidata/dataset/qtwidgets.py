@@ -32,7 +32,7 @@ from guidata.qt.QtGui import (QDialog, QMessageBox, QDialogButtonBox, QWidget,
                               QVBoxLayout, QGridLayout, QLabel, QSpacerItem,
                               QColor, QTabWidget, QIcon, QApplication, QPainter,
                               QPicture, QBrush, QGroupBox, QPushButton)
-from guidata.qt.QtCore import SIGNAL, SLOT, Qt, QRect, QSize
+from guidata.qt.QtCore import Qt, QRect, QSize, Signal
 from guidata.qt.compat import getopenfilename, getopenfilenames, getsavefilename
 
 from guidata.configtools import get_icon
@@ -69,9 +69,9 @@ class DataSetEditDialog(QDialog):
         bbox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel
                                 | apply_button )
         self.bbox = bbox
-        self.connect(bbox, SIGNAL("accepted()"), SLOT("accept()"))
-        self.connect(bbox, SIGNAL("rejected()"), SLOT("reject()"))
-        self.connect(bbox, SIGNAL("clicked(QAbstractButton*)"), self.button_clicked)
+        bbox.accepted.connect(self.accept)
+        bbox.rejected.connect(self.reject)
+        bbox.clicked.connect(self.button_clicked)
         self.layout.addWidget(bbox)
         
         self.setLayout(self.layout)
@@ -126,8 +126,8 @@ class DataSetEditDialog(QDialog):
                 is_ok = False
         if not is_ok:
             QMessageBox.warning(self, self.instance.get_title(),
-                                _("Some required entries are incorrect")+".\n",
-                                _("Please check highlighted fields."))
+                        _("Some required entries are incorrect")+"\n"+\
+                        _("Please check highlighted fields."))
             return False
         return True
 
@@ -474,6 +474,8 @@ class DataSetEditGroupBox(DataSetShowGroupBox):
     button_text: action button text (default: "Apply")
     button_icon: QIcon object or string (default "apply.png")
     """
+    SIG_APPLY_BUTTON_CLICKED = Signal()
+    
     def __init__(self, label, klass, button_text=None, button_icon=None,
                  show_button=True, wordwrap=False, **kwargs):
         DataSetShowGroupBox.__init__(self, label, klass, wordwrap=wordwrap,
@@ -486,7 +488,7 @@ class DataSetEditGroupBox(DataSetShowGroupBox):
             elif is_text_string(button_icon):
                 button_icon = get_icon(button_icon)
             apply_btn = QPushButton(button_icon, button_text, self)
-            self.connect(apply_btn, SIGNAL("clicked()"), self.set)
+            apply_btn.clicked.connect(self.set)
             layout = self.edit.layout
             layout.addWidget(apply_btn, layout.rowCount(),
                              0, 1, -1, Qt.AlignRight)
@@ -500,7 +502,7 @@ class DataSetEditGroupBox(DataSetShowGroupBox):
         for widget in self.edit.widgets:
             if widget.is_active() and widget.check():
                 widget.set()
-        self.emit(SIGNAL("apply_button_clicked()"))
+        self.SIG_APPLY_BUTTON_CLICKED.emit()
 
     def child_title(self, item):
         """Return data item title combined with QApplication title"""

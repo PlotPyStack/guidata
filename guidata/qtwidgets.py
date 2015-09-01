@@ -14,8 +14,9 @@ for developing easily Qt-based graphical user interfaces.
 """
 
 from math import cos, sin, pi
+from guidata.qt import PYQT5
 from guidata.qt.QtGui import QLabel, QPainter, QPen, QWidget, QDockWidget
-from guidata.qt.QtCore import SIGNAL, QSize, Qt
+from guidata.qt.QtCore import QSize, Qt
 
 # Local imports:
 from guidata.configtools import get_family
@@ -102,8 +103,7 @@ class DockableWidgetMixin(object):
         dock.setAllowedAreas(self._allowed_areas)
         dock.setFeatures(self._features)
         dock.setWidget(self)
-        self.connect(dock, SIGNAL('visibilityChanged(bool)'),
-                     self.visibility_changed)
+        dock.visibilityChanged.connect(self.visibility_changed)
         self.dockwidget = dock
         return (dock, self._location)
         
@@ -121,5 +121,8 @@ class DockableWidgetMixin(object):
 
 class DockableWidget(QWidget, DockableWidgetMixin):
     def __init__(self, parent):
-        QWidget.__init__(self, parent)
-        DockableWidgetMixin.__init__(self, parent)
+        if PYQT5:
+            super(DockableWidget, self).__init__(parent, parent=parent)
+        else:
+            QWidget.__init__(self, parent)
+            DockableWidgetMixin.__init__(self, parent)

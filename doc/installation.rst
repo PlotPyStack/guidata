@@ -6,7 +6,7 @@ Dependencies
 
 Requirements:
     * Python >=v2.5
-    * PyQt4 4.x (x>=3 ; recommended x>=4)
+    * PyQt4 4.x (x>=3 ; recommended x>=4) or PyQt5 5.x (x>=5)
     * spyderlib >=v2.0.10 for the test launcher and array/dictionnary editors
     
 Optional Python modules:
