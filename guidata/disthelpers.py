@@ -30,6 +30,7 @@ import warnings
 
 # Local imports
 from guidata.configtools import get_module_path
+from guidata.py3compat import to_binary_string
 
 
 #==============================================================================
@@ -104,8 +105,9 @@ def _remove_later(fname):
 def get_msvc_version(python_version):
     """Return Microsoft Visual C++ version used to build this Python version"""
     if python_version is None:
-        python_version = '2.7'
-        warnings.warn("assuming Python 2.7 target")
+        python_version = '%s.%s' % (sys.version_info.major,
+                                    sys.version_info.minor)
+        warnings.warn("Assuming Python %s target" % python_version)
     if python_version in ('2.6', '2.7', '3.0', '3.1', '3.2'):
         # Python 2.6-2.7, 3.0-3.2 were built with Visual Studio 9.0.21022.8
         # (i.e. Visual C++ 2008, not Visual C++ 2008 SP1!)
@@ -343,7 +345,7 @@ class Distribution(object):
         self.bin_path_excludes = self.DEFAULT_BIN_PATH_EXCLUDES
         self.msvc = os.name == 'nt'
         self._py2exe_is_loaded = False
-        self._pyqt4_added = False
+        self._pyqt_added = False
         self._pyside_added = False
         # Attributes relative to cx_Freeze:
         self.executables = []
@@ -409,7 +411,7 @@ class Distribution(object):
     def add_text_data_file(self, filename, contents):
         """Create temporary data file *filename* with *contents*
         and add it to *data_files*"""
-        open(filename, 'wb').write(contents)
+        open(filename, 'wb').write(to_binary_string(contents))
         self.data_files += [("", (filename, ))]
         _remove_later(filename)
     
@@ -417,18 +419,25 @@ class Distribution(object):
         self.data_files += [(destdir, (filename, ))]
 
     #------ Adding packages
-    def add_pyqt4(self):
-        """Include module PyQt4 to the distribution"""
-        if self._pyqt4_added:
+    def add_pyqt(self):
+        """Include module PyQt4 or PyQt5 to the distribution"""
+        if self._pyqt_added:
             return
-        self._pyqt4_added = True
+        self._pyqt_added = True
         
-        self.includes += ['sip', 'PyQt4.Qt', 'PyQt4.QtSvg', 'PyQt4.QtNetwork']
+        try:
+            import PyQt4 as PyQt
+            qtver = 4
+        except ImportError:
+            import PyQt5 as PyQt
+            qtver = 5
+        self.includes += ['sip', 'PyQt%d.Qt' % qtver,
+                          'PyQt%d.QtSvg' % qtver,
+                          'PyQt%d.QtNetwork' % qtver]
         
-        import PyQt4
-        pyqt_path = osp.dirname(PyQt4.__file__)
+        pyqt_path = osp.dirname(PyQt.__file__)
         
-        # Configuring PyQt4
+        # Configuring PyQt
         conf = os.linesep.join(["[Paths]", "Prefix = .", "Binaries = ."])
         self.add_text_data_file('qt.conf', conf)
         
@@ -440,15 +449,18 @@ class Distribution(object):
                 shutil.rmtree(pyqt_tmp)
             os.mkdir(pyqt_tmp)
             vc90man_pyqt = osp.join(pyqt_tmp, vc90man)
-            man = open(vc90man, "r").read().replace('<file name="',
-                                        '<file name="Microsoft.VC90.CRT\\')
-            open(vc90man_pyqt, 'w').write(man)
+            if osp.isfile(vc90man):
+                man = open(vc90man, "r").read().replace('<file name="',
+                                            '<file name="Microsoft.VC90.CRT\\')
+                open(vc90man_pyqt, 'w').write(man)
+            else:
+                vc90man_pyqt = None
         for dirpath, _, filenames in os.walk(osp.join(pyqt_path,
                                                       "plugins")):
             filelist = [osp.join(dirpath, f) for f in filenames
                         if osp.splitext(f)[1] in ('.dll', '.py')]
-            if self.msvc and [f for f in filelist
-                           if osp.splitext(f)[1] == '.dll']:
+            if self.msvc and vc90man_pyqt is not None and\
+               [f for f in filelist if osp.splitext(f)[1] == '.dll']:
                 # Where there is a DLL build with Microsoft Visual C++ 2008,
                 # there must be a manifest file as well...
                 # ...congrats to Microsoft for this great simplification!
@@ -522,10 +534,14 @@ class Distribution(object):
     def add_qt_bindings(self):
         """Include Qt bindings, i.e. PyQt4 or PySide"""
         try:
-            imp.find_module('PyQt4')
-            self.add_modules('PyQt4')
+            imp.find_module('PyQt5')
+            self.add_modules('PyQt5')
         except ImportError:
-            self.add_modules('PySide')
+            try:
+                imp.find_module('PyQt4')
+                self.add_modules('PyQt4')
+            except ImportError:
+                self.add_modules('PySide')
 
     def add_matplotlib(self):
         """Include module Matplotlib to the distribution"""
@@ -548,8 +564,8 @@ class Distribution(object):
         """Include module *module_name*"""
         for module_name in module_names:
             print("Configuring module '%s'" % module_name)
-            if module_name == 'PyQt4':
-                self.add_pyqt4()
+            if module_name in ('PyQt4', 'PyQt5'):
+                self.add_pyqt()
             elif module_name == 'PySide':
                 self.add_pyside()
             elif module_name == 'scipy.io':
@@ -595,11 +611,7 @@ class Distribution(object):
             elif module_name == 'guidata':
                 self.add_module_data_files('guidata', ("images", ),
                                        ('.png', '.svg'), copy_to_root=False)
-                try:
-                    imp.find_module('PyQt4')
-                    self.add_pyqt4()
-                except ImportError:
-                    self.add_pyside()
+                self.add_qt_bindings()
             elif module_name == 'guiqwt':
                 self.add_module_data_files('guiqwt', ("images", ),
                                        ('.png', '.svg'), copy_to_root=False)
