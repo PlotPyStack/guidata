@@ -19,7 +19,6 @@ GUIData reference
 
 .. automodule:: guidata.userconfig
    :members:
-   :inherited-members:
 
 .. automodule:: guidata.utils
    :members:

@@ -6,6 +6,9 @@
 # (see guidata/__init__.py for details)
 
 """
+dataset.qtitemwidgets
+=====================
+
 Widget factories used to edit data items
 (factory registration is done in guidata.dataset.qtwidgets)
 (data item types are defined in guidata.dataset.datatypes)
@@ -60,13 +63,14 @@ from guidata.py3compat import to_text_string, is_text_string
 
 class AbstractDataSetWidget(object):
     """
-    Base class for 'widgets' handled by DataSetEditLayout and it's derived classes
+    Base class for 'widgets' handled by `DataSetEditLayout` and it's derived 
+    classes.
     
-    this is a generic representation of an input (or display) widget that
+    This is a generic representation of an input (or display) widget that
     has a label and one or more entry field.
     
-    DataSetEditLayout uses a registry of *Item to *Widget mapping in order to
-    automatically create a GUI for a DataSet structure
+    `DataSetEditLayout` uses a registry of *Item* to *Widget* mapping in order 
+    to automatically create a GUI for a `DataSet` structure
     """
     READ_ONLY = False
     def __init__(self, item, parent_layout):

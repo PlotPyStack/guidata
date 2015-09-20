@@ -3,15 +3,15 @@
 guidata
 =======
 
-Based on the Qt Python binding module PyQt4, `guidata` is a Python library
+Based on the Qt Python binding module PyQt, `guidata` is a Python library
 generating graphical user interfaces for easy dataset editing and display.
-It also provides helpers and application development tools for PyQt4.
+It also provides helpers and application development tools for PyQt.
 
 External resources:
-    * Bug reports and feature requests: `GoogleCode`_
+    * Bug reports and feature requests: `GitHub`_
     * Help, support and discussions around the project: `GoogleGroup`_
 
-.. _GoogleCode: http://guidata.googlecode.com
+.. _GitHub: https://github.com/PierreRaybaut/guidata
 .. _GoogleGroup: http://groups.google.fr/group/guidata_guiqwt
 """
 

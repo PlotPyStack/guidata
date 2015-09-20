@@ -50,22 +50,23 @@ following recommendations should be followed:
 PyQt / PySide compatibility
 ---------------------------
 
-In the near future, the project will be officially compatible with both PyQt 
-and PySide.
+The project should be mostly compatible with both PyQt and PySide (although 
+PySide is not as popular as it used to be, so testing tend to be limited).
 
-In its current implementation, it has to be compatible with PyQt API #1 (old 
-PyQt versions) and API #2 (PySide-compatible API, PyQt >= v4.6), which means 
-that the following recommendations should be followed:
+PyQt5 compatibility
+-------------------
+
+In its current implementation, the code base has to be compatible with PyQt 
+API #2 (PySide-compatible API, PyQt >= v4.6) and with PyQt5, which means that 
+the following recommendations should be followed:
 
 * `QVariant` objects must not be used (API #2 compatibility)
 
-* `QString` and `QStringList` objects must not be used (API #2 compatibility)
+* Use exclusively new-style signals and slots
 
-* When connecting built-in C++ signals which were originally made to pass 
-  strings (or string lists), the arguments should always be assumed to be 
-  `QString` (or `QStringList`) objects (API #1 compatibility) and so be 
-  converted systematically to the Python equivalent object, i.e. unicode 
-  (or list).
+* Read carefully PyQt5 documentation regarding class inheritance behavior: it 
+  is quite different than the old PyQt4 implementation. Producing code 
+  compatible with both PyQt4 and PyQt5 can be tricky: testing is essential.
 
 
 Python 3 compatibility
@@ -111,7 +112,7 @@ issues with Python 3. For example:
 
   * file I/O may return `bytes` instead of `str` in Python 3 (depending on the 
     open mode): this can be solved by calling the `decode` method on the `bytes` 
-    object (this will work on both Python 2 `str` and Python 3 `bytes objects)
+    object (this will work on both Python 2 `str` and Python 3 `bytes` objects)
 
   * in Python 3.0-3.2, the `u'unicode text'` or `u"unicode text"` syntax is 
     not allowed and will raise a SyntaxError: this can be solved by inserting the 

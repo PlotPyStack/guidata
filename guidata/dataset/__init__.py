@@ -14,9 +14,13 @@ display and editing with automatically generated graphical user interfaces.
 
 .. automodule:: guidata.dataset.dataitems
    :members:
-   :inherited-members:
        
 .. automodule:: guidata.dataset.datatypes
    :members:
-   :inherited-members:
+       
+.. automodule:: guidata.dataset.qtitemwidgets
+   :members:
+       
+.. automodule:: guidata.dataset.qtwidgets
+   :members:
 """

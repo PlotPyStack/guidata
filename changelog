@@ -2,7 +2,7 @@
 
 === Possible API compatibility issues (since v1.6.2) ===
 
-  * Added PyQt5 support (there may be side effects).
+  * Added support for PyQt5 (removed old-style signals)
 
 ----
 

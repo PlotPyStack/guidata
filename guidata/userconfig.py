@@ -281,7 +281,8 @@ class UserConfig(cp.ConfigParser):
     def get_default(self, section, option):
         """
         Get Default value for a given (section, option)
-        -> useful for type checking in 'get' method
+
+        Useful for type checking in 'get' method
         """
         section = self.__check_section_option(section, option)
         options = self.defaults.get(section, {})

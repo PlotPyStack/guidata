@@ -6,6 +6,9 @@
 # (see guidata/__init__.py for details)
 
 """
+dataset.qtwidgets
+=================
+
 Dialog boxes used to edit data sets:
     DataSetEditDialog
     DataSetGroupEditDialog
@@ -474,6 +477,8 @@ class DataSetEditGroupBox(DataSetShowGroupBox):
     button_text: action button text (default: "Apply")
     button_icon: QIcon object or string (default "apply.png")
     """
+    
+    #: Signal emitted when Apply button is clicked
     SIG_APPLY_BUTTON_CLICKED = Signal()
     
     def __init__(self, label, klass, button_text=None, button_icon=None,
