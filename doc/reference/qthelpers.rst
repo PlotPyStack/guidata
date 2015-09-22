@@ -1,0 +1,2 @@
+.. automodule:: guidata.qthelpers
+   :members:

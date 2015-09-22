@@ -11,7 +11,7 @@ Contents:
     installation
     development
     examples
-    reference
+    reference/index
     
 
 Indices and tables:

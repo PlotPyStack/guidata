@@ -1,0 +1,2 @@
+.. automodule:: guidata.userconfig
+   :members:
