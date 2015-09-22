@@ -1,7 +1,7 @@
-guidata reference
-=================
+Reference
+=========
 
-API reference:
+guidata API:
 
 .. toctree::
     :maxdepth: 2
