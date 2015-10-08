@@ -568,6 +568,8 @@ class Distribution(object):
                 self.add_pyqt()
             elif module_name == 'PySide':
                 self.add_pyside()
+            elif module_name == 'scipy':
+                self.add_module_dir('scipy')
             elif module_name == 'scipy.io':
                 self.includes += ['scipy.io.matlab.streams']
             elif module_name == 'matplotlib':
@@ -652,6 +654,34 @@ class Distribution(object):
             if verbose:
                 for name in pathlist:
                     print("  ", name)
+    
+    def add_module_dir(self, module_name, verbose=False, exclude_dirs=[]):
+        """
+        Collect all module files for module *module_name*
+        and add them to *data_files*
+        """
+        module_dir = get_module_path(module_name)
+        nstrip = len(module_dir) + len(osp.sep)
+        for dirpath, dirnames, filenames in os.walk(module_dir):
+            if osp.basename(dirpath) in exclude_dirs:
+                continue
+            for dn in dirnames[:]:
+                if not osp.isfile(osp.join(dirpath, dn, '__init__.py')):
+                    dirnames.remove(dn)
+            dirname = osp.join(module_name, dirpath[nstrip:])
+            for filename in filenames:
+                ext = osp.splitext(filename)[1].lower()
+                if ext in ('.py', '.pyd'):
+                    if filename == '__init__.py':
+                        fn = dirname
+                    else:
+                        fn = osp.splitext(osp.join(dirname, filename))[0]
+                    if fn.endswith(os.sep):
+                        fn = fn[:-1]
+                    modname = ".".join(fn.split(os.sep))
+                    self.includes += [modname]
+                    if verbose:
+                        print("  + ", modname)
     
     def add_module_data_files(self, module_name, data_dir_names, extensions,
                               copy_to_root=True, verbose=False,
@@ -772,9 +802,30 @@ class Distribution(object):
         assert not self._py2exe_is_loaded, \
                "cx_Freeze can't be executed after py2exe"
         from cx_Freeze import setup
+        
+        #===== Monkey-patching cx_Freeze (backported from v5.0 dev) ===========
+        from cx_Freeze import hooks
+        def load_h5py(finder, module):
+            """h5py module has a number of implicit imports"""
+            finder.IncludeModule('h5py.defs')
+            finder.IncludeModule('h5py.utils')
+            finder.IncludeModule('h5py._proxy')
+            try:
+                import h5py.api_gen
+                finder.IncludeModule('h5py.api_gen')
+            except ImportError:
+                pass
+            finder.IncludeModule('h5py._errors')
+            finder.IncludeModule('h5py.h5ac')
+        hooks.load_h5py = load_h5py
+        #===== Monkey-patching cx_Freeze (backported from v5.0 dev) ===========
+
         if cleanup:
             self.__cleanup()
         sys.argv += ["build"]
+        excv = "3" if sys.version[0] == "2" else "2"
+        self.excludes += ["sympy.mpmath.libmp.exec_py%s" % excv]
+        self.excludes += ["PyQt4.uic.port_v%s" % excv]
         build_exe = dict(include_files=to_include_files(self.data_files),
                          includes=self.includes, excludes=self.excludes,
                          bin_excludes=self.bin_excludes,
