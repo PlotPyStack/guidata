@@ -50,7 +50,10 @@ def create_action(parent, title, triggered=None, toggled=None,
     """
     action = QAction(title, parent)
     if triggered:
-        action.triggered.connect(triggered)
+        if checkable:
+            action.triggered.connect(triggered)
+        else:
+            action.triggered.connect(lambda checked=False: triggered())
     if checkable is not None:
         # Action may be checkable even if the toggled signal is not connected
         action.setCheckable(checkable)
@@ -90,7 +93,7 @@ def create_toolbutton(parent, icon=None, text=None, triggered=None, tip=None,
         button.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
         button.setAutoRaise(True)
     if triggered is not None:
-        button.clicked.connect(triggered)
+        button.clicked.connect(lambda checked=False: triggered())
     if toggled is not None:
         button.toggled.connect(toggled)
         button.setCheckable(True)
