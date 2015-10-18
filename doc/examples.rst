@@ -7,7 +7,7 @@ Basic example
 Source code : ::
 
  import guidata
- guidata.qapplication() # not required if a QApplication has already been created
+ _app = guidata.qapplication() # not required if a QApplication has already been created
  
  import guidata.dataset.datatypes as dt
  import guidata.dataset.dataitems as di
