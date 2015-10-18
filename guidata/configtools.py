@@ -36,7 +36,7 @@ def get_module_data_path(modname, relpath=None):
     datapath = getattr(sys.modules[modname], 'DATAPATH', '')
     if not datapath:
         datapath = get_module_path(modname)
-        parentdir = osp.join(datapath, osp.pardir)
+        parentdir = osp.normpath(osp.join(datapath, osp.pardir))
         if osp.isfile(parentdir):
             # Parent directory is not a directory but the 'library.zip' file:
             # this is either a py2exe or a cx_Freeze distribution
