@@ -381,7 +381,7 @@ class FilesOpenItem(FileSaveItem):
     def from_string(self, value):        
         """Override DataItem method"""
         value = to_text_string(value)
-        if value.endswith("']"):
+        if value.endswith("']") or value.endswith('"]'):
             value = eval(value)
         else:
             value = [value]
