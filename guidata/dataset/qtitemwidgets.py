@@ -354,8 +354,8 @@ class CheckBoxWidget(AbstractDataSetWidget):
     def get(self):
         """Override AbstractDataSetWidget method"""
         value = self.item.get()
-        if value:
-            self.checkbox.setChecked(True)
+        if value is not None:
+            self.checkbox.setChecked(value)
     
     def set(self):
         """Override AbstractDataSetWidget method"""
