@@ -307,7 +307,8 @@ from guidata.dataset.qtitemwidgets import (LineEditWidget, TextEditWidget,
                 CheckBoxWidget, ColorWidget, FileWidget, DirectoryWidget,
                 ChoiceWidget, MultipleChoiceWidget, FloatArrayWidget,
                 GroupWidget, AbstractDataSetWidget, ButtonWidget,
-                TabGroupWidget, DateWidget, DateTimeWidget, SliderWidget)
+                TabGroupWidget, DateWidget, DateTimeWidget, SliderWidget,
+                FloatSliderWidget)
 from guidata.dataset.dataitems import (FloatItem, StringItem, TextItem, IntItem,
                 BoolItem, ColorItem, FileOpenItem, FilesOpenItem, FileSaveItem,
                 DirectoryItem, ChoiceItem, ImageChoiceItem, MultipleChoiceItem,
@@ -319,7 +320,7 @@ DataSetEditLayout.register(FloatItem, LineEditWidget)
 DataSetEditLayout.register(StringItem, LineEditWidget)
 DataSetEditLayout.register(TextItem, TextEditWidget)
 DataSetEditLayout.register(IntItem, SliderWidget)
-DataSetEditLayout.register(FloatItem, SliderWidget)
+DataSetEditLayout.register(FloatItem, FloatSliderWidget)
 DataSetEditLayout.register(BoolItem, CheckBoxWidget)
 DataSetEditLayout.register(DateItem, DateWidget)
 DataSetEditLayout.register(DateTimeItem, DateTimeWidget)

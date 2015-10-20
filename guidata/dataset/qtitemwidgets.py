@@ -490,39 +490,61 @@ class ColorWidget(HLayoutMixin, LineEditWidget):
 
 class SliderWidget(HLayoutMixin, LineEditWidget):
     """
-    NumericTypeItem with Slider
+    IntItem with Slider
     """
+    DATA_TYPE = int
+
     def __init__(self, item, parent_layout):
         super(SliderWidget, self).__init__(item, parent_layout)
+        self.slider = self.vmin = self.vmax = None
         if item.get_prop_value("display", "slider"):
+            self.vmin = item.get_prop_value("data", "min")
+            self.vmax = item.get_prop_value("data", "max")
+            assert self.vmin is not None and self.vmax is not None, \
+                "SliderWidget requires that item min/max have been defined"
             self.slider = QSlider()
             self.slider.setOrientation(Qt.Horizontal)
-            vmin = item.get_prop_value("data", "min")
-            vmax = item.get_prop_value("data", "max")
-            vstep = item.get_prop_value("data", "step", 1)
-            assert vmin is not None and vmax is not None, "SliderWidget requires that NumericTypeItem min/max have been defined"
-            
-            self.slider.setRange(0, int((vmax-vmin)/vstep))
-            self.convert_value = lambda v: v*vstep + vmin
-            
+            self.setup_slider(item)
             self.slider.valueChanged.connect(self.value_changed)
             self.group.addWidget(self.slider)
-        else:
-            self.slider = None
+    
+    def value_to_slider(self, value):
+        return value
+    
+    def slider_to_value(self, value):
+        return value
+            
+    def setup_slider(self, item):
+        self.slider.setRange(self.vmin, self.vmax)
         
     def update(self, value):
         """Reimplement LineEditWidget method"""
         LineEditWidget.update(self, value)
-        if  self.slider is not None and isinstance(value, int):
+        if  self.slider is not None and isinstance(value, self.DATA_TYPE):
             self.slider.blockSignals(True)
-            self.slider.setValue(int(value))
+            self.slider.setValue(self.value_to_slider(value))
             self.slider.blockSignals(False)
             
     def value_changed(self, ivalue):
         """Update the lineedit"""
-        value = str(self.convert_value(ivalue))
+        value = str(self.slider_to_value(ivalue))
         self.edit.setText(value)
         self.update(value)
+
+class FloatSliderWidget(SliderWidget):
+    """
+    FloatItem with Slider
+    """
+    DATA_TYPE = float
+
+    def value_to_slider(self, value):
+        return (value-self.vmin)*100/(self.vmax-self.vmin)
+    
+    def slider_to_value(self, value):
+        return value*(self.vmax-self.vmin)/100+self.vmin
+            
+    def setup_slider(self, item):
+        self.slider.setRange(0, 100)
 
 
 def _get_child_title_func(ancestor):
