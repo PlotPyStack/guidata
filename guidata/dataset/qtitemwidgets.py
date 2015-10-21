@@ -833,10 +833,7 @@ class FloatArrayWidget(AbstractDataSetWidget):
         """Open an array editor dialog"""
         parent = self.parent_layout.parent
         label = self.item.get_prop_value("display", "label")
-        try:
-            from spyderlib.widgets.arrayeditor import ArrayEditor
-        except ImportError:
-            from spyderlib.widgets.editors.arrayeditor import ArrayEditor
+        from spyderlib.widgets.arrayeditor import ArrayEditor
         editor = ArrayEditor(parent)
         if editor.setup_and_check(self.arr, title=label):
             if editor.exec_():
