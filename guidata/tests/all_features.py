@@ -73,10 +73,14 @@ class TestParameters(DataSet):
     bool2 = BoolItem("Boolean option with label", "Label").set_pos(col=1,
                                                                    colspan=2)
     color = ColorItem("Color", default="red")
-    choice = ChoiceItem("Single choice",
-                        [(16, "first choice"), (32, "second choice"),
-                         (64, "third choice")]
-                        ).set_pos(col=1, colspan=2)
+    choice1 = ChoiceItem("Single choice (radio)",
+                         [(16, "first choice"), (32, "second choice"),
+                          (64, "third choice")], radio=True
+                         ).set_pos(col=1, colspan=2)
+    choice2 = ChoiceItem("Single choice (combo)",
+                         [(16, "first choice"), (32, "second choice"),
+                          (64, "third choice")]
+                         ).set_pos(col=1, colspan=2)
     _eg = EndGroup("A sub group")
     floatarray = FloatArrayItem("Float array", default=np.ones( (50, 5), float),
                                 format=" %.2e ").set_pos(col=1)

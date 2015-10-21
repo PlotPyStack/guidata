@@ -37,7 +37,8 @@ except ImportError:
 from guidata.qt.QtGui import (QIcon, QPixmap, QHBoxLayout, QGridLayout, QColor,
                               QColorDialog, QPushButton, QLineEdit, QCheckBox,
                               QComboBox, QTabWidget, QGroupBox, QDateTimeEdit,
-                              QLabel, QTextEdit, QFrame, QDateEdit, QSlider)
+                              QLabel, QTextEdit, QFrame, QDateEdit, QSlider,
+                              QRadioButton, QVBoxLayout)
 from guidata.qt.QtCore import Qt
 from guidata.qt.compat import getexistingdirectory
 try:
@@ -634,12 +635,19 @@ class ChoiceWidget(AbstractDataSetWidget):
     """
     def __init__(self, item, parent_layout):
         super(ChoiceWidget, self).__init__(item, parent_layout)
-        self.combobox = self.group = QComboBox()
-        self.combobox.setToolTip(item.get_help())
-        
-        self.__first_call = True
+        self._first_call = True
+        self.is_radio = item.get_prop_value("display", "radio")
         self.store = self.item.get_prop("display", "store", None)
-        self.combobox.currentIndexChanged.connect(self.index_changed)
+        if self.is_radio:
+            self.group = QGroupBox()
+            self.group.setToolTip(item.get_help())
+            self.vbox = QVBoxLayout()
+            self.group.setLayout(self.vbox)
+            self._buttons = []
+        else:
+            self.combobox = self.group = QComboBox()
+            self.combobox.setToolTip(item.get_help())
+            self.combobox.currentIndexChanged.connect(self.index_changed)
         
     def index_changed(self, index):
         if self.store:
@@ -654,12 +662,21 @@ class ChoiceWidget(AbstractDataSetWidget):
             cb(self.item.instance, self.item.item, self.value())
             self.parent_layout.update_widgets(except_this_one=self)
     
-    def fill_combo(self):
-        self.combobox.blockSignals(True)
-        while self.combobox.count():
-            self.combobox.removeItem(0)
+    def initialize_widget(self):
+        if self.is_radio:
+            for button in self._buttons:
+                button.toggled.disconnect(self.index_changed)
+                self.vbox.removeWidget(button)
+                button.deleteLater()
+            self._buttons = []
+        else:
+            self.combobox.blockSignals(True)
+            while self.combobox.count():
+                self.combobox.removeItem(0)
         _choices = self.item.get_prop_value("data", "choices")
         for key, lbl, img in _choices:
+            if self.is_radio:
+                button = QRadioButton(lbl, self.group)
             if img:
                 if is_text_string(img):
                     if not osp.isfile(img):
@@ -667,14 +684,42 @@ class ChoiceWidget(AbstractDataSetWidget):
                     img = QIcon(img)
                 elif isinstance(img, collections.Callable):
                     img = img(key)
-                self.combobox.addItem(img, lbl)
-            else:
+                if self.is_radio:
+                    button.setIcon(img)
+                else:
+                    self.combobox.addItem(img, lbl)
+            elif not self.is_radio:
                 self.combobox.addItem(lbl)
-        self.combobox.blockSignals(False)
-        
+            if self.is_radio:
+                self._buttons.append(button)
+                self.vbox.addWidget(button)
+                button.toggled.connect(self.index_changed)
+        if not self.is_radio:
+            self.combobox.blockSignals(False)
+
+    def set_widget_value(self, idx):
+        if self.is_radio:
+            for button in self._buttons:
+                button.blockSignals(True)
+            self._buttons[idx].setChecked(True)
+            for button in self._buttons:
+                button.blockSignals(False)
+        else:
+            self.combobox.blockSignals(True)
+            self.combobox.setCurrentIndex(idx)
+            self.combobox.blockSignals(False)
+    
+    def get_widget_value(self):
+        if self.is_radio:
+            for index, widget in enumerate(self._buttons):
+                if widget.isChecked():
+                    return index
+        else:
+            return self.combobox.currentIndex()
+
     def get(self):
         """Override AbstractDataSetWidget method"""
-        self.fill_combo()
+        self.initialize_widget()
         value = self.item.get()
         if value is not None:
             idx = 0
@@ -683,12 +728,10 @@ class ChoiceWidget(AbstractDataSetWidget):
                 if key == value:
                     break
                 idx += 1
-            self.combobox.blockSignals(True)
-            self.combobox.setCurrentIndex(idx)
-            self.combobox.blockSignals(False)
-            if self.__first_call:
+            self.set_widget_value(idx)
+            if self._first_call:
                 self.index_changed(idx)
-                self.__first_call = False
+                self._first_call = False
         
     def set(self):
         """Override AbstractDataSetWidget method"""
@@ -699,7 +742,7 @@ class ChoiceWidget(AbstractDataSetWidget):
         self.item.set(value)
 
     def value(self):
-        index = self.combobox.currentIndex()
+        index = self.get_widget_value()
         choices = self.item.get_prop_value("data", "choices")
         return choices[index][0]
         

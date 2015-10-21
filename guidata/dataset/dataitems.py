@@ -430,9 +430,11 @@ class ChoiceItem(DataItem):
         * default [-]: default label or default key (optional)
         * help [string]: text shown in tooltip (optional)
         * check [bool]: if False, value is not checked (optional, default=True)
+        * radio [bool]: if True, shows radio buttons instead of a combo box 
+          (default is False)
     """
     def __init__(self, label, choices, default=FirstChoice, help='',
-                 check=True):
+                 check=True, radio=False):
         if isinstance(choices, collections.Callable):
             _choices_data = ItemProperty(choices)
         else:
@@ -445,7 +447,8 @@ class ChoiceItem(DataItem):
         elif default is FirstChoice:
             default = None
         DataItem.__init__(self, label, default=default, help=help, check=check)
-        self.set_prop("data", choices=_choices_data )
+        self.set_prop("data", choices=_choices_data)
+        self.set_prop("display", radio=radio)
 
     def _normalize_choice(self, idx, choice_tuple):
         if isinstance(choice_tuple, tuple):
