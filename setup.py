@@ -32,10 +32,10 @@ from guidata.utils import get_subpackages, get_package_data
 LIBNAME = 'guidata'
 from guidata import __version__ as version
 
-DESCRIPTION = 'guidata is a set of basic GUIs to edit and display objects of many kinds'
+DESCRIPTION = 'Set of basic GUIs to edit and display objects of many kinds'
 LONG_DESCRIPTION = """Set of basic GUIs to edit and display objects of many kinds:
     - integers, floats, strings ;
-    - ndarrays (NumPy's n-dimensional arrays) ;
+    - ndarrays (NumPy's N-dimensional arrays) ;
     - etc."""
 KEYWORDS = ''
 CLASSIFIERS = ['Topic :: Scientific/Engineering']

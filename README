@@ -1,48 +1,57 @@
 guidata
 =======
 
-Copyright © 2009-2011 CEA
-Pierre Raybaut
-Licensed under the terms of the CECILL License (see Licence_CeCILL_V2-en.txt)
+Copyright © 2009-2015 CEA, Pierre Raybaut
+
+Licensed under the terms of the CECILL V2 License
 
 
-    Overview
+Overview
+--------
 
-        Based on the Qt Python binding module PyQt4, ``guidata`` is a Python 
-	library generating graphical user interfaces for easy dataset editing 
-	and display.
-	It also provides helpers and application development tools for PyQt4.
-	
-	Generate GUIs to edit and display all kind of objects:
-	    - integers, floats, strings ;
-	    - ndarrays (NumPy's n-dimensional arrays) ;
-	    - etc.
-	Application development tools:
-	    - configuration management
-	    - internationalization (gettext)
-	    - deployment tools
-	    - HDF5 I/O helpers
-	    - misc. utils
+Based on the Qt Python binding module PyQt4, ``guidata`` is a Python library generating graphical user interfaces for easy dataset editing and display. It also provides helpers and application development tools for PyQt4.
 
-    Dependencies
+Generate GUIs to edit and display all kind of objects:
+
+    - integers, floats, strings ;
+    - ndarrays (NumPy's n-dimensional arrays) ;
+    - etc.
+
+Application development tools:
+
+    - configuration management
+    - internationalization (gettext)
+    - deployment tools
+    - HDF5 I/O helpers
+    - misc. utils
+
+Dependencies
+------------
+
+    Requirements
+
+        Python >=2.6 or Python >=3.0
+        PyQt4 4.x (x>=3 ; recommended x>=4) or PyQt5 5.x (x>=5)
+        spyderlib >=v2.0.10 (test launcher and array/dictionnary editors)
     
-        Requirements
-            Python >=2.6 or Python >=3.0
-            PyQt4 4.x (x>=3 ; recommended x>=4) or PyQt5 5.x (x>=5)
-            spyderlib >=v2.0.10 (test launcher and array/dictionnary editors)
-	    
-	Optional Python modules
-	    h5py (HDF5 files I/O)
-	    py2exe (application deployment on Windows platforms)
+Optional Python modules
+-----------------------
 
-	Other optional modules:
-	    gettext
-            
-	Recommended modules
-	    guiqwt >=v2.0
+    h5py (HDF5 files I/O)
+    py2exe (application deployment on Windows platforms)
 
-    Installation
-    
-        From the source package:
-            python setup.py install
-            
+Other optional modules
+----------------------
+
+    gettext
+        
+Recommended modules
+
+    guiqwt >=v2.0
+
+Installation
+------------
+
+    From the source package:
+
+        ``python setup.py install``
