@@ -14,7 +14,7 @@ Set of basic GUIs to edit and display objects of many kinds:
     - ndarrays (NumPy's n-dimensional arrays) ;
     - etc.
 
-Copyright © 2009-2010 CEA
+Copyright © 2009-2015 CEA
 Pierre Raybaut
 Licensed under the terms of the CECILL License
 (see guidata/__init__.py for details)
@@ -24,7 +24,9 @@ from __future__ import print_function
 
 import setuptools  # analysis:ignore
 from distutils.core import setup
+import sys
 import os
+import os.path as osp
 
 from guidata.utils import get_subpackages, get_package_data
 
@@ -46,10 +48,14 @@ elif 'alpha' in version or 'a' in version:
 else:
     CLASSIFIERS += ['Development Status :: 5 - Production/Stable']
 
-if os.name == 'nt':
-    SCRIPTS = ['guidata-tests', 'guidata-tests.bat']
-else:
-    SCRIPTS = ['guidata-tests']
+
+def _create_script_list(basename):
+    scripts = ['%s-py%d' % (basename, sys.version_info.major)]
+    if os.name == 'nt':
+        scripts.append('%s.bat' % scripts[0])
+    return [osp.join('scripts', name) for name in scripts]
+
+SCRIPTS = _create_script_list('guidata-tests')
 
 
 try:
@@ -71,7 +77,6 @@ cmdclass = {'build' : build}
 
 if sphinx:
     from sphinx.setup_command import BuildDoc
-    import sys
     class build_doc(BuildDoc):
         def run(self):
             # make sure the python path is pointing to the newly built

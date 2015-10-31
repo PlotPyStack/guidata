@@ -1,7 +1,6 @@
+recursive-include scripts * *.bat
 recursive-include guidata *.inc *.png *.svg *.pot *.po *.mo
 recursive-include doc *.py *.rst *.png *.ico
-include guidata-tests
-include guidata-tests.py
 include MANIFEST.in
 include Licence_CeCILL_V2-en.txt
 include README
