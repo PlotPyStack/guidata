@@ -1,13 +1,16 @@
 guidata
 =======
 
-Copyright © 2009-2015 CEA, Pierre Raybaut, licensed under the terms of the CECILL License (see ``Licence_CeCILL_V2-en.txt``).
+Copyright © 2009-2015 CEA, Pierre Raybaut, licensed under the terms of the 
+CECILL License (see ``Licence_CeCILL_V2-en.txt``).
 
 
 Overview
 --------
 
-Based on the Qt Python binding module PyQt4, ``guidata`` is a Python library generating graphical user interfaces for easy dataset editing and display. It also provides helpers and application development tools for PyQt4.
+Based on the Qt Python binding module PyQt4, ``guidata`` is a Python library 
+generating graphical user interfaces for easy dataset editing and display. It 
+also provides helpers and application development tools for PyQt4.
 
 Generate GUIs to edit and display all kind of objects:
 

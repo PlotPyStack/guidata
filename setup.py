@@ -34,11 +34,8 @@ from guidata.utils import get_subpackages, get_package_data
 LIBNAME = 'guidata'
 from guidata import __version__ as version
 
-DESCRIPTION = 'Set of basic GUIs to edit and display objects of many kinds'
-LONG_DESCRIPTION = """Set of basic GUIs to edit and display objects of many kinds:
-    - integers, floats, strings ;
-    - ndarrays (NumPy's N-dimensional arrays) ;
-    - etc."""
+DESCRIPTION = 'Automatic graphical user interfaces generation for easy dataset editing and display'
+LONG_DESCRIPTION = ''
 KEYWORDS = ''
 CLASSIFIERS = ['Topic :: Scientific/Engineering']
 if 'beta' in version or 'b' in version:
@@ -99,7 +96,6 @@ setup(name=LIBNAME, version=version,
       package_data={LIBNAME:
                     get_package_data(LIBNAME, ('.png', '.svg', '.mo'))},
       scripts=SCRIPTS,
-      install_requires=["PyQt4 (>4.3)",],
       extras_require = {
                         'Doc':  ["Sphinx>=1.1"],
                         },
