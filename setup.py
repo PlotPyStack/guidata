@@ -99,7 +99,10 @@ setup(name=LIBNAME, version=version,
       package_data={LIBNAME:
                     get_package_data(LIBNAME, ('.png', '.svg', '.mo'))},
       scripts=SCRIPTS,
-      requires=["PyQt4 (>4.3)",],
+      install_requires=["PyQt4 (>4.3)",],
+      extras_require = {
+                        'Doc':  ["Sphinx>=1.1"],
+                        },
       author = "Pierre Raybaut",
       author_email = 'pierre.raybaut@gmail.com',
       url = 'https://github.com/PierreRaybaut/%s' % LIBNAME,
