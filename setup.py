@@ -34,7 +34,8 @@ from guidata.utils import get_subpackages, get_package_data
 LIBNAME = 'guidata'
 from guidata import __version__ as version
 
-DESCRIPTION = 'Automatic graphical user interfaces generation for easy dataset editing and display'
+DESCRIPTION = 'Automatic graphical user interfaces generation for easy '\
+              'dataset editing and display'
 LONG_DESCRIPTION = ''
 KEYWORDS = ''
 CLASSIFIERS = ['Topic :: Scientific/Engineering']
@@ -53,41 +54,6 @@ def _create_script_list(basename):
     return [osp.join('scripts', name) for name in scripts]
 
 SCRIPTS = _create_script_list('guidata-tests')
-
-
-try:
-    import sphinx
-except ImportError:
-    sphinx = None
-    
-from distutils.command.build import build as dftbuild
-
-class build(dftbuild):
-    def has_doc(self):
-        if sphinx is None:
-            return False
-        setup_dir = os.path.dirname(os.path.abspath(__file__))
-        return os.path.isdir(os.path.join(setup_dir, 'doc'))
-    sub_commands = dftbuild.sub_commands + [('build_doc', has_doc)]
-
-cmdclass = {'build' : build}
-
-if sphinx:
-    from sphinx.setup_command import BuildDoc
-    class build_doc(BuildDoc):
-        def run(self):
-            # make sure the python path is pointing to the newly built
-            # code so that the documentation is built on this and not a
-            # previously installed version
-            build = self.get_finalized_command('build')
-            sys.path.insert(0, os.path.abspath(build.build_lib))
-            try:
-                sphinx.setup_command.BuildDoc.run(self)
-            except UnicodeDecodeError:
-                print("ERROR: unable to build documentation because Sphinx do not handle source path with non-ASCII characters. Please try to move the source package to another location (path with *only* ASCII characters).", file=sys.stderr)
-            sys.path.pop(0)
-
-    cmdclass['build_doc'] = build_doc
 
 
 setup(name=LIBNAME, version=version,
@@ -113,4 +79,4 @@ setup(name=LIBNAME, version=version,
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         ],
-      cmdclass=cmdclass)
+      )
