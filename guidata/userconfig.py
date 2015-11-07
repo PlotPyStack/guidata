@@ -288,7 +288,7 @@ class UserConfig(cp.ConfigParser):
         options = self.defaults.get(section, {})
         return options.get(option, NoDefault)
                 
-    def get(self, section, option, default=NoDefault):
+    def get(self, section, option, default=NoDefault, **kwargs):
         """
         Get an option
         section=None: attribute a default section name
