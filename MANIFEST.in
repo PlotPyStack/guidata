@@ -1,4 +1,3 @@
-recursive-include scripts * *.bat
 recursive-include guidata *.inc *.png *.svg *.pot *.po *.mo
 recursive-include doc *.py *.rst *.png *.ico
 include MANIFEST.in
