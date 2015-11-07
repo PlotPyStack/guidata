@@ -25,8 +25,6 @@ from __future__ import print_function
 import setuptools  # analysis:ignore
 from distutils.core import setup
 import sys
-import os
-import os.path as osp
 
 from guidata.utils import get_subpackages, get_package_data
 
@@ -47,21 +45,14 @@ else:
     CLASSIFIERS += ['Development Status :: 5 - Production/Stable']
 
 
-def _create_script_list(basename):
-    scripts = ['%s-py%d' % (basename, sys.version_info.major)]
-    if os.name == 'nt':
-        scripts.append('%s.bat' % scripts[0])
-    return [osp.join('scripts', name) for name in scripts]
-
-SCRIPTS = _create_script_list('guidata-tests')
-
-
 setup(name=LIBNAME, version=version,
       description=DESCRIPTION, long_description=LONG_DESCRIPTION,
       packages=get_subpackages(LIBNAME),
       package_data={LIBNAME:
                     get_package_data(LIBNAME, ('.png', '.svg', '.mo'))},
-      scripts=SCRIPTS,
+      entry_points={'gui_scripts':
+                    ['guidata-tests-py%d = guidata.tests:run'\
+                     % sys.version_info.major,]},
       extras_require = {
                         'Doc':  ["Sphinx>=1.1"],
                         },
