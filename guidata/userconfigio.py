@@ -74,7 +74,7 @@ class WriterMixin(object):
         """Write value using the appropriate routine depending on value type
         
         group_name: if None, writing the value in current group"""
-        from numpy import ndarray
+        import numpy as np
         if group_name:
             self.begin(group_name)
         if isinstance(val, bool):
@@ -87,8 +87,10 @@ class WriterMixin(object):
             self.write_unicode(val)
         elif isinstance(val, str):
             self.write_any(val)
-        elif isinstance(val, ndarray):
+        elif isinstance(val, np.ndarray):
             self.write_array(val)
+        elif np.isscalar(val):
+            self.write_any(val)
         elif val is None:
             self.write_none()
         elif isinstance(val, (list, tuple)):
