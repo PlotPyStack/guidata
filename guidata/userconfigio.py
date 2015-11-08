@@ -14,6 +14,7 @@ UserConfig reader/writer objects
 """
 
 import collections
+import datetime
 
 from guidata.py3compat import is_unicode, PY3
 
@@ -95,6 +96,10 @@ class WriterMixin(object):
             self.write_none()
         elif isinstance(val, (list, tuple)):
             self.write_sequence(val)
+        elif isinstance(val, datetime.datetime):
+            self.write_float(val.timestamp())
+        elif isinstance(val, datetime.date):
+            self.write_int(val.toordinal())
         elif hasattr(val, 'serialize') and isinstance(val.serialize,
                                                       collections.Callable):
             # The object has a DataSet-like `serialize` method

@@ -24,6 +24,7 @@ import os.path as osp
 import sys
 import numpy
 import collections
+import datetime
 
 try:
     # PyQt4 4.3.3 on Windows (static DLLs) with py2exe installed:
@@ -393,6 +394,8 @@ class DateWidget(AbstractDataSetWidget):
         """Override AbstractDataSetWidget method"""
         value = self.item.get()
         if value:
+            if not isinstance(value, datetime.date):
+                value = datetime.date.fromordinal(value)
             self.dateedit.setDate(value)
     
     def set(self):
@@ -417,6 +420,8 @@ class DateTimeWidget(AbstractDataSetWidget):
         """Override AbstractDataSetWidget method"""
         value = self.item.get()
         if value:
+            if not isinstance(value, datetime.datetime):
+                value = datetime.datetime.fromtimestamp(value)
             self.dateedit.setDateTime(value)
     
     def set(self):
