@@ -7,6 +7,7 @@
 
 """Compatibility package (PyQt4/PyQt5/PySide)"""
 
+from __future__ import print_function
 import os
 
 os.environ.setdefault('QT_API', 'pyqt')
@@ -28,6 +29,16 @@ if API == 'pyqt':
         sip.setapi('QTextStream', 2)
         sip.setapi('QTime', 2)
         sip.setapi('QUrl', 2)        
+    except ValueError:
+        import sys
+        if 'spyderlib.spyder' in sys.modules:
+            #  Spyder v2 is initializing: it's safe to ignore this exception
+            from spyderlib import __version__ as spyder_ver
+            if int(spyder_ver.split('.')[1]) < 3:
+                print("Warning: deprecated version of Spyder, please upgrade!", 
+                      file=sys.stderr)
+        else:
+            raise
     except AttributeError:
         # PyQt < v4.6. The actual check is done by requirements.check_qt()
         # call from spyder.py
