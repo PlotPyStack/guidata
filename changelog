@@ -1,3 +1,29 @@
+== Version 1.7.2 ==
+
+Bug fixes:
+
+  * Fixed compatibility issues with old versions of Spyder (<v2.3)
+
+----
+
+== Version 1.7.1 ==
+
+Bug fixes:
+
+  * Fixed Issue #25: ConfigParser.get unexpected keyword argument 'raw'
+  * Fixed tests failures: disthelpers, guiqwt/tests/loadsaveitems_hdf5.py
+
+Features:
+
+  * userconfigio: added support for serializing/deserializing NumPy scalars
+  * Fixed Issue #47: added support for DateTimeItem/DateItem (de)serialization
+
+Setup:
+
+  * Using setuptools "entry_points" instead of distutils "scripts"
+
+----
+
 == Version 1.7.0 ==
 
 === Possible API compatibility issues (since v1.6.2) ===
