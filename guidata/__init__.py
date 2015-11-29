@@ -9,9 +9,11 @@ dataset editing and display. It also provides helpers and application
 development tools for PyQt.
 
 External resources:
+    * Python Package Index: `PyPI`_
     * Bug reports and feature requests: `GitHub`_
     * Help, support and discussions around the project: `GoogleGroup`_
 
+.. _PyPI: https://pypi.python.org/pypi/guidata
 .. _GitHub: https://github.com/PierreRaybaut/guidata
 .. _GoogleGroup: http://groups.google.fr/group/guidata_guiqwt
 """

@@ -6,18 +6,18 @@ Dependencies
 
 Requirements:
 
-    * Python >=v2.5
+    * Python 2.x (x>=6) or 3.x (x>=2)
     * PyQt4 4.x (x>=3 ; recommended x>=4) or PyQt5 5.x (x>=5)
     * spyderlib >=v2.0.10 for the test launcher and array/dictionnary editors
     
 Optional Python modules:
 
     * h5py (HDF5 files I/O)
-    * py2exe (application deployment on Windows platforms)
+    * cx_Freze or py2exe (application deployment on Windows platforms)
 
-Other optional modules:
+Other optional modules for developers:
 
-    * gettext
+    * gettext (text translation support)
 
 Installation
 ------------

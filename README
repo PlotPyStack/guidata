@@ -31,24 +31,22 @@ Dependencies
 
     Requirements
 
-    - Python >=2.6 or Python >=3.0
+    - Python >=2.6 or Python >=3.2
     - PyQt4 4.x (x>=3 ; recommended x>=4) or PyQt5 5.x (x>=5)
     - spyderlib >=v2.0.10 (test launcher and array/dictionnary editors)
     
-Optional Python modules
------------------------
+    Optional Python modules
 
     - h5py (HDF5 files I/O)
-    - py2exe (application deployment on Windows platforms)
+    - cx_Freeze or py2exe (application deployment on Windows platforms)
 
-Other optional modules
-----------------------
+    Other optional modules
 
-    gettext
+    gettext (text translation support)
         
-Recommended modules
+    Recommended modules
 
-    guiqwt >=v2.0
+    guiqwt >= 3.0
 
 Installation
 ------------
