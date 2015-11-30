@@ -322,6 +322,10 @@ class Distribution(object):
                         'PIL.ImageTk', 'FixTk', 'bsddb', 'email',
                         'pywin.debugger', 'pywin.debugger.dbgcon',
                         'matplotlib']
+    if sys.version_info.major == 2:
+        #  Fixes compatibility issue with IPython (more specifically with one 
+        #  of its dependencies: `jsonschema`) on Python 2.7
+        DEFAULT_EXCLUDES += ['collections.abc']
     DEFAULT_INCLUDES = []
     DEFAULT_BIN_EXCLUDES = ['MSVCP100.dll', 'MSVCP90.dll', 'w9xpopen.exe',
                             'MSVCP80.dll', 'MSVCR80.dll']
@@ -546,7 +550,7 @@ class Distribution(object):
     def add_matplotlib(self):
         """Include module Matplotlib to the distribution"""
         if 'matplotlib' in self.excludes:
-            self.excludes.pop(self.excludes.index('matplotlib'))
+            self.excludes.remove('matplotlib')
         try:
             import matplotlib.numerix  # analysis:ignore
             self.includes += ['matplotlib.numerix.ma',
@@ -570,16 +574,10 @@ class Distribution(object):
                 self.add_pyside()
             elif module_name == 'scipy':
                 self.add_module_dir('scipy')
-            elif module_name == 'scipy.io':
-                self.includes += ['scipy.io.matlab.streams']
             elif module_name == 'matplotlib':
                 self.add_matplotlib()
             elif module_name == 'h5py':
-                import h5py
-                for attr in ['_stub', '_sync', 'utils', '_conv', '_proxy',
-                             'defs']:
-                    if hasattr(h5py, attr):
-                        self.includes.append('h5py.%s' % attr)
+                self.add_module_dir('h5py')
                 if self.bin_path_excludes is not None and os.name == 'nt':
                     # Specific to cx_Freeze on Windows: avoid including a zlib dll
                     # built with another version of Microsoft Visual Studio
@@ -819,6 +817,12 @@ class Distribution(object):
             finder.IncludeModule('h5py.h5ac')
         hooks.load_h5py = load_h5py
         #===== Monkey-patching cx_Freeze (backported from v5.0 dev) ===========
+
+        #===== Monkey-patching cx_Freeze for Scipy ============================
+        def load_scipy(finder, module):
+            pass
+        hooks.load_scipy = load_scipy
+        #===== Monkey-patching cx_Freeze for Scipy ============================
 
         if cleanup:
             self.__cleanup()
