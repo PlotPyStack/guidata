@@ -338,10 +338,16 @@ class HDF5Reader(HDF5Handler):
         group = self.get_parent_group()
         return list(group.attrs[self.option[-1]])
     
-    def read_object_list(self, group_name, klass):
+    def read_object_list(self, group_name, klass, progress_callback=None):
         """Read object sequence in group.
         Objects must implement the DataSet-like `deserialize` method.
-        `klass` is the object class which constructor requires no argument."""
+        `klass` is the object class which constructor requires no argument.
+        
+        progress_callback: if not None, this function is called with 
+        an integer argument (progress: 0 --> 100). Function returns the 
+        `cancel` state (True: progress dialog has been canceled, False 
+        otherwise)
+        """
         with self.group(group_name):
             try:
                 ids = self.read('IDs', func=self.read_sequence)
@@ -350,7 +356,11 @@ class HDF5Reader(HDF5Handler):
                 self.end('IDs')
                 return
             seq = []
-            for name in ids:
+            count = len(ids)
+            for idx, name in enumerate(ids):
+                if progress_callback is not None:
+                    if progress_callback(int(100*float(idx)/(count-1))):
+                        break
                 with self.group(name):
                     group = self.get_parent_group()
                     if name in group.attrs:
