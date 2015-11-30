@@ -1,3 +1,17 @@
+== Version 1.7.3 ==
+
+Features:
+
+  * hdf5io: added support for a progress bar callback in "read_object_list" (this allows implementing a progress dialog widget showing the progress when reading an object list in an HDF5 file)
+
+Bug fixes:
+
+  * disthelpers:
+    * Supporting recent versions of SciPy, h5py and IPython
+    * Fixed compatibility issue (workaround) with IPython on Python 2.7 (that is the "collection.sys cx_Freeze error")
+
+----
+
 == Version 1.7.2 ==
 
 Bug fixes:
