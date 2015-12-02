@@ -266,7 +266,7 @@ class HDF5Writer(HDF5Handler, WriterMixin):
             else:
                 ids = []
                 for obj in seq:
-                    guid = to_binary_string(uuid1())
+                    guid = to_binary_string(str(uuid1()))
                     ids.append(guid)
                     with self.group(guid):
                         if obj is None:
