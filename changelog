@@ -2,10 +2,14 @@
 
 Features:
 
+  * Added CHM documentation to wheel package
   * hdf5io: added support for a progress bar callback in "read_object_list" (this allows implementing a progress dialog widget showing the progress when reading an object list in an HDF5 file)
 
 Bug fixes:
 
+  * Python 3 compatibility: fixed `hdf5io.HDF5Writer.write_object_list` method
+  * data items:
+    * StringItem: when `notempty` parameter was set to True, item value was not checked at startup (expected orange background)
   * disthelpers:
     * Supporting recent versions of SciPy, h5py and IPython
     * Fixed compatibility issue (workaround) with IPython on Python 2.7 (that is the "collection.sys cx_Freeze error")
