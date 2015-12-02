@@ -261,7 +261,10 @@ class LineEditWidget(AbstractDataSetWidget):
             
     def line_edit_changed(self, qvalue):
         """QLineEdit validator"""
-        value = self.item.from_string(to_text_string(qvalue))
+        if qvalue is not None:
+            value = self.item.from_string(to_text_string(qvalue))
+        else:
+            value = None
         if not self.item.check_value(value):
             self.edit.setStyleSheet("background-color:rgb(255, 175, 90);")
         else:
