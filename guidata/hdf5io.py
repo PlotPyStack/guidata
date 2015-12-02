@@ -20,7 +20,7 @@ import numpy as np
 from guidata.utils import utf8_to_unicode
 from guidata.userconfigio import BaseIOHandler, WriterMixin
 
-from guidata.py3compat import to_text_string, PY3, is_binary_string
+from guidata.py3compat import to_text_string, PY3, is_binary_string, to_binary_string
 
 
 class TypeConverter(object):
@@ -266,7 +266,7 @@ class HDF5Writer(HDF5Handler, WriterMixin):
             else:
                 ids = []
                 for obj in seq:
-                    guid = str(uuid1())
+                    guid = to_binary_string(uuid1())
                     ids.append(guid)
                     with self.group(guid):
                         if obj is None:
