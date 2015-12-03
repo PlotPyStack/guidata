@@ -359,7 +359,7 @@ class HDF5Reader(HDF5Handler):
             count = len(ids)
             for idx, name in enumerate(ids):
                 if progress_callback is not None:
-                    if progress_callback(int(100*float(idx)/(count-1))):
+                    if progress_callback(int(100*float(idx)/count)):
                         break
                 with self.group(name):
                     group = self.get_parent_group()
