@@ -20,7 +20,8 @@ import numpy as np
 from guidata.utils import utf8_to_unicode
 from guidata.userconfigio import BaseIOHandler, WriterMixin
 
-from guidata.py3compat import to_text_string, PY3, is_binary_string, to_binary_string
+from guidata.py3compat import (PY2, PY3, is_binary_string, to_binary_string,
+                               to_text_string)
 
 
 class TypeConverter(object):
@@ -43,7 +44,11 @@ class TypeConverter(object):
 
 
 #TODO: Py3/Test if the 'unicode_hdf' type converter is working with Python 3
-unicode_hdf = TypeConverter(lambda x: x.encode("utf-8"), utf8_to_unicode)
+if PY2:
+    unicode_hdf = TypeConverter(lambda x: x.encode("utf-8"), utf8_to_unicode)
+else:
+    unicode_hdf = TypeConverter(lambda x: x.encode("utf-8"), 
+                                lambda x: to_text_string(x, encoding='utf-8'))
 int_hdf = TypeConverter(int)
 
 
