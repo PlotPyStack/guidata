@@ -43,7 +43,6 @@ class TypeConverter(object):
         return self._from_type(value)
 
 
-#TODO: Py3/Test if the 'unicode_hdf' type converter is working with Python 3
 if PY2:
     unicode_hdf = TypeConverter(lambda x: x.encode("utf-8"), utf8_to_unicode)
 else:
