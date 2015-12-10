@@ -288,13 +288,16 @@ class UserConfig(cp.ConfigParser):
         options = self.defaults.get(section, {})
         return options.get(option, NoDefault)
                 
-    def get(self, section, option, default=NoDefault, **kwargs):
+    def get(self, section, option, default=NoDefault, raw=None, **kwargs):
         """
         Get an option
         section=None: attribute a default section name
         default: default value (if not specified, an exception
         will be raised if option doesn't exist)
         """
+        if raw is None:
+            raw = self.raw
+
         section = self.__check_section_option(section, option)
 
         if not self.has_section(section):
@@ -309,14 +312,9 @@ class UserConfig(cp.ConfigParser):
             else:
                 self.set(section, option, default)
                 return default
-        value = self.__get(section, option)
-        if PY2 and isinstance(value, str):
-            return value.decode("utf-8")
-        return value
 
-    def __get(self, section, option):
-        """Get and convert value to the type of the default value"""
-        value = cp.ConfigParser.get(self, section, option, raw=self.raw)
+        value = cp.ConfigParser.get(self, section, option, raw=raw)
+
         default_value = self.get_default(section, option)
         if isinstance(default_value, bool):
             value = eval(value)
@@ -332,12 +330,16 @@ class UserConfig(cp.ConfigParser):
                 value = eval(value)
             except:
                 pass
-        return encode_to_utf8(value)
+        value = encode_to_utf8(value)
+
+        if PY2 and isinstance(value, str):
+            return value.decode("utf-8")
+        return value
 
     def get_section(self, section):
         sect = self.defaults.get(section, {}).copy()
         for opt in self.options(section):
-            sect[opt] = self.__get(section, opt)
+            sect[opt] = self.get(section, opt)
         return sect
 
     def __set(self, section, option, value, verbose):
