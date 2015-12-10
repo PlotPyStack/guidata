@@ -1,3 +1,13 @@
+== Version 1.7.4 ==
+
+Bug fixes:
+
+  * Fixed compatibility issue with Python 3.5.1rc1 (Issue #32: RecursionError in userconfig.UserConfig.get)
+  * HDF5Reader.read_object_list: fixed division by zero (when count was 1)
+  * hdf5io: fixed Python3 compatibility issue with unicode_hdf type converter
+
+----
+
 == Version 1.7.3 ==
 
 Features:
