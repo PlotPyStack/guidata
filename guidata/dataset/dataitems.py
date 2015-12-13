@@ -371,7 +371,9 @@ class FilesOpenItem(FileSaveItem):
     def check_value(self, value):
         """Override DataItem method"""
         if not self.get_prop('data', 'check_value', True):
-            return True 
+            return True
+        if value is None:
+            return False
         allexist = True
         for path in value:
             allexist = allexist and os.path.exists(path) \
