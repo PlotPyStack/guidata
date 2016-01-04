@@ -3,7 +3,7 @@
 
 ### Version 1.7.4 ###
 
-#### Bug fixes ####
+Bug fixes:
 
 * Fixed compatibility issue with Python 3.5.1rc1 (Issue #32: RecursionError in userconfig.UserConfig.get)
 * HDF5Reader.read_object_list: fixed division by zero (when count was 1)
@@ -12,12 +12,12 @@
 
 ### Version 1.7.3 ###
 
-#### Features ####
+Features:
 
 * Added CHM documentation to wheel package
 * hdf5io: added support for a progress bar callback in "read_object_list" (this allows implementing a progress dialog widget showing the progress when reading an object list in an HDF5 file)
 
-#### Bug fixes ####
+Bug fixes:
 
 * Python 3 compatibility: fixed `hdf5io.HDF5Writer.write_object_list` method
 * data items:
@@ -29,38 +29,38 @@
 
 ### Version 1.7.2 ###
 
-#### Bug fixes ####
+Bug fixes:
 
 * Fixed compatibility issues with old versions of Spyder (<v2.3)
 
 
 ### Version 1.7.1 ###
 
-#### Bug fixes ####
+Bug fixes:
 
 * Fixed Issue #25: ConfigParser.get unexpected keyword argument 'raw'
 * Fixed tests failures: disthelpers, guiqwt/tests/loadsaveitems_hdf5.py
 
-#### Features ####
+Features:
 
 * userconfigio: added support for serializing/deserializing NumPy scalars
 * Fixed Issue #47: added support for DateTimeItem/DateItem (de)serialization
 
-#### Setup ####
+Setup:
 
 * Using setuptools "entry_points" instead of distutils "scripts"
 
 
 ### Version 1.7.0 ###
 
-#### Possible API compatibility issues (since v1.6.2) ####
+Possible API compatibility issues:
 
 * Added support for PyQt5 (removed old-style signals)
 
 
 ### Version 1.6.1 ###
 
-#### Possible API compatibility issues (since v1.6.0) ####
+Possible API compatibility issues:
 
 * disthelpers:
   * Changed arguments from "architecture=None, python_version=None" to "msvc_version, architecture=None"
@@ -70,21 +70,21 @@
 
 Added support for Python 3 (see module `guidata.py3compat`).
 
-#### New features (since v1.5.1) ####
+New features:
 
 * disthelpers:
   * Added support for Python 3.3
   * Added support for pygments (and partial support for zmq: still failing)
 * FloatArrayItem: added support for `unit` property value
 
-#### Bug fixes (since v1.5.1) ####
+Bug fixes:
 
 * disthelpers.prepend_module_to_path: unload modules which were already imported to be able to replace them by other versions (mostly `guidata` should be concerned by this if the function is used -as it should be- in package's __init__.py script)
 
 
 ### Version 1.5.1 ###
 
-#### New features (since v1.5.0) ####
+New features:
 
 * HDF5 serialization (HDF5 reader/writer):
   * Added context manager
@@ -95,11 +95,11 @@ Added support for Python 3 (see module `guidata.py3compat`).
 * Added slider support for FloatItem objects (contributor: julien.jaeck)
 * (Issue 21) Added option 'size' in dataset `edit` and `view` methods to resize the generated dialog box (size may be a tuple of integers (width, height) or a QSize object)
 
-#### Possible API compatibility issues (since v1.5.0) ####
+Possible API compatibility issues:
 
 * guidata now requires Python 2.6 (Python 2.5 support has been dropped)
 
-#### Bug fixes (since v1.5.0) ####
+Bug fixes:
 
 * DataSet objects (de)serialization: fixed HDF5 reader/writer for FilesOpenItem and FloatArrayItem serialize/deserialize methods
 * Fixed DataSet userconfig read/write test
@@ -111,17 +111,17 @@ Added support for Python 3 (see module `guidata.py3compat`).
 
 ### Version 1.5.0 ###
 
-#### Bug fixes (since v1.4.2) ####
+Bug fixes:
 
 * Fixed 'callback' property related issue: when updating a DataSetShowGroupBox or
 DataSetEditGroupBox internal dataset, the callback property was causing a reset
 of the data items to their default values
 
-#### Possible API compatibility issues (since v1.4.2) ####
+Possible API compatibility issues:
 
 * datatypes.OperatorProperty was renamed to FuncProp
 
-#### Other changes (since v1.4.2) ####
+Other changes:
 
 * Added test for the FuncProp item property: how to change an item active state depending on another item's value
 * Added support for dictionaries for `update_dataset` and `restore_dataset` (functions of `guidata.utils`):
@@ -137,13 +137,13 @@ Studio DLLs (and create manifest) associated to Python architecture and version
 
 ### Version 1.4.2 ###
 
-#### Bug fixes (since v1.4.1) ####
+Bug fixes:
 
 * disthelpers:
   * the vs2008 option was accidently turned off by default on Windows platforms
   * build_chm.bat: added support for Windows x64
 
-#### Other changes (since v1.4.2) ####
+Other changes:
 
 * dataset.qtwidgets:
   * QLabel widgets word wrapping is now disabled for read-only items and may be disabled for dataset comments: this is necessary because when the parent widget height is constrained, Qt is unexpectedly reducing the height of word-wrapped QLabel widgets below their minimum size, hence truncating their contents...
@@ -154,7 +154,7 @@ Studio DLLs (and create manifest) associated to Python architecture and version
 
 ### Version 1.4.1 ###
 
-#### Bug fixes (since v1.4.0) ####
+Bug fixes:
 
 * ColorItem for recent versions of Qt: in QLineEdit widget, the text representation of color was str(QColor(...)) instead of str(QColor(...).name())
 * guidata.qt compat package: fixed _modname typo
@@ -166,12 +166,12 @@ Studio DLLs (and create manifest) associated to Python architecture and version
   * added 'C:\Program Files (x86)' to bin includes (cx_Freeze)
 * Data items/callbacks: fixed callbacks for ChoiceItem (or derived items) which were triggered when other widgets were triggering their own callbacks...
 
-#### Other changes (since v1.4.0) ####
+Other changes:
 
 * Added test for item callbacks
 * dataset.datatypes.FormatProp/new behavior: added `ignore_error` argument, default to True (ignores string formatting error: ValueError)
 * disthelpers:
-  * Distribution.#### Setup #### added `target_dir` option
+  * Distribution.Setup: added `target_dir` option
   * Distribution.build: added `create_archive` option to create a ZIP archive after building the package
   * cx_Freeze: added support for multiple executables
   * added support for h5py 2.0
@@ -181,7 +181,7 @@ Studio DLLs (and create manifest) associated to Python architecture and version
 
 ### Version 1.4.0 ###
 
-#### Possible API compatibility issues (since v1.3.2) ####
+Possible API compatibility issues:
 
 * disthelpers: removed functions remove_build_dist, add_module_data_files,
     add_text_data_file, get_default_excludes, get_default_includes, 
@@ -190,7 +190,7 @@ Studio DLLs (and create manifest) associated to Python architecture and version
     see the new disthelpers test for more details (tests/dishelpers.py)
 * reorganized utils and configtools modules
 
-#### Other changes (since v1.3.2) ####
+Other changes:
 
 * disthelpers: replaced almost all functions by a class named Distribution,
     and added support for cx_Freeze (module remains compatible with py2exe),
@@ -204,19 +204,19 @@ Since this version, `guidata` is compatible with PyQt4 API #1 *and* API #2.
 Please read carefully the coding guidelines which have been recently added to 
 the documentation.
 
-#### Possible API compatibility issues (since v1.3.1) ####
+Possible API compatibility issues:
 
 * Removed deprecated wrappers around QFileDialog's static methods (use the wrappers provided by `guidata.qt.compat` instead):
   * getExistingDirectory, getOpenFileName, getOpenFileNames, getSaveFileName
 
-#### Bug fixes (since v1.3.1) ####
+Bug fixes:
 
 * qtwidgets.ShowFloatArrayWidget: fixed string float formatting issue (replaced %f by %g)
 * Fixed compatiblity issues with PyQt v4.4 (Contributor: Carlos Pascual)
 * Fixed missing 'child_title' attribute error with FileOpenItem, FilesOpenItem, FileSaveItem and DirectoryItem
 * (Fixes Issue 8) disthelpers.add_modules was failing when vs2008=False
 
-#### Other changes (since v1.3.1) ####
+Other changes:
 
 * added *this* changelog
 * qtwidgets: removed ProgressPopUp dialog (it is now recommended to use QProgressDialog instead, which is pretty much identical)
@@ -234,19 +234,19 @@ the documentation.
 
 ### Version 1.3.1 ###
 
-#### Bug fixes (since v1.3.0) ####
+Bug fixes:
 
 * setup.py: added svg icons to data files
 * gettext helpers were not working on Linux (Windows install pygettext was hardcoded)
 
-#### Other changes (since v1.3.0) ####
+Other changes:
 
 * hdf5io: printing error messages in sys.stderr + added more infos when failing to load attribute
 
 
 ### Version 1.3.0 ###
 
-#### Bug fixes (since v1.2.5) ####
+Bug fixes:
 
 * setup.py: added svg icons to data files
 * gettext helpers were not working on Linux (Windows install pygettext was hardcoded)
@@ -257,7 +257,7 @@ the documentation.
 * Bugfix: recent versions of PyQt don't like the QApplication reference to be stored in modules (why is that?)
 * Bugfix/tests: always keep a reference to the QApplication instance
 
-#### Other changes (since v1.2.5) ####
+Other changes:
 
 * setup.py: added source archive download url
 * Tests: now creating real temporary files and cleaning up at exit
