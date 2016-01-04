@@ -2,6 +2,6 @@ recursive-include guidata *.inc *.png *.svg *.pot *.po *.mo
 recursive-include doc *.py *.rst *.png *.ico
 include MANIFEST.in
 include Licence_CeCILL_V2-en.txt
-include README
-include changelog
+include README.md
+include changelog.md
 prune guidata/tests/dist
