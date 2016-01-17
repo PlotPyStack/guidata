@@ -1,7 +1,9 @@
 .spyderproject
 guidata.chm
+guidata.chm.zip
 doc.zip
 Thumbs.db
+doctmp/
 
 # Created by https://www.gitignore.io/api/python
 

@@ -39,7 +39,53 @@ from guidata import __version__ as version
 
 DESCRIPTION = 'Automatic graphical user interfaces generation for easy '\
               'dataset editing and display'
-LONG_DESCRIPTION = ''
+LONG_DESCRIPTION = """\
+guidata: Automatic GUI generation for easy dataset editing and display with Python
+======================================================================================
+
+Simple example of ``guidata`` datasets embedded in an application window:
+
+.. image:: http://pythonhosted.org/guidata/_images/editgroupbox.png
+
+See `documentation`_ for more details on the library and `changelog`_ for recent history of changes.
+
+Copyright © 2009-2015 CEA, Pierre Raybaut, licensed under the terms of the 
+`CECILL License`_.
+
+.. _documentation: http://pythonhosted.org/guidata/
+.. _changelog: https://github.com/PierreRaybaut/guidata/blob/master/CHANGELOG.md
+.. _CECILL License: https://github.com/PierreRaybaut/guidata/blob/master/Licence_CeCILL_V2-en.txt
+
+
+Overview
+--------
+
+Based on the Qt Python binding module PyQt4, ``guidata`` is a Python library 
+generating graphical user interfaces for easy dataset editing and display. It 
+also provides helpers and application development tools for PyQt4.
+
+Generate GUIs to edit and display all kind of objects:
+
+- integers, floats, strings ;
+- ndarrays (NumPy's n-dimensional arrays) ;
+- etc.
+
+Application development tools:
+
+- configuration management
+- internationalization (``gettext``)
+- deployment tools
+- HDF5 I/O helpers
+- misc. utils
+
+
+Building, installation, ...
+---------------------------
+
+See the `README`_ and `documentation`_.
+
+.. _README: https://github.com/PierreRaybaut/guidata/blob/master/README.md"""
+
 KEYWORDS = ''
 CLASSIFIERS = ['Topic :: Scientific/Engineering']
 if 'beta' in version or 'b' in version:
