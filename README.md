@@ -36,14 +36,14 @@ Application development tools:
 
 ### Requirements
 
-- Python >=2.6 or Python >=3.2
-- PyQt4 4.x (x>=3 ; recommended x>=4) or PyQt5 5.x (x>=5)
-- spyderlib >=v2.0.10 (test launcher and array/dictionnary editors)
+- Python 2.6+ or Python 3.2+
+- [PyQt4](https://pypi.python.org/pypi/PyQt4) 4.3+ or [PyQt5](https://pypi.python.org/pypi/PyQt5) 5.5+
+- [spyderlib](https://pypi.python.org/pypi/spyder) 2.1+ (test launcher and array/dictionnary editors)
     
 ### Optional Python modules
 
-- h5py (HDF5 files I/O)
-- cx_Freeze or py2exe (application deployment on Windows platforms)
+- [h5py](https://pypi.python.org/pypi/h5py) (HDF5 files I/O)
+- [cx_Freeze](https://pypi.python.org/pypi/cx_Freeze) or [py2exe](https://pypi.python.org/pypi/py2exe) (application deployment on Windows platforms)
 
 ### Other optional modules
 
@@ -51,7 +51,7 @@ gettext (text translation support)
         
 ### Recommended modules
 
-guiqwt >= 3.0
+[guiqwt](https://pypi.python.org/pypi/guiqwt) >= 3.0 is a set of tools for curve and image plotting based on `guidata`.
 
 
 ## Installation
