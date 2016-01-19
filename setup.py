@@ -82,7 +82,16 @@ Application development tools:
 Building, installation, ...
 ---------------------------
 
-See the `README`_ and `documentation`_.
+The following package is **required**: `PyQt4`_ (or `PyQt5`_).
+
+The following packages are optional: `spyderlib`_ (GUI-based test launcher, dict/array editor), `h5py`_ (HDF5 I/O).
+
+.. _PyQt4: https://pypi.python.org/pypi/PyQt4
+.. _PyQt5: https://pypi.python.org/pypi/PyQt5
+.. _spyderlib: https://pypi.python.org/pypi/Spyder
+.. _h5py: https://pypi.python.org/pypi/h5py
+
+See the `README`_ and `documentation`_ for more details.
 
 .. _README: https://github.com/PierreRaybaut/guidata/blob/master/README.md"""
 
