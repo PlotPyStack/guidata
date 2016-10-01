@@ -654,14 +654,20 @@ class DictItem(ButtonItem):
     def __init__(self, label, default=None, help='', check=True):
         def dictedit(instance, item, value, parent):
             try:
-                # Spyder 3
-                from spyderlib.widgets.variableexplorer \
+                # Spyder 3.0
+                from spyder.widgets.variableexplorer \
                     import collectionseditor
                 Editor = collectionseditor.CollectionsEditor
             except ImportError:
-                # Spyder 2
-                from spyderlib.widgets import dicteditor
-                Editor = dicteditor.DictEditor
+                try:
+                    # Spyder 3.0-
+                    from spyderlib.widgets.variableexplorer \
+                        import collectionseditor
+                    Editor = collectionseditor.CollectionsEditor
+                except ImportError:
+                    # Spyder 2
+                    from spyderlib.widgets import dicteditor
+                    Editor = dicteditor.DictEditor
             editor = Editor(parent)
             value_was_none = value is None
             if value_was_none:

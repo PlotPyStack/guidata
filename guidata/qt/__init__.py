@@ -31,7 +31,13 @@ if API == 'pyqt':
         sip.setapi('QUrl', 2)        
     except ValueError:
         import sys
-        if 'spyderlib.spyder' in sys.modules:
+        if 'spyder.spyder' in sys.modules:
+            #  Spyder v3 is initializing: it's safe to ignore this exception
+            from spyder import __version__ as spyder_ver
+            if int(spyder_ver.split('.')[1]) < 3:
+                print("Warning: deprecated version of Spyder, please upgrade!", 
+                      file=sys.stderr)
+        elif 'spyderlib.spyder' in sys.modules:
             #  Spyder v2 is initializing: it's safe to ignore this exception
             from spyderlib import __version__ as spyder_ver
             if int(spyder_ver.split('.')[1]) < 3:
