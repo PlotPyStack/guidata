@@ -52,7 +52,7 @@ if API == 'pyqt':
 
     try:
         from PyQt4.QtCore import PYQT_VERSION_STR as __version__ # analysis:ignore
-    except ImportError:
+    except (RuntimeError, ImportError):
         # Trying PyQt5 before switching to PySide (at this point, PyQt4 may 
         # not be installed but PyQt5 or Pyside could still be if the QT_API 
         # environment variable hasn't been set-up)
