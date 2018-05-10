@@ -406,7 +406,10 @@ class DateWidget(AbstractDataSetWidget):
         self.item.set(self.value())
 
     def value(self):
-        return self.dateedit.date().toPyDate()
+        try:
+            return self.dateedit.date().toPyDate()
+        except:
+            return self.dateedit.dateTime().toPython()
 
 
 class DateTimeWidget(AbstractDataSetWidget):
@@ -432,7 +435,10 @@ class DateTimeWidget(AbstractDataSetWidget):
         self.item.set(self.value())
 
     def value(self):
-        return self.dateedit.dateTime().toPyDateTime()
+        try:
+            return self.dateedit.dateTime().toPyDateTime() 
+        except:
+            return self.dateedit.dateTime().toPython()
     
 
 class GroupLayout(QHBoxLayout):
