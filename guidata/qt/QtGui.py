@@ -5,4 +5,6 @@
 # (copied from Spyder source code [spyderlib.qt])
 
 from ..qtpy.QtGui import *                                 # analysis:ignore
-from ..qtpy.QtWidgets import *                           
+from ..qtpy.QtWidgets import *    
+
+from ..qtpy.QtPrintSupport import *
