@@ -19,10 +19,6 @@ import os.path as osp
 import sys
 import gettext
 
-from guidata.qt.QtGui import (QFont, QLabel, QPixmap, QIcon, QHBoxLayout,
-                              QColor, QPen, QBrush, QFontDatabase)
-from guidata.qt.QtCore import Qt
-
 from guidata.utils import get_module_path, decode_fs_string
 
 from guidata.py3compat import is_unicode, to_text_string, PY3, is_text_string
@@ -130,7 +126,8 @@ def get_icon(name, default="not_found.png"):
     Construct a QIcon from the file with specified name
     name, default: filenames with extensions
     """
-    return QIcon(get_image_file_path(name, default))
+    from guidata.qt import QtGui as QG
+    return QG.QIcon(get_image_file_path(name, default))
 
 
 def get_image_label(name, default="not_found.png"):
@@ -138,33 +135,39 @@ def get_image_label(name, default="not_found.png"):
     Construct a QLabel from the file with specified name
     name, default: filenames with extensions
     """
-    label = QLabel()
-    pixmap = QPixmap(get_image_file_path(name, default))
+    from guidata.qt import QtGui as QG
+    label = QG.QLabel()
+    pixmap = QG.QPixmap(get_image_file_path(name, default))
     label.setPixmap(pixmap)
     return label
 
 
-def get_image_layout(imagename, text="", tooltip="", alignment=Qt.AlignLeft):
+def get_image_layout(imagename, text="", tooltip="", alignment=None):
     """
     Construct a QHBoxLayout including image from the file with specified name,
     left-aligned text [with specified tooltip]
     Return (layout, label)
     """
-    layout = QHBoxLayout()
-    if alignment in (Qt.AlignCenter, Qt.AlignRight):
+    from guidata.qt import QtGui as QG
+    from guidata.qt import QtCore as QC
+    if alignment is None:
+        alignment = QC.Qt.AlignLeft
+    layout = QG.QHBoxLayout()
+    if alignment in (QC.Qt.AlignCenter, QC.Qt.AlignRight):
         layout.addStretch()
     layout.addWidget(get_image_label(imagename))
-    label = QLabel(text)
+    label = QG.QLabel(text)
     label.setToolTip(tooltip)
     layout.addWidget(label)
-    if alignment in (Qt.AlignCenter, Qt.AlignLeft):
+    if alignment in (QC.Qt.AlignCenter, QC.Qt.AlignLeft):
         layout.addStretch()
     return (layout, label)    
 
 
 def font_is_installed(font):
     """Check if font is installed"""
-    return [fam for fam in QFontDatabase().families()
+    from guidata.qt import QtGui as QG
+    return [fam for fam in QG.QFontDatabase().families()
             if to_text_string(fam)==font]
 
 
@@ -190,11 +193,12 @@ def get_font(conf, section, option=""):
     conf: UserConfig instance
     section [, option]: configuration entry
     """
+    from guidata.qt import QtGui as QG
     if not option:
         option = "font"
     if 'font' not in option:
         option += '/font'
-    font = QFont()
+    font = QG.QFont()
     if conf.has_option(section, option+'/family/nt'):
         families = conf.get(section, option+'/family/'+os.name)
     elif conf.has_option(section, option+'/family'):
@@ -212,9 +216,9 @@ def get_font(conf, section, option=""):
     if conf.has_option(section, option+'/size'):
         font.setPointSize(conf.get(section, option+'/size'))
     if conf.get(section, option+'/bold', False):
-        font.setWeight(QFont.Bold)
+        font.setWeight(QG.QFont.Bold)
     else:
-        font.setWeight(QFont.Normal)
+        font.setWeight(QG.QFont.Normal)
     return font
     
     
@@ -228,14 +232,16 @@ def get_pen(conf, section, option="",
     [width]: default width
     [style]: default style
     """
+    from guidata.qt import QtGui as QG
+    from guidata.qt import QtCore as QC
     if 'pen' not in option:
         option += '/pen'
     color = conf.get(section, option+"/color", color)
-    color = QColor(color)
+    color = QG.QColor(color)
     width = conf.get(section, option+"/width", width)
     style_name = conf.get(section, option+"/style", style)
-    style = getattr(Qt, style_name)
-    return QPen(color, width, style)
+    style = getattr(QC.Qt, style_name)
+    return QG.QPen(color, width, style)
 
 
 def get_brush(conf, section, option="", color="black", alpha=1.0):
@@ -246,11 +252,12 @@ def get_brush(conf, section, option="", color="black", alpha=1.0):
     [color]: default color
     [alpha]: default alpha-channel
     """
+    from guidata.qt import QtGui as QG
     if 'brush' not in option:
         option += '/brush'
     color = conf.get(section, option+"/color", color)
-    color = QColor(color)
+    color = QG.QColor(color)
     alpha = conf.get(section, option+"/alphaF", alpha)
     color.setAlphaF(alpha)
-    return QBrush(color)
+    return QG.QBrush(color)
 
