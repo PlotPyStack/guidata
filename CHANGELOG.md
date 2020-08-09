@@ -1,6 +1,14 @@
 # guidata Releases #
 
 
+### Version 1.7.8 ###
+
+Changes:
+
+* Added PyQt4/PyQt5/PySide automatic switch depending on installed libraries
+* Moved documentation to https://docs.readthedocs.io/
+
+
 ### Version 1.7.7 ###
 
 Bug fixes:
