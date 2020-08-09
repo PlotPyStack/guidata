@@ -1,6 +1,13 @@
 # guidata Releases #
 
 
+### Version 1.7.7 ###
+
+Bug fixes:
+
+* Fixed Spyder v4.0 compatibility issues.
+
+
 ### Version 1.7.6 ###
 
 Bug fixes:

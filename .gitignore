@@ -1,9 +1,11 @@
 .spyderproject
+.spyproject
 guidata.chm
 guidata.chm.zip
 doc.zip
 Thumbs.db
 doctmp/
+*.h5
 
 # Created by https://www.gitignore.io/api/python
 

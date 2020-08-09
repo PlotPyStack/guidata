@@ -14,10 +14,13 @@ import os
 import os.path as osp
 import subprocess
 
-try:  # Spyder3.0
-    from spyder.widgets.sourcecode.codeeditor import CodeEditor
+try:  # Spyder 4
+    from spyder.plugins.editor.widgets.codeeditor import CodeEditor
 except ImportError:
-    from spyderlib.widgets.sourcecode.codeeditor import CodeEditor
+    try:  # Spyder 3
+        from spyder.widgets.sourcecode.codeeditor import CodeEditor
+    except ImportError:
+        from spyderlib.widgets.sourcecode.codeeditor import CodeEditor
 # Local imports
 from guidata.qt.QtGui import (QWidget, QVBoxLayout, QSplitter, QFont,
                               QListWidget, QPushButton, QLabel, QGroupBox,

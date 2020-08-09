@@ -38,7 +38,7 @@ Application development tools:
 
 - Python 2.6+ or Python 3.2+
 - [PyQt4](https://pypi.python.org/pypi/PyQt4) 4.3+ or [PyQt5](https://pypi.python.org/pypi/PyQt5) 5.5+
-- [spyderlib](https://pypi.python.org/pypi/spyder) 2.1+ (test launcher and array/dictionnary editors)
+- [spyder](https://pypi.python.org/pypi/spyder) 2.1+ (test launcher and array/dictionnary editors)
     
 ### Optional Python modules
 
