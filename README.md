@@ -1,5 +1,11 @@
 # guidata: Automatic GUI generation for easy dataset editing and display with Python
 
+[![license](https://img.shields.io/pypi/l/guidata.svg)](./LICENSE)
+[![pypi version](https://img.shields.io/pypi/v/guidata.svg)](https://pypi.org/project/guidata/)
+[![PyPI status](https://img.shields.io/pypi/status/guidata.svg)](https://github.com/PierreRaybaut/guidata)
+[![PyPI pyversions](https://img.shields.io/pypi/pyversions/guidata.svg)](https://pypi.python.org/pypi/guidata/)
+[![download count](https://img.shields.io/conda/dn/conda-forge/guidata.svg)](https://www.anaconda.com/download/)
+
 Simple example of ``guidata`` datasets embedded in an application window:
 
 <img src="http://pythonhosted.org/guidata/_images/editgroupbox.png">
