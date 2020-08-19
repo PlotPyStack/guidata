@@ -6,6 +6,7 @@ doc.zip
 Thumbs.db
 doctmp/
 *.h5
+*.stats
 
 # Created by https://www.gitignore.io/api/python
 
