@@ -146,6 +146,7 @@ setup(name=LIBNAME, version=version,
       package_data={LIBNAME:
                     get_package_data(LIBNAME, ('.png', '.svg', '.mo'))},
       data_files=[(r'Doc', [CHM_DOC])] if CHM_DOC else [],
+      install_requires=["QtPy"],
       entry_points={'gui_scripts':
                     ['guidata-tests-py%d = guidata.tests:run'\
                      % sys.version_info.major,]},

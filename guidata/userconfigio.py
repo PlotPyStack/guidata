@@ -16,26 +16,29 @@ UserConfig reader/writer objects
 import collections
 import datetime
 
-from guidata.py3compat import is_unicode, PY3
+from qtpy.py3compat import is_unicode, PY3
 
 
 class GroupContext(object):
     """Group context object"""
+
     def __init__(self, handler, group_name):
         self.handler = handler
         self.group_name = group_name
-        
+
     def __enter__(self):
         self.handler.begin(self.group_name)
-    
+
     def __exit__(self, exc_type, exc_value, traceback):
         if exc_type is None:
             self.handler.end(self.group_name)
         return False
 
+
 class BaseIOHandler(object):
     """Base I/O Handler with group context manager
     (see guidata.hdf5io for another example of this handler usage)"""
+
     def __init__(self):
         self.option = []
 
@@ -46,7 +49,7 @@ class BaseIOHandler(object):
 
     def begin(self, section):
         self.option.append(section)
-        
+
     def end(self, section):
         sect = self.option.pop(-1)
         assert sect == section, "Error: %s != %s" % (sect, section)
@@ -64,11 +67,12 @@ class UserConfigIOHandler(BaseIOHandler):
     def end(self, section):
         sect = self.option.pop(-1)
         assert sect == section
-    
+
     def group(self, option):
         """Enter a HDF5 group. This returns a context manager, to be used with 
         the `with` statement"""
         return GroupContext(self, option)
+
 
 class WriterMixin(object):
     def write(self, val, group_name=None):
@@ -76,6 +80,7 @@ class WriterMixin(object):
         
         group_name: if None, writing the value in current group"""
         import numpy as np
+
         if group_name:
             self.begin(group_name)
         if isinstance(val, bool):
@@ -100,15 +105,18 @@ class WriterMixin(object):
             self.write_float(val.timestamp())
         elif isinstance(val, datetime.date):
             self.write_int(val.toordinal())
-        elif hasattr(val, 'serialize') and isinstance(val.serialize,
-                                                      collections.Callable):
+        elif hasattr(val, "serialize") and isinstance(
+            val.serialize, collections.Callable
+        ):
             # The object has a DataSet-like `serialize` method
             val.serialize(self)
         else:
-            raise NotImplementedError("cannot serialize %r of type %r" %
-                                      (val, type(val)))
+            raise NotImplementedError(
+                "cannot serialize %r of type %r" % (val, type(val))
+            )
         if group_name:
             self.end(group_name)
+
 
 class UserConfigWriter(UserConfigIOHandler, WriterMixin):
     def write_any(self, val):
@@ -120,11 +128,13 @@ class UserConfigWriter(UserConfigIOHandler, WriterMixin):
 
     def write_unicode(self, val):
         self.write_any(val.encode("utf-8"))
+
     if PY3:
         write_unicode = write_str
 
     def write_none(self):
         self.write_any(None)
+
 
 class UserConfigReader(UserConfigIOHandler):
     def read_any(self):
@@ -141,5 +151,6 @@ class UserConfigReader(UserConfigIOHandler):
             return val
         else:
             return self.read_str()
+
     if PY3:
         read_unicode = read_str

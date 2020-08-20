@@ -12,14 +12,17 @@ Text visitor for DataItem objects
 
 from __future__ import print_function
 
-from guidata.py3compat import input
+from qtpy.py3compat import input
+
 
 def prompt(item):
     """Get item value"""
-    return input(item.get_prop("display", "label")+" ? ")
+    return input(item.get_prop("display", "label") + " ? ")
+
 
 class TextEditVisitor:
     """Text visitor"""
+
     def __init__(self, instance):
         self.instance = instance
 
@@ -35,4 +38,4 @@ class TextEditVisitor:
     visit_FloatItem = visit_generic
     visit_IntItem = visit_generic
     visit_StringItem = visit_generic
-    
+

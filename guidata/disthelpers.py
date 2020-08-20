@@ -30,22 +30,23 @@ import warnings
 
 # Local imports
 from guidata.configtools import get_module_path
-from guidata.py3compat import to_binary_string
+from qtpy.py3compat import to_binary_string
 
 
-#==============================================================================
+# ==============================================================================
 # Dependency management
-#==============================================================================
+# ==============================================================================
 def get_changeset(path, rev=None):
     """Return Mercurial repository *path* revision number"""
-    args = ['hg', 'parent']
+    args = ["hg", "parent"]
     if rev is not None:
-        args += ['--rev', str(rev)]
+        args += ["--rev", str(rev)]
     process = Popen(args, stdout=PIPE, stderr=PIPE, cwd=path, shell=True)
     try:
         return process.stdout.read().splitlines()[0].split()[1]
     except IndexError:
         raise RuntimeError(process.stderr.read())
+
 
 def prepend_module_to_path(module_path):
     """
@@ -63,77 +64,90 @@ def prepend_module_to_path(module_path):
     changeset = get_changeset(module_path)
     name = osp.basename(module_path)
     prefix = "Prepending module to sys.path"
-    message = prefix + ("%s [revision %s]" % (name, changeset)
-                        ).rjust(80 - len(prefix), ".")
+    message = prefix + ("%s [revision %s]" % (name, changeset)).rjust(
+        80 - len(prefix), "."
+    )
     print(message, file=sys.stderr)
     if name in sys.modules:
         sys.modules.pop(name)
         nbsp = 0
         for modname in sys.modules.keys():
-            if modname.startswith(name + '.'):
+            if modname.startswith(name + "."):
                 sys.modules.pop(modname)
                 nbsp += 1
-        warning = '(removed %s from sys.modules' % name
+        warning = "(removed %s from sys.modules" % name
         if nbsp:
-            warning += ' and %d subpackages' % nbsp
-        warning += ')'
+            warning += " and %d subpackages" % nbsp
+        warning += ")"
         print(warning.rjust(80), file=sys.stderr)
     return message
+
 
 def prepend_modules_to_path(module_base_path):
     """Prepend to sys.path all modules located in *module_base_path*"""
     if not osp.isdir(module_base_path):
         # Assuming py2exe distribution
         return
-    fnames = [osp.join(module_base_path, name)
-              for name in os.listdir(module_base_path)]
-    messages = [prepend_module_to_path(dirname)
-                for dirname in fnames if osp.isdir(dirname)]
+    fnames = [osp.join(module_base_path, name) for name in os.listdir(module_base_path)]
+    messages = [
+        prepend_module_to_path(dirname) for dirname in fnames if osp.isdir(dirname)
+    ]
     return os.linesep.join(messages)
 
 
-#==============================================================================
+# ==============================================================================
 # Distribution helpers
-#==============================================================================
+# ==============================================================================
 def _remove_later(fname):
     """Try to remove file later (at exit)"""
+
     def try_to_remove(fname):
         if osp.exists(fname):
             os.remove(fname)
+
     atexit.register(try_to_remove, osp.abspath(fname))
+
 
 def get_msvc_version(python_version):
     """Return Microsoft Visual C++ version used to build this Python version"""
     if python_version is None:
-        python_version = '%s.%s' % (sys.version_info.major,
-                                    sys.version_info.minor)
+        python_version = "%s.%s" % (sys.version_info.major, sys.version_info.minor)
         warnings.warn("Assuming Python %s target" % python_version)
-    if python_version in ('2.6', '2.7', '3.0', '3.1', '3.2'):
+    if python_version in ("2.6", "2.7", "3.0", "3.1", "3.2"):
         # Python 2.6-2.7, 3.0-3.2 were built with Visual Studio 9.0.21022.8
         # (i.e. Visual C++ 2008, not Visual C++ 2008 SP1!)
         return "9.0.21022.8"
-    elif python_version in ('3.3', '3.4'):
+    elif python_version in ("3.3", "3.4"):
         # Python 3.3+ were built with Visual Studio 10.0.30319.1
         # (i.e. Visual C++ 2010)
-        return '10.0'
+        return "10.0"
     else:
         raise RuntimeError("Unsupported Python version %s" % python_version)
 
+
 def get_dll_architecture(path):
     """Return DLL architecture (32 or 64bit) using Microsoft dumpbin.exe"""
-    os.environ['PATH'] += r';C:\Program Files (x86)\Microsoft Visual Studio 9.0\Common7\IDE\;C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\BIN;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Common7\IDE\;C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\BIN'
-    process = Popen(['dumpbin', '/HEADERS', osp.basename(path)], stdout=PIPE,
-                     stderr=PIPE, cwd=osp.dirname(path), shell=True)
+    os.environ[
+        "PATH"
+    ] += r";C:\Program Files (x86)\Microsoft Visual Studio 9.0\Common7\IDE\;C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\BIN;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Common7\IDE\;C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\BIN"
+    process = Popen(
+        ["dumpbin", "/HEADERS", osp.basename(path)],
+        stdout=PIPE,
+        stderr=PIPE,
+        cwd=osp.dirname(path),
+        shell=True,
+    )
     output = process.stdout.read()
     error = process.stderr.read()
     if error:
         raise RuntimeError(error)
-    elif 'x86' in output:
+    elif "x86" in output:
         return 32
-    elif 'x64' in output:
+    elif "x64" in output:
         return 64
     else:
-        raise ValueError('Unable to get DLL architecture')
+        raise ValueError("Unable to get DLL architecture")
+
 
 def get_msvc_dlls(msvc_version, architecture=None, check_architecture=False):
     """Get the list of Microsoft Visual C++ DLLs associated to 
@@ -141,33 +155,32 @@ def get_msvc_dlls(msvc_version, architecture=None, check_architecture=False):
     
     architecture: integer (32 or 64) -- if None, take the Python build arch
     python_version: X.Y"""
-    current_architecture = 64 if sys.maxsize > 2**32 else 32
+    current_architecture = 64 if sys.maxsize > 2 ** 32 else 32
     if architecture is None:
         architecture = current_architecture
     assert architecture in (32, 64)
 
     filelist = []
 
-    msvc_major = msvc_version.split('.')[0]
-    msvc_minor = msvc_version.split('.')[1]
+    msvc_major = msvc_version.split(".")[0]
+    msvc_minor = msvc_version.split(".")[1]
 
-    if msvc_major == '9':
+    if msvc_major == "9":
         key = "1fc8b3b9a1e18e3b"
         atype = "" if architecture == 64 else "win32"
         arch = "amd64" if architecture == 64 else "x86"
-        
+
         groups = {
-                  'CRT': ('msvcr90.dll', 'msvcp90.dll', 'msvcm90.dll'),
-#                  'OPENMP': ('vcomp90.dll',)
-                  }
+            "CRT": ("msvcr90.dll", "msvcp90.dll", "msvcm90.dll"),
+            #                  'OPENMP': ('vcomp90.dll',)
+        }
 
         for group, dll_list in groups.items():
-            dlls = ''
+            dlls = ""
             for dll in dll_list:
                 dlls += '    <file name="%s" />%s' % (dll, os.linesep)
-        
-            manifest =\
-"""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+            manifest = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <!-- Copyright (c) Microsoft Corporation.  All rights reserved. -->
 <assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
     <noInheritable/>
@@ -179,17 +192,22 @@ def get_msvc_dlls(msvc_version, architecture=None, check_architecture=False):
         publicKeyToken="%(key)s"
     />
 %(dlls)s</assembly>
-""" % dict(version=msvc_version, key=key, atype=atype, arch=arch,
-           group=group, dlls=dlls)
+""" % dict(
+                version=msvc_version,
+                key=key,
+                atype=atype,
+                arch=arch,
+                group=group,
+                dlls=dlls,
+            )
 
             vc90man = "Microsoft.VC90.%s.manifest" % group
-            open(vc90man, 'w').write(manifest)
+            open(vc90man, "w").write(manifest)
             _remove_later(vc90man)
             filelist += [vc90man]
-    
-            winsxs = osp.join(os.environ['windir'], 'WinSxS')
-            vcstr = '%s_Microsoft.VC90.%s_%s_%s' % (arch, group,
-                                                    key, msvc_version)
+
+            winsxs = osp.join(os.environ["windir"], "WinSxS")
+            vcstr = "%s_Microsoft.VC90.%s_%s_%s" % (arch, group, key, msvc_version)
             for fname in os.listdir(winsxs):
                 path = osp.join(winsxs, fname)
                 if osp.isdir(path) and fname.lower().startswith(vcstr.lower()):
@@ -197,26 +215,27 @@ def get_msvc_dlls(msvc_version, architecture=None, check_architecture=False):
                         filelist.append(osp.join(path, dllname))
                     break
             else:
-                raise RuntimeError("Microsoft Visual C++ %s DLLs version %s "\
-                                    "were not found" % (group, msvc_version))
+                raise RuntimeError(
+                    "Microsoft Visual C++ %s DLLs version %s "
+                    "were not found" % (group, msvc_version)
+                )
 
-    elif msvc_major == '10':
-        namelist = [name % (msvc_major + msvc_minor) for name in 
-                    (
-                     'msvcp%s.dll', 'msvcr%s.dll',
-                     'vcomp%s.dll',
-                     )]
-        
-        windir = os.environ['windir']
+    elif msvc_major == "10":
+        namelist = [
+            name % (msvc_major + msvc_minor)
+            for name in ("msvcp%s.dll", "msvcr%s.dll", "vcomp%s.dll",)
+        ]
+
+        windir = os.environ["windir"]
         is_64bit_windows = osp.isdir(osp.join(windir, "SysWOW64"))
 
-        # Reminder: WoW64 (*W*indows 32-bit *o*n *W*indows *64*-bit) is a 
-        # subsystem of the Windows operating system capable of running 32-bit 
+        # Reminder: WoW64 (*W*indows 32-bit *o*n *W*indows *64*-bit) is a
+        # subsystem of the Windows operating system capable of running 32-bit
         # applications and is included on all 64-bit versions of Windows
         # (source: http://en.wikipedia.org/wiki/WoW64)
         #
-        # In other words, "SysWOW64" contains 32-bit DLL and applications, 
-        # whereas "System32" contains 64-bit DLL and applications on a 64-bit 
+        # In other words, "SysWOW64" contains 32-bit DLL and applications,
+        # whereas "System32" contains 64-bit DLL and applications on a 64-bit
         # system.
         if architecture == 64:
             # 64-bit DLLs are located in...
@@ -237,28 +256,30 @@ def get_msvc_dlls(msvc_version, architecture=None, check_architecture=False):
             if osp.exists(fname):
                 filelist.append(fname)
             else:
-                raise RuntimeError("Microsoft Visual C++ DLLs version %s "\
-                                   "were not found" % msvc_version)
+                raise RuntimeError(
+                    "Microsoft Visual C++ DLLs version %s "
+                    "were not found" % msvc_version
+                )
 
     else:
         raise RuntimeError("Unsupported MSVC version %s" % msvc_version)
 
     if check_architecture:
         for path in filelist:
-            if path.endswith('.dll'):
+            if path.endswith(".dll"):
                 try:
                     arch = get_dll_architecture(path)
                 except RuntimeError:
                     return
                 if arch != architecture:
-                    raise RuntimeError("%s: expecting %dbit, found %dbit"\
-                                       % (path, architecture, arch))
+                    raise RuntimeError(
+                        "%s: expecting %dbit, found %dbit" % (path, architecture, arch)
+                    )
 
     return filelist
 
 
-def create_msvc_data_files(architecture=None, python_version=None,
-                           verbose=False):
+def create_msvc_data_files(architecture=None, python_version=None, verbose=False):
     """Including Microsoft Visual C++ DLLs"""
     msvc_version = get_msvc_version(python_version)
     filelist = get_msvc_dlls(msvc_version, architecture=architecture)
@@ -266,11 +287,15 @@ def create_msvc_data_files(architecture=None, python_version=None,
     if verbose:
         for name in filelist:
             print("  ", name)
-    msvc_major = msvc_version.split('.')[0]
-    if msvc_major == '9':
-        return [("Microsoft.VC90.CRT", filelist),]
+    msvc_major = msvc_version.split(".")[0]
+    if msvc_major == "9":
+        return [
+            ("Microsoft.VC90.CRT", filelist),
+        ]
     else:
-        return [("", filelist),]
+        return [
+            ("", filelist),
+        ]
 
 
 def to_include_files(data_files):
@@ -296,14 +321,13 @@ def to_include_files(data_files):
 def strip_version(version):
     """Return version number with digits only
     (Windows does not support strings in version numbers)"""
-    return version.split('beta')[0].split('alpha'
-                         )[0].split('rc')[0].split('dev')[0]
+    return version.split("beta")[0].split("alpha")[0].split("rc")[0].split("dev")[0]
 
 
 def remove_dir(dirname):
     """Remove directory *dirname* and all its contents
     Print details about the operation (progress, success/failure)"""
-    print("Removing directory '%s'..." % dirname, end=' ')
+    print("Removing directory '%s'..." % dirname, end=" ")
     try:
         shutil.rmtree(dirname, ignore_errors=True)
         print("OK")
@@ -317,18 +341,37 @@ class Distribution(object):
     
     Help creating an executable using ``py2exe`` or ``cx_Freeze``
     """
-    DEFAULT_EXCLUDES = ['Tkconstants', 'Tkinter', 'tcl', 'tk', 'wx',
-                        '_imagingtk', 'curses', 'PIL._imagingtk', 'ImageTk',
-                        'PIL.ImageTk', 'FixTk', 'bsddb', 'email',
-                        'pywin.debugger', 'pywin.debugger.dbgcon',
-                        'matplotlib']
+
+    DEFAULT_EXCLUDES = [
+        "Tkconstants",
+        "Tkinter",
+        "tcl",
+        "tk",
+        "wx",
+        "_imagingtk",
+        "curses",
+        "PIL._imagingtk",
+        "ImageTk",
+        "PIL.ImageTk",
+        "FixTk",
+        "bsddb",
+        "email",
+        "pywin.debugger",
+        "pywin.debugger.dbgcon",
+        "matplotlib",
+    ]
     if sys.version_info.major == 2:
-        #  Fixes compatibility issue with IPython (more specifically with one 
+        #  Fixes compatibility issue with IPython (more specifically with one
         #  of its dependencies: `jsonschema`) on Python 2.7
-        DEFAULT_EXCLUDES += ['collections.abc']
+        DEFAULT_EXCLUDES += ["collections.abc"]
     DEFAULT_INCLUDES = []
-    DEFAULT_BIN_EXCLUDES = ['MSVCP100.dll', 'MSVCP90.dll', 'w9xpopen.exe',
-                            'MSVCP80.dll', 'MSVCR80.dll']
+    DEFAULT_BIN_EXCLUDES = [
+        "MSVCP100.dll",
+        "MSVCP90.dll",
+        "w9xpopen.exe",
+        "MSVCP80.dll",
+        "MSVCR80.dll",
+    ]
     DEFAULT_BIN_INCLUDES = []
     DEFAULT_BIN_PATH_INCLUDES = []
     DEFAULT_BIN_PATH_EXCLUDES = []
@@ -347,30 +390,44 @@ class Distribution(object):
         self.bin_excludes = self.DEFAULT_BIN_EXCLUDES
         self.bin_path_includes = self.DEFAULT_BIN_PATH_INCLUDES
         self.bin_path_excludes = self.DEFAULT_BIN_PATH_EXCLUDES
-        self.msvc = os.name == 'nt'
+        self.msvc = os.name == "nt"
         self._py2exe_is_loaded = False
         self._pyqt_added = False
         self._pyside_added = False
         # Attributes relative to cx_Freeze:
         self.executables = []
-    
+
     @property
     def target_dir(self):
         """Return target directory (default: 'dist')"""
         dirname = self._target_dir
         if dirname is None:
-            return 'dist'
+            return "dist"
         else:
             return dirname
+
     @target_dir.setter  # analysis:ignore
     def target_dir(self, value):
         self._target_dir = value
-        
-    def setup(self, name, version, description, script,
-              target_name=None, target_dir=None, icon=None,
-              data_files=None, includes=None, excludes=None,
-              bin_includes=None, bin_excludes=None,
-              bin_path_includes=None, bin_path_excludes=None, msvc=None):
+
+    def setup(
+        self,
+        name,
+        version,
+        description,
+        script,
+        target_name=None,
+        target_dir=None,
+        icon=None,
+        data_files=None,
+        includes=None,
+        excludes=None,
+        bin_includes=None,
+        bin_excludes=None,
+        bin_path_includes=None,
+        bin_path_excludes=None,
+        msvc=None,
+    ):
         """Setup distribution object
         
         Notes:
@@ -379,7 +436,7 @@ class Distribution(object):
             platforms, False on non-Windows platforms
         """
         self.name = name
-        self.version = strip_version(version) if os.name == 'nt' else version
+        self.version = strip_version(version) if os.name == "nt" else version
         self.description = description
         assert osp.isfile(script)
         self.script = script
@@ -406,8 +463,10 @@ class Distribution(object):
             try:
                 self.data_files += create_msvc_data_files()
             except IOError:
-                print("Setting the msvc option to False "\
-                      "will avoid this error", file=sys.stderr)
+                print(
+                    "Setting the msvc option to False " "will avoid this error",
+                    file=sys.stderr,
+                )
                 raise
         # cx_Freeze:
         self.add_executable(self.script, self.target_name, icon=self.icon)
@@ -415,221 +474,297 @@ class Distribution(object):
     def add_text_data_file(self, filename, contents):
         """Create temporary data file *filename* with *contents*
         and add it to *data_files*"""
-        open(filename, 'wb').write(to_binary_string(contents))
-        self.data_files += [("", (filename, ))]
+        open(filename, "wb").write(to_binary_string(contents))
+        self.data_files += [("", (filename,))]
         _remove_later(filename)
-    
-    def add_data_file(self, filename, destdir=''):
-        self.data_files += [(destdir, (filename, ))]
 
-    #------ Adding packages
+    def add_data_file(self, filename, destdir=""):
+        self.data_files += [(destdir, (filename,))]
+
+    # ------ Adding packages
     def add_pyqt(self):
         """Include module PyQt4 or PyQt5 to the distribution"""
         if self._pyqt_added:
             return
         self._pyqt_added = True
-        
+
         try:
             import PyQt4 as PyQt
+
             qtver = 4
         except ImportError:
             import PyQt5 as PyQt
+
             qtver = 5
-        self.includes += ['sip', 'PyQt%d.Qt' % qtver,
-                          'PyQt%d.QtSvg' % qtver,
-                          'PyQt%d.QtNetwork' % qtver]
-        
+        self.includes += [
+            "sip",
+            "PyQt%d.Qt" % qtver,
+            "PyQt%d.QtSvg" % qtver,
+            "PyQt%d.QtNetwork" % qtver,
+        ]
+
         pyqt_path = osp.dirname(PyQt.__file__)
-        
+
         # Configuring PyQt
         conf = os.linesep.join(["[Paths]", "Prefix = .", "Binaries = ."])
-        self.add_text_data_file('qt.conf', conf)
-        
+        self.add_text_data_file("qt.conf", conf)
+
         # Including plugins (.svg icons support, QtDesigner support, ...)
         if self.msvc:
             vc90man = "Microsoft.VC90.CRT.manifest"
-            pyqt_tmp = 'pyqt_tmp'
+            pyqt_tmp = "pyqt_tmp"
             if osp.isdir(pyqt_tmp):
                 shutil.rmtree(pyqt_tmp)
             os.mkdir(pyqt_tmp)
             vc90man_pyqt = osp.join(pyqt_tmp, vc90man)
             if osp.isfile(vc90man):
-                man = open(vc90man, "r").read().replace('<file name="',
-                                            '<file name="Microsoft.VC90.CRT\\')
-                open(vc90man_pyqt, 'w').write(man)
+                man = (
+                    open(vc90man, "r")
+                    .read()
+                    .replace('<file name="', '<file name="Microsoft.VC90.CRT\\')
+                )
+                open(vc90man_pyqt, "w").write(man)
             else:
                 vc90man_pyqt = None
-        for dirpath, _, filenames in os.walk(osp.join(pyqt_path,
-                                                      "plugins")):
-            filelist = [osp.join(dirpath, f) for f in filenames
-                        if osp.splitext(f)[1] in ('.dll', '.py')]
-            if self.msvc and vc90man_pyqt is not None and\
-               [f for f in filelist if osp.splitext(f)[1] == '.dll']:
+        for dirpath, _, filenames in os.walk(osp.join(pyqt_path, "plugins")):
+            filelist = [
+                osp.join(dirpath, f)
+                for f in filenames
+                if osp.splitext(f)[1] in (".dll", ".py")
+            ]
+            if (
+                self.msvc
+                and vc90man_pyqt is not None
+                and [f for f in filelist if osp.splitext(f)[1] == ".dll"]
+            ):
                 # Where there is a DLL build with Microsoft Visual C++ 2008,
                 # there must be a manifest file as well...
                 # ...congrats to Microsoft for this great simplification!
                 filelist.append(vc90man_pyqt)
-            self.data_files.append( (dirpath[len(pyqt_path)+len(os.pathsep):],
-                                     filelist) )
+            self.data_files.append(
+                (dirpath[len(pyqt_path) + len(os.pathsep) :], filelist)
+            )
         if self.msvc:
             atexit.register(remove_dir, pyqt_tmp)
-        
+
         # Including french translation
         fr_trans = osp.join(pyqt_path, "translations", "qt_fr.qm")
         if osp.exists(fr_trans):
-            self.data_files.append(('translations', (fr_trans, )))
+            self.data_files.append(("translations", (fr_trans,)))
 
     def add_pyside(self):
         """Include module PySide to the distribution"""
         if self._pyside_added:
             return
         self._pyside_added = True
-        
-        self.includes += ['PySide.QtDeclarative', 'PySide.QtHelp',
-                          'PySide.QtMultimedia', 'PySide.QtNetwork',
-                          'PySide.QtOpenGL', 'PySide.QtScript',
-                          'PySide.QtScriptTools', 'PySide.QtSql',
-                          'PySide.QtSvg', 'PySide.QtTest',
-                          'PySide.QtUiTools', 'PySide.QtWebKit',
-                          'PySide.QtXml', 'PySide.QtXmlPatterns']
-        
+
+        self.includes += [
+            "PySide.QtDeclarative",
+            "PySide.QtHelp",
+            "PySide.QtMultimedia",
+            "PySide.QtNetwork",
+            "PySide.QtOpenGL",
+            "PySide.QtScript",
+            "PySide.QtScriptTools",
+            "PySide.QtSql",
+            "PySide.QtSvg",
+            "PySide.QtTest",
+            "PySide.QtUiTools",
+            "PySide.QtWebKit",
+            "PySide.QtXml",
+            "PySide.QtXmlPatterns",
+        ]
+
         import PySide
+
         pyside_path = osp.dirname(PySide.__file__)
-        
+
         # Configuring PySide
         conf = os.linesep.join(["[Paths]", "Prefix = .", "Binaries = ."])
-        self.add_text_data_file('qt.conf', conf)
-        
+        self.add_text_data_file("qt.conf", conf)
+
         # Including plugins (.svg icons support, QtDesigner support, ...)
         if self.msvc:
             vc90man = "Microsoft.VC90.CRT.manifest"
-            os.mkdir('pyside_tmp')
-            vc90man_pyside = osp.join('pyside_tmp', vc90man)
-            man = open(vc90man, "r").read().replace('<file name="',
-                                        '<file name="Microsoft.VC90.CRT\\')
-            open(vc90man_pyside, 'w').write(man)
+            os.mkdir("pyside_tmp")
+            vc90man_pyside = osp.join("pyside_tmp", vc90man)
+            man = (
+                open(vc90man, "r")
+                .read()
+                .replace('<file name="', '<file name="Microsoft.VC90.CRT\\')
+            )
+            open(vc90man_pyside, "w").write(man)
         for dirpath, _, filenames in os.walk(osp.join(pyside_path, "plugins")):
-            filelist = [osp.join(dirpath, f) for f in filenames
-                        if osp.splitext(f)[1] in ('.dll', '.py')]
-            if self.msvc and [f for f in filelist
-                              if osp.splitext(f)[1] == '.dll']:
+            filelist = [
+                osp.join(dirpath, f)
+                for f in filenames
+                if osp.splitext(f)[1] in (".dll", ".py")
+            ]
+            if self.msvc and [f for f in filelist if osp.splitext(f)[1] == ".dll"]:
                 # Where there is a DLL build with Microsoft Visual C++ 2008,
                 # there must be a manifest file as well...
                 # ...congrats to Microsoft for this great simplification!
                 filelist.append(vc90man_pyside)
             self.data_files.append(
-                    (dirpath[len(pyside_path)+len(os.pathsep):], filelist) )
+                (dirpath[len(pyside_path) + len(os.pathsep) :], filelist)
+            )
 
         # Replacing dlls found by cx_Freeze by the real PySide Qt dlls:
         # (http://qt-project.org/wiki/Packaging_PySide_applications_on_Windows)
-        dlls = [osp.join(pyside_path, fname)
-                for fname in os.listdir(pyside_path)
-                if osp.splitext(fname)[1] == '.dll']
-        self.data_files.append( ('', dlls) )
+        dlls = [
+            osp.join(pyside_path, fname)
+            for fname in os.listdir(pyside_path)
+            if osp.splitext(fname)[1] == ".dll"
+        ]
+        self.data_files.append(("", dlls))
 
         if self.msvc:
-            atexit.register(remove_dir, 'pyside_tmp')
-        
+            atexit.register(remove_dir, "pyside_tmp")
+
         # Including french translation
         fr_trans = osp.join(pyside_path, "translations", "qt_fr.qm")
         if osp.exists(fr_trans):
-            self.data_files.append(('translations', (fr_trans, )))
-    
+            self.data_files.append(("translations", (fr_trans,)))
+
     def add_qt_bindings(self):
         """Include Qt bindings, i.e. PyQt4 or PySide"""
         try:
-            imp.find_module('PyQt5')
-            self.add_modules('PyQt5')
+            imp.find_module("PyQt5")
+            self.add_modules("PyQt5")
         except ImportError:
             try:
-                imp.find_module('PyQt4')
-                self.add_modules('PyQt4')
+                imp.find_module("PyQt4")
+                self.add_modules("PyQt4")
             except ImportError:
-                self.add_modules('PySide')
+                self.add_modules("PySide")
 
     def add_matplotlib(self):
         """Include module Matplotlib to the distribution"""
-        if 'matplotlib' in self.excludes:
-            self.excludes.remove('matplotlib')
+        if "matplotlib" in self.excludes:
+            self.excludes.remove("matplotlib")
         try:
             import matplotlib.numerix  # analysis:ignore
-            self.includes += ['matplotlib.numerix.ma',
-                              'matplotlib.numerix.fft',
-                              'matplotlib.numerix.linear_algebra',
-                              'matplotlib.numerix.mlab',
-                              'matplotlib.numerix.random_array']
+
+            self.includes += [
+                "matplotlib.numerix.ma",
+                "matplotlib.numerix.fft",
+                "matplotlib.numerix.linear_algebra",
+                "matplotlib.numerix.mlab",
+                "matplotlib.numerix.random_array",
+            ]
         except ImportError:
             pass
-        self.add_module_data_files('matplotlib', ('mpl-data', ),
-                                   ('.conf', '.glade', '', '.png', '.svg',
-                                    '.xpm', '.ppm', '.npy', '.afm', '.ttf'))
+        self.add_module_data_files(
+            "matplotlib",
+            ("mpl-data",),
+            (
+                ".conf",
+                ".glade",
+                "",
+                ".png",
+                ".svg",
+                ".xpm",
+                ".ppm",
+                ".npy",
+                ".afm",
+                ".ttf",
+            ),
+        )
 
     def add_modules(self, *module_names):
         """Include module *module_name*"""
         for module_name in module_names:
             print("Configuring module '%s'" % module_name)
-            if module_name in ('PyQt4', 'PyQt5'):
+            if module_name in ("PyQt4", "PyQt5"):
                 self.add_pyqt()
-            elif module_name == 'PySide':
+            elif module_name == "PySide":
                 self.add_pyside()
-            elif module_name == 'scipy':
-                self.add_module_dir('scipy')
-            elif module_name == 'matplotlib':
+            elif module_name == "scipy":
+                self.add_module_dir("scipy")
+            elif module_name == "matplotlib":
                 self.add_matplotlib()
-            elif module_name == 'h5py':
-                self.add_module_dir('h5py')
-                if self.bin_path_excludes is not None and os.name == 'nt':
+            elif module_name == "h5py":
+                self.add_module_dir("h5py")
+                if self.bin_path_excludes is not None and os.name == "nt":
                     # Specific to cx_Freeze on Windows: avoid including a zlib dll
                     # built with another version of Microsoft Visual Studio
-                    self.bin_path_excludes += [r'C:\Program Files',
-                                               r'C:\Program Files (x86)']
+                    self.bin_path_excludes += [
+                        r"C:\Program Files",
+                        r"C:\Program Files (x86)",
+                    ]
                     self.data_files.append(  # necessary for cx_Freeze only
-                       ('', (osp.join(get_module_path('h5py'), 'zlib1.dll'), ))
-                                           )
-            elif module_name in ('docutils', 'rst2pdf', 'sphinx'):
-                self.includes += ['docutils.writers.null',
-                                  'docutils.languages.en',
-                                  'docutils.languages.fr']
-                if module_name == 'rst2pdf':
-                    self.add_module_data_files("rst2pdf", ("styles", ),
-                                               ('.json', '.style'),
-                                               copy_to_root=True)
-                if module_name == 'sphinx':
+                        ("", (osp.join(get_module_path("h5py"), "zlib1.dll"),))
+                    )
+            elif module_name in ("docutils", "rst2pdf", "sphinx"):
+                self.includes += [
+                    "docutils.writers.null",
+                    "docutils.languages.en",
+                    "docutils.languages.fr",
+                ]
+                if module_name == "rst2pdf":
+                    self.add_module_data_files(
+                        "rst2pdf", ("styles",), (".json", ".style"), copy_to_root=True
+                    )
+                if module_name == "sphinx":
                     import sphinx.ext
+
                     for fname in os.listdir(osp.dirname(sphinx.ext.__file__)):
-                        if osp.splitext(fname)[1] == '.py':
-                            modname = 'sphinx.ext.%s' % osp.splitext(fname)[0]
+                        if osp.splitext(fname)[1] == ".py":
+                            modname = "sphinx.ext.%s" % osp.splitext(fname)[0]
                             self.includes.append(modname)
-            elif module_name == 'pygments':
-                self.includes += ['pygments', 'pygments.formatters',
-                                  'pygments.lexers', 'pygments.lexers.agile']
-            elif module_name == 'zmq':
+            elif module_name == "pygments":
+                self.includes += [
+                    "pygments",
+                    "pygments.formatters",
+                    "pygments.lexers",
+                    "pygments.lexers.agile",
+                ]
+            elif module_name == "zmq":
                 # FIXME: this is not working, yet... (missing DLL)
-                self.includes += ['zmq', 'zmq.core._poll', 'zmq.core._version', 'zmq.core.constants', 'zmq.core.context', 'zmq.core.device', 'zmq.core.error', 'zmq.core.message', 'zmq.core.socket', 'zmq.core.stopwatch']
-                if os.name == 'nt':
-                    self.bin_includes += ['libzmq.dll']
-            elif module_name == 'guidata':
-                self.add_module_data_files('guidata', ("images", ),
-                                       ('.png', '.svg'), copy_to_root=False)
+                self.includes += [
+                    "zmq",
+                    "zmq.core._poll",
+                    "zmq.core._version",
+                    "zmq.core.constants",
+                    "zmq.core.context",
+                    "zmq.core.device",
+                    "zmq.core.error",
+                    "zmq.core.message",
+                    "zmq.core.socket",
+                    "zmq.core.stopwatch",
+                ]
+                if os.name == "nt":
+                    self.bin_includes += ["libzmq.dll"]
+            elif module_name == "guidata":
+                self.add_module_data_files(
+                    "guidata", ("images",), (".png", ".svg"), copy_to_root=False
+                )
                 self.add_qt_bindings()
-            elif module_name == 'guiqwt':
-                self.add_module_data_files('guiqwt', ("images", ),
-                                       ('.png', '.svg'), copy_to_root=False)
-                if os.name == 'nt':
+            elif module_name == "guiqwt":
+                self.add_module_data_files(
+                    "guiqwt", ("images",), (".png", ".svg"), copy_to_root=False
+                )
+                if os.name == "nt":
                     # Specific to cx_Freeze: including manually MinGW DLLs
-                    self.bin_includes += ['libgcc_s_dw2-1.dll',
-                                          'libstdc++-6.dll']
+                    self.bin_includes += ["libgcc_s_dw2-1.dll", "libstdc++-6.dll"]
             else:
                 try:
                     # Modules based on the same scheme as guidata and guiqwt
-                    self.add_module_data_files(module_name, ("images", ),
-                                       ('.png', '.svg'), copy_to_root=False)
+                    self.add_module_data_files(
+                        module_name, ("images",), (".png", ".svg"), copy_to_root=False
+                    )
                 except IOError:
                     raise RuntimeError("Module not supported: %s" % module_name)
 
-    def add_module_data_dir(self, module_name, data_dir_name, extensions,
-                            copy_to_root=True, verbose=False,
-                            exclude_dirs=[]):
+    def add_module_data_dir(
+        self,
+        module_name,
+        data_dir_name,
+        extensions,
+        copy_to_root=True,
+        verbose=False,
+        exclude_dirs=[],
+    ):
         """
         Collect data files in *data_dir_name* for module *module_name*
         and add them to *data_files*
@@ -646,13 +781,16 @@ class Distribution(object):
                 continue
             if not copy_to_root:
                 dirname = osp.join(module_name, dirname)
-            pathlist = [osp.join(dirpath, f) for f in filenames
-                        if osp.splitext(f)[1].lower() in extensions]
-            self.data_files.append( (dirname, pathlist) )
+            pathlist = [
+                osp.join(dirpath, f)
+                for f in filenames
+                if osp.splitext(f)[1].lower() in extensions
+            ]
+            self.data_files.append((dirname, pathlist))
             if verbose:
                 for name in pathlist:
                     print("  ", name)
-    
+
     def add_module_dir(self, module_name, verbose=False, exclude_dirs=[]):
         """
         Collect all module files for module *module_name*
@@ -664,13 +802,13 @@ class Distribution(object):
             if osp.basename(dirpath) in exclude_dirs:
                 continue
             for dn in dirnames[:]:
-                if not osp.isfile(osp.join(dirpath, dn, '__init__.py')):
+                if not osp.isfile(osp.join(dirpath, dn, "__init__.py")):
                     dirnames.remove(dn)
             dirname = osp.join(module_name, dirpath[nstrip:])
             for filename in filenames:
                 ext = osp.splitext(filename)[1].lower()
-                if ext in ('.py', '.pyd'):
-                    if filename == '__init__.py':
+                if ext in (".py", ".pyd"):
+                    if filename == "__init__.py":
                         fn = dirname
                     else:
                         fn = osp.splitext(osp.join(dirname, filename))[0]
@@ -680,28 +818,49 @@ class Distribution(object):
                     self.includes += [modname]
                     if verbose:
                         print("  + ", modname)
-    
-    def add_module_data_files(self, module_name, data_dir_names, extensions,
-                              copy_to_root=True, verbose=False,
-                              exclude_dirs=[]):
+
+    def add_module_data_files(
+        self,
+        module_name,
+        data_dir_names,
+        extensions,
+        copy_to_root=True,
+        verbose=False,
+        exclude_dirs=[],
+    ):
         """
         Collect data files for module *module_name* and add them to *data_files*
         *data_dir_names*: list of dirnames, e.g. ('images', )
         *extensions*: list of file extensions, e.g. ('.png', '.svg')
         """
-        print("Adding module '%s' data files in %s (%s)"\
-              % (module_name, ", ".join(data_dir_names), ", ".join(extensions)))
+        print(
+            "Adding module '%s' data files in %s (%s)"
+            % (module_name, ", ".join(data_dir_names), ", ".join(extensions))
+        )
         module_dir = get_module_path(module_name)
         for data_dir_name in data_dir_names:
-            self.add_module_data_dir(module_name, data_dir_name, extensions,
-                                     copy_to_root, verbose, exclude_dirs)
-        translation_file = osp.join(module_dir, "locale", "fr", "LC_MESSAGES",
-                                    "%s.mo" % module_name)
+            self.add_module_data_dir(
+                module_name,
+                data_dir_name,
+                extensions,
+                copy_to_root,
+                verbose,
+                exclude_dirs,
+            )
+        translation_file = osp.join(
+            module_dir, "locale", "fr", "LC_MESSAGES", "%s.mo" % module_name
+        )
         if osp.isfile(translation_file):
-            self.data_files.append((osp.join(module_name, "locale", "fr",
-                                         "LC_MESSAGES"), (translation_file, )))
-            print("Adding module '%s' translation file: %s" % (module_name,
-                                               osp.basename(translation_file)))
+            self.data_files.append(
+                (
+                    osp.join(module_name, "locale", "fr", "LC_MESSAGES"),
+                    (translation_file,),
+                )
+            )
+            print(
+                "Adding module '%s' translation file: %s"
+                % (module_name, osp.basename(translation_file))
+            )
 
     def build(self, library, cleanup=True, create_archive=None):
         """Build executable with given library.
@@ -717,22 +876,20 @@ class Distribution(object):
             * 'add': add target directory to a ZIP archive
             * 'move': move target directory to a ZIP archive
         """
-        if library == 'py2exe':
-            self.build_py2exe(cleanup=cleanup,
-                              create_archive=create_archive)
-        elif library == 'cx_Freeze':
-            self.build_cx_freeze(cleanup=cleanup,
-                                 create_archive=create_archive)
+        if library == "py2exe":
+            self.build_py2exe(cleanup=cleanup, create_archive=create_archive)
+        elif library == "cx_Freeze":
+            self.build_cx_freeze(cleanup=cleanup, create_archive=create_archive)
         else:
             raise RuntimeError("Unsupported library %s" % library)
-    
+
     def __cleanup(self):
         """Remove old build and dist directories"""
         remove_dir("build")
         if osp.isdir("dist"):
             remove_dir("dist")
         remove_dir(self.target_dir)
-    
+
     def __create_archive(self, option):
         """Create a ZIP archive
 
@@ -742,11 +899,18 @@ class Distribution(object):
         """
         name = self.target_dir
         os.system('zip "%s.zip" -r "%s"' % (name, name))
-        if option == 'move':
+        if option == "move":
             shutil.rmtree(name)
 
-    def build_py2exe(self, cleanup=True, compressed=2, optimize=2,
-                     company_name=None, copyright=None, create_archive=None):
+    def build_py2exe(
+        self,
+        cleanup=True,
+        compressed=2,
+        optimize=2,
+        company_name=None,
+        copyright=None,
+        create_archive=None,
+    ):
         """Build executable with py2exe
 
         cleanup: remove 'build/dist' directories before building distribution
@@ -758,22 +922,34 @@ class Distribution(object):
         """
         from distutils.core import setup
         import py2exe  # Patching distutils -- analysis:ignore
+
         self._py2exe_is_loaded = True
         if cleanup:
             self.__cleanup()
         sys.argv += ["py2exe"]
-        options = dict(compressed=compressed, optimize=optimize,
-                       includes=self.includes, excludes=self.excludes,
-                       dll_excludes=self.bin_excludes,
-                       dist_dir=self.target_dir)
-        windows = dict(name=self.name, description=self.description,
-                       script=self.script, icon_resources=[(0, self.icon)],
-                       bitmap_resources=[], other_resources=[],
-                       dest_base=osp.splitext(self.target_name)[0],
-                       version=self.version,
-                       company_name=company_name, copyright=copyright)
-        setup(data_files=self.data_files, windows=[windows,],
-              options=dict(py2exe=options))
+        options = dict(
+            compressed=compressed,
+            optimize=optimize,
+            includes=self.includes,
+            excludes=self.excludes,
+            dll_excludes=self.bin_excludes,
+            dist_dir=self.target_dir,
+        )
+        windows = dict(
+            name=self.name,
+            description=self.description,
+            script=self.script,
+            icon_resources=[(0, self.icon)],
+            bitmap_resources=[],
+            other_resources=[],
+            dest_base=osp.splitext(self.target_name)[0],
+            version=self.version,
+            company_name=company_name,
+            copyright=copyright,
+        )
+        setup(
+            data_files=self.data_files, windows=[windows,], options=dict(py2exe=options)
+        )
         if create_archive:
             self.__create_archive(create_archive)
 
@@ -781,11 +957,15 @@ class Distribution(object):
         """Add executable to the cx_Freeze distribution
         Not supported for py2exe"""
         from cx_Freeze import Executable
+
         base = None
-        if script.endswith('.pyw') and os.name == 'nt':
-            base = 'win32gui'
-        self.executables += [Executable(self.script, base=base, icon=self.icon,
-                                        targetName=self.target_name)]
+        if script.endswith(".pyw") and os.name == "nt":
+            base = "win32gui"
+        self.executables += [
+            Executable(
+                self.script, base=base, icon=self.icon, targetName=self.target_name
+            )
+        ]
 
     def build_cx_freeze(self, cleanup=True, create_archive=None):
         """Build executable with cx_Freeze
@@ -797,32 +977,35 @@ class Distribution(object):
             * 'add': add target directory to a ZIP archive
             * 'move': move target directory to a ZIP archive
         """
-        assert not self._py2exe_is_loaded, \
-               "cx_Freeze can't be executed after py2exe"
+        assert not self._py2exe_is_loaded, "cx_Freeze can't be executed after py2exe"
         from cx_Freeze import setup
-        
-        #===== Monkey-patching cx_Freeze (backported from v5.0 dev) ===========
+
+        # ===== Monkey-patching cx_Freeze (backported from v5.0 dev) ===========
         from cx_Freeze import hooks
+
         def load_h5py(finder, module):
             """h5py module has a number of implicit imports"""
-            finder.IncludeModule('h5py.defs')
-            finder.IncludeModule('h5py.utils')
-            finder.IncludeModule('h5py._proxy')
+            finder.IncludeModule("h5py.defs")
+            finder.IncludeModule("h5py.utils")
+            finder.IncludeModule("h5py._proxy")
             try:
                 import h5py.api_gen
-                finder.IncludeModule('h5py.api_gen')
+
+                finder.IncludeModule("h5py.api_gen")
             except ImportError:
                 pass
-            finder.IncludeModule('h5py._errors')
-            finder.IncludeModule('h5py.h5ac')
-        hooks.load_h5py = load_h5py
-        #===== Monkey-patching cx_Freeze (backported from v5.0 dev) ===========
+            finder.IncludeModule("h5py._errors")
+            finder.IncludeModule("h5py.h5ac")
 
-        #===== Monkey-patching cx_Freeze for Scipy ============================
+        hooks.load_h5py = load_h5py
+        # ===== Monkey-patching cx_Freeze (backported from v5.0 dev) ===========
+
+        # ===== Monkey-patching cx_Freeze for Scipy ============================
         def load_scipy(finder, module):
             pass
+
         hooks.load_scipy = load_scipy
-        #===== Monkey-patching cx_Freeze for Scipy ============================
+        # ===== Monkey-patching cx_Freeze for Scipy ============================
 
         if cleanup:
             self.__cleanup()
@@ -830,27 +1013,34 @@ class Distribution(object):
         excv = "3" if sys.version[0] == "2" else "2"
         self.excludes += ["sympy.mpmath.libmp.exec_py%s" % excv]
         self.excludes += ["PyQt4.uic.port_v%s" % excv]
-        build_exe = dict(include_files=to_include_files(self.data_files),
-                         includes=self.includes, excludes=self.excludes,
-                         bin_excludes=self.bin_excludes,
-                         bin_includes=self.bin_includes,
-                         bin_path_includes=self.bin_path_includes,
-                         bin_path_excludes=self.bin_path_excludes,
-                         build_exe=self.target_dir)
-        setup(name=self.name, version=self.version,
-              description=self.description, executables=self.executables,
-              options=dict(build_exe=build_exe))
+        build_exe = dict(
+            include_files=to_include_files(self.data_files),
+            includes=self.includes,
+            excludes=self.excludes,
+            bin_excludes=self.bin_excludes,
+            bin_includes=self.bin_includes,
+            bin_path_includes=self.bin_path_includes,
+            bin_path_excludes=self.bin_path_excludes,
+            build_exe=self.target_dir,
+        )
+        setup(
+            name=self.name,
+            version=self.version,
+            description=self.description,
+            executables=self.executables,
+            options=dict(build_exe=build_exe),
+        )
         if create_archive:
             self.__create_archive(create_archive)
 
 
-if __name__ == '__main__':
-    for python_version in ('2.7', '3.3'):
+if __name__ == "__main__":
+    for python_version in ("2.7", "3.3"):
         for arch in (32, 64):
-            print('Python %s %dbit' % (python_version, arch))
+            print("Python %s %dbit" % (python_version, arch))
             msvc_version = get_msvc_version(python_version)
             filelist = get_msvc_dlls(msvc_version, architecture=arch)
             for fname in filelist:
-                if '.dll' in fname:
+                if ".dll" in fname:
                     print(get_dll_architecture(fname))
             print()

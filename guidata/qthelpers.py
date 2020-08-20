@@ -16,24 +16,35 @@ easily Qt-based graphical user interfaces.
 from __future__ import print_function
 
 import sys
-from guidata.qt.QtGui import (QAction, QApplication, QColor, QHBoxLayout, QIcon,
-                              QKeySequence, QLabel, QLineEdit, QMenu,
-                              QPushButton, QStyle, QToolButton, QVBoxLayout,
-                              QWidget, QGroupBox)
-from guidata.qt.QtCore import Qt
+from qtpy.QtWidgets import (
+    QAction,
+    QApplication,
+    QHBoxLayout,
+    QLabel,
+    QLineEdit,
+    QMenu,
+    QPushButton,
+    QStyle,
+    QToolButton,
+    QVBoxLayout,
+    QWidget,
+    QGroupBox,
+)
+from qtpy.QtGui import QColor, QIcon, QKeySequence
+from qtpy.QtCore import Qt
 
 # Local imports:
 from guidata.configtools import get_icon
-from guidata.py3compat import is_text_string
+from qtpy.py3compat import is_text_string
 
 
 def text_to_qcolor(text):
     """Create a QColor from specified string"""
     color = QColor()
-    if not is_text_string(text): # testing for QString (PyQt API#1)
+    if not is_text_string(text):  # testing for QString (PyQt API#1)
         text = str(text)
-    if text.startswith('#') and len(text)==7:
-        correct = '#0123456789abcdef'
+    if text.startswith("#") and len(text) == 7:
+        correct = "#0123456789abcdef"
         for char in text:
             if char.lower() not in correct:
                 return color
@@ -42,9 +53,19 @@ def text_to_qcolor(text):
     color.setNamedColor(text)
     return color
 
-def create_action(parent, title, triggered=None, toggled=None,
-                  shortcut=None, icon=None, tip=None, checkable=None,
-                  context=Qt.WindowShortcut, enabled=None):
+
+def create_action(
+    parent,
+    title,
+    triggered=None,
+    toggled=None,
+    shortcut=None,
+    icon=None,
+    tip=None,
+    checkable=None,
+    context=Qt.WindowShortcut,
+    enabled=None,
+):
     """
     Create a new QAction
     """
@@ -62,7 +83,7 @@ def create_action(parent, title, triggered=None, toggled=None,
         action.setCheckable(True)
     if icon is not None:
         assert isinstance(icon, QIcon)
-        action.setIcon( icon )
+        action.setIcon(icon)
     if shortcut is not None:
         action.setShortcut(shortcut)
     if tip is not None:
@@ -73,9 +94,18 @@ def create_action(parent, title, triggered=None, toggled=None,
     action.setShortcutContext(context)
     return action
 
-def create_toolbutton(parent, icon=None, text=None, triggered=None, tip=None,
-                      toggled=None, shortcut=None, autoraise=True,
-                      enabled=None):
+
+def create_toolbutton(
+    parent,
+    icon=None,
+    text=None,
+    triggered=None,
+    tip=None,
+    toggled=None,
+    shortcut=None,
+    autoraise=True,
+    enabled=None,
+):
     """Create a QToolButton"""
     if autoraise:
         button = QToolButton(parent)
@@ -102,9 +132,11 @@ def create_toolbutton(parent, icon=None, text=None, triggered=None, tip=None,
     if enabled is not None:
         button.setEnabled(enabled)
     return button
-    
-def create_groupbox(parent, title=None, toggled=None, checked=None,
-                    flat=False, layout=None):
+
+
+def create_groupbox(
+    parent, title=None, toggled=None, checked=None, flat=False, layout=None
+):
     """Create a QGroupBox"""
     if title is None:
         group = QGroupBox(parent)
@@ -120,10 +152,12 @@ def create_groupbox(parent, title=None, toggled=None, checked=None,
         group.setLayout(layout)
     return group
 
+
 def keybinding(attr):
     """Return keybinding"""
     ks = getattr(QKeySequence, attr)
     return QKeySequence.keyBindings(ks)[0].toString()
+
 
 def add_separator(target):
     """Add separator to target only if last action is not a separator"""
@@ -131,6 +165,7 @@ def add_separator(target):
     if target_actions:
         if not target_actions[-1].isSeparator():
             target.addSeparator()
+
 
 def add_actions(target, actions):
     """
@@ -144,45 +179,49 @@ def add_actions(target, actions):
         elif action is None:
             add_separator(target)
 
+
 def get_std_icon(name, size=None):
     """
     Get standard platform icon
     Call 'show_std_icons()' for details
     """
-    if not name.startswith('SP_'):
-        name = 'SP_'+name
-    icon = QWidget().style().standardIcon( getattr(QStyle, name) )
+    if not name.startswith("SP_"):
+        name = "SP_" + name
+    icon = QWidget().style().standardIcon(getattr(QStyle, name))
     if size is None:
         return icon
     else:
-        return QIcon( icon.pixmap(size, size) )
+        return QIcon(icon.pixmap(size, size))
+
 
 class ShowStdIcons(QWidget):
     """
     Dialog showing standard icons
     """
+
     def __init__(self, parent):
         QWidget.__init__(self, parent)
         layout = QHBoxLayout()
         row_nb = 14
         cindex = 0
         for child in dir(QStyle):
-            if child.startswith('SP_'):
+            if child.startswith("SP_"):
                 if cindex == 0:
                     col_layout = QVBoxLayout()
                 icon_layout = QHBoxLayout()
                 icon = get_std_icon(child)
                 label = QLabel()
                 label.setPixmap(icon.pixmap(32, 32))
-                icon_layout.addWidget( label )
-                icon_layout.addWidget( QLineEdit(child.replace('SP_', '')) )
+                icon_layout.addWidget(label)
+                icon_layout.addWidget(QLineEdit(child.replace("SP_", "")))
                 col_layout.addLayout(icon_layout)
-                cindex = (cindex+1) % row_nb
+                cindex = (cindex + 1) % row_nb
                 if cindex == 0:
-                    layout.addLayout(col_layout)                    
+                    layout.addLayout(col_layout)
         self.setLayout(layout)
-        self.setWindowTitle('Standard Platform Icons')
-        self.setWindowIcon(get_std_icon('TitleBarMenuButton'))
+        self.setWindowTitle("Standard Platform Icons")
+        self.setWindowIcon(get_std_icon("TitleBarMenuButton"))
+
 
 def show_std_icons():
     """
@@ -193,7 +232,9 @@ def show_std_icons():
     dialog.show()
     sys.exit(app.exec_())
 
+
 if __name__ == "__main__":
     from guidata.utils import pairs
-    print(list( pairs( list(range(5)) ) ))
+
+    print(list(pairs(list(range(5)))))
     show_std_icons()
