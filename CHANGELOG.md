@@ -1,6 +1,13 @@
 # guidata Releases #
 
 
+### Version 1.7.9 ###
+
+Changes:
+
+* Added PySide2 support: guidata is now compatible with Python 2.7, Python 3.4+, PyQt4, 
+  PyQt5 and PySide2!
+
 ### Version 1.7.8 ###
 
 Changes:
