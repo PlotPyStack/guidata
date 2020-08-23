@@ -8,7 +8,7 @@
 
 Simple example of ``guidata`` datasets embedded in an application window:
 
-<img src="http://pythonhosted.org/guidata/_images/editgroupbox.png">
+<img src="https://raw.githubusercontent.com/PierreRaybaut/guidata/master/doc/images/screenshots/editgroupbox.png">
 
 See [documentation](http://pythonhosted.org/guidata/) for more details on 
 the library and [changelog](CHANGELOG.md) for recent history of changes.

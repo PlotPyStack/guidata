@@ -47,7 +47,7 @@ guidata: Automatic GUI generation for easy dataset editing and display with Pyth
 
 Simple example of ``guidata`` datasets embedded in an application window:
 
-.. image:: http://pythonhosted.org/guidata/_images/editgroupbox.png
+.. image:: https://raw.githubusercontent.com/PierreRaybaut/guidata/master/doc/images/screenshots/editgroupbox.png
 
 See `documentation`_ for more details on the library and `changelog`_ for recent history of changes.
 
