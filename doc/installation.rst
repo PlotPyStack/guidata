@@ -8,6 +8,7 @@ Requirements:
 
     * Python 2.x (x>=6) or 3.x (x>=2)
     * `PyQt4`_ 4.x (x>=3 ; recommended x>=4) or `PyQt5`_ 5.x (x>=5)
+    * `QtPy`_ >= 1.3
     
 Optional Python modules:
 
@@ -17,6 +18,7 @@ Optional Python modules:
 
 .. _PyQt4: https://pypi.python.org/pypi/PyQt4
 .. _PyQt5: https://pypi.python.org/pypi/PyQt5
+.. _qtpy: https://pypi.org/project/QtPy/
 .. _spyder: https://pypi.python.org/pypi/Spyder
 .. _h5py: https://pypi.python.org/pypi/h5py
 .. _cx_Freeze: https://pypi.python.org/pypi/cx_Freeze
