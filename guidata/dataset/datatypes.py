@@ -97,8 +97,7 @@ class GetAttrProp(ItemProperty):
 
 
 class ValueProp(ItemProperty):
-    """A property that retrieves a value stored elsewhere
-    """
+    """A property that retrieves a value stored elsewhere"""
 
     def __init__(self, value):
         self.value = value
@@ -147,7 +146,7 @@ class FuncProp(ItemProperty):
 class DataItem(object):
     """
     DataSet data item
-    
+
     `label` : string
     `default` : any type, optional
     `help` : string Text displayed on data item's tooltip
@@ -184,7 +183,7 @@ class DataItem(object):
     def set_prop(self, realm, **kwargs):
         """Set one or several properties using
         the syntax set_prop(name1=value1, ..., nameX=valueX)
-        
+
         it returns self so that we can assign to the result like this:
 
         item = Item().set_prop(x=y)
@@ -259,6 +258,12 @@ class DataItem(object):
         """
         self._name = new_name
 
+    def set_help(self, new_help):
+        """
+        Set data item's help text
+        """
+        self._help = new_help
+
     def set_from_string(self, instance, string_value):
         """
         Set data item's value from specified string
@@ -277,7 +282,7 @@ class DataItem(object):
         This is the visitor pattern's accept function.
         It calls the corresponding visit_MYCLASS method
         of the visitor object.
-        
+
         Python's allow a generic base class implementation of
         this method so there's no need to write an accept function
         for each derived class unless you need to override the
@@ -329,7 +334,7 @@ class DataItem(object):
 
     def serialize(self, instance, writer):
         """Serialize this item using the writer object
-        
+
         this is a default implementation that should work for
         everything but new datatypes
         """
@@ -337,15 +342,15 @@ class DataItem(object):
         writer.write(value)
 
     def get_value_from_reader(self, reader):
-        """Reads value from the reader object, inside the try...except 
+        """Reads value from the reader object, inside the try...except
         statement defined in the base item `deserialize` method
-        
+
         This method is reimplemented in some child classes"""
         return reader.read_any()
 
     def deserialize(self, instance, reader):
         """Deserialize this item using the reader object
-        
+
         Default base implementation supposes the reader can
         detect expected datatype from the stream
         """
@@ -378,8 +383,7 @@ class ObjectItem(DataItem):
     klass = None
 
     def set_default(self, instance):
-        """Make a copy of the default value
-        """
+        """Make a copy of the default value"""
         value = self.klass()
         if self._default is not None:
             update_dataset(value, self._default)
@@ -387,7 +391,7 @@ class ObjectItem(DataItem):
 
     def deserialize(self, instance, reader):
         """Deserialize this item using the reader object
-        
+
         We build a new default object and deserialize it
         """
         value = self.klass()
@@ -398,7 +402,7 @@ class ObjectItem(DataItem):
 class DataItemProxy(object):
     """
     Proxy for DataItem objects
-    
+
     This class is needed to construct GroupItem class
     (see module guidata.qtwidgets)
     """
@@ -480,9 +484,9 @@ class DataItemProxy(object):
 class DataItemVariable(object):
     """An instance of a DataItemVariable represent a binding between
     an item and a dataset.
-    
+
     could be called a bound property.
-    
+
     since DataItem instances are class attributes they need to have a
     DataSet instance to store their value. This class binds the two
     together.
@@ -565,7 +569,7 @@ class DataItemVariable(object):
 class DataSetMeta(type):
     """
     DataSet metaclass
-    
+
     Create class attribute `_items`: list of the DataSet class attributes,
     created in the same order as these attributes were written
     """
@@ -622,7 +626,7 @@ class DataSet(Meta_Py3Compat):
     def _get_translation(self):
         """We try to find the translation function (_) from the module
         this class was created in
-        
+
         This function is unused but could be useful to translate strings that
         cannot be translated at the time they are created.
         """
@@ -866,9 +870,9 @@ class DataSetGroup(object):
         * title [string]
         * icon [QIcon or string]: icon show on the button (optional)
           (string: icon filename as in guidata/guiqwt image search paths)
-    
+
     This class tries to mimics the DataSet interface.
-    
+
     The GUI should represent it as a notebook with one page for each
     contained dataset.
     """

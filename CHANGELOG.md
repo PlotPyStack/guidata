@@ -1,6 +1,12 @@
 # guidata Releases #
 
 
+### Version 1.7.10 ###
+
+Changes:
+
+* Added setter method on DataItem for "help" text (fixed part of the tooltip).
+
 ### Version 1.7.9 ###
 
 Changes:
