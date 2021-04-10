@@ -5,7 +5,7 @@
 
 Changes:
 
-* Added setter method on DataItem for "help" text (fixed part of the tooltip).
+* Added setter method on DataItem object for "help" text (fixed part of the tooltip).
 
 ### Version 1.7.9 ###
 
