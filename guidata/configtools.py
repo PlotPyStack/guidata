@@ -130,14 +130,21 @@ def get_image_file_path(name, default="not_found.png"):
         raise RuntimeError()
 
 
+ICON_CACHE = {}
+
 def get_icon(name, default="not_found.png"):
     """
     Construct a QIcon from the file with specified name
     name, default: filenames with extensions
     """
-    from qtpy import QtGui as QG
+    try:
+        return ICON_CACHE[name]
+    except KeyError:
+        from qtpy import QtGui as QG
 
-    return QG.QIcon(get_image_file_path(name, default))
+        icon = QG.QIcon(get_image_file_path(name, default))
+        ICON_CACHE[name] = icon
+        return icon
 
 
 def get_image_label(name, default="not_found.png"):
