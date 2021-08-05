@@ -114,7 +114,7 @@ class FloatItem(NumericTypeItem):
         * default [float]: default value (optional)
         * min [float]: minimum value (optional)
         * max [float]: maximum value (optional)
-        * slider [bool]: if True, shows a slider widget right after the line 
+        * slider [bool]: if True, shows a slider widget right after the line
           edit widget (default is False)
         * step [float]: step between tick values with a slider widget (optional)
         * nonzero [bool]: if True, zero is not a valid value (optional)
@@ -152,7 +152,7 @@ class FloatItem(NumericTypeItem):
         self.set_prop("data", step=step)
 
     def get_value_from_reader(self, reader):
-        """Reads value from the reader object, inside the try...except 
+        """Reads value from the reader object, inside the try...except
         statement defined in the base item `deserialize` method"""
         return reader.read_float()
 
@@ -168,7 +168,7 @@ class IntItem(NumericTypeItem):
         * unit [string]: physical unit (optional)
         * even [bool]: if True, even values are valid, if False,
           odd values are valid if None (default), ignored (optional)
-        * slider [bool]: if True, shows a slider widget right after the line 
+        * slider [bool]: if True, shows a slider widget right after the line
           edit widget (default is False)
         * help [string]: text shown in tooltip (optional)
         * check [bool]: if False, value is not checked (optional, default=True)
@@ -228,7 +228,7 @@ class IntItem(NumericTypeItem):
         return True
 
     def get_value_from_reader(self, reader):
-        """Reads value from the reader object, inside the try...except 
+        """Reads value from the reader object, inside the try...except
         statement defined in the base item `deserialize` method"""
         return reader.read_int()
 
@@ -263,7 +263,7 @@ class StringItem(DataItem):
         return to_text_string(value)
 
     def get_value_from_reader(self, reader):
-        """Reads value from the reader object, inside the try...except 
+        """Reads value from the reader object, inside the try...except
         statement defined in the base item `deserialize` method"""
         return reader.read_unicode()
 
@@ -306,7 +306,7 @@ class BoolItem(DataItem):
         self.set_prop("display", text=text)
 
     def get_value_from_reader(self, reader):
-        """Reads value from the reader object, inside the try...except 
+        """Reads value from the reader object, inside the try...except
         statement defined in the base item `deserialize` method"""
         return reader.read_bool()
 
@@ -334,7 +334,7 @@ class ColorItem(StringItem):
         * default [string]: default value (optional)
         * help [string]: text shown in tooltip (optional)
         * check [bool]: if False, value is not checked (optional, default=True)
-    
+
     Color values are encoded as hexadecimal strings or Qt color names
     """
 
@@ -349,7 +349,7 @@ class ColorItem(StringItem):
         return text_to_qcolor(value).isValid()
 
     def get_value_from_reader(self, reader):
-        """Reads value from the reader object, inside the try...except 
+        """Reads value from the reader object, inside the try...except
         statement defined in the base item `deserialize` method"""
         # Using read_str converts `numpy.string_` to `str` -- otherwise,
         # when passing the string to a QColor Qt object, any numpy.string_ will
@@ -489,7 +489,7 @@ class FilesOpenItem(FileSaveItem):
         writer.write_sequence([fname.encode("utf-8") for fname in value])
 
     def get_value_from_reader(self, reader):
-        """Reads value from the reader object, inside the try...except 
+        """Reads value from the reader object, inside the try...except
         statement defined in the base item `deserialize` method"""
         return [to_text_string(fname, "utf-8") for fname in reader.read_sequence()]
 
@@ -521,13 +521,13 @@ class ChoiceItem(DataItem):
     Construct a data item for a list of choices.
         * label [string]: name
         * choices [list, tuple or function]: string list or (key, label) list
-          function of two arguments (item, value) returning a list of tuples 
-          (key, label, image) where image is an icon path, a QIcon instance 
+          function of two arguments (item, value) returning a list of tuples
+          (key, label, image) where image is an icon path, a QIcon instance
           or a function of one argument (key) returning a QIcon instance
         * default [-]: default label or default key (optional)
         * help [string]: text shown in tooltip (optional)
         * check [bool]: if False, value is not checked (optional, default=True)
-        * radio [bool]: if True, shows radio buttons instead of a combo box 
+        * radio [bool]: if True, shows radio buttons instead of a combo box
           (default is False)
     """
 
@@ -594,7 +594,7 @@ class MultipleChoiceItem(ChoiceItem):
     def horizontal(self, row_nb=1):
         """
         Method to arange choice list horizontally on `n` rows
-        
+
         Example:
         nb = MultipleChoiceItem("Number", ['1', '2', '3'] ).horizontal(2)
         """
@@ -604,7 +604,7 @@ class MultipleChoiceItem(ChoiceItem):
     def vertical(self, col_nb=1):
         """
         Method to arange choice list vertically on `n` columns
-        
+
         Example:
         nb = MultipleChoiceItem("Number", ['1', '2', '3'] ).vertical(2)
         """
@@ -637,10 +637,10 @@ class ImageChoiceItem(ChoiceItem):
     """
     Construct a data item for a list of choices with images
         * label [string]: name
-        * choices [list, tuple or function]: (label, image) list or 
-          (key, label, image) list function of two arguments (item, value) 
-          returning a list of tuples (key, label, image) where image is an 
-          icon path, a QIcon instance or a function of one argument (key) 
+        * choices [list, tuple or function]: (label, image) list or
+          (key, label, image) list function of two arguments (item, value)
+          returning a list of tuples (key, label, image) where image is an
+          icon path, a QIcon instance or a function of one argument (key)
           returning a QIcon instance
         * default [-]: default label or default key (optional)
         * help [string]: text shown in tooltip (optional)
@@ -711,7 +711,7 @@ class FloatArrayItem(DataItem):
         writer.write_array(value)
 
     def get_value_from_reader(self, reader):
-        """Reads value from the reader object, inside the try...except 
+        """Reads value from the reader object, inside the try...except
         statement defined in the base item `deserialize` method"""
         return reader.read_array()
 
@@ -723,7 +723,7 @@ class ButtonItem(DataItem):
         * callback [function]: function with four parameters (dataset, item, value, parent)
             - dataset [DataSet]: instance of the parent dataset
             - item [DataItem]: instance of ButtonItem (i.e. self)
-            - value [unspecified]: value of ButtonItem (default ButtonItem 
+            - value [unspecified]: value of ButtonItem (default ButtonItem
               value or last value returned by the callback)
             - parent [QObject]: button's parent widget
         * icon [QIcon or string]: icon show on the button (optional)
@@ -731,8 +731,8 @@ class ButtonItem(DataItem):
         * default [unspecified]: default value passed to the callback (optional)
         * help [string]: text shown in button's tooltip (optional)
         * check [bool]: if False, value is not checked (optional, default=True)
-    
-    The value of this item is unspecified but is passed to the callback along 
+
+    The value of this item is unspecified but is passed to the callback along
     with the whole dataset. The value is assigned the callback`s return value.
     """
 
@@ -759,29 +759,7 @@ class DictItem(ButtonItem):
 
     def __init__(self, label, default=None, help="", check=True):
         def dictedit(instance, item, value, parent):
-            try:
-                # Spyder 4
-                from spyder.plugins.variableexplorer.widgets import collectionseditor
-
-                Editor = collectionseditor.CollectionsEditor
-            except ImportError:
-                try:
-                    # Spyder 3.0
-                    from spyder.widgets.variableexplorer import collectionseditor
-
-                    Editor = collectionseditor.CollectionsEditor
-                except ImportError:
-                    try:
-                        # Spyder 3.0-
-                        from spyderlib.widgets.variableexplorer import collectionseditor
-
-                        Editor = collectionseditor.CollectionsEditor
-                    except ImportError:
-                        # Spyder 2
-                        from spyderlib.widgets import dicteditor
-
-                        Editor = dicteditor.DictEditor
-            editor = Editor(parent)
+            editor = CollectionsEditor(parent)
             value_was_none = value is None
             if value_was_none:
                 value = {}

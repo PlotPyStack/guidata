@@ -1,10 +1,11 @@
 # guidata Releases #
 
 
-### Version 1.7.10 ###
+### Version 1.8.0 ###
 
 Changes:
 
+* Removed `spyderlib`/`spyder` dependency.
 * Added setter method on DataItem object for "help" text (fixed part of the tooltip).
 
 ### Version 1.7.9 ###

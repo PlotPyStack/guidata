@@ -14,13 +14,6 @@ import os
 import os.path as osp
 import subprocess
 
-try:  # Spyder 4
-    from spyder.plugins.editor.widgets.codeeditor import CodeEditor
-except ImportError:
-    try:  # Spyder 3
-        from spyder.widgets.sourcecode.codeeditor import CodeEditor
-    except ImportError:
-        from spyderlib.widgets.sourcecode.codeeditor import CodeEditor
 # Local imports
 from qtpy.QtWidgets import (
     QWidget,
@@ -39,6 +32,7 @@ from qtpy.QtCore import Qt, QSize
 from guidata.config import _
 from guidata.configtools import get_icon, get_family, MONOSPACE
 from guidata.qthelpers import get_std_icon
+from guidata.widgets.codeeditor import PythonCodeEditor
 
 
 def get_tests(test_package):
@@ -108,8 +102,8 @@ class TestPropertiesWidget(QWidget):
         layout.addWidget(self.desc_label)
         group_desc.setLayout(layout)
 
-        self.editor = CodeEditor(self)
-        self.editor.setup_editor(linenumbers=True, font=font)
+        self.editor = PythonCodeEditor(self)
+        self.editor.setup(font=font)
         self.editor.setReadOnly(True)
         group_code = QGroupBox(_("Source code"), self)
         layout = QVBoxLayout()

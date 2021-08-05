@@ -69,6 +69,8 @@ from guidata.qthelpers import text_to_qcolor, get_std_icon
 from guidata.configtools import get_icon, get_image_layout, get_image_file_path
 from guidata.config import _
 from qtpy.py3compat import to_text_string, is_text_string
+from guidata.widgets.arrayeditor import ArrayEditor
+from guidata.widgets.collectionseditor import CollectionsEditor
 
 # ========================== <!> IMPORTANT <!> =================================
 #
@@ -82,13 +84,13 @@ from qtpy.py3compat import to_text_string, is_text_string
 
 class AbstractDataSetWidget(object):
     """
-    Base class for 'widgets' handled by `DataSetEditLayout` and it's derived 
+    Base class for 'widgets' handled by `DataSetEditLayout` and it's derived
     classes.
-    
+
     This is a generic representation of an input (or display) widget that
     has a label and one or more entry field.
-    
-    `DataSetEditLayout` uses a registry of *Item* to *Widget* mapping in order 
+
+    `DataSetEditLayout` uses a registry of *Item* to *Widget* mapping in order
     to automatically create a GUI for a `DataSet` structure
     """
 
@@ -96,7 +98,7 @@ class AbstractDataSetWidget(object):
 
     def __init__(self, item, parent_layout):
         """Derived constructors should create the necessary widgets
-        The base class keeps a reference to item and parent 
+        The base class keeps a reference to item and parent
         """
         self.item = item
         self.parent_layout = parent_layout
@@ -893,21 +895,7 @@ class FloatArrayWidget(AbstractDataSetWidget):
         """Open an array editor dialog"""
         parent = self.parent_layout.parent
         label = self.item.get_prop_value("display", "label")
-        try:
-            # Spyder 4
-            from spyder.plugins.variableexplorer.widgets import arrayeditor
-        except ImportError:
-            try:
-                # Spyder 3.0
-                from spyder.widgets.variableexplorer import arrayeditor
-            except ImportError:
-                # Spyder 3.0-
-                try:
-                    from spyderlib.widgets.variableexplorer import arrayeditor
-                except ImportError:
-                    # Spyder 2
-                    from spyderlib.widgets import arrayeditor
-        editor = arrayeditor.ArrayEditor(parent)
+        editor = ArrayEditor(parent)
         if editor.setup_and_check(self.arr, title=label):
             if editor.exec_():
                 self.update(self.arr)
@@ -1051,7 +1039,7 @@ class DataSetWidget(AbstractDataSetWidget):
     def get_dataset(self):
         """update's internal parameter representation
         from the item's stored value
-        
+
         default behavior uses update_dataset and assumes
         internal dataset class is the same as item's value
         class"""
@@ -1061,7 +1049,7 @@ class DataSetWidget(AbstractDataSetWidget):
     def set_dataset(self):
         """update the item's value from the internal
         data representation
-        
+
         default behavior uses restore_dataset and assumes
         internal dataset class is the same as item's value
         class"""
@@ -1073,4 +1061,3 @@ class DataSetWidget(AbstractDataSetWidget):
     ):
         """Override AbstractDataSetWidget method"""
         layout.addWidget(self.group, row, label_column, row_span, column_span + 1)
-

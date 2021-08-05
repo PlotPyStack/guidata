@@ -57,7 +57,7 @@ def get_translation(modname, dirname=None):
         _trans = gettext.translation(
             modname, get_module_locale_path(dirname), codeset="utf-8"
         )
-        lgettext = _trans.lgettext
+        lgettext = _trans.gettext
 
         def translate_gettext(x):
             if not PY3 and is_unicode(x):

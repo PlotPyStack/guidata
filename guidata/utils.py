@@ -33,6 +33,8 @@ from qtpy.py3compat import (
     get_func_name,
 )
 
+# Local imports
+from guidata.userconfig import get_home_dir
 
 # ==============================================================================
 # Misc.
@@ -337,6 +339,28 @@ def is_module_available(module_name):
         return True
     except ImportError:
         return False
+
+
+# ==============================================================================
+# Path utils
+# ==============================================================================
+
+
+def getcwd_or_home():
+    """Safe version of getcwd that will fallback to home user dir.
+
+    This will catch the error raised when the current working directory
+    was removed for an external program.
+    """
+    try:
+        return os.getcwd()
+    except OSError:
+        print(
+            "WARNING: Current working directory was deleted, "
+            "falling back to home directory"
+        )
+        return get_home_dir()
+
 
 
 # ==============================================================================
