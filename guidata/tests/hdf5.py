@@ -14,36 +14,40 @@ file.
 """
 
 try:
-    import guidata.hdf5io #@UnusedImport
+    import guidata.hdf5io  # @UnusedImport
+
     hdf5_is_available = True
 except ImportError:
     hdf5_is_available = False
 
-SHOW = hdf5_is_available # Show test in GUI-based test launcher
+SHOW = hdf5_is_available  # Show test in GUI-based test launcher
 
 import os
 from guidata.hdf5io import HDF5Reader, HDF5Writer
 from guidata.tests.all_items import TestParameters
 from guidata.dataset.dataitems import StringItem
 
+
 class TestParameters_Light(TestParameters):
     date = StringItem("D1", default="Replacement for unsupported DateItem")
     dtime = StringItem("D2", default="Replacement for unsupported DateTimeItem")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     # Create QApplication
     import guidata
+
     _app = guidata.qapplication()
-    
+
     if os.path.exists("test.h5"):
         os.unlink("test.h5")
-    
+
     e = TestParameters()
     if e.edit():
         writer = HDF5Writer("test.h5")
         e.serialize(writer)
         writer.close()
-    
+
         e = TestParameters()
         reader = HDF5Reader("test.h5")
         e.deserialize(reader)

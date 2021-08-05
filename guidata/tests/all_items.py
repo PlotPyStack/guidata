@@ -17,16 +17,29 @@ DataSet class definition: each parameter type has its own DataItem class
 
 from __future__ import print_function
 
-SHOW = True # Show test in GUI-based test launcher
+SHOW = True  # Show test in GUI-based test launcher
 
 import tempfile, atexit, shutil, datetime, numpy as np
 
 from guidata.dataset.datatypes import DataSet, BeginGroup, EndGroup
-from guidata.dataset.dataitems import (FloatItem, IntItem, BoolItem, ChoiceItem,
-                             MultipleChoiceItem, ImageChoiceItem, FilesOpenItem,
-                             StringItem, TextItem, ColorItem, FileSaveItem,
-                             FileOpenItem, DirectoryItem, FloatArrayItem,
-                             DateItem, DateTimeItem)
+from guidata.dataset.dataitems import (
+    FloatItem,
+    IntItem,
+    BoolItem,
+    ChoiceItem,
+    MultipleChoiceItem,
+    ImageChoiceItem,
+    FilesOpenItem,
+    StringItem,
+    TextItem,
+    ColorItem,
+    FileSaveItem,
+    FileOpenItem,
+    DirectoryItem,
+    FloatArrayItem,
+    DateItem,
+    DateTimeItem,
+)
 
 
 # Creating temporary files and registering cleanup functions
@@ -37,6 +50,7 @@ atexit.register(FILE_ETA.close)
 FILE_CSV = tempfile.NamedTemporaryFile(suffix=".csv", dir=TEMPDIR)
 atexit.register(FILE_CSV.close)
 
+
 class TestParameters(DataSet):
     """
     DataSet test
@@ -44,48 +58,59 @@ class TestParameters(DataSet):
     <b>rich text<sup>2</sup></b> are both supported,
     as well as special characters (α, β, γ, δ, ...)
     """
+
     dir = DirectoryItem("Directory", TEMPDIR)
     fname = FileOpenItem("Open file", ("csv", "eta"), FILE_CSV.name)
     fnames = FilesOpenItem("Open files", "csv", FILE_CSV.name)
     fname_s = FileSaveItem("Save file", "eta", FILE_ETA.name)
     string = StringItem("String")
     text = TextItem("Text")
-    float_slider = FloatItem("Float (with slider)",
-                             default=0.5, min=0, max=1, step=0.01, slider=True)                             
-    integer = IntItem("Integer", default=5, min=3, max=16, slider=True
-                      ).set_pos(col=1)
+    float_slider = FloatItem(
+        "Float (with slider)", default=0.5, min=0, max=1, step=0.01, slider=True
+    )
+    integer = IntItem("Integer", default=5, min=3, max=16, slider=True).set_pos(col=1)
     dtime = DateTimeItem("Date/time", default=datetime.datetime(2010, 10, 10))
     date = DateItem("Date", default=datetime.date(2010, 10, 10)).set_pos(col=1)
     bool1 = BoolItem("Boolean option without label")
     bool2 = BoolItem("Boolean option with label", "Label")
     _bg = BeginGroup("A sub group")
     color = ColorItem("Color", default="red")
-    choice = ChoiceItem("Single choice 1",
-                        [('16', "first choice"), ('32', "second choice"),
-                         ('64', "third choice")])
-    mchoice2 = ImageChoiceItem("Single choice 2",
-                               [("rect", "first choice", "gif.png" ),
-                                ("ell", "second choice", "txt.png" ),
-                                ("qcq", "third choice", "file.png" )]
-                               )
+    choice = ChoiceItem(
+        "Single choice 1",
+        [("16", "first choice"), ("32", "second choice"), ("64", "third choice")],
+    )
+    mchoice2 = ImageChoiceItem(
+        "Single choice 2",
+        [
+            ("rect", "first choice", "gif.png"),
+            ("ell", "second choice", "txt.png"),
+            ("qcq", "third choice", "file.png"),
+        ],
+    )
     _eg = EndGroup("A sub group")
-    floatarray = FloatArrayItem("Float array", default=np.ones( (50, 5), float),
-                                format=" %.2e ").set_pos(col=1)
-    mchoice3 = MultipleChoiceItem("MC type 1",
-                                  [ str(i) for i in range(12)]
-                                  ).horizontal(4)
-    mchoice1 = MultipleChoiceItem("MC type 2",
-                                  ["first choice", "second choice",
-                                   "third choice"]).vertical(1).set_pos(col=1)
-    
-    
+    floatarray = FloatArrayItem(
+        "Float array", default=np.ones((50, 5), float), format=" %.2e "
+    ).set_pos(col=1)
+    mchoice3 = MultipleChoiceItem("MC type 1", [str(i) for i in range(12)]).horizontal(
+        4
+    )
+    mchoice1 = (
+        MultipleChoiceItem(
+            "MC type 2", ["first choice", "second choice", "third choice"]
+        )
+        .vertical(1)
+        .set_pos(col=1)
+    )
+
+
 if __name__ == "__main__":
     # Create QApplication
     import guidata
+
     _app = guidata.qapplication()
-    
+
     e = TestParameters()
-    e.floatarray[:, 0] = np.linspace( -5, 5, 50)
+    e.floatarray[:, 0] = np.linspace(-5, 5, 50)
     print(e)
     if e.edit():
         print(e)

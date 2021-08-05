@@ -10,11 +10,14 @@ guidata test package
 ====================
 """
 
+
 def run():
     """Run guidata test launcher"""
     import guidata
     from guidata.guitest import run_testlauncher
+
     run_testlauncher(guidata)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     run()

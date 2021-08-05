@@ -105,8 +105,8 @@ def add_image_module_path(modname, relpath, subfolders=True):
     Appends image data path relative to a module name.
     Used to add module local data that resides in a module directory
     but will be shipped under sys.prefix / share/ ...
-    
-    modname must be the name of an already imported module as found in 
+
+    modname must be the name of an already imported module as found in
     sys.modules
     """
     add_image_path(get_module_data_path(modname, relpath=relpath), subfolders)
@@ -131,6 +131,7 @@ def get_image_file_path(name, default="not_found.png"):
 
 
 ICON_CACHE = {}
+
 
 def get_icon(name, default="not_found.png"):
     """
@@ -291,4 +292,3 @@ def get_brush(conf, section, option="", color="black", alpha=1.0):
     alpha = conf.get(section, option + "/alphaF", alpha)
     color.setAlphaF(alpha)
     return QG.QBrush(color)
-

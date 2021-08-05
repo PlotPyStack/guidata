@@ -75,7 +75,7 @@ def bind(fct, value):
     """
     Returns a callable representing the function 'fct' with it's
     first argument bound to the value
-    
+
     if g = bind(f,1) and f is a function of x,y,z
     then g(y,z) will return f(1,y,z)
     """
@@ -148,14 +148,14 @@ def unicode_to_stdout(ustr):
 def update_dataset(dest, source, visible_only=False):
     """
     Update `dest` dataset items from `source` dataset
-    
+
     dest should inherit from DataSet, whereas source can be:
         * any Python object containing matching attribute names
         * or a dictionary with matching key names
-    
+
     For each DataSet item, the function will try to get the attribute
-    of the same name from the source. 
-    
+    of the same name from the source.
+
     visible_only: if True, update only visible items
     """
     for item in dest._items:
@@ -176,7 +176,7 @@ def update_dataset(dest, source, visible_only=False):
 def restore_dataset(source, dest):
     """
     Restore `dest` dataset items from `source` dataset
-    
+
     This function is almost the same as update_dataset but requires
     the source to be a DataSet instead of the destination.
 
@@ -360,7 +360,6 @@ def getcwd_or_home():
             "falling back to home directory"
         )
         return get_home_dir()
-
 
 
 # ==============================================================================

@@ -38,4 +38,3 @@ class TextEditVisitor:
     visit_FloatItem = visit_generic
     visit_IntItem = visit_generic
     visit_StringItem = visit_generic
-

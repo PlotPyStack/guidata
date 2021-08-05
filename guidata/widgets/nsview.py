@@ -280,7 +280,7 @@ def sort_against(list1, list2, reverse=False):
     """
     Arrange items of list1 in the same order as sorted(list2).
 
-    In other words, apply to list1 the permutation which takes list2 
+    In other words, apply to list1 the permutation which takes list2
     to sorted(list2, reverse).
     """
     try:

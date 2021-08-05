@@ -54,7 +54,7 @@ int_hdf = TypeConverter(int)
 class Attr(object):
     """Helper class representing class attribute that
     should be saved/restored to/from a corresponding HDF5 attribute
-    
+
     hdf_name : name of the attribute in the HDF5 file
     struct_name : name of the attribute in the object (default to hdf_name)
     type : attribute type (guess it if None)
@@ -216,7 +216,7 @@ class H5Store(object):
     def generic_load(self, parent, dest, structure):
         """load the data from the file into dest using 'structure'
         as a descriptor.
-        
+
         structure is the same as in generic_save
         """
         for instr in structure:
@@ -310,7 +310,7 @@ class HDF5Reader(HDF5Handler):
     def read(self, group_name=None, func=None, instance=None):
         """Read value within current group or group_name.
 
-        Optional argument `instance` is an object which 
+        Optional argument `instance` is an object which
         implements the DataSet-like `deserialize` method."""
         if group_name:
             self.begin(group_name)
@@ -368,10 +368,10 @@ class HDF5Reader(HDF5Handler):
         """Read object sequence in group.
         Objects must implement the DataSet-like `deserialize` method.
         `klass` is the object class which constructor requires no argument.
-        
-        progress_callback: if not None, this function is called with 
-        an integer argument (progress: 0 --> 100). Function returns the 
-        `cancel` state (True: progress dialog has been canceled, False 
+
+        progress_callback: if not None, this function is called with
+        an integer argument (progress: 0 --> 100). Function returns the
+        `cancel` state (True: progress dialog has been canceled, False
         otherwise)
         """
         with self.group(group_name):

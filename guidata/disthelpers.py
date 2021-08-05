@@ -52,7 +52,7 @@ def prepend_module_to_path(module_path):
     """
     Prepend to sys.path module located in *module_path*
     Return string with module infos: name, revision, changeset
-    
+
     Use this function:
     1) In your application to import local frozen copies of internal libraries
     2) In your py2exe distributed package to add a text file containing the returned string
@@ -150,9 +150,9 @@ def get_dll_architecture(path):
 
 
 def get_msvc_dlls(msvc_version, architecture=None, check_architecture=False):
-    """Get the list of Microsoft Visual C++ DLLs associated to 
+    """Get the list of Microsoft Visual C++ DLLs associated to
     architecture and Python version, create the manifest file.
-    
+
     architecture: integer (32 or 64) -- if None, take the Python build arch
     python_version: X.Y"""
     current_architecture = 64 if sys.maxsize > 2 ** 32 else 32
@@ -223,7 +223,11 @@ def get_msvc_dlls(msvc_version, architecture=None, check_architecture=False):
     elif msvc_major == "10":
         namelist = [
             name % (msvc_major + msvc_minor)
-            for name in ("msvcp%s.dll", "msvcr%s.dll", "vcomp%s.dll",)
+            for name in (
+                "msvcp%s.dll",
+                "msvcr%s.dll",
+                "vcomp%s.dll",
+            )
         ]
 
         windir = os.environ["windir"]
@@ -300,11 +304,11 @@ def create_msvc_data_files(architecture=None, python_version=None, verbose=False
 
 def to_include_files(data_files):
     """Convert data_files list to include_files list
-    
+
     data_files:
       * this is the ``py2exe`` data files format
       * list of tuples (dest_dirname, (src_fname1, src_fname2, ...))
-    
+
     include_files:
       * this is the ``cx_Freeze`` data files format
       * list of tuples ((src_fname1, dst_fname1),
@@ -338,7 +342,7 @@ def remove_dir(dirname):
 
 class Distribution(object):
     """Distribution object
-    
+
     Help creating an executable using ``py2exe`` or ``cx_Freeze``
     """
 
@@ -429,10 +433,10 @@ class Distribution(object):
         msvc=None,
     ):
         """Setup distribution object
-        
+
         Notes:
           * bin_path_excludes is specific to cx_Freeze (ignored if it's None)
-          * if msvc is None, it's set to True by default on Windows 
+          * if msvc is None, it's set to True by default on Windows
             platforms, False on non-Windows platforms
         """
         self.name = name
@@ -948,7 +952,11 @@ class Distribution(object):
             copyright=copyright,
         )
         setup(
-            data_files=self.data_files, windows=[windows,], options=dict(py2exe=options)
+            data_files=self.data_files,
+            windows=[
+                windows,
+            ],
+            options=dict(py2exe=options),
         )
         if create_archive:
             self.__create_archive(create_archive)

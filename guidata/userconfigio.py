@@ -43,7 +43,7 @@ class BaseIOHandler(object):
         self.option = []
 
     def group(self, group_name):
-        """Enter a group. This returns a context manager, to be used with 
+        """Enter a group. This returns a context manager, to be used with
         the `with` statement"""
         return GroupContext(self, group_name)
 
@@ -69,7 +69,7 @@ class UserConfigIOHandler(BaseIOHandler):
         assert sect == section
 
     def group(self, option):
-        """Enter a HDF5 group. This returns a context manager, to be used with 
+        """Enter a HDF5 group. This returns a context manager, to be used with
         the `with` statement"""
         return GroupContext(self, option)
 
@@ -77,7 +77,7 @@ class UserConfigIOHandler(BaseIOHandler):
 class WriterMixin(object):
     def write(self, val, group_name=None):
         """Write value using the appropriate routine depending on value type
-        
+
         group_name: if None, writing the value in current group"""
         import numpy as np
 

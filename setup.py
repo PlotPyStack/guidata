@@ -108,9 +108,9 @@ else:
 
 
 def build_chm_doc(libname):
-    """Return CHM documentation file (on Windows only), which is copied under 
-    {PythonInstallDir}\Doc, hence allowing Spyder to add an entry for opening 
-    package documentation in "Help" menu. This has no effect on a source 
+    """Return CHM documentation file (on Windows only), which is copied under
+    {PythonInstallDir}\Doc, hence allowing Spyder to add an entry for opening
+    package documentation in "Help" menu. This has no effect on a source
     distribution."""
     args = "".join(sys.argv)
     if os.name == "nt" and ("bdist" in args or "build" in args):
@@ -160,7 +160,9 @@ setup(
             "guidata-tests-py%d = guidata.tests:run" % sys.version_info.major,
         ]
     },
-    extras_require={"Doc": ["Sphinx>=1.1"],},
+    extras_require={
+        "Doc": ["Sphinx>=1.1"],
+    },
     author="Pierre Raybaut",
     author_email="pierre.raybaut@gmail.com",
     url="https://github.com/PierreRaybaut/%s" % LIBNAME,

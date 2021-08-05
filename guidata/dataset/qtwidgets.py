@@ -123,7 +123,7 @@ class DataSetEditDialog(QDialog):
 
     def layout_factory(self, instance, grid):
         """A factory method that produces instances of DataSetEditLayout
-        
+
         or derived classes (see DataSetShowDialog)
         """
         return DataSetEditLayout(self, instance, grid)
@@ -541,7 +541,7 @@ class DataSetShowGroupBox(QGroupBox):
 class DataSetEditGroupBox(DataSetShowGroupBox):
     """
     Group box widget including a DataSet
-    
+
     label: group box label (string)
     klass: guidata.DataSet class
     button_text: action button text (default: "Apply")
@@ -591,4 +591,3 @@ class DataSetEditGroupBox(DataSetShowGroupBox):
         if not app_name:
             app_name = to_text_string(self.title())
         return "%s - %s" % (app_name, item.label())
-

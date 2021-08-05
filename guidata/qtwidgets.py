@@ -27,7 +27,7 @@ class RotatedLabel(QLabel):
     """
     Rotated QLabel
     (rich text is not supported)
-    
+
     Arguments:
         * parent: parent widget
         * angle=270 (int): rotation angle in degrees
