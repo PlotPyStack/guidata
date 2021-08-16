@@ -734,17 +734,3 @@ class ImportWizard(QDialog):
         else:
             self.clip_data = str(self._get_plain_text())
         self.accept()
-
-
-def test(text):
-    """Test"""
-    from guidata import qapplication
-
-    _app = qapplication()  # analysis:ignore
-    dialog = ImportWizard(None, text)
-    if dialog.exec_():
-        print(dialog.get_data())  # spyder: test-skip
-
-
-if __name__ == "__main__":
-    test(u"17/11/1976\t1.34\n14/05/09\t3.14")

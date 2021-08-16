@@ -26,11 +26,11 @@ from qtpy.QtWidgets import (
     QHBoxLayout,
     QShortcut,
 )
-from qtpy.QtGui import QFont, QKeySequence
+from qtpy.QtGui import QKeySequence
 from qtpy.QtCore import Qt, QSize
 
 from guidata.config import _
-from guidata.configtools import get_icon, get_family, MONOSPACE
+from guidata.configtools import get_icon
 from guidata.qthelpers import get_std_icon
 from guidata.widgets.codeeditor import PythonCodeEditor
 
@@ -85,8 +85,6 @@ class TestModule(object):
 class TestPropertiesWidget(QWidget):
     def __init__(self, parent):
         QWidget.__init__(self, parent)
-        font = QFont(get_family(MONOSPACE), 10, QFont.Normal)
-
         info_icon = QLabel()
         icon = get_std_icon("MessageBoxInformation").pixmap(24, 24)
         info_icon.setPixmap(icon)
@@ -95,7 +93,6 @@ class TestPropertiesWidget(QWidget):
         self.desc_label = QLabel()
         self.desc_label.setWordWrap(True)
         self.desc_label.setAlignment(Qt.AlignTop)
-        self.desc_label.setFont(font)
         group_desc = QGroupBox(_("Description"), self)
         layout = QHBoxLayout()
         layout.addWidget(info_icon)
@@ -103,7 +100,7 @@ class TestPropertiesWidget(QWidget):
         group_desc.setLayout(layout)
 
         self.editor = PythonCodeEditor(self)
-        self.editor.setup(font=font)
+        self.desc_label.setFont(self.editor.font())
         self.editor.setReadOnly(True)
         group_code = QGroupBox(_("Source code"), self)
         layout = QVBoxLayout()
@@ -161,7 +158,7 @@ class TestLauncherWindow(QSplitter):
 
         self.setSizes([150, 1])
         self.setStretchFactor(1, 1)
-        self.resize(QSize(950, 600))
+        self.resize(QSize(840, 600))
         self.properties.set_item(tests[0])
 
 

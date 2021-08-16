@@ -193,6 +193,11 @@ def font_is_installed(font):
 
 
 MONOSPACE = [
+    "Cascadia Code PL",
+    "Cascadia Mono PL",
+    "Cascadia Code",
+    "Cascadia Mono",
+    "Consolas",
     "Courier New",
     "Bitstream Vera Sans Mono",
     "Andale Mono",
