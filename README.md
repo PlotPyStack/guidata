@@ -13,7 +13,7 @@ Simple example of ``guidata`` datasets embedded in an application window:
 See [documentation](http://pythonhosted.org/guidata/) for more details on 
 the library and [changelog](CHANGELOG.md) for recent history of changes.
 
-Copyright © 2009-2015 CEA, Pierre Raybaut, licensed under the terms of the 
+Copyright © 2009-2021 CEA, Pierre Raybaut, licensed under the terms of the 
 CECILL License (see ``Licence_CeCILL_V2-en.txt``).
 
 
@@ -42,9 +42,8 @@ Application development tools:
 
 ### Requirements
 
-- Python 2.6+ or Python 3.2+
-- [PyQt4](https://pypi.python.org/pypi/PyQt4) 4.3+ or [PyQt5](https://pypi.python.org/pypi/PyQt5) 5.5+
-- [spyder](https://pypi.python.org/pypi/spyder) 2.1+ (test launcher and array/dictionnary editors)
+- Python >=2.6 or Python >=3.2
+- [PyQt4](https://pypi.python.org/pypi/PyQt4) >=4.3 or [PyQt5](https://pypi.python.org/pypi/PyQt5) >=5.5 or [PySide2](https://pypi.python.org/pypi/PySide2) >=5.11
 - [QtPy](https://pypi.org/project/QtPy/) >= 1.3
     
 ### Optional Python modules

@@ -51,7 +51,7 @@ Simple example of ``guidata`` datasets embedded in an application window:
 
 See `documentation`_ for more details on the library and `changelog`_ for recent history of changes.
 
-Copyright © 2009-2015 CEA, Pierre Raybaut, licensed under the terms of the 
+Copyright © 2009-2021 CEA, Pierre Raybaut, licensed under the terms of the 
 `CECILL License`_.
 
 .. _documentation: http://pythonhosted.org/guidata/
@@ -84,13 +84,11 @@ Application development tools:
 Building, installation, ...
 ---------------------------
 
-The following package is **required**: `PyQt4`_ (or `PyQt5`_).
-
-The following packages are optional: `spyder`_ (GUI-based test launcher, dict/array editor), `h5py`_ (HDF5 I/O).
+The following package is **required**: `PyQt4`_ (or `PyQt5`_, or `PySide2`_).
 
 .. _PyQt4: https://pypi.python.org/pypi/PyQt4
 .. _PyQt5: https://pypi.python.org/pypi/PyQt5
-.. _spyder: https://pypi.python.org/pypi/Spyder
+.. _PySide2: https://pypi.python.org/pypi/PySide2
 .. _h5py: https://pypi.python.org/pypi/h5py
 
 See the `README`_ and `documentation`_ for more details.
