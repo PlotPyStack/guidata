@@ -50,7 +50,6 @@ All `guidata` items demo
 
 .. literalinclude:: ../guidata/tests/all_items.py
    :start-after: SHOW
-   :end-before: Workaround for Sphinx v0.6 bug: empty 'end-before' directive
 
 .. image:: images/screenshots/all_items.png
 
@@ -59,7 +58,6 @@ All (GUI-related) `guidata` features demo
 
 .. literalinclude:: ../guidata/tests/all_features.py
    :start-after: SHOW
-   :end-before: Workaround for Sphinx v0.6 bug: empty 'end-before' directive
 
 .. image:: images/screenshots/all_features.png
 
@@ -68,7 +66,6 @@ Embedding guidata objects in GUI layouts
 
 .. literalinclude:: ../guidata/tests/editgroupbox.py
    :start-after: SHOW
-   :end-before: Workaround for Sphinx v0.6 bug: empty 'end-before' directive
 
 .. image:: images/screenshots/editgroupbox.png
 
@@ -77,7 +74,6 @@ Data item groups and group selection
 
 .. literalinclude:: ../guidata/tests/bool_selector.py
    :start-after: SHOW
-   :end-before: Workaround for Sphinx v0.6 bug: empty 'end-before' directive
 
 .. image:: images/screenshots/bool_selector.png
 
@@ -86,7 +82,6 @@ Activable data sets
 
 .. literalinclude:: ../guidata/tests/activable_dataset.py
    :start-after: SHOW
-   :end-before: Workaround for Sphinx v0.6 bug: empty 'end-before' directive
 
 .. image:: images/screenshots/activable_dataset.png
 
@@ -95,6 +90,5 @@ Data set groups
 
 .. literalinclude:: ../guidata/tests/datasetgroup.py
    :start-after: SHOW
-   :end-before: Workaround for Sphinx v0.6 bug: empty 'end-before' directive
 
 .. image:: images/screenshots/datasetgroup.png

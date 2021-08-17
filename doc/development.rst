@@ -45,7 +45,7 @@ following recommendations should be followed:
   from the `spyderlib` library (from module `spyderlib.qt.compat`).
 
 PyQt / PySide2 compatibility
----------------------------
+----------------------------
 
 The project should be mostly compatible with both PyQt and PySide2 (thanks to QtPy).
 
