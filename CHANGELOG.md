@@ -5,6 +5,7 @@
 
 Changes:
 
+* Added generic widgets: array, dictionnary, text and code editors.
 * Removed `spyderlib`/`spyder` dependency.
 * Added setter method on DataItem object for "help" text (fixed part of the tooltip).
 
