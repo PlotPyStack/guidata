@@ -3,10 +3,9 @@
 guidata
 =======
 
-Based on the Qt library (``PyQt4`` and ``PyQt5`` are currently supported), 
-`guidata` is a Python library generating graphical user interfaces for easy 
-dataset editing and display. It also provides helpers and application 
-development tools for PyQt.
+Based on the Qt library (``PyQt4``, ``PyQt5`` and ``PySide2`` are currently supported), 
+`guidata` is a Python library generating graphical user interfaces for easy dataset 
+editing and display. It also provides helpers and application development tools for Qt.
 
 External resources:
     * Python Package Index: `PyPI`_

@@ -35,23 +35,19 @@ following recommendations should be followed:
   builtin-function should not be used outside the constructor method (call 
   the parent class method directly instead)
 
-* before using any function or method from PyQt4, please check that the feature 
-  you are about to use was already implemented in PyQt4 v4.4 (more precisely 
-  in the Qt version used in PyQt4 v4.4) -- if not, a workaround should be 
-  implemented to avoid breaking compatibility
+* do not use any function or method directly from PyQt4: use exclusively features from 
+  QtPy (e.g. `from qtpy.QtWidgets import QCheckBox`)
 
 * do not use the PyQt-specific QFileDialog static methods (not present in Qt) 
   which were introduced in PyQt v4.6: `getOpenFileNameAndFilter`, 
-  `getOpenFileNamesAndFilter` and `getSaveFileNameAndFilter` (`guidata` 
-  provides wrappers around `QFileDialog` static methods handling the selected 
-  filter which were taken from the `spyderlib` library (from module 
-  `spyderlib.qt.compat`): they are available in `guidata.qt.compat`)
+  `getOpenFileNamesAndFilter` and `getSaveFileNameAndFilter` (QtPy provides wrappers 
+  around `QFileDialog` static methods handling the selected filter which were taken 
+  from the `spyderlib` library (from module `spyderlib.qt.compat`).
 
-PyQt / PySide compatibility
+PyQt / PySide2 compatibility
 ---------------------------
 
-The project should be mostly compatible with both PyQt and PySide (although 
-PySide is not as popular as it used to be, so testing tend to be limited).
+The project should be mostly compatible with both PyQt and PySide2 (thanks to QtPy).
 
 PyQt5 compatibility
 -------------------
@@ -120,10 +116,10 @@ issues with Python 3. For example:
     by removing all the `u` string prefixes
 
   * in Python 3 `isinstance(text, basestring)` can be replaced by 
-    `is_text_string(text)` (function of the `guidata.py3compat` module)
+    `is_text_string(text)` (function of the `qtpy.py3compat` module)
 
   * in Python 3 `isinstance(text, unicode)` can be replaced by 
-    `is_unicode(text)` (function of the `guidata.py3compat` module)
+    `is_unicode(text)` (function of the `qtpy.py3compat` module)
 
   * in Python 3 `unicode(text)` can be replaced by `to_text_string(text)` 
-    (function of the `guidata.py3compat` module)
+    (function of the `qtpy.py3compat` module)

@@ -32,7 +32,7 @@ automatically generated depending on each data item type.
 
 The `guidata` library also provides the following features:
 
-    * :py:mod:`guidata.qthelpers`: `PyQt4` helpers
+    * :py:mod:`guidata.qthelpers`: Qt helpers
     * :py:mod:`guidata.disthelpers`: `py2ex` helpers
     * :py:mod:`guidata.userconfig`: `.ini` configuration management helpers 
       (based on Python standard module :py:mod:`ConfigParser`)
