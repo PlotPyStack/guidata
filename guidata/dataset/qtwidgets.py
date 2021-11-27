@@ -13,7 +13,7 @@ Dialog boxes used to edit data sets:
     DataSetEditDialog
     DataSetGroupEditDialog
     DataSetShowDialog
-    
+
 ...and layouts:
     GroupItem
     DataSetEditLayout
@@ -262,21 +262,45 @@ class DataSetEditLayout(object):
                 for item in items
             ]
         )
+
+        # Check if specified rows are consistent
+        sorted_items = [None] * len(items)
+        rows = []
+        other_items = []
+        for item in items:
+            row = item.get_prop("display", "row")
+            if row is not None:
+                if row in rows:
+                    raise ValueError(
+                        "Duplicate row index (%d) for item %r" % (row, item._name)
+                    )
+                if row < 0 or row >= len(items):
+                    raise ValueError(
+                        "Out of range row index (%d) for item %r" % (row, item._name)
+                    )
+                rows.append(row)
+                sorted_items[row] = item
+            else:
+                other_items.append(item)
+        for idx, line in enumerate(sorted_items[:]):
+            if line is None:
+                sorted_items[idx] = other_items.pop(0)
+
         self.items_pos = {}
         line = self.first_line - 1
         last_item = [-1, 0, colmax]
-        for item in items:
-            beg = item.get_prop("display", "col")
-            span = item.get_prop("display", "colspan")
-            if span is None:
-                span = colmax - beg + 1
-            if beg <= last_item[1]:
+        for item in sorted_items:
+            col = item.get_prop("display", "col")
+            colspan = item.get_prop("display", "colspan")
+            if colspan is None:
+                colspan = colmax - col + 1
+            if col <= last_item[1]:
                 # on passe à la ligne si la colonne de debut de cet item
                 #  est avant la colonne de debut de l'item précédent
                 line += 1
             else:
-                last_item[2] = beg - last_item[1]
-            last_item = [line, beg, span]
+                last_item[2] = col - last_item[1]
+            last_item = [line, col, colspan]
             self.items_pos[item] = last_item
 
         for item in items:

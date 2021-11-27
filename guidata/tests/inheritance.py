@@ -16,20 +16,28 @@ from __future__ import print_function
 
 SHOW = True  # Show test in GUI-based test launcher
 
-from guidata.tests.all_features import TestParameters
-from guidata.dataset.datatypes import BeginGroup, EndGroup
-from guidata.dataset.dataitems import FloatItem, BoolItem
+import guidata.dataset.datatypes as gdt
+import guidata.dataset.dataitems as gdi
 
 
-class TestParameters2(TestParameters):
-    bool1 = BoolItem("Boolean option (bis)")
-    g1 = BeginGroup("Group")
-    a = FloatItem("Level 1")
-    gg1 = BeginGroup("sub-group")
-    b = FloatItem("Level 2a")
-    c = FloatItem("Level 2b")
-    _gg1 = EndGroup("sub-group end")
-    _g1 = EndGroup("sub-group")
+class OriginalDataset(gdt.DataSet):
+    """Original dataset
+    This is the original dataset"""
+
+    bool = gdi.BoolItem("Boolean")
+    string = gdi.StringItem("String")
+    text = gdi.TextItem("Text")
+    float = gdi.FloatItem("Float", default=0.5, min=0, max=1, step=0.01, slider=True)
+
+
+class DerivedDataset(OriginalDataset):
+    """Derived dataset
+    This is the derived dataset"""
+
+    bool = gdi.BoolItem("Boolean (modified in derived dataset)")
+    a = gdi.FloatItem("Level 1 (added in derived dataset)", default=0)
+    b = gdi.FloatItem("Level 2 (added in derived dataset)", default=0)
+    c = gdi.FloatItem("Level 3 (added in derived dataset)", default=0)
 
 
 if __name__ == "__main__":
@@ -38,6 +46,10 @@ if __name__ == "__main__":
 
     _app = guidata.qapplication()
 
-    e = TestParameters2()
+    e = OriginalDataset()
+    e.edit()
+    print(e)
+
+    e = DerivedDataset()
     e.edit()
     print(e)

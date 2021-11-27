@@ -9,8 +9,8 @@
 dataset.datatypes
 =================
 
-The ``guidata.dataset.datatypes`` module contains implementation for 
-DataSets (DataSet, DataSetGroup, ...) and related objects (ItemProperty, 
+The ``guidata.dataset.datatypes`` module contains implementation for
+DataSets (DataSet, DataSetGroup, ...) and related objects (ItemProperty,
 ValueProp, ...).
 """
 
@@ -161,7 +161,9 @@ class DataItem(object):
         self._default = default
         self._help = utf8_to_unicode(help)
         self._props = {}  # a dict realm->dict containing realm-specific properties
-        self.set_prop("display", col=0, colspan=None, label=utf8_to_unicode(label))
+        self.set_prop(
+            "display", col=0, colspan=None, row=None, label=utf8_to_unicode(label)
+        )
         self.set_prop("data", check_value=check)
 
     def get_prop(self, realm, name, default=NoDefault):
@@ -195,11 +197,11 @@ class DataItem(object):
         prop.update(kwargs)
         return self
 
-    def set_pos(self, col=0, colspan=None):
+    def set_pos(self, col=0, colspan=None, row=None):
         """
         Set data item's position on a GUI layout
         """
-        self.set_prop("display", col=col, colspan=colspan)
+        self.set_prop("display", col=col, colspan=colspan, row=row)
         return self
 
     def __str__(self):
