@@ -11,8 +11,6 @@ Text editor dialog
 
 from __future__ import print_function
 
-from guidata.configtools import get_font, get_icon
-from guidata.config import CONF, _
 from qtpy.QtWidgets import (
     QDialog,
     QHBoxLayout,
@@ -25,6 +23,10 @@ from qtpy.QtCore import (
     Slot,
 )
 
+from guidata.configtools import get_font, get_icon
+from guidata.config import CONF, _
+from guidata.qthelpers import win32_fix_title_bar_background
+
 
 class TextEditor(QDialog):
     """Array Editor Dialog"""
@@ -33,6 +35,8 @@ class TextEditor(QDialog):
         self, text, title="", font=None, parent=None, readonly=False, size=(400, 300)
     ):
         QDialog.__init__(self, parent)
+
+        win32_fix_title_bar_background(self)
 
         # Destroying the C++ object right after closing the dialog box,
         # otherwise it may be garbage-collected in another QThread

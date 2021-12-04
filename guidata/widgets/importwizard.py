@@ -18,7 +18,7 @@ from itertools import zip_longest
 from numpy import nan
 
 from guidata.configtools import get_icon
-from guidata.qthelpers import add_actions, create_action
+from guidata.qthelpers import add_actions, create_action, win32_fix_title_bar_background
 from guidata.config import _
 from qtpy.QtWidgets import (
     QCheckBox,
@@ -578,6 +578,8 @@ class ImportWizard(QDialog):
         self, parent, text, title=None, icon=None, contents_title=None, varname=None
     ):
         QDialog.__init__(self, parent)
+
+        win32_fix_title_bar_background(self)
 
         # Destroying the C++ object right after closing the dialog box,
         # otherwise it may be garbage-collected in another QThread

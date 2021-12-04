@@ -9,7 +9,7 @@
 qthelpers
 ---------
 
-The ``guidata.qthelpers`` module provides helper functions for developing 
+The ``guidata.qthelpers`` module provides helper functions for developing
 easily Qt-based graphical user interfaces.
 """
 
@@ -34,10 +34,49 @@ from qtpy.QtWidgets import (
 )
 from qtpy.QtGui import QColor, QIcon, QKeySequence
 from qtpy.QtCore import Qt
+from qtpy.py3compat import is_text_string
+
 
 # Local imports:
+from guidata.external import darkdetect
 from guidata.configtools import get_icon
-from qtpy.py3compat import is_text_string
+
+
+def win32_fix_title_bar_background(widget):
+    """Fix window title bar background for Windows 10+ dark theme"""
+    if os.name != "nt" or not darkdetect.isDark():
+        return
+
+    import ctypes
+    from ctypes import wintypes
+
+    class ACCENTPOLICY(ctypes.Structure):
+        _fields_ = [
+            ("AccentState", ctypes.c_uint),
+            ("AccentFlags", ctypes.c_uint),
+            ("GradientColor", ctypes.c_uint),
+            ("AnimationId", ctypes.c_uint),
+        ]
+
+    class WINDOWCOMPOSITIONATTRIBDATA(ctypes.Structure):
+        _fields_ = [
+            ("Attribute", ctypes.c_int),
+            ("Data", ctypes.POINTER(ctypes.c_int)),
+            ("SizeOfData", ctypes.c_size_t),
+        ]
+
+    accent = ACCENTPOLICY()
+    accent.AccentState = 1  # Default window Blur #ACCENT_ENABLE_BLURBEHIND
+
+    data = WINDOWCOMPOSITIONATTRIBDATA()
+    data.Attribute = 26  # WCA_USEDARKMODECOLORS
+    data.SizeOfData = ctypes.sizeof(accent)
+    data.Data = ctypes.cast(ctypes.pointer(accent), ctypes.POINTER(ctypes.c_int))
+
+    set_win_cpa = ctypes.windll.user32.SetWindowCompositionAttribute
+    set_win_cpa.argtypes = (wintypes.HWND, WINDOWCOMPOSITIONATTRIBDATA)
+    set_win_cpa.restype = ctypes.c_int
+    set_win_cpa(int(widget.winId()), data)
 
 
 def text_to_qcolor(text):

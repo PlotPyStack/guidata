@@ -84,10 +84,12 @@ class BaseSH(QSyntaxHighlighter):
     # Syntax highlighting parameters.
     BLANK_ALPHA_FACTOR = 0.31
 
-    def __init__(self, parent, font=None, color_scheme="Spyder"):
+    def __init__(self, parent, font=None, color_scheme=None):
         QSyntaxHighlighter.__init__(self, parent)
 
         self.font = font
+        if color_scheme is None:
+            color_scheme = CONF.get("color_schemes", "default")
         if isinstance(color_scheme, str):
             self.color_scheme = get_color_scheme(color_scheme)
         else:
@@ -362,7 +364,7 @@ class PythonSH(BaseSH):
     # Comments suitable for Outline Explorer
     OECOMMENT = re.compile(r"^(# ?--[-]+|##[#]+ )[ -]*[^- ]+")
 
-    def __init__(self, parent, font=None, color_scheme="Spyder"):
+    def __init__(self, parent, font=None, color_scheme=None):
         BaseSH.__init__(self, parent, font, color_scheme)
         self.import_statements = {}
         self.found_cell_separators = False

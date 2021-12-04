@@ -14,54 +14,16 @@ Editor widget based on QtGui.QPlainTextEdit
 # pylint: disable=R0911
 # pylint: disable=R0201
 
-import keyword
-import os.path as osp
-import re
-import sre_constants
-import sys
+from qtpy.QtWidgets import QWidget, QPlainTextEdit
+from qtpy.QtGui import QColor, QPainter
+from qtpy.QtCore import QRect, QSize, Qt
 
+from guidata.external import darkdetect
 import guidata.widgets.syntaxhighlighters as sh
 from guidata.configtools import get_font
 from guidata import encoding
-from guidata.qthelpers import (
-    add_actions,
-    create_action,
-)
+from guidata.qthelpers import win32_fix_title_bar_background
 from guidata.config import CONF, _
-from qtpy.QtWidgets import (
-    QApplication,
-    QMenu,
-    QMessageBox,
-    QTextEdit,
-    QToolTip,
-    QWidget,
-    QPlainTextEdit,
-    QStyle,
-)
-from qtpy.QtGui import (
-    QBrush,
-    QColor,
-    QCursor,
-    QPainter,
-    QPaintEvent,
-    QFont,
-    QKeySequence,
-    QTextBlockUserData,
-    QTextCharFormat,
-    QTextCursor,
-    QTextFormat,
-    QTextOption,
-    QTextDocument,
-)
-from qtpy.QtCore import (
-    QRect,
-    QRegExp,
-    QSize,
-    Qt,
-    QTimer,
-    Signal,
-    Slot,
-)
 
 
 class LineNumberArea(QWidget):
@@ -109,11 +71,15 @@ class PythonCodeEditor(QPlainTextEdit):
     def __init__(self, parent=None):
         QPlainTextEdit.__init__(self, parent)
 
+        win32_fix_title_bar_background(self)
+
         self.visible_blocks = []
         self.highlighter = None
         self.normal_color = None
         self.sideareas_color = None
-        self.linenumbers_color = QColor(Qt.darkGray)
+        self.linenumbers_color = QColor(
+            Qt.lightGray if darkdetect.isDark() else Qt.darkGray
+        )
 
         # Line number area management
         self.linenumbers_margin = True

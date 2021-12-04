@@ -31,7 +31,12 @@ import PIL.Image
 
 from guidata.utils import getcwd_or_home
 from guidata.configtools import get_font, get_icon
-from guidata.qthelpers import add_actions, create_action, mimedata2url
+from guidata.qthelpers import (
+    add_actions,
+    create_action,
+    mimedata2url,
+    win32_fix_title_bar_background,
+)
 from guidata.config import CONF, _
 from qtpy.QtWidgets import (
     QAbstractItemDelegate,
@@ -52,7 +57,6 @@ from qtpy.QtWidgets import (
 )
 from qtpy.QtCore import (
     QAbstractTableModel,
-    QLocale,
     QModelIndex,
     Qt,
     Signal,
@@ -1525,6 +1529,8 @@ class CollectionsEditor(QDialog):
 
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
+
+        win32_fix_title_bar_background(self)
 
         # Destroying the C++ object right after closing the dialog box,
         # otherwise it may be garbage-collected in another QThread

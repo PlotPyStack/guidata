@@ -23,6 +23,7 @@ from guidata.qthelpers import (
     add_actions,
     create_action,
     keybinding,
+    win32_fix_title_bar_background,
 )
 from guidata.config import CONF, _
 from qtpy.QtWidgets import (
@@ -680,6 +681,7 @@ class ArrayEditor(QDialog):
 
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
+        win32_fix_title_bar_background(self)
 
         # Destroying the C++ object right after closing the dialog box,
         # otherwise it may be garbage-collected in another QThread

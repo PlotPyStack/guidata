@@ -1,6 +1,13 @@
 # guidata Releases #
 
 
+### Version 1.9.0 ###
+
+Changes:
+
+* Added support for dark theme mode on Windows (including windows title bar background),
+  MacOS and GNU/Linux.
+
 ### Version 1.8.0 ###
 
 Changes:
@@ -13,7 +20,7 @@ Changes:
 
 Changes:
 
-* Added PySide2 support: guidata is now compatible with Python 2.7, Python 3.4+, PyQt4, 
+* Added PySide2 support: guidata is now compatible with Python 2.7, Python 3.4+, PyQt4,
   PyQt5 and PySide2!
 
 ### Version 1.7.8 ###
@@ -177,7 +184,7 @@ Other changes:
   * added support for PySide
 	* disthelpers: new function 'get_visual_studio_dlls' -- returns the list of Visual
 Studio DLLs (and create manifest) associated to Python architecture and version
-	
+
 
 ### Version 1.4.2 ###
 
@@ -228,9 +235,9 @@ Other changes:
 Possible API compatibility issues:
 
 * disthelpers: removed functions remove_build_dist, add_module_data_files,
-    add_text_data_file, get_default_excludes, get_default_includes, 
-    get_default_dll_excludes, create_vs2008_data_files (...) which were 
-    replaced by a class named Distribution, 
+    add_text_data_file, get_default_excludes, get_default_includes,
+    get_default_dll_excludes, create_vs2008_data_files (...) which were
+    replaced by a class named Distribution,
     see the new disthelpers test for more details (tests/dishelpers.py)
 * reorganized utils and configtools modules
 
@@ -245,7 +252,7 @@ Other changes:
 ### Version 1.3.2 ###
 
 Since this version, `guidata` is compatible with PyQt4 API #1 *and* API #2.
-Please read carefully the coding guidelines which have been recently added to 
+Please read carefully the coding guidelines which have been recently added to
 the documentation.
 
 Possible API compatibility issues:

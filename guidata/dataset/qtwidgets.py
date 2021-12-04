@@ -48,12 +48,13 @@ from qtpy.QtWidgets import (
 from qtpy.QtGui import QColor, QIcon, QPainter, QPicture, QBrush
 from qtpy.QtCore import Qt, QRect, QSize, Signal
 from qtpy.compat import getopenfilename, getopenfilenames, getsavefilename
+from qtpy.py3compat import to_text_string, is_text_string
 
 from guidata.configtools import get_icon
 from guidata.config import _
-from qtpy.py3compat import to_text_string, is_text_string
 
 from guidata.dataset.datatypes import BeginGroup, EndGroup, GroupItem, TabGroupItem
+from guidata.qthelpers import win32_fix_title_bar_background
 
 
 class DataSetEditDialog(QDialog):
@@ -65,6 +66,7 @@ class DataSetEditDialog(QDialog):
         self, instance, icon="", parent=None, apply=None, wordwrap=True, size=None
     ):
         QDialog.__init__(self, parent)
+        win32_fix_title_bar_background(self)
         self.wordwrap = wordwrap
         self.apply_func = apply
         self.layout = QVBoxLayout()
