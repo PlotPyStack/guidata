@@ -55,7 +55,7 @@ from qtpy.QtWidgets import (
     QVBoxLayout,
 )
 from qtpy.QtGui import QColor, QIcon, QPixmap
-from qtpy.QtCore import Qt
+from qtpy.QtCore import Qt, Signal
 from qtpy.compat import getexistingdirectory
 
 try:
@@ -168,6 +168,13 @@ class AbstractDataSetWidget(object):
         if self.label:
             self.label.setEnabled(active)
 
+    def notify_value_change(self):
+        """
+        Notify parent layout that widget value has changed
+        """
+        if not self.build_mode:
+            self.parent_layout.widget_value_changed()
+
 
 class GroupWidget(AbstractDataSetWidget):
     """
@@ -184,7 +191,11 @@ class GroupWidget(AbstractDataSetWidget):
         self.layout = QGridLayout()
         EditLayoutClass = parent_layout.__class__
         self.edit = EditLayoutClass(
-            self.group, item.instance, self.layout, item.item.group
+            self.group,
+            item.instance,
+            self.layout,
+            item.item.group,
+            change_callback=self.notify_value_change,
         )
         self.group.setLayout(self.layout)
 
@@ -304,6 +315,7 @@ class LineEditWidget(AbstractDataSetWidget):
                 cb(self.item.instance, self.item.item, value)
                 self.parent_layout.update_widgets(except_this_one=self)
         self.update(value)
+        self.notify_value_change()
 
     def update(self, value):
         """Override AbstractDataSetWidget method"""
@@ -354,6 +366,7 @@ class TextEditWidget(AbstractDataSetWidget):
         else:
             self.edit.setStyleSheet("")
         self.update(value)
+        self.notify_value_change()
 
     def update(self, value):
         """Override AbstractDataSetWidget method"""
@@ -380,8 +393,7 @@ class CheckBoxWidget(AbstractDataSetWidget):
         self.group = self.checkbox
 
         self.store = self.item.get_prop("display", "store", None)
-        if self.store:
-            self.checkbox.stateChanged.connect(self.do_store)
+        self.checkbox.stateChanged.connect(self.state_changed)
 
     def get(self):
         """Override AbstractDataSetWidget method"""
@@ -407,6 +419,11 @@ class CheckBoxWidget(AbstractDataSetWidget):
             self.place_label(layout, row, label_column)
         layout.addWidget(self.group, row, widget_column, row_span, column_span)
 
+    def state_changed(self, state):
+        self.notify_value_change()
+        if self.store:
+            self.do_store(state)
+
     def do_store(self, state):
         self.store.set(self.item.instance, self.item.item, state)
         self.parent_layout.refresh_widgets()
@@ -421,6 +438,7 @@ class DateWidget(AbstractDataSetWidget):
         super(DateWidget, self).__init__(item, parent_layout)
         self.dateedit = self.group = QDateEdit()
         self.dateedit.setToolTip(item.get_help())
+        self.dateedit.dateTimeChanged.connect(lambda value: self.notify_value_change())
 
     def get(self):
         """Override AbstractDataSetWidget method"""
@@ -451,6 +469,7 @@ class DateTimeWidget(AbstractDataSetWidget):
         self.dateedit = self.group = QDateTimeEdit()
         self.dateedit.setCalendarPopup(True)
         self.dateedit.setToolTip(item.get_help())
+        self.dateedit.dateTimeChanged.connect(lambda value: self.notify_value_change())
 
     def get(self):
         """Override AbstractDataSetWidget method"""
@@ -534,6 +553,7 @@ class ColorWidget(HLayoutMixin, LineEditWidget):
             value = color.name()
             self.edit.setText(value)
             self.update(value)
+            self.notify_value_change()
 
 
 class SliderWidget(HLayoutMixin, LineEditWidget):
@@ -717,6 +737,7 @@ class ChoiceWidget(AbstractDataSetWidget):
                 self.parent_layout.update_dataitems()
             cb(self.item.instance, self.item.item, self.value())
             self.parent_layout.update_widgets(except_this_one=self)
+        self.notify_value_change()
 
     def initialize_widget(self):
         if self.is_radio:

@@ -204,11 +204,14 @@ class DataSetEditLayout(object):
         """Register a factory for a new item_type"""
         cls._widget_factory[item_type] = factory
 
-    def __init__(self, parent, instance, layout, items=None, first_line=0):
+    def __init__(
+        self, parent, instance, layout, items=None, first_line=0, change_callback=None
+    ):
         self.parent = parent
         self.instance = instance
         self.layout = layout
         self.first_line = first_line
+        self.change_callback = change_callback
         self.widgets = []
         self.linenos = {}  # prochaine ligne à remplir par colonne
         self.items_pos = {}
@@ -350,6 +353,11 @@ class DataSetEditLayout(object):
         for widget in self.widgets:
             if widget is not except_this_one:
                 widget.get()
+
+    def widget_value_changed(self):
+        """Method called when any widget's value has changed"""
+        if self.change_callback is not None:
+            self.change_callback()
 
 
 # Enregistrement des correspondances avec les widgets
@@ -540,6 +548,7 @@ class DataSetShowGroupBox(QGroupBox):
 
     def __init__(self, label, klass, wordwrap=False, **kwargs):
         QGroupBox.__init__(self, label)
+        self.apply_button = None
         self.klass = klass
         self.dataset = klass(**kwargs)
         self.layout = QVBoxLayout()
@@ -595,14 +604,20 @@ class DataSetEditGroupBox(DataSetShowGroupBox):
                 button_icon = get_icon("apply.png")
             elif is_text_string(button_icon):
                 button_icon = get_icon(button_icon)
-            apply_btn = QPushButton(button_icon, button_text, self)
-            apply_btn.clicked.connect(self.set)
+            self.apply_button = applyb = QPushButton(button_icon, button_text, self)
+            applyb.clicked.connect(self.set)
             layout = self.edit.layout
-            layout.addWidget(apply_btn, layout.rowCount(), 0, 1, -1, Qt.AlignRight)
+            layout.addWidget(applyb, layout.rowCount(), 0, 1, -1, Qt.AlignRight)
 
     def get_edit_layout(self):
         """Return edit layout"""
-        return DataSetEditLayout(self, self.dataset, self.grid_layout)
+        return DataSetEditLayout(
+            self, self.dataset, self.grid_layout, change_callback=self.change_callback
+        )
+
+    def change_callback(self):
+        """Method called when any widget's value has changed"""
+        self.set_apply_button_state(True)
 
     def set(self):
         """Update data item values from layout contents"""
@@ -610,6 +625,12 @@ class DataSetEditGroupBox(DataSetShowGroupBox):
             if widget.is_active() and widget.check():
                 widget.set()
         self.SIG_APPLY_BUTTON_CLICKED.emit()
+        self.set_apply_button_state(False)
+
+    def set_apply_button_state(self, state):
+        """Set apply button enable/disable state"""
+        if self.apply_button is not None:
+            self.apply_button.setEnabled(state)
 
     def child_title(self, item):
         """Return data item title combined with QApplication title"""

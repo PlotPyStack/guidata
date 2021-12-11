@@ -16,63 +16,59 @@ SHOW = True  # Show test in GUI-based test launcher
 
 from qtpy.QtWidgets import QMainWindow, QSplitter
 
-from guidata.dataset.datatypes import (
-    DataSet,
-    BeginGroup,
-    EndGroup,
-    BeginTabGroup,
-    EndTabGroup,
-)
-from guidata.dataset.dataitems import (
-    ChoiceItem,
-    FloatItem,
-    StringItem,
-    DirectoryItem,
-    FileOpenItem,
-)
+from guidata.dataset import datatypes as gdt
+from guidata.dataset import dataitems as gdi
 from guidata.dataset.qtwidgets import DataSetShowGroupBox, DataSetEditGroupBox
 from guidata.configtools import get_icon
-from guidata.qthelpers import create_action, add_actions, get_std_icon
+from guidata.qthelpers import (
+    create_action,
+    add_actions,
+    get_std_icon,
+    win32_fix_title_bar_background,
+)
 
 # Local test import:
 from guidata.tests.activable_dataset import ExampleDataSet
 
 
-class AnotherDataSet(DataSet):
+class AnotherDataSet(gdt.DataSet):
     """
     Example 2
     <b>Simple dataset example</b>
     """
 
-    param0 = ChoiceItem("Choice", ["deazdazk", "aeazee", "87575757"])
-    param1 = FloatItem("Foobar 1", default=0, min=0)
-    a_group = BeginGroup("A group")
-    param2 = FloatItem("Foobar 2", default=0.93)
-    param3 = FloatItem("Foobar 3", default=123)
-    _a_group = EndGroup("A group")
+    param0 = gdi.ChoiceItem("Choice", ["deazdazk", "aeazee", "87575757"])
+    param1 = gdi.FloatItem("Foobar 1", default=0, min=0)
+    a_group = gdt.BeginGroup("A group")
+    param2 = gdi.FloatItem("Foobar 2", default=0.93)
+    param3 = gdi.FloatItem("Foobar 3", default=123)
+    _a_group = gdt.EndGroup("A group")
 
 
-class ExampleMultiGroupDataSet(DataSet):
-    param0 = ChoiceItem("Choice", ["deazdazk", "aeazee", "87575757"])
-    param1 = FloatItem("Foobar 1", default=0, min=0)
-    t_group = BeginTabGroup("T group")
-    a_group = BeginGroup("A group")
-    param2 = FloatItem("Foobar 2", default=0.93)
-    dir1 = DirectoryItem("Directory 1")
-    file1 = FileOpenItem("File 1")
-    _a_group = EndGroup("A group")
-    b_group = BeginGroup("B group")
-    param3 = FloatItem("Foobar 3", default=123)
-    _b_group = EndGroup("B group")
-    c_group = BeginGroup("C group")
-    param4 = FloatItem("Foobar 4", default=250)
-    _c_group = EndGroup("C group")
-    _t_group = EndTabGroup("T group")
+class ExampleMultiGroupDataSet(gdt.DataSet):
+    param0 = gdi.ChoiceItem("Choice", ["deazdazk", "aeazee", "87575757"])
+    param1 = gdi.FloatItem("Foobar 1", default=0, min=0)
+    t_group = gdt.BeginTabGroup("T group")
+    a_group = gdt.BeginGroup("A group")
+    param2 = gdi.FloatItem("Foobar 2", default=0.93)
+    dir1 = gdi.DirectoryItem("Directory 1")
+    file1 = gdi.FileOpenItem("File 1")
+    _a_group = gdt.EndGroup("A group")
+    b_group = gdt.BeginGroup("B group")
+    param3 = gdi.FloatItem("Foobar 3", default=123)
+    param4 = gdi.BoolItem("Boolean")
+    _b_group = gdt.EndGroup("B group")
+    c_group = gdt.BeginGroup("C group")
+    param5 = gdi.FloatItem("Foobar 4", default=250)
+    param6 = gdi.DateItem("Date")
+    param7 = gdi.ColorItem("Color")
+    _c_group = gdt.EndGroup("C group")
+    _t_group = gdt.EndTabGroup("T group")
 
 
-class OtherDataSet(DataSet):
-    title = StringItem("Title", default="Title")
-    icon = ChoiceItem(
+class OtherDataSet(gdt.DataSet):
+    title = gdi.StringItem("Title", default="Title")
+    icon = gdi.ChoiceItem(
         "Icon",
         (
             ("python.png", "Python"),
@@ -80,12 +76,13 @@ class OtherDataSet(DataSet):
             ("settings.png", "Settings"),
         ),
     )
-    opacity = FloatItem("Opacity", default=1.0, min=0.1, max=1)
+    opacity = gdi.FloatItem("Opacity", default=1.0, min=0.1, max=1)
 
 
 class MainWindow(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
+        win32_fix_title_bar_background(self)
         self.setWindowIcon(get_icon("python.png"))
         self.setWindowTitle("Application example")
 
@@ -154,23 +151,22 @@ class MainWindow(QMainWindow):
 
     def edit_dataset1(self):
         self.groupbox1.dataset.set_writeable()  # This is an activable dataset
-        if self.groupbox1.dataset.edit():
+        if self.groupbox1.dataset.edit(self):
             self.update_groupboxes()
 
     def edit_dataset2(self):
-        if self.groupbox2.dataset.edit():
+        if self.groupbox2.dataset.edit(self):
             self.update_groupboxes()
 
     def edit_dataset4(self):
-        if self.groupbox4.dataset.edit():
+        if self.groupbox4.dataset.edit(self):
             self.update_groupboxes()
 
 
 if __name__ == "__main__":
-    from qtpy.QtWidgets import QApplication
-    import sys
+    from guidata import qapplication
 
-    app = QApplication(sys.argv)
+    app = qapplication()
     window = MainWindow()
     window.show()
-    sys.exit(app.exec_())
+    app.exec_()
