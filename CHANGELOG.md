@@ -9,6 +9,7 @@ Changes:
   MacOS and GNU/Linux.
 * Dataset edit layout: now disabling/enabling "Apply" button depending on widget value changes
 * Code editor: widget minimum size area may now be set using rows and columns size
+* Test launcher: redesigned, added support for dark mode
 
 ### Version 1.8.0 ###
 
