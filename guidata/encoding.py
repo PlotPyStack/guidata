@@ -18,9 +18,6 @@ import re
 import sys
 from codecs import BOM_UTF8, BOM_UTF16, BOM_UTF32
 
-# Third-party imports
-from chardet.universaldetector import UniversalDetector
-
 PREFERRED_ENCODING = locale.getpreferredencoding()
 
 
@@ -87,41 +84,27 @@ CODECS = [
 ]
 
 
-def get_coding(text, force_chardet=False):
+def get_coding(text):
     """
     Function to get the coding of a text.
     @param text text to inspect (string)
     @return coding string
     """
-    if not force_chardet:
-        for line in text.splitlines()[:2]:
-            try:
-                result = CODING_RE.search(str(line))
-            except UnicodeDecodeError:
-                # This could fail because str assume the text
-                # is utf8-like and we don't know the encoding to give
-                # it to str
-                pass
-            else:
-                if result:
-                    codec = result.group(1)
-                    # sometimes we find a false encoding that can
-                    # result in errors
-                    if codec in CODECS:
-                        return codec
-
-    # Fallback using chardet
-    if isinstance(text, bytes):
-        detector = UniversalDetector()
-        for line in text.splitlines()[:2]:
-            detector.feed(line)
-            if detector.done:
-                break
-
-        detector.close()
-        return detector.result["encoding"]
-
-    return None
+    for line in text.splitlines()[:2]:
+        try:
+            result = CODING_RE.search(str(line))
+        except UnicodeDecodeError:
+            # This could fail because str assume the text
+            # is utf8-like and we don't know the encoding to give
+            # it to str
+            pass
+        else:
+            if result:
+                codec = result.group(1)
+                # sometimes we find a false encoding that can
+                # result in errors
+                if codec in CODECS:
+                    return codec
 
 
 def decode(text):

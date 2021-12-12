@@ -11,7 +11,7 @@
 utils
 -----
 
-The ``guidata.utils`` module provides various utility helper functions 
+The ``guidata.utils`` module provides various utility helper functions
 (pure python).
 """
 
@@ -332,6 +332,68 @@ def run_program(name, args="", cwd=None, shell=True, wait=False):
         subprocess.Popen(" ".join(command), cwd=cwd, shell=shell)
 
 
+class ProgramError(Exception):
+    """Exception raised when a shell command failed to execute."""
+
+    pass
+
+
+def alter_subprocess_kwargs_by_platform(**kwargs):
+    """
+    Given a dict, populate kwargs to create a generally
+    useful default setup for running subprocess processes
+    on different platforms. For example, `close_fds` is
+    set on posix and creation of a new console window is
+    disabled on Windows.
+
+    This function will alter the given kwargs and return
+    the modified dict.
+    """
+    kwargs.setdefault("close_fds", os.name == "posix")
+    if os.name == "nt":
+        CONSOLE_CREATION_FLAGS = 0  # Default value
+        # See: https://msdn.microsoft.com/en-us/library/windows/desktop/ms684863%28v=vs.85%29.aspx
+        CREATE_NO_WINDOW = 0x08000000
+        # We "or" them together
+        CONSOLE_CREATION_FLAGS |= CREATE_NO_WINDOW
+        kwargs.setdefault("creationflags", CONSOLE_CREATION_FLAGS)
+    return kwargs
+
+
+def run_shell_command(cmdstr, **subprocess_kwargs):
+    """
+    Execute the given shell command.
+
+    Note that *args and **kwargs will be passed to the subprocess call.
+
+    If 'shell' is given in subprocess_kwargs it must be True,
+    otherwise ProgramError will be raised.
+    .
+    If 'executable' is not given in subprocess_kwargs, it will
+    be set to the value of the SHELL environment variable.
+
+    Note that stdin, stdout and stderr will be set by default
+    to PIPE unless specified in subprocess_kwargs.
+
+    :str cmdstr: The string run as a shell command.
+    :subprocess_kwargs: These will be passed to subprocess.Popen.
+    """
+    if "shell" in subprocess_kwargs and not subprocess_kwargs["shell"]:
+        raise ProgramError(
+            'The "shell" kwarg may be omitted, but if ' "provided it must be True."
+        )
+    else:
+        subprocess_kwargs["shell"] = True
+
+    if "executable" not in subprocess_kwargs:
+        subprocess_kwargs["executable"] = os.getenv("SHELL")
+
+    for stream in ["stdin", "stdout", "stderr"]:
+        subprocess_kwargs.setdefault(stream, subprocess.PIPE)
+    subprocess_kwargs = alter_subprocess_kwargs_by_platform(**subprocess_kwargs)
+    return subprocess.Popen(cmdstr, **subprocess_kwargs)
+
+
 def is_module_available(module_name):
     """Return True if Python module is available"""
     try:
@@ -360,6 +422,26 @@ def getcwd_or_home():
             "falling back to home directory"
         )
         return get_home_dir()
+
+
+def remove_backslashes(path):
+    """Remove backslashes in *path*
+
+    For Windows platforms only.
+    Returns the path unchanged on other platforms.
+
+    This is especially useful when formatting path strings on
+    Windows platforms for which folder paths may contain backslashes
+    and provoke unicode decoding errors in Python 3 (or in Python 2
+    when future 'unicode_literals' symbol has been imported)."""
+    if os.name == "nt":
+        # Removing trailing single backslash
+        if path.endswith("\\") and not path.endswith("\\\\"):
+            path = path[:-1]
+        # Replacing backslashes by slashes
+        path = path.replace("\\", "/")
+        path = path.replace("/'", "\\'")
+    return path
 
 
 # ==============================================================================
