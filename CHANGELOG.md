@@ -8,6 +8,7 @@ Changes:
 * Added support for dark theme mode on Windows (including windows title bar background),
   MacOS and GNU/Linux.
 * Dataset edit layout: now disabling/enabling "Apply" button depending on widget value changes
+* Code editor: widget minimum size area may now be set using rows and columns size
 
 ### Version 1.8.0 ###
 

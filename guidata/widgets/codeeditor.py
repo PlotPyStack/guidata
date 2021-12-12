@@ -68,7 +68,7 @@ class PythonCodeEditor(QPlainTextEdit):
     # To have these attrs when early viewportEvent's are triggered
     linenumberarea = None
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, font=None, columns=None, rows=None):
         QPlainTextEdit.__init__(self, parent)
 
         win32_fix_title_bar_background(self)
@@ -88,18 +88,32 @@ class PythonCodeEditor(QPlainTextEdit):
         self.linenumberarea_released = None
 
         self.setFocusPolicy(Qt.StrongFocus)
-        self.setup()
+        self.setup(font=font, columns=columns, rows=rows)
 
-    def setup(self, font=None):
+    def setup(self, font=None, columns=None, rows=None):
         """Setup widget"""
         if font is None:
-            font = get_font(CONF, "texteditor")
+            font = get_font(CONF, "codeeditor")
         self.setFont(font)
         self.setup_linenumberarea()
         self.highlighter = sh.PythonSH(self.document(), self.font())
         self.highlighter.rehighlight()
         self.normal_color = self.highlighter.get_foreground_color()
         self.sideareas_color = self.highlighter.get_sideareas_color()
+        if columns is not None:
+            self.set_minimum_width(columns)
+        if rows is not None:
+            self.set_minimum_height(rows)
+
+    def set_minimum_width(self, columns):
+        """Set widget minimum width to show the specified number of columns"""
+        width = self.fontMetrics().width("9" * (columns + 8))
+        self.setMinimumWidth(width)
+
+    def set_minimum_height(self, rows):
+        """Set widget minimum height to show the specified number of rows"""
+        height = self.fontMetrics().height() * (rows + 1)
+        self.setMinimumHeight(height)
 
     def setup_linenumberarea(self):
         """Setup widget"""
@@ -327,8 +341,7 @@ if __name__ == "__main__":
 
     app = qapplication()
 
-    widget = PythonCodeEditor()
+    widget = PythonCodeEditor(columns=80, rows=40)
     widget.set_text_from_file(__file__)
-    widget.resize(800, 600)
     widget.show()
     app.exec_()

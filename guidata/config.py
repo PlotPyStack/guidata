@@ -44,6 +44,12 @@ DEFAULTS = {
         "font/family/mac": "Monaco",
         "font/size": 9,
     },
+    "codeeditor": {
+        "font/family/nt": WINDOWS_MONO_FONTS,
+        "font/family/posix": "Bitstream Vera Sans Mono",
+        "font/family/mac": "Monaco",
+        "font/size": 10,
+    },
     "color_schemes": {
         "names": [
             "emacs",
