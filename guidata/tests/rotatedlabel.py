@@ -17,12 +17,15 @@ SHOW = True  # Show test in GUI-based test launcher
 
 from qtpy.QtWidgets import QFrame, QGridLayout
 from qtpy.QtCore import Qt
+
 from guidata.qtwidgets import RotatedLabel
+from guidata.qthelpers import win32_fix_title_bar_background
 
 
 class Frame(QFrame):
     def __init__(self, parent=None):
         QFrame.__init__(self, parent)
+        win32_fix_title_bar_background(self)
         layout = QGridLayout()
         self.setLayout(layout)
         angle = 0
@@ -40,10 +43,9 @@ class Frame(QFrame):
 
 
 if __name__ == "__main__":
-    from qtpy.QtWidgets import QApplication
-    import sys
+    from guidata import qapplication
 
-    app = QApplication([])
+    app = qapplication()
     frame = Frame()
     frame.show()
-    sys.exit(app.exec_())
+    app.exec_()
