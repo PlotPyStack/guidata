@@ -5,7 +5,13 @@
 # (see spyder/__init__.py for details)
 
 """
-Generic object editor dialog
+guidata.widgets.objecteditor
+============================
+
+This package provides a generic object editor widget.
+
+.. autofunction:: oedit
+
 """
 
 

@@ -1,0 +1,2 @@
+.. automodule:: guidata.widgets
+   :members:

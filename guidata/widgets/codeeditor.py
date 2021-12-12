@@ -5,7 +5,13 @@
 # (see spyder/__init__.py for details)
 
 """
-Editor widget based on QtGui.QPlainTextEdit
+guidata.widgets.codeeditor
+==========================
+
+This package provides an Editor widget based on QtGui.QPlainTextEdit.
+
+.. autoclass:: PythonCodeEditor
+
 """
 
 # %% This line is for cell execution testing

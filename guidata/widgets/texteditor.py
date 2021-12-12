@@ -5,7 +5,13 @@
 # (see spyder/__init__.py for details)
 
 """
-Text editor dialog
+guidata.widgets.texteditor
+==========================
+
+This package provides a text editor widget based on QtGui.QPlainTextEdit.
+
+.. autoclass:: TextEditor
+
 """
 
 

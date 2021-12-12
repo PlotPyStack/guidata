@@ -9,11 +9,14 @@
 # -----------------------------------------------------------------------------
 
 """
-Pandas DataFrame Editor Dialog.
+guidata.widgets.dataframeeditor
+===============================
 
-DataFrameModel is based on the class ArrayModel from array editor
+This package provides a DataFrameModel based on the class ArrayModel from array editor
 and the class DataFrameModel from the pandas project.
 Present in pandas.sandbox.qtpandas in v0.13.1.
+
+.. autoclass:: DataFrameEditor
 
 Originally based on pandas/sandbox/qtpandas.py of the
 `pandas project <https://github.com/pandas-dev/pandas>`_.

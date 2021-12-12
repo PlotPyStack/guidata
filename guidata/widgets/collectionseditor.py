@@ -7,7 +7,13 @@
 # ----------------------------------------------------------------------------
 
 """
-Collections (i.e. dictionary, list and tuple) editor widget and dialog.
+guidata.widgets.collectionseditor
+=================================
+
+This package provides a Collections (i.e. dictionary, list and tuple) editor widget and dialog.
+
+.. autoclass:: CollectionsEditor
+
 """
 
 # TODO: Multiple selection: open as many editors (array/dict/...) as necessary,

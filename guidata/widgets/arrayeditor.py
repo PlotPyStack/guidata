@@ -5,7 +5,13 @@
 # (see spyder/__init__.py for details)
 
 """
-NumPy Array Editor Dialog based on Qt
+guidata.widgets.arrayeditor
+===========================
+
+This package provides a NumPy Array Editor Dialog based on Qt.
+
+.. autoclass:: ArrayEditor
+
 """
 
 # pylint: disable=C0103
