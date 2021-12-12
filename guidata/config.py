@@ -23,7 +23,7 @@ APP_PATH = osp.dirname(__file__)
 add_image_module_path("guidata", "images")
 _ = get_translation("guidata")
 
-WINDOWS_MONO_FONTS = ["Consolas", "Courier New"]
+WINDOWS_MONO_FONTS = ["Cascadia Code", "Consolas", "Courier New"]
 
 DEFAULTS = {
     "arrayeditor": {
@@ -31,23 +31,18 @@ DEFAULTS = {
         "font/family/posix": "Bitstream Vera Sans Mono",
         "font/family/mac": "Monaco",
         "font/size": 9,
-        "font/bold": False,
     },
     "dicteditor": {
         "font/family/nt": WINDOWS_MONO_FONTS,
         "font/family/posix": "Bitstream Vera Sans Mono",
         "font/family/mac": "Monaco",
         "font/size": 9,
-        "font/italic": False,
-        "font/bold": False,
     },
     "texteditor": {
         "font/family/nt": WINDOWS_MONO_FONTS,
         "font/family/posix": "Bitstream Vera Sans Mono",
         "font/family/mac": "Monaco",
         "font/size": 9,
-        "font/italic": False,
-        "font/bold": False,
     },
     "color_schemes": {
         "names": [
@@ -104,7 +99,7 @@ DEFAULTS = {
         # ---- Monokai ----
         "monokai/name": "Monokai",
         #      Name              Color     Bold  Italic
-        "monokai/background": "#2a2b24",
+        "monokai/background": "#121212",
         "monokai/currentline": "#484848",
         "monokai/currentcell": "#3d3d3d",
         "monokai/occurrence": "#666666",
@@ -180,7 +175,7 @@ DEFAULTS = {
         # ---- Spyder/Dark ----
         "spyder/dark/name": "Spyder Dark",
         #           Name             Color     Bold  Italic
-        "spyder/dark/background": "#131926",
+        "spyder/dark/background": "#121212",
         "spyder/dark/currentline": "#2b2b43",
         "spyder/dark/currentcell": "#31314e",
         "spyder/dark/occurrence": "#abab67",
@@ -199,7 +194,7 @@ DEFAULTS = {
         # ---- Zenburn ----
         "zenburn/name": "Zenburn",
         #        Name            Color     Bold  Italic
-        "zenburn/background": "#3f3f3f",
+        "zenburn/background": "#121212",
         "zenburn/currentline": "#333333",
         "zenburn/currentcell": "#2c2c2c",
         "zenburn/occurrence": "#7a738f",
@@ -237,7 +232,7 @@ DEFAULTS = {
         # ---- Solarized Dark ----
         "solarized/dark/name": "Solarized Dark",
         #        Name            Color     Bold  Italic
-        "solarized/dark/background": "#002b36",
+        "solarized/dark/background": "#121212",
         "solarized/dark/currentline": "#083f4d",
         "solarized/dark/currentcell": "#073642",
         "solarized/dark/occurrence": "#657b83",
