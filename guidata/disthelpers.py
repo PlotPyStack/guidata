@@ -11,8 +11,8 @@
 disthelpers
 -----------
 
-The ``guidata.disthelpers`` module provides helper functions for Python 
-package distribution on Microsoft Windows platforms with ``py2exe`` or on 
+The ``guidata.disthelpers`` module provides helper functions for Python
+package distribution on Microsoft Windows platforms with ``py2exe`` or on
 all platforms thanks to ``cx_Freeze``.
 """
 
@@ -384,6 +384,7 @@ class Distribution(object):
         self.name = None
         self.version = None
         self.description = None
+        self.script = None
         self.target_name = None
         self._target_dir = None
         self.icon = None
@@ -970,9 +971,7 @@ class Distribution(object):
         if script.endswith(".pyw") and os.name == "nt":
             base = "win32gui"
         self.executables += [
-            Executable(
-                self.script, base=base, icon=self.icon, targetName=self.target_name
-            )
+            Executable(script, base=base, icon=self.icon, targetName=self.target_name)
         ]
 
     def build_cx_freeze(self, cleanup=True, create_archive=None):
