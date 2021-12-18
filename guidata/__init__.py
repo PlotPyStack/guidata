@@ -19,6 +19,11 @@ External resources:
 
 __version__ = "1.9.0beta"
 
+#TODO: Re-include py3compat module from QtPy since they have dropped Py3 support
+#TODO: Fix Python 3 compatibility issues (winreg, builtins, ...)
+#TODO: Add Python module hash utilities (for dependencies checking)
+#TODO: Investigate the qthelpers test failure (see after if __name__=='__main__')
+
 # Dear (Debian, RPM, ...) package makers, please feel free to customize the
 # following path to module's data (images) and translations:
 DATAPATH = LOCALEPATH = ""

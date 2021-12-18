@@ -13,6 +13,7 @@ import sys
 import os
 import os.path as osp
 import subprocess
+import traceback
 
 # Local imports
 from qtpy.QtWidgets import (
@@ -28,7 +29,7 @@ from qtpy.QtWidgets import (
     QMainWindow,
     QFrame,
 )
-from qtpy.QtGui import QKeySequence
+from qtpy.QtGui import QKeySequence, QColor
 from qtpy.QtCore import Qt, QSize
 
 from guidata.config import _
@@ -37,18 +38,22 @@ from guidata.qthelpers import get_std_icon, win32_fix_title_bar_background
 from guidata.widgets.codeeditor import PythonCodeEditor
 
 
-def get_tests(test_package):
+def get_test_package(package):
+    """Return test package for package"""
+    test_package_name = "%s.tests" % package.__name__
+    _temp = __import__(test_package_name)
+    return sys.modules[test_package_name]
+
+
+def get_tests(package):
     """Retrieve test scripts from test package"""
     tests = []
+    test_package = get_test_package(package)
     test_path = osp.dirname(osp.realpath(test_package.__file__))
     for fname in sorted(os.listdir(test_path)):
-        module_name, ext = osp.splitext(fname)
-        if ext not in (".py", ".pyw"):
-            continue
-        if not module_name.startswith("_"):
-            _temp = __import__(test_package.__name__, fromlist=[module_name])
-            test_module = getattr(_temp, module_name)
-            test = TestModule(test_module)
+        path = osp.join(test_path, fname)
+        if fname.endswith((".py", ".pyw")) and not fname.startswith("_"):
+            test = TestModule(test_package, path)
             if test.is_visible():
                 tests.append(test)
     return tests
@@ -57,26 +62,38 @@ def get_tests(test_package):
 class TestModule(object):
     """Object representing a test module (Python script)"""
 
-    def __init__(self, test_module):
-        self.module = test_module
-        self.filename = osp.splitext(osp.abspath(test_module.__file__))[0] + ".py"
-        if not osp.isfile(self.filename):
-            self.filename += "w"
+    def __init__(self, test_package, path):
+        self.path = path
+        module_name, _ext = osp.splitext(osp.basename(path))
+        try:
+            self.error_msg = ""
+            _temp = __import__(test_package.__name__, fromlist=[module_name])
+            self.module = getattr(_temp, module_name)
+        except ImportError:
+            self.error_msg = traceback.format_exc()
+            self.module = None
 
     def is_visible(self):
         """Returns True if this script is intended to be shown in test launcher"""
-        return hasattr(self.module, "SHOW") and self.module.SHOW
+        return self.module is None or (
+            hasattr(self.module, "SHOW") and self.module.SHOW
+        )
+
+    def is_valid(self):
+        """Returns True if test module is valid and can be executed"""
+        return self.module is not None
 
     def get_description(self):
         """Returns test module description"""
-        doc = self.module.__doc__
-        if doc is None or not doc.strip():
-            return _("No description available")
-        else:
+        if self.is_valid():
+            doc = self.module.__doc__
+            if doc is None or not doc.strip():
+                return _("No description available")
             lines = doc.strip().splitlines()
             fmt = "<span style='color: #2222FF'><b>%s</b></span>"
             lines[0] = fmt % lines[0]
             return "<br>".join(lines)
+        return self.error_msg
 
     def run(self, args=""):
         """Run test script"""
@@ -84,7 +101,7 @@ class TestModule(object):
         # (useful when the program is executed from Spyder, for example)
         os.environ["PYTHONPATH"] = os.pathsep.join(sys.path)
 
-        command = [sys.executable, '"' + self.filename + '"']
+        command = [sys.executable, '"' + self.path + '"']
         if args:
             command.append(args)
         subprocess.Popen(" ".join(command), shell=True)
@@ -95,20 +112,19 @@ class TestPropertiesWidget(QWidget):
 
     def __init__(self, parent):
         QWidget.__init__(self, parent)
-        info_icon = QLabel()
-        icon = get_std_icon("MessageBoxInformation").pixmap(24, 24)
-        info_icon.setPixmap(icon)
-        info_icon.setFixedWidth(32)
+        self.lbl_icon = QLabel()
+        self.lbl_icon.setFixedWidth(32)
         self.desc_label = QLabel()
+        self.desc_label.setTextInteractionFlags(Qt.TextSelectableByMouse)
         self.desc_label.setWordWrap(True)
         group_desc = QGroupBox(_("Description"), self)
         layout = QHBoxLayout()
-        for label in (info_icon, self.desc_label):
+        for label in (self.lbl_icon, self.desc_label):
             label.setAlignment(Qt.AlignTop)
             layout.addWidget(label)
         group_desc.setLayout(layout)
 
-        self.editor = PythonCodeEditor(self, columns=80, rows=30)
+        self.editor = PythonCodeEditor(self, columns=85, rows=30)
         self.editor.setReadOnly(True)
         self.desc_label.setFont(self.editor.font())
 
@@ -120,7 +136,9 @@ class TestPropertiesWidget(QWidget):
     def set_item(self, test):
         """Set current item"""
         self.desc_label.setText(test.get_description())
-        self.editor.set_text_from_file(test.filename)
+        self.editor.set_text_from_file(test.path)
+        txt = "Information" if test.is_valid() else "Critical"
+        self.lbl_icon.setPixmap(get_std_icon("MessageBox" + txt).pixmap(24, 24))
 
 
 class TestMainView(QSplitter):
@@ -128,36 +146,55 @@ class TestMainView(QSplitter):
 
     def __init__(self, package, parent=None):
         QSplitter.__init__(self, parent)
-        test_package_name = "%s.tests" % package.__name__
-        _temp = __import__(test_package_name)
-        test_package = sys.modules[test_package_name]
+        self.tests = get_tests(package)
 
-        tests = get_tests(test_package)
         listgroup = QFrame()
-        props = TestPropertiesWidget(self)
-        font = props.editor.font()
         self.addWidget(listgroup)
-        self.addWidget(props)
-
-        listw = QListWidget(self)
-        listw.addItems([osp.basename(test.filename) for test in tests])
-        for index in range(listw.count()):
-            listw.item(index).setSizeHint(QSize(1, 25))
-        listw.setFont(font)
-        listw.currentRowChanged.connect(lambda row: props.set_item(tests[row]))
-        listw.itemActivated.connect(lambda: tests[listw.currentRow()].run())
-        listw.setCurrentRow(0)
-        run_button = QPushButton(get_icon("apply.png"), _("Run this script"), self)
-        run_button.setFont(font)
-        run_button.clicked.connect(lambda: tests[listw.currentRow()].run())
+        self.props = TestPropertiesWidget(self)
+        font = self.props.editor.font()
+        self.addWidget(self.props)
 
         vlayout = QVBoxLayout()
-        vlayout.addWidget(listw)
-        vlayout.addWidget(run_button)
+        self.run_button = self.create_run_button(font)
+        self.listw = self.create_test_listwidget(font)
+        vlayout.addWidget(self.listw)
+        vlayout.addWidget(self.run_button)
         listgroup.setLayout(vlayout)
 
         self.setStretchFactor(1, 1)
-        props.set_item(tests[0])
+        self.props.set_item(self.tests[0])
+
+    def create_test_listwidget(self, font):
+        """Create and setup test list widget"""
+        listw = QListWidget(self)
+        listw.addItems([osp.basename(test.path) for test in self.tests])
+        for index in range(listw.count()):
+            item = listw.item(index)
+            item.setSizeHint(QSize(1, 25))
+            if not self.tests[index].is_valid():
+                item.setForeground(QColor("#FF3333"))
+        listw.setFont(font)
+        listw.currentRowChanged.connect(self.current_row_changed)
+        listw.itemActivated.connect(self.run_current_script)
+        listw.setCurrentRow(0)
+        return listw
+
+    def create_run_button(self, font):
+        """Create and setup run button"""
+        btn = QPushButton(get_icon("apply.png"), _("Run this script"), self)
+        btn.setFont(font)
+        btn.clicked.connect(self.run_current_script)
+        return btn
+
+    def current_row_changed(self, row):
+        """Current list widget row has changed"""
+        current_test = self.tests[row]
+        self.props.set_item(current_test)
+        self.run_button.setEnabled(current_test.is_valid())
+
+    def run_current_script(self):
+        """Run current script"""
+        self.tests[self.listw.currentRow()].run()
 
 
 class TestLauncherWindow(QMainWindow):
