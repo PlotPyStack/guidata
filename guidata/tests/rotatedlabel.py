@@ -11,8 +11,6 @@ RotatedLabel test
 RotatedLabel is derived from QLabel: it provides rotated text display.
 """
 
-from __future__ import unicode_literals
-
 SHOW = True  # Show test in GUI-based test launcher
 
 from qtpy.QtWidgets import QFrame, QGridLayout

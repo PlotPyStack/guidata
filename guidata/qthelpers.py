@@ -13,8 +13,6 @@ The ``guidata.qthelpers`` module provides helper functions for developing
 easily Qt-based graphical user interfaces.
 """
 
-from __future__ import print_function
-
 import sys
 import os
 import os.path as osp
@@ -34,7 +32,6 @@ from qtpy.QtWidgets import (
 )
 from qtpy.QtGui import QColor, QIcon, QKeySequence
 from qtpy.QtCore import Qt
-from qtpy.py3compat import is_text_string
 
 
 # Local imports:
@@ -82,9 +79,7 @@ def win32_fix_title_bar_background(widget):
 def text_to_qcolor(text):
     """Create a QColor from specified string"""
     color = QColor()
-    if not is_text_string(text):  # testing for QString (PyQt API#1)
-        text = str(text)
-    if text.startswith("#") and len(text) == 7:
+    if text is not None and text.startswith("#") and len(text) == 7:
         correct = "#0123456789abcdef"
         for char in text:
             if char.lower() not in correct:
@@ -155,7 +150,7 @@ def create_toolbutton(
     if text is not None:
         button.setText(text)
     if icon is not None:
-        if is_text_string(icon):
+        if isinstance(icon, str):
             icon = get_icon(icon)
         button.setIcon(icon)
     if text is not None or tip is not None:

@@ -12,7 +12,6 @@ From time to time, it may be useful to change the item order,
 for example when deriving a dataset from another.
 """
 
-from __future__ import print_function
 
 SHOW = True  # Show test in GUI-based test launcher
 

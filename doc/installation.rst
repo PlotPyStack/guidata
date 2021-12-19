@@ -6,16 +6,15 @@ Dependencies
 
 Requirements:
 
-    * Python >=2.6 or >=3.2
-    * `PyQt4`_ >=4.3 or `PyQt5`_ >=5.5 or `PySide2`_ >=5.11
+    * Python >=3.2
+    * `PyQt5`_ >=5.5 or `PySide2`_ >=5.11
     * `QtPy`_ >= 1.3
-    
+
 Optional Python modules:
 
     * `h5py`_ (HDF5 files I/O)
     * `cx_Freeze`_ or `py2exe`_ (application deployment on Windows platforms)
 
-.. _PyQt4: https://pypi.python.org/pypi/PyQt4
 .. _PyQt5: https://pypi.python.org/pypi/PyQt5
 .. _PySide2: https://pypi.org/project/PySide2
 .. _qtpy: https://pypi.org/project/QtPy/
@@ -33,7 +32,7 @@ Installation
 From the source package:
 
     `python setup.py install`
-        
+
 Help and support
 ----------------
 

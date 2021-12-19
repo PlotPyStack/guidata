@@ -17,14 +17,11 @@ ValueProp, ...).
 # pylint: disable-msg=W0622
 # pylint: disable-msg=W0212
 
-from __future__ import print_function, unicode_literals
-
 import sys
 import re
 import collections
 
 from guidata.utils import utf8_to_unicode, update_dataset
-from qtpy.py3compat import to_text_string, is_text_string, PY2
 
 
 DEBUG_DESERIALIZE = False
@@ -244,10 +241,6 @@ class DataItem(object):
             func = self.get_prop_value("display", instance, "func", lambda x: x)
             if isinstance(fmt, collections.Callable) and value is not None:
                 return fmt(func(value))
-            elif is_text_string(fmt):
-                # This is only necessary with Python 2: converting to unicode
-                fmt = to_text_string(fmt)
-
             if value is not None:
                 text = self.format_string(instance, value, fmt, func)
             else:
@@ -595,10 +588,7 @@ class DataSetMeta(type):
         return type.__new__(cls, name, bases, dct)
 
 
-if PY2:
-    Meta_Py3Compat = DataSetMeta(b"Meta_Py3Compat", (object,), {})
-else:
-    Meta_Py3Compat = DataSetMeta("Meta_Py3Compat", (object,), {})
+Meta_Py3Compat = DataSetMeta("Meta_Py3Compat", (object,), {})
 
 
 class DataSet(Meta_Py3Compat):

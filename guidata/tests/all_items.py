@@ -15,7 +15,6 @@ DataSet class definition: each parameter type has its own DataItem class
 (IntItem for integers, FloatItem for floats, StringItem for strings, etc.)
 """
 
-from __future__ import print_function
 
 SHOW = True  # Show test in GUI-based test launcher
 

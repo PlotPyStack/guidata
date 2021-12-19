@@ -3,9 +3,9 @@
 guidata
 =======
 
-Based on the Qt library (``PyQt4``, ``PyQt5`` and ``PySide2`` are currently supported),
-`guidata` is a Python library generating graphical user interfaces for easy dataset
-editing and display. It also provides helpers and application development tools for Qt.
+Based on the Qt library `guidata` is a Python library generating graphical
+user interfaces for easy dataset editing and display. It also provides helpers
+and application development tools for Qt.
 
 External resources:
     * Python Package Index: `PyPI`_
@@ -17,12 +17,13 @@ External resources:
 .. _GoogleGroup: http://groups.google.fr/group/guidata_guiqwt
 """
 
-__version__ = "1.9.0beta"
+__version__ = "2.0.0beta"
 
-#TODO: Re-include py3compat module from QtPy since they have dropped Py3 support
-#TODO: Fix Python 3 compatibility issues (winreg, builtins, ...)
-#TODO: Add Python module hash utilities (for dependencies checking)
-#TODO: Investigate the qthelpers test failure (see after if __name__=='__main__')
+# TODO: Fix Python 3 compatibility issues (winreg, builtins, ...)
+# TODO: Add Python module hash utilities (for dependencies checking)
+# TODO: Investigate the qthelpers test failure (see after if __name__=='__main__')
+# TODO: Add support for PyQt6
+# TODO: Add support for PySide6
 
 # Dear (Debian, RPM, ...) package makers, please feel free to customize the
 # following path to module's data (images) and translations:

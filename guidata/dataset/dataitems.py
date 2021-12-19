@@ -9,11 +9,9 @@
 dataset.dataitems
 =================
 
-The ``guidata.dataset.dataitems`` module contains implementation for 
+The ``guidata.dataset.dataitems`` module contains implementation for
 concrete DataItems.
 """
-
-from __future__ import division, unicode_literals
 
 import os
 import re
@@ -23,7 +21,6 @@ import collections
 from guidata.dataset.datatypes import DataItem, ItemProperty
 from guidata.utils import utf8_to_unicode, add_extension
 from guidata.config import _
-from qtpy.py3compat import to_text_string, is_text_string, TEXT_TYPES
 
 
 class NumericTypeItem(DataItem):
@@ -97,7 +94,6 @@ class NumericTypeItem(DataItem):
 
     def from_string(self, value):
         """Override DataItem method"""
-        value = to_text_string(value)  # necessary if value is a QString
         # String may contains numerical operands:
         if re.match(r"^([\d\(\)\+/\-\*.]|e)+$", value):
             try:
@@ -243,7 +239,7 @@ class StringItem(DataItem):
         * wordwrap [bool]: toggle word wrapping (optional)
     """
 
-    type = TEXT_TYPES
+    type = (str,)
 
     def __init__(self, label, default=None, notempty=None, wordwrap=False, help=""):
         DataItem.__init__(self, label, default=default, help=help)
@@ -259,8 +255,7 @@ class StringItem(DataItem):
 
     def from_string(self, value):
         """Override DataItem method"""
-        # QString -> str
-        return to_text_string(value)
+        return value
 
     def get_value_from_reader(self, reader):
         """Reads value from the reader object, inside the try...except
@@ -450,7 +445,7 @@ class FilesOpenItem(FileSaveItem):
         help="",
         check=True,
     ):
-        if is_text_string(default):
+        if isinstance(default, str):
             default = [default]
         FileSaveItem.__init__(
             self,
@@ -476,7 +471,6 @@ class FilesOpenItem(FileSaveItem):
 
     def from_string(self, value):
         """Override DataItem method"""
-        value = to_text_string(value)
         if value.endswith("']") or value.endswith('"]'):
             value = eval(value)
         else:
@@ -491,7 +485,7 @@ class FilesOpenItem(FileSaveItem):
     def get_value_from_reader(self, reader):
         """Reads value from the reader object, inside the try...except
         statement defined in the base item `deserialize` method"""
-        return [to_text_string(fname, "utf-8") for fname in reader.read_sequence()]
+        return [fname for fname in reader.read_sequence()]
 
 
 class DirectoryItem(StringItem):
@@ -572,7 +566,7 @@ class ChoiceItem(DataItem):
         # print "ShowChoiceWidget:", choices, value
         for choice in choices:
             if choice[0] == value:
-                return to_text_string(choice[1])
+                return str(choice[1])
         else:
             return DataItem.get_string_value(self, instance)
 
@@ -703,7 +697,7 @@ class FloatArrayItem(DataItem):
             text += " .. " + fmt % v.max()
             text += "]"
         text += " %s" % unit
-        return to_text_string(text)
+        return str(text)
 
     def serialize(self, instance, writer):
         """Serialize this item"""

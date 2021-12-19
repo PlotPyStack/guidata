@@ -16,8 +16,6 @@ package distribution on Microsoft Windows platforms with ``py2exe`` or on
 all platforms thanks to ``cx_Freeze``.
 """
 
-from __future__ import print_function
-
 import sys
 import os
 import os.path as osp
@@ -30,7 +28,6 @@ import warnings
 
 # Local imports
 from guidata.configtools import get_module_path
-from qtpy.py3compat import to_binary_string
 
 
 # ==============================================================================
@@ -479,7 +476,7 @@ class Distribution(object):
     def add_text_data_file(self, filename, contents):
         """Create temporary data file *filename* with *contents*
         and add it to *data_files*"""
-        open(filename, "wb").write(to_binary_string(contents))
+        open(filename, "wb").write(bytes(contents, "utf-8"))
         self.data_files += [("", (filename,))]
         _remove_later(filename)
 
@@ -488,19 +485,15 @@ class Distribution(object):
 
     # ------ Adding packages
     def add_pyqt(self):
-        """Include module PyQt4 or PyQt5 to the distribution"""
+        """Include module PyQt5 to the distribution"""
+        # TODO: Add PyQt6 support
         if self._pyqt_added:
             return
         self._pyqt_added = True
 
-        try:
-            import PyQt4 as PyQt
+        import PyQt5 as PyQt
 
-            qtver = 4
-        except ImportError:
-            import PyQt5 as PyQt
-
-            qtver = 5
+        qtver = 5
         self.includes += [
             "sip",
             "PyQt%d.Qt" % qtver,
@@ -632,16 +625,12 @@ class Distribution(object):
             self.data_files.append(("translations", (fr_trans,)))
 
     def add_qt_bindings(self):
-        """Include Qt bindings, i.e. PyQt4 or PySide"""
+        """Include Qt bindings, i.e. PyQt or PySide"""
         try:
             imp.find_module("PyQt5")
             self.add_modules("PyQt5")
         except ImportError:
-            try:
-                imp.find_module("PyQt4")
-                self.add_modules("PyQt4")
-            except ImportError:
-                self.add_modules("PySide")
+            self.add_modules("PySide")
 
     def add_matplotlib(self):
         """Include module Matplotlib to the distribution"""
@@ -680,7 +669,8 @@ class Distribution(object):
         """Include module *module_name*"""
         for module_name in module_names:
             print("Configuring module '%s'" % module_name)
-            if module_name in ("PyQt4", "PyQt5"):
+            # TODO: Add support for PyQt6
+            if module_name == "PyQt5":
                 self.add_pyqt()
             elif module_name == "PySide":
                 self.add_pyside()
@@ -1019,7 +1009,6 @@ class Distribution(object):
         sys.argv += ["build"]
         excv = "3" if sys.version[0] == "2" else "2"
         self.excludes += ["sympy.mpmath.libmp.exec_py%s" % excv]
-        self.excludes += ["PyQt4.uic.port_v%s" % excv]
         build_exe = dict(
             include_files=to_include_files(self.data_files),
             includes=self.includes,

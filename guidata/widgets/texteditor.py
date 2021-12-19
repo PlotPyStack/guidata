@@ -15,8 +15,6 @@ This package provides a text editor widget based on QtGui.QPlainTextEdit.
 """
 
 
-from __future__ import print_function
-
 from qtpy.QtWidgets import (
     QDialog,
     QHBoxLayout,

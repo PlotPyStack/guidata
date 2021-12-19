@@ -20,17 +20,6 @@ Dialog boxes used to edit data sets:
     DataSetShowLayout
 """
 
-from __future__ import print_function
-
-try:
-    # PyQt4 4.3.3 on Windows (static DLLs) with py2exe installed:
-    # -> pythoncom must be imported first, otherwise py2exe's boot_com_servers
-    #    will raise an exception ("Unable to load DLL [...]") when calling any
-    #    of the QFileDialog static methods (getOpenFileName, ...)
-    import pythoncom
-except ImportError:
-    pass
-
 from qtpy.QtWidgets import (
     QDialog,
     QMessageBox,
@@ -48,7 +37,6 @@ from qtpy.QtWidgets import (
 from qtpy.QtGui import QColor, QIcon, QPainter, QPicture, QBrush
 from qtpy.QtCore import Qt, QRect, QSize, Signal
 from qtpy.compat import getopenfilename, getopenfilenames, getsavefilename
-from qtpy.py3compat import to_text_string, is_text_string
 
 from guidata.configtools import get_icon
 from guidata.config import _
@@ -602,7 +590,7 @@ class DataSetEditGroupBox(DataSetShowGroupBox):
                 button_text = _("Apply")
             if button_icon is None:
                 button_icon = get_icon("apply.png")
-            elif is_text_string(button_icon):
+            elif isinstance(button_icon, str):
                 button_icon = get_icon(button_icon)
             self.apply_button = applyb = QPushButton(button_icon, button_text, self)
             applyb.clicked.connect(self.set)
@@ -636,5 +624,5 @@ class DataSetEditGroupBox(DataSetShowGroupBox):
         """Return data item title combined with QApplication title"""
         app_name = QApplication.applicationName()
         if not app_name:
-            app_name = to_text_string(self.title())
+            app_name = str(self.title())
         return "%s - %s" % (app_name, item.label())

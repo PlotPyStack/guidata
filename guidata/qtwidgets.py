@@ -9,12 +9,11 @@
 qtwidgets
 ---------
 
-The ``guidata.qtwidgets`` module provides ready-to-use or generic widgets 
+The ``guidata.qtwidgets`` module provides ready-to-use or generic widgets
 for developing easily Qt-based graphical user interfaces.
 """
 
 from math import cos, sin, pi
-from qtpy import PYQT5
 from qtpy.QtWidgets import QLabel, QWidget, QDockWidget
 from qtpy.QtGui import QPainter, QPen
 from qtpy.QtCore import QSize, Qt
@@ -136,8 +135,4 @@ class DockableWidgetMixin(object):
 
 class DockableWidget(QWidget, DockableWidgetMixin):
     def __init__(self, parent):
-        if PYQT5:
-            super(DockableWidget, self).__init__(parent, parent=parent)
-        else:
-            QWidget.__init__(self, parent)
-            DockableWidgetMixin.__init__(self, parent)
+        super(DockableWidget, self).__init__(parent, parent=parent)

@@ -5,8 +5,6 @@
 # Licensed under the terms of the CECILL License
 # (see guidata/__init__.py for details)
 
-from __future__ import print_function
-
 import sys
 import os
 import os.path as osp

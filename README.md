@@ -10,18 +10,18 @@ Simple example of ``guidata`` datasets embedded in an application window:
 
 <img src="https://raw.githubusercontent.com/PierreRaybaut/guidata/master/doc/images/screenshots/editgroupbox.png">
 
-See [documentation](http://pythonhosted.org/guidata/) for more details on 
+See [documentation](http://pythonhosted.org/guidata/) for more details on
 the library and [changelog](CHANGELOG.md) for recent history of changes.
 
-Copyright © 2009-2021 CEA, Pierre Raybaut, licensed under the terms of the 
+Copyright © 2009-2021 CEA, Pierre Raybaut, licensed under the terms of the
 CECILL License (see ``Licence_CeCILL_V2-en.txt``).
 
 
 ## Overview
 
-Based on the Qt library, ``guidata`` is a Python library generating graphical user 
-interfaces for easy dataset editing and display. It also provides helpers and 
-application development tools for Qt (PyQt4, PyQt5, PySide2).
+Based on the Qt library, ``guidata`` is a Python library generating graphical user
+interfaces for easy dataset editing and display. It also provides helpers and
+application development tools for Qt (PyQt5, PySide2, PyQt6, PySide6).
 
 Generate GUIs to edit and display all kind of objects:
 
@@ -42,10 +42,10 @@ Application development tools:
 
 ### Requirements
 
-- Python >=2.6 or Python >=3.2
-- [PyQt4](https://pypi.python.org/pypi/PyQt4) >=4.3 or [PyQt5](https://pypi.python.org/pypi/PyQt5) >=5.5 or [PySide2](https://pypi.python.org/pypi/PySide2) >=5.11
+- Python >= 3.6
+- [PyQt5](https://pypi.python.org/pypi/PyQt5) >=5.5 or [PySide2](https://pypi.python.org/pypi/PySide2) >=5.11
 - [QtPy](https://pypi.org/project/QtPy/) >= 1.3
-    
+
 ### Optional Python modules
 
 - [h5py](https://pypi.python.org/pypi/h5py) (HDF5 files I/O)
@@ -54,10 +54,10 @@ Application development tools:
 ### Other optional modules
 
 gettext (text translation support)
-        
+
 ### Recommended modules
 
-[guiqwt](https://pypi.python.org/pypi/guiqwt) >= 3.0 is a set of tools for curve and image plotting based on `guidata`.
+[guiqwt](https://pypi.python.org/pypi/guiqwt) >= 4.0 is a set of tools for curve and image plotting based on `guidata`.
 
 
 ## Installation

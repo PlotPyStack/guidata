@@ -25,8 +25,6 @@ This package provides a Collections (i.e. dictionary, list and tuple) editor wid
 # pylint: disable=R0201
 
 
-from __future__ import print_function
-
 import datetime
 import io
 import re
@@ -1232,7 +1230,7 @@ class BaseTableView(QTableView):
                 if "matplotlib" not in sys.modules:
                     import matplotlib
 
-                    matplotlib.use("Qt4Agg")
+                    matplotlib.use("Qt5Agg")
                 return True
             except:
                 QMessageBox.warning(

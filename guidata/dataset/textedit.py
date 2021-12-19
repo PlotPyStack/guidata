@@ -10,10 +10,6 @@ Text visitor for DataItem objects
 (for test purpose only)
 """
 
-from __future__ import print_function
-
-from qtpy.py3compat import input
-
 
 def prompt(item):
     """Get item value"""

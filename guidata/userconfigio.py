@@ -16,8 +16,6 @@ UserConfig reader/writer objects
 import collections
 import datetime
 
-from qtpy.py3compat import is_unicode, PY3
-
 
 class GroupContext(object):
     """Group context object"""
@@ -89,7 +87,7 @@ class WriterMixin(object):
             self.write_int(val)
         elif isinstance(val, float):
             self.write_float(val)
-        elif is_unicode(val):
+        elif isinstance(val, str):
             self.write_unicode(val)
         elif isinstance(val, str):
             self.write_any(val)
@@ -129,8 +127,7 @@ class UserConfigWriter(UserConfigIOHandler, WriterMixin):
     def write_unicode(self, val):
         self.write_any(val.encode("utf-8"))
 
-    if PY3:
-        write_unicode = write_str
+    write_unicode = write_str
 
     def write_none(self):
         self.write_any(None)
@@ -147,10 +144,9 @@ class UserConfigReader(UserConfigIOHandler):
 
     def read_unicode(self):
         val = self.read_any()
-        if is_unicode(val) or val is None:
+        if isinstance(val, str) or val is None:
             return val
         else:
             return self.read_str()
 
-    if PY3:
-        read_unicode = read_str
+    read_unicode = read_str

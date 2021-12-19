@@ -9,8 +9,6 @@
 Reader and Writer for the serialization of DataSets into HDF5 files
 """
 
-from __future__ import print_function
-
 import sys
 from uuid import uuid1
 
@@ -19,8 +17,6 @@ import numpy as np
 
 from guidata.utils import utf8_to_unicode
 from guidata.userconfigio import BaseIOHandler, WriterMixin
-
-from qtpy.py3compat import PY2, PY3, is_binary_string, to_binary_string, to_text_string
 
 
 class TypeConverter(object):
@@ -42,12 +38,7 @@ class TypeConverter(object):
         return self._from_type(value)
 
 
-if PY2:
-    unicode_hdf = TypeConverter(lambda x: x.encode("utf-8"), utf8_to_unicode)
-else:
-    unicode_hdf = TypeConverter(
-        lambda x: x.encode("utf-8"), lambda x: to_text_string(x, encoding="utf-8")
-    )
+unicode_hdf = TypeConverter(lambda x: x.encode("utf-8"), lambda x: str(x, "utf-8"))
 int_hdf = TypeConverter(int)
 
 
@@ -268,8 +259,7 @@ class HDF5Writer(HDF5Handler, WriterMixin):
         group = self.get_parent_group()
         group.attrs[self.option[-1]] = val.encode("utf-8")
 
-    if PY3:
-        write_unicode = write_str
+    write_unicode = write_str
 
     def write_array(self, val):
         group = self.get_parent_group()
@@ -290,7 +280,7 @@ class HDF5Writer(HDF5Handler, WriterMixin):
             else:
                 ids = []
                 for obj in seq:
-                    guid = to_binary_string(str(uuid1()))
+                    guid = bytes(str(uuid1()), "utf-8")
                     ids.append(guid)
                     with self.group(guid):
                         if obj is None:
@@ -334,7 +324,7 @@ class HDF5Reader(HDF5Handler):
     def read_any(self):
         group = self.get_parent_group()
         value = group.attrs[self.option[-1]]
-        if is_binary_string(value):
+        if isinstance(value, bytes):
             return value.decode("utf-8")
         else:
             return value

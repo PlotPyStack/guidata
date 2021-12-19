@@ -12,7 +12,6 @@ DataSet objects may be grouped into DataSetGroup, allowing them to be edited
 in a single dialog box (with one tab per DataSet object).
 """
 
-from __future__ import print_function
 
 SHOW = True  # Show test in GUI-based test launcher
 

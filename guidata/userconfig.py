@@ -32,23 +32,22 @@
 userconfig
 ----------
 
-The ``guidata.userconfig`` module provides user configuration file (.ini file) 
+The ``guidata.userconfig`` module provides user configuration file (.ini file)
 management features based on ``ConfigParser`` (standard Python library).
 
 It is the exact copy of the open-source package `userconfig` (MIT license).
+
+19/12/2021: Removed Python 2 compatibility
 """
 
-from __future__ import print_function
 
-__version__ = "1.0.7"
+__version__ = "1.1.0"
 
 import os
 import re
 import os.path as osp
 import sys
-
-from qtpy.py3compat import configparser as cp
-from qtpy.py3compat import is_text_string, is_unicode, PY2
+import configparser as cp
 
 
 def _check_values(sections):
@@ -87,14 +86,6 @@ def get_home_dir():
         return path
     else:
         raise RuntimeError("Please define environment variable $HOME")
-
-
-def encode_to_utf8(x):
-    """Encode unicode string in UTF-8 -- but only with Python 2"""
-    if PY2 and is_unicode(x):
-        return x.encode("utf-8")
-    else:
-        return x
 
 
 def get_config_dir():
@@ -207,12 +198,7 @@ class UserConfig(cp.ConfigParser):
         Load config from the associated .ini file
         """
         try:
-            if PY2:
-                # Python 2
-                self.read(self.filename())
-            else:
-                # Python 3
-                self.read(self.filename(), encoding="utf-8")
+            self.read(self.filename(), encoding="utf-8")
         except cp.MissingSectionHeaderError:
             print("Warning: File contains no section headers.")
 
@@ -234,14 +220,8 @@ class UserConfig(cp.ConfigParser):
         fname = self.filename()
         if osp.isfile(fname):
             os.remove(fname)
-        if PY2:
-            # Python 2
-            with open(fname, "w") as configfile:
-                self.write(configfile)
-        else:
-            # Python 3
-            with open(fname, "w", encoding="utf-8") as configfile:
-                self.write(configfile)
+        with open(fname, "w", encoding="utf-8") as configfile:
+            self.write(configfile)
 
     def filename(self):
         """
@@ -283,9 +263,9 @@ class UserConfig(cp.ConfigParser):
         """
         if section is None:
             section = self.default_section_name
-        elif not is_text_string(section):
+        elif not isinstance(section, str):
             raise RuntimeError("Argument 'section' must be a string")
-        if not is_text_string(option):
+        if not isinstance(option, str):
             raise RuntimeError("Argument 'option' must be a string")
         return section
 
@@ -341,10 +321,6 @@ class UserConfig(cp.ConfigParser):
                 value = eval(value)
             except:
                 pass
-        value = encode_to_utf8(value)
-
-        if PY2 and isinstance(value, str):
-            return value.decode("utf-8")
         return value
 
     def get_section(self, section):
@@ -359,11 +335,11 @@ class UserConfig(cp.ConfigParser):
         """
         if not self.has_section(section):
             self.add_section(section)
-        if not is_text_string(value):
+        if not isinstance(value, str):
             value = repr(value)
         if verbose:
             print("%s[ %s ] = %s" % (section, option, value))
-        cp.ConfigParser.set(self, section, option, encode_to_utf8(value))
+        cp.ConfigParser.set(self, section, option, value)
 
     def set_default(self, section, option, default_value):
         """
@@ -372,7 +348,7 @@ class UserConfig(cp.ConfigParser):
         """
         section = self.__check_section_option(section, option)
         options = self.defaults.setdefault(section, {})
-        options[option] = encode_to_utf8(default_value)
+        options[option] = default_value
 
     def set(self, section, option, value, verbose=False, save=True):
         """
@@ -390,7 +366,7 @@ class UserConfig(cp.ConfigParser):
             value = float(value)
         elif isinstance(default_value, int):
             value = int(value)
-        elif not is_text_string(default_value):
+        elif not isinstance(default_value, str):
             value = repr(value)
         self.__set(section, option, value, verbose)
         if save:

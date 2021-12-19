@@ -20,8 +20,6 @@ Licensed under the terms of the CECILL License
 (see guidata/__init__.py for details)
 """
 
-from __future__ import print_function
-
 import setuptools  # analysis:ignore
 from distutils.core import setup
 import sys
@@ -51,7 +49,7 @@ Simple example of ``guidata`` datasets embedded in an application window:
 
 See `documentation`_ for more details on the library and `changelog`_ for recent history of changes.
 
-Copyright © 2009-2021 CEA, Pierre Raybaut, licensed under the terms of the 
+Copyright © 2009-2021 CEA, Pierre Raybaut, licensed under the terms of the
 `CECILL License`_.
 
 .. _documentation: http://pythonhosted.org/guidata/
@@ -62,9 +60,9 @@ Copyright © 2009-2021 CEA, Pierre Raybaut, licensed under the terms of the
 Overview
 --------
 
-Based on the Qt library, ``guidata`` is a Python library generating graphical user 
-interfaces for easy dataset editing and display. It also provides helpers and 
-application development tools for Qt (PyQt4, PyQt5, PySide2).
+Based on the Qt library, ``guidata`` is a Python library generating graphical user
+interfaces for easy dataset editing and display. It also provides helpers and
+application development tools for Qt (PyQt5, PySide2, PyQt6, PySide6).
 
 Generate GUIs to edit and display all kind of objects:
 
@@ -84,9 +82,8 @@ Application development tools:
 Building, installation, ...
 ---------------------------
 
-The following package is **required**: `PyQt4`_ (or `PyQt5`_, or `PySide2`_).
+The following package is **required**: `PyQt5`_ (or `PySide2`_).
 
-.. _PyQt4: https://pypi.python.org/pypi/PyQt4
 .. _PyQt5: https://pypi.python.org/pypi/PyQt5
 .. _PySide2: https://pypi.python.org/pypi/PySide2
 .. _h5py: https://pypi.python.org/pypi/h5py
@@ -172,8 +169,6 @@ setup(
         "Operating System :: OS Independent",
         "Operating System :: POSIX",
         "Operating System :: Unix",
-        "Programming Language :: Python :: 2.6",
-        "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
     ],
 )

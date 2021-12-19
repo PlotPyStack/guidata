@@ -12,16 +12,12 @@ configtools
 The ``guidata.configtools`` module provides configuration related tools.
 """
 
-from __future__ import print_function
-
 import os
 import os.path as osp
 import sys
 import gettext
 
 from guidata.utils import get_module_path, decode_fs_string
-
-from qtpy.py3compat import is_unicode, to_text_string, PY3, is_text_string
 
 IMG_PATH = []
 
@@ -60,20 +56,18 @@ def get_translation(modname, dirname=None):
         lgettext = _trans.gettext
 
         def translate_gettext(x):
-            if not PY3 and is_unicode(x):
-                x = x.encode("utf-8")
             y = lgettext(x)
-            if is_text_string(y) and PY3:
+            if isinstance(y, str):
                 return y
             else:
-                return to_text_string(y, "utf-8")
+                return str(y, "utf-8")
 
         return translate_gettext
     except IOError as _e:
         # print "Not using translations (%s)" % _e
         def translate_dumb(x):
-            if not is_unicode(x):
-                return to_text_string(x, "utf-8")
+            if not isinstance(x, str):
+                return str(x, "utf-8")
             return x
 
         return translate_dumb
@@ -89,7 +83,7 @@ def get_module_locale_path(modname):
 
 def add_image_path(path, subfolders=True):
     """Append image path (opt. with its subfolders) to global list IMG_PATH"""
-    if not is_unicode(path):
+    if not isinstance(path, str):
         path = decode_fs_string(path)
     global IMG_PATH
     IMG_PATH.append(path)
@@ -189,7 +183,7 @@ def font_is_installed(font):
     """Check if font is installed"""
     from qtpy import QtGui as QG
 
-    return [fam for fam in QG.QFontDatabase().families() if to_text_string(fam) == font]
+    return [fam for fam in QG.QFontDatabase().families() if str(fam) == font]
 
 
 MONOSPACE = [

@@ -13,7 +13,6 @@ box widgets in the editing dialog box) and item groups may be enabled/disabled
 using one group parameter (a boolean item).
 """
 
-from __future__ import print_function
 
 SHOW = True  # Show test in GUI-based test launcher
 
