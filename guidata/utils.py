@@ -350,7 +350,7 @@ def run_shell_command(cmdstr, **subprocess_kwargs):
 
     If 'shell' is given in subprocess_kwargs it must be True,
     otherwise ProgramError will be raised.
-    .
+
     If 'executable' is not given in subprocess_kwargs, it will
     be set to the value of the SHELL environment variable.
 

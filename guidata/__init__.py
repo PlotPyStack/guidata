@@ -17,9 +17,8 @@ External resources:
 .. _GoogleGroup: http://groups.google.fr/group/guidata_guiqwt
 """
 
-__version__ = "2.0.0beta"
+__version__ = "2.0.0"
 
-# TODO: Fix Python 3 compatibility issues (winreg, builtins, ...)
 # TODO: Add Python module hash utilities (for dependencies checking)
 # TODO: Investigate the qthelpers test failure (see after if __name__=='__main__')
 # TODO: Add support for PyQt6
