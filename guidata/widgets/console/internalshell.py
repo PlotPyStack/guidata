@@ -493,9 +493,7 @@ class InternalShell(PythonShellWidget):
             else:
                 self.write(
                     _(
-                        'In order to use commands like "raw_input" '
-                        'or "input" run Spyder with the multithread '
-                        "option (--multithread) from a system terminal"
+                        'In order to use commands like "input" run console with the multithread option'
                     ),
                     error=True,
                 )

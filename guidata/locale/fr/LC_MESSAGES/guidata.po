@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2021-08-05 09:25+0200\n"
+"POT-Creation-Date: 2021-12-19 15:01+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,226 +16,218 @@ msgstr ""
 "Content-Transfer-Encoding: utf-8\n"
 "Generated-By: pygettext.py 1.5\n"
 
-#: guidata\dataset\dataitems.py:53
+#: guidata\dataset\dataitems.py:50
 msgid "float"
 msgstr "flottant"
 
-#: guidata\dataset\dataitems.py:53
+#: guidata\dataset\dataitems.py:50
 msgid "integer"
 msgstr "entier"
 
-#: guidata\dataset\dataitems.py:59
+#: guidata\dataset\dataitems.py:56
 msgid " and "
 msgstr " et "
 
-#: guidata\dataset\dataitems.py:59
+#: guidata\dataset\dataitems.py:56
 msgid " between "
 msgstr " compris entre "
 
-#: guidata\dataset\dataitems.py:61
+#: guidata\dataset\dataitems.py:58
 msgid " higher than "
 msgstr " supérieur à "
 
-#: guidata\dataset\dataitems.py:63
+#: guidata\dataset\dataitems.py:60
 msgid " lower than "
 msgstr " inférieur à "
 
-#: guidata\dataset\dataitems.py:65
+#: guidata\dataset\dataitems.py:62
 msgid "non zero"
 msgstr "non nul"
 
-#: guidata\dataset\dataitems.py:67
+#: guidata\dataset\dataitems.py:64
 msgid "unit:"
 msgstr "unité :"
 
-#: guidata\dataset\dataitems.py:211
+#: guidata\dataset\dataitems.py:207
 msgid "even"
 msgstr "pair"
 
-#: guidata\dataset\dataitems.py:213
+#: guidata\dataset\dataitems.py:209
 msgid "odd"
 msgstr "impair"
 
-#: guidata\dataset\dataitems.py:392
+#: guidata\dataset\dataitems.py:387
 msgid "all file types"
 msgstr "tout type de fichier"
 
-#: guidata\dataset\dataitems.py:394
+#: guidata\dataset\dataitems.py:389
 msgid "supported file types:"
 msgstr "types de fichiers pris en charge : "
 
-#: guidata\dataset\qtitemwidgets.py:272 guidata\dataset\qtitemwidgets.py:335
+#: guidata\dataset\qtitemwidgets.py:264 guidata\dataset\qtitemwidgets.py:328
 msgid "Value is forced to %d"
 msgstr "La valeur est imposée à %d"
 
-#: guidata\dataset\qtitemwidgets.py:644
+#: guidata\dataset\qtitemwidgets.py:645
 msgid "%s files"
 msgstr "Fichiers %s"
 
-#: guidata\dataset\qtitemwidgets.py:646
+#: guidata\dataset\qtitemwidgets.py:647
 msgid "All supported files"
 msgstr "Tous les fichiers pris en charge"
 
-#: guidata\dataset\qtitemwidgets.py:873
+#: guidata\dataset\qtitemwidgets.py:875
 msgid "Number of rows x Number of columns"
 msgstr "Nombre de lignes x Nombre de colonnes"
 
-#: guidata\dataset\qtitemwidgets.py:876
+#: guidata\dataset\qtitemwidgets.py:878
 msgid "Edit array contents"
 msgstr "Modifier le contenu du tableau"
 
-#: guidata\dataset\qtitemwidgets.py:882
+#: guidata\dataset\qtitemwidgets.py:884
 msgid "Smallest element in array"
 msgstr "Valeur minimale du tableau"
 
-#: guidata\dataset\qtitemwidgets.py:886
+#: guidata\dataset\qtitemwidgets.py:888
 msgid "Largest element in array"
 msgstr "Valeur maximale du tableau"
 
-#: guidata\dataset\qtwidgets.py:147 guidata\tests\translations.py:16
+#: guidata\dataset\qtwidgets.py:137 guidata\tests\translations.py:15
 msgid "Some required entries are incorrect"
 msgstr "Les champs surlignés n'ont pas été remplis correctement."
 
-#: guidata\dataset\qtwidgets.py:149
+#: guidata\dataset\qtwidgets.py:139
 msgid "Please check highlighted fields."
 msgstr "Veuillez vérifier votre saisie."
 
-#: guidata\dataset\qtwidgets.py:567
+#: guidata\dataset\qtwidgets.py:590
 msgid "Apply"
 msgstr "Appliquer"
 
-#: guidata\guitest.py:73
+#: guidata\guitest.py:91
 msgid "No description available"
 msgstr "Aucune description disponible"
 
-#: guidata\guitest.py:105
+#: guidata\guitest.py:120
 msgid "Description"
 msgstr "Description"
 
-#: guidata\guitest.py:114
-msgid "Source code"
-msgstr "Code source"
-
-#: guidata\guitest.py:119
+#: guidata\guitest.py:184
 msgid "Run this script"
 msgstr "Exécuter ce script"
 
-#: guidata\guitest.py:120
-msgid "Quit"
-msgstr "Quitter"
-
-#: guidata\guitest.py:140
+#: guidata\guitest.py:206
 msgid "Tests - %s module"
 msgstr "Tests - Module %s"
 
-#: guidata\widgets\arrayeditor.py:535 guidata\widgets\collectionseditor.py:842
-#: guidata\widgets\dataframeeditor.py:668
+#: guidata\widgets\arrayeditor.py:542 guidata\widgets\collectionseditor.py:847
+#: guidata\widgets\console\shell.py:163 guidata\widgets\dataframeeditor.py:671
 msgid "Copy"
 msgstr "Copier"
 
-#: guidata\widgets\arrayeditor.py:583 guidata\widgets\collectionseditor.py:527
-#: guidata\widgets\collectionseditor.py:1315
-#: guidata\widgets\collectionseditor.py:1328
+#: guidata\widgets\arrayeditor.py:590 guidata\widgets\collectionseditor.py:532
+#: guidata\widgets\collectionseditor.py:1320
+#: guidata\widgets\collectionseditor.py:1333
 msgid "Warning"
 msgstr "Avertissement"
 
-#: guidata\widgets\arrayeditor.py:584
+#: guidata\widgets\arrayeditor.py:591
 msgid "It was not possible to copy values for this array"
 msgstr "Impossible de copier les valeurs pour ce tableau"
 
-#: guidata\widgets\arrayeditor.py:626 guidata\widgets\arrayeditor.py:661
-#: guidata\widgets\dataframeeditor.py:780
-#: guidata\widgets\dataframeeditor.py:842
+#: guidata\widgets\arrayeditor.py:633 guidata\widgets\arrayeditor.py:668
+#: guidata\widgets\dataframeeditor.py:784
+#: guidata\widgets\dataframeeditor.py:846
 msgid "Format"
 msgstr "Format"
 
-#: guidata\widgets\arrayeditor.py:631 guidata\widgets\dataframeeditor.py:784
+#: guidata\widgets\arrayeditor.py:638 guidata\widgets\dataframeeditor.py:788
 msgid "Resize"
 msgstr "Ajuster"
 
-#: guidata\widgets\arrayeditor.py:634 guidata\widgets\dataframeeditor.py:788
+#: guidata\widgets\arrayeditor.py:641 guidata\widgets\dataframeeditor.py:792
 msgid "Background color"
 msgstr "Couleur de fond"
 
-#: guidata\widgets\arrayeditor.py:662 guidata\widgets\dataframeeditor.py:843
+#: guidata\widgets\arrayeditor.py:669 guidata\widgets\dataframeeditor.py:847
 msgid "Float formatting"
 msgstr "Format de flottant"
 
-#: guidata\widgets\arrayeditor.py:672
+#: guidata\widgets\arrayeditor.py:679
 msgid "Format (%s) is incorrect"
 msgstr "Le format (%s) est incorrect"
 
-#: guidata\widgets\arrayeditor.py:672 guidata\widgets\collectionseditor.py:543
-#: guidata\widgets\dataframeeditor.py:853
+#: guidata\widgets\arrayeditor.py:679 guidata\widgets\collectionseditor.py:548
 #: guidata\widgets\dataframeeditor.py:857
+#: guidata\widgets\dataframeeditor.py:861
 msgid "Error"
 msgstr "Erreur"
 
-#: guidata\widgets\arrayeditor.py:713
+#: guidata\widgets\arrayeditor.py:721
 msgid "Arrays with more than 3 dimensions are not supported"
 msgstr "Les tableaux ayant plus de trois dimensions ne sont pas pris en charge"
 
-#: guidata\widgets\arrayeditor.py:717
+#: guidata\widgets\arrayeditor.py:725
 msgid "The 'xlabels' argument length do no match array column number"
 msgstr ""
 "La taille de l'argument 'xlabels' ne correspond pas au nombre de colonnes du "
 "tableau"
 
-#: guidata\widgets\arrayeditor.py:722
+#: guidata\widgets\arrayeditor.py:730
 msgid "The 'ylabels' argument length do no match array row number"
 msgstr ""
 "La taille de l'argument 'ylabels' ne correspond pas au nombre de lignes du "
 "tableau"
 
-#: guidata\widgets\arrayeditor.py:732
+#: guidata\widgets\arrayeditor.py:740
 msgid "%s arrays"
 msgstr "les tableaux %s"
 
-#: guidata\widgets\arrayeditor.py:733
+#: guidata\widgets\arrayeditor.py:741
 msgid "%s are currently not supported"
 msgstr "Attention: %s ne sont pas pris en charge"
 
-#: guidata\widgets\arrayeditor.py:740
+#: guidata\widgets\arrayeditor.py:748
 msgid "NumPy array"
 msgstr "Tableau NumPy"
 
-#: guidata\widgets\arrayeditor.py:742 guidata\widgets\arrayeditor.py:934
+#: guidata\widgets\arrayeditor.py:750 guidata\widgets\arrayeditor.py:942
 msgid "Array editor"
 msgstr "Éditeur de tableaux"
 
-#: guidata\widgets\arrayeditor.py:744
+#: guidata\widgets\arrayeditor.py:752
 msgid "read only"
 msgstr "lecture seule"
 
-#: guidata\widgets\arrayeditor.py:781
+#: guidata\widgets\arrayeditor.py:789
 msgid "Record array fields:"
 msgstr "Champs :"
 
-#: guidata\widgets\arrayeditor.py:793
+#: guidata\widgets\arrayeditor.py:801
 msgid "Data"
 msgstr "Données"
 
-#: guidata\widgets\arrayeditor.py:793
+#: guidata\widgets\arrayeditor.py:801
 msgid "Mask"
 msgstr "Masque"
 
-#: guidata\widgets\arrayeditor.py:793
+#: guidata\widgets\arrayeditor.py:801
 msgid "Masked data"
 msgstr "Données masquées"
 
-#: guidata\widgets\arrayeditor.py:804
+#: guidata\widgets\arrayeditor.py:812
 msgid "Axis:"
 msgstr "Axe :"
 
-#: guidata\widgets\arrayeditor.py:809
+#: guidata\widgets\arrayeditor.py:817
 msgid "Index:"
 msgstr "Indice :"
 
-#: guidata\widgets\arrayeditor.py:822
+#: guidata\widgets\arrayeditor.py:830
 msgid "<u>Warning</u>: changes are applied separately"
 msgstr "<u>Attention</u>: les changements sont appliqués séparément"
 
-#: guidata\widgets\arrayeditor.py:824
+#: guidata\widgets\arrayeditor.py:832
 msgid ""
 "For performance reasons, changes applied to masked array won't be reflected "
 "in array's data (and vice-versa)."
@@ -243,61 +235,61 @@ msgstr ""
 "Pour des raisons de performance, les changements appliqués au masque ne sont "
 "pas reflétés dans le tableau associé (et vice-versa)."
 
-#: guidata\widgets\arrayeditor.py:835 guidata\widgets\collectionseditor.py:1584
-#: guidata\widgets\dataframeeditor.py:804 guidata\widgets\texteditor.py:71
+#: guidata\widgets\arrayeditor.py:843 guidata\widgets\collectionseditor.py:1591
+#: guidata\widgets\dataframeeditor.py:808 guidata\widgets\texteditor.py:79
 msgid "Save and Close"
 msgstr "Enregistrer et Fermer"
 
-#: guidata\widgets\arrayeditor.py:840 guidata\widgets\collectionseditor.py:1589
-#: guidata\widgets\dataframeeditor.py:809 guidata\widgets\texteditor.py:76
+#: guidata\widgets\arrayeditor.py:848 guidata\widgets\collectionseditor.py:1596
+#: guidata\widgets\dataframeeditor.py:813 guidata\widgets\texteditor.py:84
 msgid "Close"
 msgstr "Fermer"
 
-#: guidata\widgets\collectionseditor.py:205
+#: guidata\widgets\collectionseditor.py:210
 msgid "Index"
 msgstr "Indice"
 
-#: guidata\widgets\collectionseditor.py:207
+#: guidata\widgets\collectionseditor.py:212
 msgid "Name"
 msgstr "Nom"
 
-#: guidata\widgets\collectionseditor.py:210
+#: guidata\widgets\collectionseditor.py:215
 msgid "Tuple"
 msgstr "Tuple"
 
-#: guidata\widgets\collectionseditor.py:213
+#: guidata\widgets\collectionseditor.py:218
 msgid "List"
 msgstr "Liste"
 
-#: guidata\widgets\collectionseditor.py:216
+#: guidata\widgets\collectionseditor.py:221
 msgid "Dictionary"
 msgstr "Dictionnaire"
 
-#: guidata\widgets\collectionseditor.py:218
+#: guidata\widgets\collectionseditor.py:223
 msgid "Key"
 msgstr "Clé"
 
-#: guidata\widgets\collectionseditor.py:223
+#: guidata\widgets\collectionseditor.py:228
 msgid "Attribute"
 msgstr "Attribut"
 
-#: guidata\widgets\collectionseditor.py:226
+#: guidata\widgets\collectionseditor.py:231
 msgid "elements"
 msgstr "éléments"
 
-#: guidata\widgets\collectionseditor.py:418
+#: guidata\widgets\collectionseditor.py:423
 msgid "Size"
 msgstr "Taille"
 
-#: guidata\widgets\collectionseditor.py:418
+#: guidata\widgets\collectionseditor.py:423
 msgid "Type"
 msgstr "Type"
 
-#: guidata\widgets\collectionseditor.py:418
+#: guidata\widgets\collectionseditor.py:423
 msgid "Value"
 msgstr "Valeur"
 
-#: guidata\widgets\collectionseditor.py:528
+#: guidata\widgets\collectionseditor.py:533
 msgid ""
 "Opening this variable can be slow\n"
 "\n"
@@ -306,190 +298,285 @@ msgstr ""
 "Editer cette variable sera vraisemblablement très long.\n"
 "Souhaitez-vous néanmoins continuer ?"
 
-#: guidata\widgets\collectionseditor.py:544
+#: guidata\widgets\collectionseditor.py:549
 msgid ""
 "Spyder was unable to retrieve the value of this variable from the console."
 "<br><br>The error mesage was:<br><i>%s</i>"
 msgstr ""
 
-#: guidata\widgets\collectionseditor.py:764
+#: guidata\widgets\collectionseditor.py:769
 msgid "Edit item"
 msgstr "Modifier"
 
-#: guidata\widgets\collectionseditor.py:765
+#: guidata\widgets\collectionseditor.py:770
 msgid "<b>Unable to assign data to item.</b><br><br>Error message:<br>%s"
 msgstr ""
 "<b>Impossible d'accéder aux données</b><br><br>Message d'erreur :<br>%s"
 
-#: guidata\widgets\collectionseditor.py:836
+#: guidata\widgets\collectionseditor.py:841
 msgid "Resize rows to contents"
 msgstr "Ajuster les colonnes au contenu"
 
-#: guidata\widgets\collectionseditor.py:839
+#: guidata\widgets\collectionseditor.py:844
+#: guidata\widgets\console\shell.py:170
 msgid "Paste"
 msgstr "Coller"
 
-#: guidata\widgets\collectionseditor.py:845
+#: guidata\widgets\collectionseditor.py:850
 msgid "Edit"
 msgstr "Modifier"
 
-#: guidata\widgets\collectionseditor.py:849
-#: guidata\widgets\collectionseditor.py:1247
-#: guidata\widgets\collectionseditor.py:1266
+#: guidata\widgets\collectionseditor.py:854
+#: guidata\widgets\collectionseditor.py:1252
+#: guidata\widgets\collectionseditor.py:1271
 msgid "Plot"
 msgstr "Tracer"
 
-#: guidata\widgets\collectionseditor.py:856
+#: guidata\widgets\collectionseditor.py:861
 msgid "Histogram"
 msgstr "Histogramme"
 
-#: guidata\widgets\collectionseditor.py:863
+#: guidata\widgets\collectionseditor.py:868
 msgid "Show image"
 msgstr "Afficher l'image"
 
-#: guidata\widgets\collectionseditor.py:870
-#: guidata\widgets\collectionseditor.py:1274
+#: guidata\widgets\collectionseditor.py:875
+#: guidata\widgets\collectionseditor.py:1279
 msgid "Save array"
 msgstr "Enregistrer le tableau"
 
-#: guidata\widgets\collectionseditor.py:876
-#: guidata\widgets\collectionseditor.py:1204
-#: guidata\widgets\collectionseditor.py:1213
+#: guidata\widgets\collectionseditor.py:881
+#: guidata\widgets\collectionseditor.py:1209
+#: guidata\widgets\collectionseditor.py:1218
 msgid "Insert"
 msgstr "Insérer"
 
-#: guidata\widgets\collectionseditor.py:880
-#: guidata\widgets\collectionseditor.py:1141
+#: guidata\widgets\collectionseditor.py:885
+#: guidata\widgets\collectionseditor.py:1146
 msgid "Remove"
 msgstr "Supprimer"
 
-#: guidata\widgets\collectionseditor.py:885
+#: guidata\widgets\collectionseditor.py:890
 msgid "Show arrays min/max"
 msgstr "Afficher les min/max des tableaux"
 
-#: guidata\widgets\collectionseditor.py:890
-#: guidata\widgets\collectionseditor.py:1160
+#: guidata\widgets\collectionseditor.py:895
+#: guidata\widgets\collectionseditor.py:1165
 msgid "Rename"
 msgstr "Renommer"
 
-#: guidata\widgets\collectionseditor.py:894
-#: guidata\widgets\collectionseditor.py:1163
+#: guidata\widgets\collectionseditor.py:899
+#: guidata\widgets\collectionseditor.py:1168
 msgid "Duplicate"
 msgstr "Dupliquer"
 
-#: guidata\widgets\collectionseditor.py:1137
+#: guidata\widgets\collectionseditor.py:1142
 msgid "Do you want to remove the selected item?"
 msgstr "Souhaitez-vous supprimer l'élément sélectionné ?"
 
-#: guidata\widgets\collectionseditor.py:1138
+#: guidata\widgets\collectionseditor.py:1143
 msgid "Do you want to remove all selected items?"
 msgstr "Souhaitez-vous supprimer les éléments sélectionnés ?"
 
-#: guidata\widgets\collectionseditor.py:1161
+#: guidata\widgets\collectionseditor.py:1166
 msgid "New variable name:"
 msgstr "Nouveau nom de variable :"
 
-#: guidata\widgets\collectionseditor.py:1164
+#: guidata\widgets\collectionseditor.py:1169
 msgid "Variable name:"
 msgstr "Nom de variable :"
 
-#: guidata\widgets\collectionseditor.py:1204
+#: guidata\widgets\collectionseditor.py:1209
 msgid "Key:"
 msgstr "Clé :"
 
-#: guidata\widgets\collectionseditor.py:1213
+#: guidata\widgets\collectionseditor.py:1218
 msgid "Value:"
 msgstr "Valeur :"
 
-#: guidata\widgets\collectionseditor.py:1233
+#: guidata\widgets\collectionseditor.py:1238
 msgid "Import error"
 msgstr "Erreur d'import"
 
-#: guidata\widgets\collectionseditor.py:1234
+#: guidata\widgets\collectionseditor.py:1239
 msgid "Please install <b>matplotlib</b> or <b>guiqwt</b>."
 msgstr "Merci d'installer <b>guiqwt</b> ou <b>matplotlib</b>."
 
-#: guidata\widgets\collectionseditor.py:1248
+#: guidata\widgets\collectionseditor.py:1253
 msgid "<b>Unable to plot data.</b><br><br>Error message:<br>%s"
 msgstr ""
 "<b>Impossible d'afficher les données</b><br><br>Message d'erreur :<br>%s"
 
-#: guidata\widgets\collectionseditor.py:1267
+#: guidata\widgets\collectionseditor.py:1272
 msgid "<b>Unable to show image.</b><br><br>Error message:<br>%s"
 msgstr "<b>Impossible d'afficher l'image</b><br><br>Message d'erreur :<br>%s"
 
-#: guidata\widgets\collectionseditor.py:1279
+#: guidata\widgets\collectionseditor.py:1284
 msgid "NumPy arrays"
 msgstr "Tableaux NumPy"
 
-#: guidata\widgets\collectionseditor.py:1293
+#: guidata\widgets\collectionseditor.py:1298
 msgid "<b>Unable to save array</b><br><br>Error message:<br>%s"
 msgstr ""
 "<b>Impossible d'enregistrer le tableau</b><br><br>Message d'erreur :<br>%s"
 
-#: guidata\widgets\collectionseditor.py:1316
+#: guidata\widgets\collectionseditor.py:1321
 msgid "It was not possible to copy this array"
 msgstr "Impossible de copier ce tableau"
 
-#: guidata\widgets\collectionseditor.py:1329
+#: guidata\widgets\collectionseditor.py:1334
 msgid "It was not possible to copy this dataframe"
 msgstr "Impossible de copier ce DataFrame"
 
-#: guidata\widgets\collectionseditor.py:1351
+#: guidata\widgets\collectionseditor.py:1356
 msgid "Clipboard contents"
 msgstr "Contenu du presse-papiers"
 
-#: guidata\widgets\collectionseditor.py:1366
+#: guidata\widgets\collectionseditor.py:1371
 msgid "Import from clipboard"
 msgstr "Importer depuis le presse-papiers"
 
-#: guidata\widgets\collectionseditor.py:1369
+#: guidata\widgets\collectionseditor.py:1374
 msgid "Empty clipboard"
 msgstr "Presse-papiers vide"
 
-#: guidata\widgets\collectionseditor.py:1369
+#: guidata\widgets\collectionseditor.py:1374
 msgid "Nothing to be imported from clipboard."
 msgstr "Aucune donnée ne peut être importée depuis le presse-papiers."
 
-#: guidata\widgets\dataframeeditor.py:331
+#: guidata\widgets\console\internalshell.py:345
+msgid "Help..."
+msgstr "Aide..."
+
+#: guidata\widgets\console\internalshell.py:356
+msgid "Help"
+msgstr "Aide"
+
+#: guidata\widgets\console\internalshell.py:367
+msgid "Shell special commands:"
+msgstr "Commandes spéciales :"
+
+#: guidata\widgets\console\internalshell.py:368
+msgid "Internal editor:"
+msgstr "Éditeur interne :"
+
+#: guidata\widgets\console\internalshell.py:369
+msgid "External editor:"
+msgstr "Éditeur externe :"
+
+#: guidata\widgets\console\internalshell.py:370
+msgid "Run script:"
+msgstr "Exécuter le script :"
+
+#: guidata\widgets\console\internalshell.py:371
+msgid "Remove references:"
+msgstr "Supprimer les références :"
+
+#: guidata\widgets\console\internalshell.py:372
+msgid "System commands:"
+msgstr "Commandes système :"
+
+#: guidata\widgets\console\internalshell.py:373
+msgid "Python help:"
+msgstr "Aide Python :"
+
+#: guidata\widgets\console\internalshell.py:374
+msgid "GUI-based editor:"
+msgstr "Éditeur graphique"
+
+#: guidata\widgets\console\internalshell.py:495
+msgid ""
+"In order to use commands like \"input\" run console with the multithread "
+"option"
+msgstr "Pour utiliser des commandes du type \"input\" dans la console, utiliser l'option multithread"
+
+#: guidata\widgets\console\mixins.py:726
+msgid "Arguments"
+msgstr "Arguments"
+
+#: guidata\widgets\console\shell.py:156
+msgid "Cut"
+msgstr "Couper"
+
+#: guidata\widgets\console\shell.py:177
+msgid "Save history log..."
+msgstr "Enregistrer l'historique..."
+
+#: guidata\widgets\console\shell.py:179
+msgid "Save current history log (i.e. all inputs and outputs) in a text file"
+msgstr "Enregistrer l'historique actuel (c.-à-d. toutes les entrées-sorties) dans un fichier texte"
+
+#: guidata\widgets\console\shell.py:187
+msgid "Delete"
+msgstr "Supprimer"
+
+#: guidata\widgets\console\shell.py:194
+msgid "Select All"
+msgstr "Sélectionner tout"
+
+#: guidata\widgets\console\shell.py:319
+msgid "Save history log"
+msgstr "Enregistrer l'historique"
+
+#: guidata\widgets\console\shell.py:322
+msgid "History logs"
+msgstr "Historiques"
+
+#: guidata\widgets\console\shell.py:726
+msgid "Copy without prompts"
+msgstr "Copier sans les entêtes"
+
+#: guidata\widgets\console\shell.py:732 guidata\widgets\console\shell.py:734
+msgid "Clear line"
+msgstr "Supprimer la ligne"
+
+#: guidata\widgets\console\shell.py:739
+msgid "Clear shell"
+msgstr "Effacer la console"
+
+#: guidata\widgets\console\shell.py:741
+msgid "Clear shell contents ('cls' command)"
+msgstr "Effacer le contenu de la console (commande 'cls')"
+
+#: guidata\widgets\dataframeeditor.py:334
 msgid ""
 "It is not possible to display this value because\n"
 "an error ocurred while trying to do it"
 msgstr "Impossible d'afficher cette valeur en raison d'une erreur inattendue"
 
-#: guidata\widgets\dataframeeditor.py:675
+#: guidata\widgets\dataframeeditor.py:678
 msgid "To bool"
 msgstr "Vers booléen"
 
-#: guidata\widgets\dataframeeditor.py:676
+#: guidata\widgets\dataframeeditor.py:679
 msgid "To complex"
 msgstr "Vers complexe"
 
-#: guidata\widgets\dataframeeditor.py:677
+#: guidata\widgets\dataframeeditor.py:680
 msgid "To int"
 msgstr "Vers entier"
 
-#: guidata\widgets\dataframeeditor.py:678
+#: guidata\widgets\dataframeeditor.py:681
 msgid "To float"
 msgstr "Vers flottant"
 
-#: guidata\widgets\dataframeeditor.py:679
+#: guidata\widgets\dataframeeditor.py:682
 msgid "To str"
 msgstr "Vers chaîne"
 
-#: guidata\widgets\dataframeeditor.py:759
+#: guidata\widgets\dataframeeditor.py:763
 msgid "%s editor"
 msgstr "Éditeur de %s"
 
-#: guidata\widgets\dataframeeditor.py:794
+#: guidata\widgets\dataframeeditor.py:798
 msgid "Column min/max"
 msgstr "Min/max de colonne"
 
-#: guidata\widgets\dataframeeditor.py:852
+#: guidata\widgets\dataframeeditor.py:856
 msgid "Format ({}) is incorrect"
 msgstr "Le format ({}) est incorrect"
 
-#: guidata\widgets\dataframeeditor.py:856
+#: guidata\widgets\dataframeeditor.py:860
 msgid "Format ({}) should start with '%'"
 msgstr "Le format ({}) ne doit pas commencer par '%'"
 
@@ -505,7 +592,7 @@ msgstr "données"
 msgid "code"
 msgstr "code"
 
-#: guidata\widgets\importwizard.py:175 guidata\widgets\importwizard.py:606
+#: guidata\widgets\importwizard.py:175 guidata\widgets\importwizard.py:608
 msgid "text"
 msgstr "texte"
 
@@ -561,47 +648,47 @@ msgstr "liste"
 msgid "DataFrame"
 msgstr ""
 
-#: guidata\widgets\importwizard.py:589 guidata\widgets\importwizard.py:676
+#: guidata\widgets\importwizard.py:591 guidata\widgets\importwizard.py:678
 msgid "Import wizard"
 msgstr "Assistant d'importation"
 
-#: guidata\widgets\importwizard.py:594
+#: guidata\widgets\importwizard.py:596
 msgid "Raw text"
 msgstr "Text brut"
 
-#: guidata\widgets\importwizard.py:597
+#: guidata\widgets\importwizard.py:599
 msgid "variable_name"
 msgstr "nom_de_variable"
 
-#: guidata\widgets\importwizard.py:608
+#: guidata\widgets\importwizard.py:610
 msgid "table"
 msgstr "tableau"
 
-#: guidata\widgets\importwizard.py:609
+#: guidata\widgets\importwizard.py:611
 msgid "Preview"
 msgstr "Aperçu"
 
-#: guidata\widgets\importwizard.py:613
+#: guidata\widgets\importwizard.py:615
 msgid "Variable Name"
 msgstr "Nom de variable"
 
-#: guidata\widgets\importwizard.py:621
+#: guidata\widgets\importwizard.py:623
 msgid "Cancel"
 msgstr "Annuler"
 
-#: guidata\widgets\importwizard.py:626
+#: guidata\widgets\importwizard.py:628
 msgid "Previous"
 msgstr "Précédent"
 
-#: guidata\widgets\importwizard.py:630
+#: guidata\widgets\importwizard.py:632
 msgid "Next"
 msgstr "Suivant"
 
-#: guidata\widgets\importwizard.py:635
+#: guidata\widgets\importwizard.py:637
 msgid "Done"
 msgstr "Terminer"
 
-#: guidata\widgets\importwizard.py:677
+#: guidata\widgets\importwizard.py:679
 msgid ""
 "<b>Unable to proceed to next step</b><br><br>Please check your entries."
 "<br><br>Error message:<br>%s"
@@ -609,73 +696,79 @@ msgstr ""
 "<b>Impossible de passer à l'étape suivante</b><br><br>Merci de vérifier "
 "votre saisie.<br><br>Message d'erreur :<br>%s"
 
-#: guidata\widgets\syntaxhighlighters.py:37
+#: guidata\widgets\syntaxhighlighters.py:35
 msgid "Background:"
 msgstr "Fond :"
 
-#: guidata\widgets\syntaxhighlighters.py:38
+#: guidata\widgets\syntaxhighlighters.py:36
 msgid "Current line:"
 msgstr "Ligne courante :"
 
-#: guidata\widgets\syntaxhighlighters.py:39
+#: guidata\widgets\syntaxhighlighters.py:37
 msgid "Current cell:"
 msgstr "Cellule courante :"
 
-#: guidata\widgets\syntaxhighlighters.py:40
+#: guidata\widgets\syntaxhighlighters.py:38
 msgid "Occurrence:"
 msgstr "Occurence :"
 
-#: guidata\widgets\syntaxhighlighters.py:41
+#: guidata\widgets\syntaxhighlighters.py:39
 msgid "Link:"
 msgstr "Lien :"
 
-#: guidata\widgets\syntaxhighlighters.py:42
+#: guidata\widgets\syntaxhighlighters.py:40
 msgid "Side areas:"
 msgstr "Zone latérale :"
 
-#: guidata\widgets\syntaxhighlighters.py:43
+#: guidata\widgets\syntaxhighlighters.py:41
 msgid "Matched <br>parens:"
 msgstr ""
 
-#: guidata\widgets\syntaxhighlighters.py:44
+#: guidata\widgets\syntaxhighlighters.py:42
 msgid "Unmatched <br>parens:"
 msgstr ""
 
-#: guidata\widgets\syntaxhighlighters.py:45
+#: guidata\widgets\syntaxhighlighters.py:43
 msgid "Normal text:"
 msgstr "Text normal :"
 
-#: guidata\widgets\syntaxhighlighters.py:46
+#: guidata\widgets\syntaxhighlighters.py:44
 msgid "Keyword:"
 msgstr "Mot-clé :"
 
-#: guidata\widgets\syntaxhighlighters.py:47
+#: guidata\widgets\syntaxhighlighters.py:45
 msgid "Builtin:"
 msgstr "Builtin :"
 
-#: guidata\widgets\syntaxhighlighters.py:48
+#: guidata\widgets\syntaxhighlighters.py:46
 msgid "Definition:"
 msgstr "Définition :"
 
-#: guidata\widgets\syntaxhighlighters.py:49
+#: guidata\widgets\syntaxhighlighters.py:47
 msgid "Comment:"
 msgstr "Commentaire :"
 
-#: guidata\widgets\syntaxhighlighters.py:50
+#: guidata\widgets\syntaxhighlighters.py:48
 msgid "String:"
 msgstr "Chaîne :"
 
-#: guidata\widgets\syntaxhighlighters.py:51
+#: guidata\widgets\syntaxhighlighters.py:49
 msgid "Number:"
 msgstr "Nombre :"
 
-#: guidata\widgets\syntaxhighlighters.py:52
+#: guidata\widgets\syntaxhighlighters.py:50
 msgid "Instance:"
 msgstr "Instance :"
 
-#: guidata\widgets\texteditor.py:89
+#: guidata\widgets\texteditor.py:97
 msgid "Text editor"
 msgstr "Éditeur de texte"
+
+#~ msgid "Source code"
+#~ msgstr "Code source"
+
+#~ msgid "Quit"
+#~ msgstr "Quitter"
 
 #~ msgid "Run all tests"
 #~ msgstr "Exécuter tous les tests"
