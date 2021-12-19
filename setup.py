@@ -152,7 +152,7 @@ setup(
     install_requires=["QtPy>=1.3"],
     entry_points={
         "gui_scripts": [
-            "guidata-tests-py%d = guidata.tests:run" % sys.version_info.major,
+            "guidata-tests = guidata.tests:run",
         ]
     },
     extras_require={

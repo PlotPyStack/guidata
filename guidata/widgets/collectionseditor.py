@@ -1222,7 +1222,7 @@ class BaseTableView(QTableView):
 
     def __prepare_plot(self):
         try:
-            import plotpy.gui.widgets.pyplot  # analysis:ignore
+            import guiqwt.pyplot  # analysis:ignore
 
             return True
         except:
@@ -1460,14 +1460,14 @@ class CollectionsEditorTableView(BaseTableView):
     def oedit(self, key):
         """Edit item"""
         data = self.model.get_data()
-        from plotpy.gui.widgets.variableexplorer.objecteditor import oedit
+        from guidata.widgets.objecteditor import oedit
 
         oedit(data[key])
 
     def plot(self, key, funcname):
         """Plot item"""
         data = self.model.get_data()
-        import plotpy.gui.widgets.pyplot as plt
+        import guiqwt.pyplot as plt
 
         plt.figure()
         getattr(plt, funcname)(data[key])
@@ -1476,7 +1476,7 @@ class CollectionsEditorTableView(BaseTableView):
     def imshow(self, key):
         """Show item's image"""
         data = self.model.get_data()
-        import plotpy.gui.widgets.pyplot as plt
+        import guiqwt.pyplot as plt
 
         plt.figure()
         plt.imshow(data[key])
