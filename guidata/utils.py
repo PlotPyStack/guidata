@@ -23,6 +23,9 @@ import os.path as osp
 import locale  # Warning: 2to3 false alarm ('import' fixer)
 import collections
 
+if sys.version_info >= (3, 10):
+    collections.Callable = collections.abc.Callable
+    
 # Local imports
 from guidata.userconfig import get_home_dir
 
