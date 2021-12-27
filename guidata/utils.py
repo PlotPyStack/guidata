@@ -21,7 +21,7 @@ import subprocess
 import os
 import os.path as osp
 import locale  # Warning: 2to3 false alarm ('import' fixer)
-import collections
+import collections.abc
 
 # Local imports
 from guidata.userconfig import get_home_dir
@@ -185,7 +185,7 @@ def assert_interface_supported(klass, iface):
     for name, func in list(iface.__dict__.items()):
         if name == "__inherits__":
             continue
-        if isinstance(func, collections.Callable):
+        if isinstance(func, collections.abc.Callable):
             assert hasattr(klass, name), "Attribute %s missing from %r" % (name, klass)
             imp_func = getattr(klass, name)
             imp_code = imp_func.__code__
@@ -270,11 +270,11 @@ class Timer(object):
     def tic(self, cat):
         """Starting timer"""
         print(">", cat)
-        self.t0_dict[cat] = time.clock()
+        self.t0_dict[cat] = time.perf_counter()
 
     def toc(self, cat, msg="delta:"):
         """Stopping timer"""
-        print("<", cat, ":", msg, time.clock() - self.t0_dict[cat])
+        print("<", cat, ":", msg, time.perf_counter() - self.t0_dict[cat])
 
 
 _TIMER = Timer()
