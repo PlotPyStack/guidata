@@ -13,7 +13,7 @@ UserConfig reader/writer objects
 (see guidata.hdf5io for another example of reader/writer)
 """
 
-import collections
+import collections.abc
 import datetime
 
 
@@ -104,7 +104,7 @@ class WriterMixin(object):
         elif isinstance(val, datetime.date):
             self.write_int(val.toordinal())
         elif hasattr(val, "serialize") and isinstance(
-            val.serialize, collections.Callable
+            val.serialize, collections.abc.Callable
         ):
             # The object has a DataSet-like `serialize` method
             val.serialize(self)

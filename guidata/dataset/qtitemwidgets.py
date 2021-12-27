@@ -21,7 +21,7 @@ import os
 import os.path as osp
 import sys
 import numpy
-import collections
+import collections.abc
 import datetime
 
 from qtpy.QtWidgets import (
@@ -437,7 +437,7 @@ class DateWidget(AbstractDataSetWidget):
         try:
             return self.dateedit.date().toPyDate()
         except AttributeError:
-            return self.dateedit.dateTime().toPython()  # PySide2
+            return self.dateedit.dateTime().toPython().date()  # PySide
 
 
 class DateTimeWidget(AbstractDataSetWidget):
@@ -468,7 +468,7 @@ class DateTimeWidget(AbstractDataSetWidget):
         try:
             return self.dateedit.dateTime().toPyDateTime()
         except AttributeError:
-            return self.dateedit.dateTime().toPython()  # PySide2
+            return self.dateedit.dateTime().toPython()  # PySide
 
 
 class GroupLayout(QHBoxLayout):
@@ -740,7 +740,7 @@ class ChoiceWidget(AbstractDataSetWidget):
                     if not osp.isfile(img):
                         img = get_image_file_path(img)
                     img = QIcon(img)
-                elif isinstance(img, collections.Callable):
+                elif isinstance(img, collections.abc.Callable):
                     img = img(key)
                 if self.is_radio:
                     button.setIcon(img)

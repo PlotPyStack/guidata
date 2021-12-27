@@ -1,6 +1,19 @@
 # guidata Releases #
 
 
+### Version 2.0.2 ###
+
+Bug fixes:
+
+* Fixed PySide6 compatibility issues
+* Fixed remaining Python 3 compatibility issues
+
+### Version 2.0.1 ###
+
+Bug fixes:
+
+* Fixed Python 3 compatibility issues
+
 ### Version 2.0.0 ###
 
 Changes:

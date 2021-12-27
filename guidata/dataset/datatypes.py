@@ -19,7 +19,7 @@ ValueProp, ...).
 
 import sys
 import re
-import collections
+import collections.abc
 
 from guidata.utils import utf8_to_unicode, update_dataset
 
@@ -239,7 +239,7 @@ class DataItem(object):
         else:
             fmt = self.get_prop_value("display", instance, "format", "%s")
             func = self.get_prop_value("display", instance, "func", lambda x: x)
-            if isinstance(fmt, collections.Callable) and value is not None:
+            if isinstance(fmt, collections.abc.Callable) and value is not None:
                 return fmt(func(value))
             if value is not None:
                 text = self.format_string(instance, value, fmt, func)
