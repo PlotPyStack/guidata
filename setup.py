@@ -52,7 +52,7 @@ See `documentation`_ for more details on the library and `changelog`_ for recent
 Copyright © 2009-2021 CEA, Pierre Raybaut, licensed under the terms of the
 `CECILL License`_.
 
-.. _documentation: http://pythonhosted.org/guidata/
+.. _documentation: https://guidata.readthedocs.io/en/latest/
 .. _changelog: https://github.com/PierreRaybaut/guidata/blob/master/CHANGELOG.md
 .. _CECILL License: https://github.com/PierreRaybaut/guidata/blob/master/Licence_CeCILL_V2-en.txt
 
