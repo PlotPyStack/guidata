@@ -70,8 +70,8 @@ class RotatedLabel(QLabel):
         hint = QLabel.sizeHint(self)
         width, height = hint.width(), hint.height()
         angle = self.angle * pi / 180
-        rotated_width = abs(width * cos(angle)) + abs(height * sin(angle))
-        rotated_height = abs(width * sin(angle)) + abs(height * cos(angle))
+        rotated_width = int(abs(width * cos(angle)) + abs(height * sin(angle)))
+        rotated_height = int(abs(width * sin(angle)) + abs(height * cos(angle)))
         return QSize(rotated_width, rotated_height)
 
     def minimumSizeHint(self):

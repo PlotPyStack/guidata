@@ -277,6 +277,7 @@ class ShowStdIcons(QWidget):
         layout = QHBoxLayout()
         row_nb = 14
         cindex = 0
+        col_layout = QVBoxLayout()
         for child in dir(QStyle):
             if child.startswith("SP_"):
                 if cindex == 0:
@@ -307,7 +308,4 @@ def show_std_icons():
 
 
 if __name__ == "__main__":
-    from guidata.utils import pairs
-
-    print(list(pairs(list(range(5)))))
     show_std_icons()
