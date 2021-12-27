@@ -87,13 +87,17 @@ class DockableWidgetMixin(object):
         | QDockWidget.DockWidgetMovable
     )
 
-    def __init__(self, parent):
-        self.parent_widget = parent
+    def __init__(self):
         self._isvisible = False
         self.dockwidget = None
         self._allowed_areas = self.ALLOWED_AREAS
         self._location = self.LOCATION
         self._features = self.FEATURES
+
+    @property
+    def parent_widget(self):
+        """Return associated QWidget parent"""
+        return self.parent()
 
     def setup_dockwidget(self, location=None, features=None, allowed_areas=None):
         assert (
@@ -135,4 +139,5 @@ class DockableWidgetMixin(object):
 
 class DockableWidget(QWidget, DockableWidgetMixin):
     def __init__(self, parent):
-        super(DockableWidget, self).__init__(parent, parent=parent)
+        QWidget.__init__(self, parent)
+        DockableWidgetMixin.__init__(self)
