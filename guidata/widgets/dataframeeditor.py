@@ -51,6 +51,7 @@ from qtpy.QtWidgets import (
     QPushButton,
     QTableView,
     QShortcut,
+    QAbstractItemView,
 )
 from qtpy.QtGui import (
     QKeySequence,
@@ -533,7 +534,7 @@ class FrozenTableView(QTableView):
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.show()
 
-        self.setVerticalScrollMode(1)
+        self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
 
     def update_geometry(self):
         """Update the frozen column size when an update occurs
@@ -556,8 +557,8 @@ class DataFrameView(QTableView):
         self.frozen_table_view = FrozenTableView(self)
         self.frozen_table_view.update_geometry()
 
-        self.setHorizontalScrollMode(1)
-        self.setVerticalScrollMode(1)
+        self.setHorizontalScrollMode(QAbstractItemView.ScrollPerPixel)
+        self.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
 
         self.horizontalHeader().sectionResized.connect(self.update_section_width)
         self.verticalHeader().sectionResized.connect(self.update_section_height)
