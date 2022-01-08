@@ -17,7 +17,7 @@ External resources:
 .. _GoogleGroup: http://groups.google.fr/group/guidata_guiqwt
 """
 
-__version__ = "2.0.0"
+__version__ = "2.0.3"
 
 # TODO: Add Python module hash utilities (for dependencies checking)
 # TODO: Investigate the qthelpers test failure (see after if __name__=='__main__')

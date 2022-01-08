@@ -961,7 +961,7 @@ class Distribution(object):
         if script.endswith(".pyw") and os.name == "nt":
             base = "win32gui"
         self.executables += [
-            Executable(script, base=base, icon=self.icon, targetName=self.target_name)
+            Executable(script, base=base, icon=icon, targetName=target_name)
         ]
 
     def build_cx_freeze(self, cleanup=True, create_archive=None):

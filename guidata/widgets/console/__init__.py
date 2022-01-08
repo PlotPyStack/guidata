@@ -95,7 +95,7 @@ class DockableConsole(Console, DockableWidgetMixin):
     def __init__(
         self, parent, namespace, message, commands=None, multithreaded=True, debug=False
     ):
-        DockableWidgetMixin.__init__(self, parent)
+        DockableWidgetMixin.__init__(self)
         Console.__init__(
             self,
             parent=parent,

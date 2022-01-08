@@ -22,7 +22,10 @@ def test_console():
     widget = Console(debug=False, multithreaded=True)
     widget.resize(800, 600)
     widget.show()
-    app.exec_()
+    try:
+        app.exec()
+    except AttributeError:
+        app.exec_()
 
 
 if __name__ == "__main__":

@@ -10,7 +10,7 @@ Simple example of ``guidata`` datasets embedded in an application window:
 
 <img src="https://raw.githubusercontent.com/PierreRaybaut/guidata/master/doc/images/screenshots/editgroupbox.png">
 
-See [documentation](http://pythonhosted.org/guidata/) for more details on
+See [documentation](https://guidata.readthedocs.io/en/latest/) for more details on
 the library and [changelog](CHANGELOG.md) for recent history of changes.
 
 Copyright © 2009-2021 CEA, Pierre Raybaut, licensed under the terms of the
