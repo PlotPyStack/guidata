@@ -573,8 +573,9 @@ def install_translator(qapp):
         # Qt-specific translator
         qt_translator = QTranslator()
         paths = QLibraryInfo.location(QLibraryInfo.TranslationsPath)
-        if qt_translator.load("qt_" + locale, paths):
-            QT_TRANSLATOR = qt_translator  # Keep reference alive
+        for prefix in ("qt", "qtbase"):
+            if qt_translator.load(prefix + "_" + locale, paths):
+                QT_TRANSLATOR = qt_translator  # Keep reference alive
     if QT_TRANSLATOR is not None:
         qapp.installTranslator(QT_TRANSLATOR)
 
