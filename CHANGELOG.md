@@ -1,6 +1,13 @@
 # guidata Releases #
 
 
+### Version 2.0.3 ###
+
+Bug fixes:
+
+* Fixed Qt5 translation standard support
+
+
 ### Version 2.0.2 ###
 
 Bug fixes:

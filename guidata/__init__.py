@@ -21,8 +21,6 @@ __version__ = "2.0.3"
 
 # TODO: Add Python module hash utilities (for dependencies checking)
 # TODO: Investigate the qthelpers test failure (see after if __name__=='__main__')
-# TODO: Add support for PyQt6
-# TODO: Add support for PySide6
 
 # Dear (Debian, RPM, ...) package makers, please feel free to customize the
 # following path to module's data (images) and translations:
