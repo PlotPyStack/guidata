@@ -92,7 +92,9 @@ class DockableConsole(Console, DockableWidgetMixin):
 
     LOCATION = Qt.BottomDockWidgetArea
 
-    def __init__(self, parent, namespace, message, commands=None, debug=False):
+    def __init__(
+        self, parent, namespace, message, commands=None, multithreaded=True, debug=False
+    ):
         DockableWidgetMixin.__init__(self, parent)
         Console.__init__(
             self,
@@ -100,7 +102,7 @@ class DockableConsole(Console, DockableWidgetMixin):
             namespace=namespace,
             message=message,
             commands=commands or [],
-            multithreaded=True,
+            multithreaded=multithreaded,
             debug=debug,
         )
 
