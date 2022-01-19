@@ -15,59 +15,41 @@ import os.path as osp
 from guidata.configtools import add_image_module_path, get_translation
 from guidata.userconfig import UserConfig
 
-from guidata.external import darkdetect
-
-IS_DARK = darkdetect.isDark()
 
 APP_PATH = osp.dirname(__file__)
 add_image_module_path("guidata", "images")
 _ = get_translation("guidata")
 
-WINDOWS_MONO_FONTS = ["Cascadia Code", "Consolas", "Courier New"]
+
+def gen_mono_font_settings(size, other_settings=None):
+    """Generate mono font settings"""
+    settings = dict({} if other_settings is None else other_settings)
+    settings.update(
+        {
+            "font/family/nt": ["Cascadia Code", "Consolas", "Courier New"],
+            "font/family/posix": "Bitstream Vera Sans Mono",
+            "font/family/mac": "Monaco",
+            "font/size": size,
+        }
+    )
+    return settings
+
 
 DEFAULTS = {
-    "arrayeditor": {
-        "font/family/nt": WINDOWS_MONO_FONTS,
-        "font/family/posix": "Bitstream Vera Sans Mono",
-        "font/family/mac": "Monaco",
-        "font/size": 9,
-    },
-    "dicteditor": {
-        "font/family/nt": WINDOWS_MONO_FONTS,
-        "font/family/posix": "Bitstream Vera Sans Mono",
-        "font/family/mac": "Monaco",
-        "font/size": 9,
-    },
-    "texteditor": {
-        "font/family/nt": WINDOWS_MONO_FONTS,
-        "font/family/posix": "Bitstream Vera Sans Mono",
-        "font/family/mac": "Monaco",
-        "font/size": 9,
-    },
-    "codeeditor": {
-        "font/family/nt": WINDOWS_MONO_FONTS,
-        "font/family/posix": "Bitstream Vera Sans Mono",
-        "font/family/mac": "Monaco",
-        "font/size": 10,
-    },
-    "internal_console": {
-        "max_line_count": 300,
-        "working_dir_history": 30,
-        "working_dir_adjusttocontents": False,
-        "font/family": WINDOWS_MONO_FONTS,
-        "font/size": 9,
-        "wrap": True,
-        "calltips": True,
-        "cursor/width": 2,
-        "codecompletion/size": (300, 180),
-        "codecompletion/auto": False,
-        "codecompletion/enter_key": True,
-        "codecompletion/case_sensitive": True,
-        "codecompletion/show_single": False,
-        "external_editor/path": "SciTE",
-        "external_editor/gotoline": "-goto:",
-        "light_background": not IS_DARK,
-    },
+    "arrayeditor": gen_mono_font_settings(9),
+    "dicteditor": gen_mono_font_settings(9),
+    "texteditor": gen_mono_font_settings(9),
+    "codeeditor": gen_mono_font_settings(10),
+    "console": gen_mono_font_settings(
+        9,
+        {
+            "cursor/width": 2,
+            "codecompletion/size": (300, 180),
+            "codecompletion/case_sensitive": True,
+            "external_editor/path": "SciTE",
+            "external_editor/gotoline": "-goto:",
+        },
+    ),
     "color_schemes": {
         "names": [
             "emacs",
@@ -81,7 +63,8 @@ DEFAULTS = {
             "solarized/light",
             "solarized/dark",
         ],
-        "default": "spyder/dark" if IS_DARK else "spyder",
+        "default/light": "spyder",
+        "default/dark": "spyder/dark",
         # ---- Emacs ----
         "emacs/name": "Emacs",
         #      Name            Color     Bold  Italic

@@ -59,7 +59,7 @@ class Console(InternalShell):
     def setup(self):
         """Setup the calltip widget and show the console once all
         internal handler are ready."""
-        font = get_font(CONF, "codeeditor")
+        font = get_font(CONF, "console")
         font.setPointSize(10)
         self.set_font(font)
         self.set_codecompletion_auto(True)

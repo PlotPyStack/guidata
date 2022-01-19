@@ -29,7 +29,7 @@ from qtpy.QtCore import (
     Slot,
 )
 
-from guidata.config import CONF, _, IS_DARK
+from guidata.config import CONF, _
 from guidata.widgets.console.dochelpers import getargtxt, getdoc, getobjdir, getsource
 from guidata.widgets.console.interpreter import Interpreter
 from guidata.utils import getcwd_or_home
@@ -37,6 +37,9 @@ from guidata.widgets.console.shell import PythonShellWidget
 from guidata.utils import run_program
 from guidata.qthelpers import get_std_icon, create_action
 from guidata.widgets.objecteditor import oedit
+from guidata.external import darkdetect
+
+IS_DARK = darkdetect.isDark()
 
 builtins.oedit = oedit
 
@@ -202,7 +205,7 @@ class InternalShell(PythonShellWidget):
         self.sig_keyboard_interrupt.connect(self.keyboard_interrupt)
 
         # Code completion / calltips
-        getcfg = lambda option: CONF.get("internal_console", option)
+        getcfg = lambda option: CONF.get("console", option)
         case_sensitive = getcfg("codecompletion/case_sensitive")
         self.set_codecompletion_case(case_sensitive)
 
@@ -378,8 +381,8 @@ class InternalShell(PythonShellWidget):
     def external_editor(self, filename, goto=-1):
         """Edit in an external editor
         Recommended: SciTE (e.g. to go to line where an error did occur)"""
-        editor_path = CONF.get("internal_console", "external_editor/path")
-        goto_option = CONF.get("internal_console", "external_editor/gotoline")
+        editor_path = CONF.get("console", "external_editor/path")
+        goto_option = CONF.get("console", "external_editor/gotoline")
         try:
             args = [filename]
             if goto > 0 and goto_option:

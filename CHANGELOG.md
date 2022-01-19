@@ -6,6 +6,7 @@
 Bug fixes:
 
 * Fixed Qt5 translation standard support
+* Fixed editor/console widgets dark mode default settings
 
 
 ### Version 2.0.2 ###

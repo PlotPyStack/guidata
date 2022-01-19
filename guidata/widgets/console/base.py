@@ -349,7 +349,7 @@ class TextEditBaseWidget(QPlainTextEdit, BaseEditMixin):
         :param size:
         :param font:
         """
-        size = size or CONF.get("internal_console", "codecompletion/size")
+        size = size or CONF.get("console", "codecompletion/size")
         font = font or get_font(CONF, "texteditor", "font")
         self.completion_widget.setup_appearance(size, font)
 
