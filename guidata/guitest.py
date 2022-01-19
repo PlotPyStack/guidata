@@ -35,7 +35,7 @@ from qtpy.QtCore import Qt, QSize
 from guidata.config import _
 from guidata.configtools import get_icon
 from guidata.qthelpers import get_std_icon, win32_fix_title_bar_background
-from guidata.widgets.codeeditor import PythonCodeEditor
+from guidata.widgets.codeeditor import CodeEditor
 
 
 def get_test_package(package):
@@ -124,7 +124,7 @@ class TestPropertiesWidget(QWidget):
             layout.addWidget(label)
         group_desc.setLayout(layout)
 
-        self.editor = PythonCodeEditor(self, columns=85, rows=30)
+        self.editor = CodeEditor(self, columns=85, rows=30)
         self.editor.setReadOnly(True)
         self.desc_label.setFont(self.editor.font())
 

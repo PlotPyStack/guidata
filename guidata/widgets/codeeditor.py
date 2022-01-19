@@ -10,7 +10,7 @@ guidata.widgets.codeeditor
 
 This package provides an Editor widget based on QtGui.QPlainTextEdit.
 
-.. autoclass:: PythonCodeEditor
+.. autoclass:: CodeEditor
 
 """
 
@@ -69,12 +69,30 @@ class LineNumberArea(QWidget):
         self.code_editor.wheelEvent(event)
 
 
-class PythonCodeEditor(QPlainTextEdit):
+class CodeEditor(QPlainTextEdit):
 
     # To have these attrs when early viewportEvent's are triggered
     linenumberarea = None
 
-    def __init__(self, parent=None, font=None, columns=None, rows=None):
+    LANGUAGES = {
+        "python": sh.PythonSH,
+        "cython": sh.CythonSH,
+        "fortran77": sh.Fortran77SH,
+        "fortran": sh.FortranSH,
+        "idl": sh.IdlSH,
+        "diff": sh.DiffSH,
+        "gettext": sh.GetTextSH,
+        "nsis": sh.NsisSH,
+        "html": sh.HtmlSH,
+        "yaml": sh.YamlSH,
+        "cpp": sh.CppSH,
+        "opencL": sh.OpenCLSH,
+        "enaml": sh.EnamlSH,
+        # Every other language
+        None: sh.TextSH,
+    }
+
+    def __init__(self, parent=None, language=None, font=None, columns=None, rows=None):
         QPlainTextEdit.__init__(self, parent)
 
         win32_fix_title_bar_background(self)
@@ -94,15 +112,20 @@ class PythonCodeEditor(QPlainTextEdit):
         self.linenumberarea_released = None
 
         self.setFocusPolicy(Qt.StrongFocus)
-        self.setup(font=font, columns=columns, rows=rows)
+        self.setup(language=language, font=font, columns=columns, rows=rows)
 
-    def setup(self, font=None, columns=None, rows=None):
+    def setup(self, language=None, font=None, columns=None, rows=None):
         """Setup widget"""
         if font is None:
             font = get_font(CONF, "codeeditor")
         self.setFont(font)
         self.setup_linenumberarea()
-        self.highlighter = sh.PythonSH(self.document(), self.font())
+        if language is not None:
+            language = language.lower()
+        highlighter_class = self.LANGUAGES.get(language)
+        if highlighter_class is None:
+            raise ValueError("Unsupported language '%s'" % language)
+        self.highlighter = highlighter_class(self.document(), self.font())
         self.highlighter.rehighlight()
         self.normal_color = self.highlighter.get_foreground_color()
         self.sideareas_color = self.highlighter.get_sideareas_color()
@@ -196,15 +219,6 @@ class PythonCodeEditor(QPlainTextEdit):
 
         active_block = self.textCursor().block()
         active_line_number = active_block.blockNumber() + 1
-
-        def draw_pixmap(ytop, pixmap):
-            """
-
-            :param ytop:
-            :param pixmap:
-            """
-            pixmap_height = pixmap.height() / pixmap.devicePixelRatio()
-            painter.drawPixmap(0, ytop + (font_height - pixmap_height) / 2, pixmap)
 
         for top, line_number, block in self.visible_blocks:
             if self.linenumbers_margin:
@@ -347,7 +361,7 @@ if __name__ == "__main__":
 
     app = qapplication()
 
-    widget = PythonCodeEditor(columns=80, rows=40)
+    widget = CodeEditor(columns=80, rows=40)
     widget.set_text_from_file(__file__)
     widget.show()
     app.exec_()

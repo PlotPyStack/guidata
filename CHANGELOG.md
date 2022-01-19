@@ -3,10 +3,14 @@
 
 ### Version 2.0.3 ###
 
+Changes:
+
+* Code editor: added support for other languages than Python (C++, XML, ...)
+
 Bug fixes:
 
 * Fixed Qt5 translation standard support
-* Fixed editor/console widgets dark mode default settings
+* Fixed code editor/console widgets dark mode default settings
 
 
 ### Version 2.0.2 ###

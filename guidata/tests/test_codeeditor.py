@@ -19,7 +19,7 @@ def test_codeeditor():
 
     app = qapplication()
 
-    widget = codeeditor.PythonCodeEditor()
+    widget = codeeditor.CodeEditor(language="python")
     widget.set_text_from_file(codeeditor.__file__)
     widget.resize(800, 600)
     widget.show()
