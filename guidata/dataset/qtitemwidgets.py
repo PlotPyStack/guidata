@@ -591,7 +591,7 @@ class FloatSliderWidget(SliderWidget):
     DATA_TYPE = float
 
     def value_to_slider(self, value):
-        return (value - self.vmin) * 100 / (self.vmax - self.vmin)
+        return int((value - self.vmin) * 100 / (self.vmax - self.vmin))
 
     def slider_to_value(self, value):
         return value * (self.vmax - self.vmin) / 100 + self.vmin
