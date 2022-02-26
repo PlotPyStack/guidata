@@ -124,7 +124,7 @@ class TestPropertiesWidget(QWidget):
             layout.addWidget(label)
         group_desc.setLayout(layout)
 
-        self.editor = CodeEditor(self, columns=85, rows=30)
+        self.editor = CodeEditor(self, columns=85, rows=30, language="python")
         self.editor.setReadOnly(True)
         self.desc_label.setFont(self.editor.font())
 
