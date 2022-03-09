@@ -753,6 +753,8 @@ class DictItem(ButtonItem):
 
     def __init__(self, label, default=None, help="", check=True):
         def dictedit(instance, item, value, parent):
+            from guidata.widgets.collectionseditor import CollectionsEditor
+
             editor = CollectionsEditor(parent)
             value_was_none = value is None
             if value_was_none:
