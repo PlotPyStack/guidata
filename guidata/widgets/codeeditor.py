@@ -24,11 +24,10 @@ from qtpy.QtWidgets import QWidget, QPlainTextEdit
 from qtpy.QtGui import QColor, QPainter
 from qtpy.QtCore import QRect, QSize, Qt
 
-from guidata.external import darkdetect
 import guidata.widgets.syntaxhighlighters as sh
 from guidata.configtools import get_font
 from guidata import encoding
-from guidata.qthelpers import win32_fix_title_bar_background
+from guidata.qthelpers import is_dark_mode, win32_fix_title_bar_background
 from guidata.config import CONF, _
 
 
@@ -101,9 +100,7 @@ class CodeEditor(QPlainTextEdit):
         self.highlighter = None
         self.normal_color = None
         self.sideareas_color = None
-        self.linenumbers_color = QColor(
-            Qt.lightGray if darkdetect.isDark() else Qt.darkGray
-        )
+        self.linenumbers_color = QColor(Qt.lightGray if is_dark_mode() else Qt.darkGray)
 
         # Line number area management
         self.linenumbers_margin = True

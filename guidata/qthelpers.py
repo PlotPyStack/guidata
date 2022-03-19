@@ -13,12 +13,16 @@ The ``guidata.qthelpers`` module provides helper functions for developing
 easily Qt-based graphical user interfaces.
 """
 
-import sys
 import os
 import os.path as osp
+import sys
+
+from qtpy.QtCore import Qt
+from qtpy.QtGui import QColor, QIcon, QKeySequence
 from qtpy.QtWidgets import (
     QAction,
     QApplication,
+    QGroupBox,
     QHBoxLayout,
     QLabel,
     QLineEdit,
@@ -28,20 +32,25 @@ from qtpy.QtWidgets import (
     QToolButton,
     QVBoxLayout,
     QWidget,
-    QGroupBox,
 )
-from qtpy.QtGui import QColor, QIcon, QKeySequence
-from qtpy.QtCore import Qt
 
+from guidata.configtools import get_icon
 
 # Local imports:
 from guidata.external import darkdetect
-from guidata.configtools import get_icon
+
+
+def is_dark_mode():
+    """Return True if current color mode is dark mode"""
+    try:
+        return os.environ["QT_COLOR_MODE"].lower() == "dark"
+    except KeyError:
+        return darkdetect.isDark()
 
 
 def win32_fix_title_bar_background(widget):
     """Fix window title bar background for Windows 10+ dark theme"""
-    if os.name != "nt" or not darkdetect.isDark():
+    if os.name != "nt" or not is_dark_mode():
         return
 
     import ctypes

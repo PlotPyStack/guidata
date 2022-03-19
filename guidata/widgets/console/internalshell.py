@@ -35,11 +35,9 @@ from guidata.widgets.console.interpreter import Interpreter
 from guidata.utils import getcwd_or_home
 from guidata.widgets.console.shell import PythonShellWidget
 from guidata.utils import run_program
-from guidata.qthelpers import get_std_icon, create_action
+from guidata.qthelpers import get_std_icon, create_action, is_dark_mode
 from guidata.widgets.objecteditor import oedit
-from guidata.external import darkdetect
 
-IS_DARK = darkdetect.isDark()
 
 builtins.oedit = oedit
 
@@ -182,7 +180,7 @@ class InternalShell(PythonShellWidget):
         exitfunc=None,
         profile=False,
         multithreaded=True,
-        light_background=not IS_DARK,
+        light_background=not is_dark_mode(),
         debug=False,
     ):
         PythonShellWidget.__init__(self, parent, profile)

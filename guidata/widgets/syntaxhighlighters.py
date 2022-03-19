@@ -28,9 +28,8 @@ from qtpy.QtGui import (
 )
 from qtpy.QtCore import Qt
 
-from guidata.external import darkdetect
+from guidata.qthelpers import is_dark_mode
 
-IS_DARK = darkdetect.isDark()
 
 # =============================================================================
 # Constants
@@ -93,7 +92,7 @@ class BaseSH(QSyntaxHighlighter):
 
         self.font = font
         if color_scheme is None:
-            suffix = "dark" if IS_DARK else "light"
+            suffix = "dark" if is_dark_mode() else "light"
             color_scheme = CONF.get("color_schemes", "default/" + suffix)
         if isinstance(color_scheme, str):
             self.color_scheme = get_color_scheme(color_scheme)

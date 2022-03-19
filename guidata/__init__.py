@@ -17,9 +17,8 @@ External resources:
 .. _GoogleGroup: http://groups.google.fr/group/guidata_guiqwt
 """
 
-__version__ = "2.0.4"
+__version__ = "2.0.5"
 
-# TODO: Add Python module hash utilities (for dependencies checking)
 # TODO: Investigate the qthelpers test failure (see after if __name__=='__main__')
 
 # Dear (Debian, RPM, ...) package makers, please feel free to customize the
@@ -583,10 +582,9 @@ def set_color_mode(app):
     from qtpy.QtWidgets import QStyleFactory
     from qtpy.QtGui import QPalette, QColor
     from qtpy.QtCore import Qt
+    from guidata import qthelpers
 
-    from guidata.external import darkdetect
-
-    if darkdetect.isDark():
+    if qthelpers.is_dark_mode():
         app.setStyle(QStyleFactory.create("Fusion"))
         dark_palette = QPalette()
         dark_color = QColor(45, 45, 45)
