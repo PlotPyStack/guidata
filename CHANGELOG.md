@@ -1,12 +1,18 @@
 # guidata Releases #
 
-### Version 2.0.4 ###
+## Version 2.1.0 ##
+
+Changes:
+
+* Dark mode may be overriden by QT_COLOR_MODE environment variable
+
+## Version 2.0.4 ##
 
 Bug fixes:
 
 * Fixed missing import for DictItem callback
 
-### Version 2.0.3 ###
+## Version 2.0.3 ##
 
 Changes:
 
@@ -17,20 +23,20 @@ Bug fixes:
 * Fixed Qt5 translation standard support
 * Fixed code editor/console widgets dark mode default settings
 
-### Version 2.0.2 ###
+## Version 2.0.2 ##
 
 Bug fixes:
 
 * Fixed PySide6 compatibility issues
 * Fixed remaining Python 3 compatibility issues
 
-### Version 2.0.1 ###
+## Version 2.0.1 ##
 
 Bug fixes:
 
 * Fixed Python 3 compatibility issues
 
-### Version 2.0.0 ###
+## Version 2.0.0 ##
 
 Changes:
 
@@ -42,7 +48,7 @@ Changes:
 * Code editor: widget minimum size area may now be set using rows and columns size
 * Test launcher: redesigned, added support for dark mode
 
-### Version 1.8.0 ###
+## Version 1.8.0 ##
 
 Changes:
 
@@ -50,39 +56,39 @@ Changes:
 * Removed `spyderlib`/`spyder` dependency.
 * Added setter method on DataItem object for "help" text (fixed part of the tooltip).
 
-### Version 1.7.9 ###
+## Version 1.7.9 ##
 
 Changes:
 
 * Added PySide2 support: guidata is now compatible with Python 2.7, Python 3.4+, PyQt4,
   PyQt5 and PySide2!
 
-### Version 1.7.8 ###
+## Version 1.7.8 ##
 
 Changes:
 
 * Added PyQt4/PyQt5/PySide automatic switch depending on installed libraries
 * Moved documentation to <https://docs.readthedocs.io/>
 
-### Version 1.7.7 ###
+## Version 1.7.7 ##
 
 Bug fixes:
 
 * Fixed Spyder v4.0 compatibility issues.
 
-### Version 1.7.6 ###
+## Version 1.7.6 ##
 
 Bug fixes:
 
 * Fixed Spyder v3.0 compatibility issues.
 
-### Version 1.7.5 ###
+## Version 1.7.5 ##
 
 Bug fixes:
 
 * `FilesOpenItem.check_value` : if value is None, return False (avoids "None Type object is not iterable" error)
 
-### Version 1.7.4 ###
+## Version 1.7.4 ##
 
 Bug fixes:
 
@@ -90,7 +96,7 @@ Bug fixes:
 * `HDF5Reader.read_object_list`: fixed division by zero (when count was 1)
 * `hdf5io`: fixed Python3 compatibility issue with unicode_hdf type converter
 
-### Version 1.7.3 ###
+## Version 1.7.3 ##
 
 Features:
 
@@ -106,13 +112,13 @@ Bug fixes:
   * Supporting recent versions of SciPy, h5py and IPython
   * Fixed compatibility issue (workaround) with IPython on Python 2.7 (that is the "collection.sys cx_Freeze error")
 
-### Version 1.7.2 ###
+## Version 1.7.2 ##
 
 Bug fixes:
 
 * Fixed compatibility issues with old versions of Spyder (<v2.3)
 
-### Version 1.7.1 ###
+## Version 1.7.1 ##
 
 Bug fixes:
 
@@ -128,20 +134,20 @@ Setup:
 
 * Using setuptools "entry_points" instead of distutils "scripts"
 
-### Version 1.7.0 ###
+## Version 1.7.0 ##
 
 Possible API compatibility issues:
 
 * Added support for PyQt5 (removed old-style signals)
 
-### Version 1.6.1 ###
+## Version 1.6.1 ##
 
 Possible API compatibility issues:
 
 * disthelpers:
   * Changed arguments from "architecture=None, python_version=None" to "msvc_version, architecture=None"
 
-### Version 1.6.0 ###
+## Version 1.6.0 ##
 
 Added support for Python 3 (see module `guidata.py3compat`).
 
@@ -156,7 +162,7 @@ Bug fixes:
 
 * disthelpers.prepend_module_to_path: unload modules which were already imported to be able to replace them by other versions (mostly `guidata` should be concerned by this if the function is used -as it should be- in package's __init__.py script)
 
-### Version 1.5.1 ###
+## Version 1.5.1 ##
 
 New features:
 
@@ -182,7 +188,7 @@ Bug fixes:
 * configtools/image paths: handling file system encoded paths
 * (Issue 14) Restored compatiblity with PyQt v4.4
 
-### Version 1.5.0 ###
+## Version 1.5.0 ##
 
 Bug fixes:
 
@@ -207,7 +213,7 @@ Other changes:
     * disthelpers: new function 'get_visual_studio_dlls' -- returns the list of Visual
 Studio DLLs (and create manifest) associated to Python architecture and version
 
-### Version 1.4.2 ###
+## Version 1.4.2 ##
 
 Bug fixes:
 
@@ -223,7 +229,7 @@ Other changes:
   * raising an exception when the right version of Ms Visual C++ DLLs was not found
   * now creating the manifest and distributing from the redistribuable package installed in WinSxS
 
-### Version 1.4.1 ###
+## Version 1.4.1 ##
 
 Bug fixes:
 
@@ -249,7 +255,7 @@ Other changes:
   * added support for Maplotlib 1.1
 * Allow DateTime edit widgets to popup calendar
 
-### Version 1.4.0 ###
+## Version 1.4.0 ##
 
 Possible API compatibility issues:
 
@@ -267,7 +273,7 @@ Other changes:
     see the new disthelpers test for more details (tests/dishelpers.py)
 * reorganized utils and configtools modules
 
-### Version 1.3.2 ###
+## Version 1.3.2 ##
 
 Since this version, `guidata` is compatible with PyQt4 API #1 *and* API #2.
 Please read carefully the coding guidelines which have been recently added to
@@ -300,7 +306,7 @@ Other changes:
 * guidata.hdf5io.Dset: added missing keyword argument 'optional' (same effect as parent class Attr)
 * guidata.dataset.dataitems.IntItem objects: added support for sliders (fixes Issue 9) with option slider=True (see documentation)
 
-### Version 1.3.1 ###
+## Version 1.3.1 ##
 
 Bug fixes:
 
@@ -311,7 +317,7 @@ Other changes:
 
 * hdf5io: printing error messages in sys.stderr + added more infos when failing to load attribute
 
-### Version 1.3.0 ###
+## Version 1.3.0 ##
 
 Bug fixes:
 
