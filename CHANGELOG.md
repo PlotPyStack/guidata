@@ -1,5 +1,11 @@
 # guidata Releases #
 
+## Version 2.1.1 ##
+
+Bug fixes:
+
+* win32_fix_title_bar_background: not working in 32bits
+
 ## Version 2.1.0 ##
 
 Changes:
