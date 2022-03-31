@@ -1,5 +1,11 @@
 # guidata Releases #
 
+## Version 2.2.0 ##
+
+Changes:
+
+* guitest.TestModule.run: added timeout argument to wait for processus
+
 ## Version 2.1.1 ##
 
 Bug fixes:

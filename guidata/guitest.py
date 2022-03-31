@@ -95,7 +95,7 @@ class TestModule(object):
             return "<br>".join(lines)
         return self.error_msg
 
-    def run(self, args=""):
+    def run(self, args="", timeout=None):
         """Run test script"""
         # Keep the same sys.path environment in child process:
         # (useful when the program is executed from Spyder, for example)
@@ -104,7 +104,9 @@ class TestModule(object):
         command = [sys.executable, '"' + self.path + '"']
         if args:
             command.append(args)
-        subprocess.Popen(" ".join(command), shell=True)
+        proc = subprocess.Popen(" ".join(command), shell=True)
+        if timeout is not None:
+            proc.wait(timeout)
 
 
 class TestPropertiesWidget(QWidget):
