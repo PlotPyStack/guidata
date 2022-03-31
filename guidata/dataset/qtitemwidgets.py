@@ -893,6 +893,10 @@ class FloatArrayWidget(AbstractDataSetWidget):
         self.arr = None  # le tableau si il a été modifié
         self.instance = None
 
+        self.dtype_line, self.dtype_label = get_image_layout("dtype.png", "")
+        self.first_line.insertSpacing(2, 5)
+        self.first_line.insertLayout(3, self.dtype_line)
+
     def edit_array(self):
         """Open an array editor dialog"""
         parent = self.parent_layout.parent
@@ -941,6 +945,8 @@ class FloatArrayWidget(AbstractDataSetWidget):
             mint, maxt = "-", "-"
         self.min_label.setText(mint)
         self.max_label.setText(maxt)
+        typestr = str(arr.dtype)
+        self.dtype_label.setText("-" if typestr == "object" else typestr)
 
     def set(self):
         """Override AbstractDataSetWidget method"""

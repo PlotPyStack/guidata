@@ -4,6 +4,7 @@
 
 Changes:
 
+* FloatArrayItem: added data type information on associated widget
 * guitest.TestModule.run: added timeout argument to wait for processus
 
 ## Version 2.1.1 ##
