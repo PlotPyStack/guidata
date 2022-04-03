@@ -923,23 +923,24 @@ class FloatArrayWidget(AbstractDataSetWidget):
 
         format = self.item.get_prop_value("display", "format")
         minmax = self.item.get_prop_value("display", "minmax")
+        real_arr = numpy.real(arr)
         try:
             if minmax == "all":
-                mint = format % arr.min()
-                maxt = format % arr.max()
+                mint = format % real_arr.min()
+                maxt = format % real_arr.max()
             elif minmax == "columns":
                 mint = ", ".join(
-                    [format % arr[r, :].min() for r in range(arr.shape[0])]
+                    [format % real_arr[r, :].min() for r in range(arr.shape[0])]
                 )
                 maxt = ", ".join(
-                    [format % arr[r, :].max() for r in range(arr.shape[0])]
+                    [format % real_arr[r, :].max() for r in range(arr.shape[0])]
                 )
             else:
                 mint = ", ".join(
-                    [format % arr[:, r].min() for r in range(arr.shape[1])]
+                    [format % real_arr[:, r].min() for r in range(arr.shape[1])]
                 )
                 maxt = ", ".join(
-                    [format % arr[:, r].max() for r in range(arr.shape[1])]
+                    [format % real_arr[:, r].max() for r in range(arr.shape[1])]
                 )
         except (TypeError, IndexError):
             mint, maxt = "-", "-"

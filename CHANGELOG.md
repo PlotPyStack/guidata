@@ -2,6 +2,10 @@
 
 ## Version 2.2.0 ##
 
+Bug fixes:
+
+* FloatArrayItem: avoid RuntimeWarning when dealing with complex data
+
 Changes:
 
 * FloatArrayItem: added data type information on associated widget
