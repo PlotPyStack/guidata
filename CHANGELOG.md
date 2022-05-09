@@ -2,14 +2,15 @@
 
 ## Version 2.2.0 ##
 
-Bug fixes:
-
-* FloatArrayItem: avoid RuntimeWarning when dealing with complex data
-
 Changes:
 
 * FloatArrayItem: added data type information on associated widget
-* guitest.TestModule.run: added timeout argument to wait for processus
+* guitest.TestModule.run: added timeout argument to wait for process termination
+
+Bug fixes:
+
+* FloatArrayItem: avoid RuntimeWarning when dealing with complex data
+* external/darkdetect: fixed compatibility issue with Windows Server 2008 R2
 
 ## Version 2.1.1 ##
 
