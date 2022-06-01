@@ -17,7 +17,7 @@ External resources:
 .. _GoogleGroup: http://groups.google.fr/group/guidata_guiqwt
 """
 
-__version__ = "2.2.0"
+__version__ = "2.2.1"
 
 # TODO: Investigate the qthelpers test failure (see after if __name__=='__main__')
 
@@ -564,7 +564,7 @@ def install_translator(qapp):
     """Install Qt translator to the QApplication instance"""
     global QT_TRANSLATOR
     if QT_TRANSLATOR is None:
-        from qtpy.QtCore import QLocale, QTranslator, QLibraryInfo
+        from qtpy.QtCore import QLibraryInfo, QLocale, QTranslator
 
         locale = QLocale.system().name()
         # Qt-specific translator
@@ -579,9 +579,10 @@ def install_translator(qapp):
 
 def set_color_mode(app):
     """Set color mode (dark or light), depending on OS setting"""
-    from qtpy.QtWidgets import QStyleFactory
-    from qtpy.QtGui import QPalette, QColor
     from qtpy.QtCore import Qt
+    from qtpy.QtGui import QColor, QPalette
+    from qtpy.QtWidgets import QStyleFactory
+
     from guidata import qthelpers
 
     if qthelpers.is_dark_mode():

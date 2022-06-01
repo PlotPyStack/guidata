@@ -1,5 +1,12 @@
 # guidata Releases #
 
+## Version 2.2.1 ##
+
+Bug fixes:
+
+* Collection editor: fixed "Save array" feature
+* Console widget context menu: added missing icons
+
 ## Version 2.2.0 ##
 
 Changes:
