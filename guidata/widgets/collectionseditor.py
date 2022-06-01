@@ -32,8 +32,7 @@ import sys
 import warnings
 
 import PIL.Image
-
-from guidata.utils import getcwd_or_home
+from guidata.config import CONF, _
 from guidata.configtools import get_font, get_icon
 from guidata.qthelpers import (
     add_actions,
@@ -41,36 +40,7 @@ from guidata.qthelpers import (
     mimedata2url,
     win32_fix_title_bar_background,
 )
-from guidata.config import CONF, _
-from qtpy.QtWidgets import (
-    QAbstractItemDelegate,
-    QApplication,
-    QDateEdit,
-    QDateTimeEdit,
-    QDialog,
-    QHBoxLayout,
-    QInputDialog,
-    QItemDelegate,
-    QLineEdit,
-    QMenu,
-    QMessageBox,
-    QPushButton,
-    QTableView,
-    QVBoxLayout,
-    QWidget,
-)
-from qtpy.QtCore import (
-    QAbstractTableModel,
-    QModelIndex,
-    Qt,
-    Signal,
-    Slot,
-    QDateTime,
-)
-from qtpy.QtGui import (
-    QColor,
-    QKeySequence,
-)
+from guidata.utils import getcwd_or_home
 from guidata.widgets.importwizard import ImportWizard
 from guidata.widgets.nsview import (
     DataFrame,
@@ -96,6 +66,26 @@ from guidata.widgets.nsview import (
     value_to_display,
 )
 from guidata.widgets.texteditor import TextEditor
+from qtpy.compat import getsavefilename
+from qtpy.QtCore import QAbstractTableModel, QDateTime, QModelIndex, Qt, Signal, Slot
+from qtpy.QtGui import QColor, QKeySequence
+from qtpy.QtWidgets import (
+    QAbstractItemDelegate,
+    QApplication,
+    QDateEdit,
+    QDateTimeEdit,
+    QDialog,
+    QHBoxLayout,
+    QInputDialog,
+    QItemDelegate,
+    QLineEdit,
+    QMenu,
+    QMessageBox,
+    QPushButton,
+    QTableView,
+    QVBoxLayout,
+    QWidget,
+)
 
 if ndarray is not FakeObject:
     from guidata.widgets.arrayeditor import ArrayEditor
@@ -1280,7 +1270,7 @@ class BaseTableView(QTableView):
         if self.array_filename is None:
             self.array_filename = getcwd_or_home()
         self.redirect_stdio.emit(False)
-        filename, _selfilter = get_save_filename(
+        filename, _selfilter = getsavefilename(
             self, title, self.array_filename, _("NumPy arrays") + " (*.npy)"
         )
         self.redirect_stdio.emit(True)
