@@ -552,8 +552,8 @@ def qapplication():
     app = QApplication.instance()
     if not app:
         app = QApplication([])
-    install_translator(app)
-    set_color_mode(app)
+        install_translator(app)
+        set_color_mode(app)
     return app
 
 

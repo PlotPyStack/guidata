@@ -7,6 +7,8 @@ Bug fixes:
 * Array editor: showing a critical message box ("Array is not writeable") when NumPy
   array flag "writeable" is False, instead of trying to change flag value since it's
   a deprecated feature since NumPy v1.17
+* Do not install Qt translator and set color mode (dark/light) on Qt application if
+  it already has been initialized (QApplication instance is not None)
 
 ## Version 2.2.1 ##
 
