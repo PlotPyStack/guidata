@@ -2,27 +2,23 @@
 #
 # Copyright © Spyder Project Contributors
 # Licensed under the terms of the MIT License
-
-SHOW = True  # Show test in GUI-based test launcher
-
-
 """
 Tests for objecteditor.py
 """
 
-import sys
-import datetime, numpy as np
-import PIL.Image
+import datetime
 
-# Local imports
+import numpy as np
+import PIL.Image
 from guidata import qapplication
 from guidata.widgets.objecteditor import oedit
+
+SHOW = True  # Show test in GUI-based test launcher
 
 
 def test():
     """Run object editor test"""
-
-    data = np.random.random_integers(255, size=(100, 100)).astype("uint8")
+    data = np.random.randint(255, size=(100, 100)).astype("uint8")
     image = PIL.Image.fromarray(data)
     example = {
         "str": "kjkj kj k j j kj k jkj",
@@ -43,21 +39,15 @@ def test():
             self.text = "toto"
 
     foobar = Foobar()
-
-    print(oedit(foobar))  # spyder: test-skip
-    print(oedit(example))  # spyder: test-skip
-    print(oedit(np.random.rand(10, 10)))  # spyder: test-skip
-    print(oedit(oedit.__doc__))  # spyder: test-skip
-    print(example)  # spyder: test-skip
+    print(oedit(foobar))
+    print(oedit(example))
+    print(oedit(np.random.rand(10, 10)))
+    print(oedit(oedit.__doc__))
+    print(example)
 
 
 if __name__ == "__main__":
+    from guidata import qapplication
 
-    def catch_exceptions(type, value, traceback):
-        """Méthode custom pour récupérer les exceptions de la boucle Qt."""
-        system_hook(type, value, traceback)
-        sys.exit(1)
-
-    system_hook = sys.excepthook
-    sys.excepthook = catch_exceptions
+    app = qapplication()
     test()

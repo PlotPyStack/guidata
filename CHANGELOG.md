@@ -1,6 +1,11 @@
 # guidata Releases #
 
-## Version 2.2.2 ##
+## Version 2.3.0 ##
+
+Changes:
+
+* Object editor: removed unnecessary code related to Spyder internal shell ; object
+  editor may now be parented to caller widget.
 
 Bug fixes:
 

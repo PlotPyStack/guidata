@@ -958,10 +958,6 @@ class BaseTableView(QTableView):
         """Return array's ndim"""
         raise NotImplementedError
 
-    def oedit(self, key):
-        """Edit item"""
-        raise NotImplementedError
-
     def plot(self, key, funcname):
         """Plot item"""
         raise NotImplementedError
@@ -1446,13 +1442,6 @@ class CollectionsEditorTableView(BaseTableView):
         """Return array's ndim"""
         data = self.model.get_data()
         return data[key].ndim
-
-    def oedit(self, key):
-        """Edit item"""
-        data = self.model.get_data()
-        from guidata.widgets.objecteditor import oedit
-
-        oedit(data[key])
 
     def plot(self, key, funcname):
         """Plot item"""

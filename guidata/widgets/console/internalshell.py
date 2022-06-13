@@ -21,25 +21,14 @@ import sys
 import threading
 from time import time
 
-from qtpy.QtWidgets import QMessageBox
-from qtpy.QtCore import (
-    QEventLoop,
-    QObject,
-    Signal,
-    Slot,
-)
-
 from guidata.config import CONF, _
+from guidata.qthelpers import create_action, get_std_icon, is_dark_mode
+from guidata.utils import getcwd_or_home, run_program
 from guidata.widgets.console.dochelpers import getargtxt, getdoc, getobjdir, getsource
 from guidata.widgets.console.interpreter import Interpreter
-from guidata.utils import getcwd_or_home
 from guidata.widgets.console.shell import PythonShellWidget
-from guidata.utils import run_program
-from guidata.qthelpers import get_std_icon, create_action, is_dark_mode
-from guidata.widgets.objecteditor import oedit
-
-
-builtins.oedit = oedit
+from qtpy.QtCore import QEventLoop, QObject, Signal, Slot
+from qtpy.QtWidgets import QMessageBox
 
 
 def create_banner(message):
@@ -167,7 +156,6 @@ class InternalShell(PythonShellWidget):
     refresh = Signal()
     go_to_error = Signal(str)
     focus_changed = Signal()
-    sig_oedit = Signal(object, bool, object)
 
     def __init__(
         self,
@@ -210,18 +198,6 @@ class InternalShell(PythonShellWidget):
         # keyboard events management
         self.eventqueue = []
 
-        # oedit management in multithread environment
-        # It's not possible to run oedit directly because it creates Qt widgets.
-        # To run oedit in the main thread, a replacement function emits a signal
-        # sig_oedit. The main thread connects to this signal, run oedit and
-        # puts the result in oedit_queue.
-        self.oedit_queue = []
-        self.oedit_condition = threading.Condition()
-        self.sig_oedit.connect(self.run_oedit)
-        if multithreaded:
-            namespace = namespace or {}
-            namespace["oedit"] = self.oedit
-
         # Init interpreter
         self.exitfunc = exitfunc
         self.commands = commands
@@ -231,30 +207,6 @@ class InternalShell(PythonShellWidget):
 
         # Clear status bar
         self.status.emit("")
-
-    def run_oedit(self, obj, modal, namespace):
-        """Run oedit(obj, modal, namespace) and put the result in `oedit_queue`."""
-        with self.oedit_condition:
-            result = oedit(obj, modal, namespace)
-            self.oedit_queue.append(result)
-            self.oedit_condition.notify()
-
-    def oedit(self, obj, modal=True, namespace=None):
-        """Edit the object 'obj' in a GUI-based editor and return the edited copy
-        (if Cancel is pressed, return None)
-
-        The object 'obj' is a container
-
-        Supported container types:
-        dict, list, tuple, str/unicode or numpy.array
-
-        (instantiate a new QApplication if necessary,
-        so it can be called directly from the interpreter)
-        """
-        self.sig_oedit.emit(obj, modal, namespace)
-        with self.oedit_condition:
-            self.oedit_condition.wait()
-            return self.oedit_queue.pop()
 
     # ------ Interpreter
     def start_interpreter(self, namespace):
@@ -362,7 +314,6 @@ class InternalShell(PythonShellWidget):
                           <p><i>%s</i><br>    clear x, y
                           <p><i>%s</i><br>    !ls
                           <p><i>%s</i><br>    object?
-                          <p><i>%s</i><br>    result = oedit(object)
                           """
             % (
                 _("Shell special commands:"),
