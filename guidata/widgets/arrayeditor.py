@@ -23,7 +23,7 @@ This package provides a NumPy Array Editor Dialog based on Qt.
 import io
 
 import numpy as np
-
+from guidata.config import CONF, _
 from guidata.configtools import get_font, get_icon
 from guidata.qthelpers import (
     add_actions,
@@ -31,7 +31,16 @@ from guidata.qthelpers import (
     keybinding,
     win32_fix_title_bar_background,
 )
-from guidata.config import CONF, _
+from qtpy.QtCore import (
+    QAbstractTableModel,
+    QItemSelection,
+    QItemSelectionRange,
+    QLocale,
+    QModelIndex,
+    Qt,
+    Slot,
+)
+from qtpy.QtGui import QColor, QCursor, QDoubleValidator, QKeySequence
 from qtpy.QtWidgets import (
     QAbstractItemDelegate,
     QApplication,
@@ -47,27 +56,12 @@ from qtpy.QtWidgets import (
     QMenu,
     QMessageBox,
     QPushButton,
+    QShortcut,
     QSpinBox,
     QStackedWidget,
     QTableView,
     QVBoxLayout,
     QWidget,
-    QShortcut,
-)
-from qtpy.QtCore import (
-    QAbstractTableModel,
-    QLocale,
-    QModelIndex,
-    QItemSelection,
-    QItemSelectionRange,
-    Qt,
-    Slot,
-)
-from qtpy.QtGui import (
-    QColor,
-    QCursor,
-    QDoubleValidator,
-    QKeySequence,
 )
 
 # Note: string and unicode data types will be formatted with '%s' (see below)
@@ -713,6 +707,10 @@ class ArrayEditor(QDialog):
         return False if data is not supported, True otherwise
         """
         self.data = data
+        if not self.data.flags.writeable:
+            self.error(_("Array is not writeable"))
+            return False
+
         self.data.flags.writeable = True
         is_record_array = data.dtype.names is not None
         is_masked_array = isinstance(data, np.ma.MaskedArray)

@@ -17,7 +17,7 @@ External resources:
 .. _GoogleGroup: http://groups.google.fr/group/guidata_guiqwt
 """
 
-__version__ = "2.2.1"
+__version__ = "2.2.2"
 
 # TODO: Investigate the qthelpers test failure (see after if __name__=='__main__')
 

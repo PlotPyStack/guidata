@@ -1,5 +1,13 @@
 # guidata Releases #
 
+## Version 2.2.2 ##
+
+Bug fixes:
+
+* Array editor: showing a critical message box ("Array is not writeable") when NumPy
+  array flag "writeable" is False, instead of trying to change flag value since it's
+  a deprecated feature since NumPy v1.17
+
 ## Version 2.2.1 ##
 
 Bug fixes:
