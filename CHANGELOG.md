@@ -4,6 +4,8 @@
 
 Changes:
 
+* Added JSON serialize/deserialize support for `DataSet` objects (from CodraFT project,
+  <https://codra-ingenierie-informatique.github.io/CodraFT/>)
 * Array editor: switching to read-only mode when array is not writeable
 * Object editor (`oedit` function): cleaner implementation, handling widget
   parenting (code specifically related to Spyder internal shell was removed)
