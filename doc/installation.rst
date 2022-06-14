@@ -6,7 +6,7 @@ Dependencies
 
 Requirements:
 
-    * Python >=3.2
+    * Python >=3.7
     * `PyQt5`_ >=5.5 or `PySide2`_ >=5.11
     * `QtPy`_ >= 1.3
 

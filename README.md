@@ -16,7 +16,6 @@ the library and [changelog](CHANGELOG.md) for recent history of changes.
 Copyright © 2009-2021 CEA, Pierre Raybaut, licensed under the terms of the
 CECILL License (see ``Licence_CeCILL_V2-en.txt``).
 
-
 ## Overview
 
 Based on the Qt library, ``guidata`` is a Python library generating graphical user
@@ -37,12 +36,11 @@ Application development tools:
 - HDF5 I/O helpers
 - misc. utils
 
-
 ## Dependencies
 
 ### Requirements
 
-- Python >= 3.6
+- Python >= 3.7
 - [PyQt5](https://pypi.python.org/pypi/PyQt5) >=5.5 or [PySide2](https://pypi.python.org/pypi/PySide2) >=5.11
 - [QtPy](https://pypi.org/project/QtPy/) >= 1.3
 
@@ -57,12 +55,11 @@ gettext (text translation support)
 
 ### Recommended modules
 
-[guiqwt](https://pypi.python.org/pypi/guiqwt) >= 4.0 is a set of tools for curve and image plotting based on `guidata`.
-
+[guiqwt](https://pypi.python.org/pypi/guiqwt) >= 4.3 is a set of tools for curve and image plotting based on `guidata`.
 
 ## Installation
 
-### From the source package:
+### From the source package
 
 ```bash
 python setup.py install
