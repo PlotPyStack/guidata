@@ -4,14 +4,14 @@
 
 Changes:
 
-* Object editor: removed unnecessary code related to Spyder internal shell ; object
-  editor may now be parented to caller widget.
+* Array editor: switching to read-only mode when array is not writeable
+* Object editor (`oedit` function): cleaner implementation, handling widget
+  parenting (code specifically related to Spyder internal shell was removed)
 
 Bug fixes:
 
-* Array editor: showing a critical message box ("Array is not writeable") when NumPy
-  array flag "writeable" is False, instead of trying to change flag value since it's
-  a deprecated feature since NumPy v1.17
+* Array editor: fixed error when NumPy array flag "writeable" is False,
+  do not try to change flag value since it's a deprecated feature since NumPy v1.17
 * Do not install Qt translator and set color mode (dark/light) on Qt application if
   it already has been initialized (QApplication instance is not None)
 
