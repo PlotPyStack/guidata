@@ -12,19 +12,12 @@ DataSet objects may be saved in JSON files.
 This script shows how to save in and then reload data from a JSON file.
 """
 
-SHOW = True  # Show test in GUI-based test launcher
-
 import os
 
-from guidata.dataset.dataitems import StringItem
 from guidata.jsonio import JSONReader, JSONWriter
 from guidata.tests.all_items import TestParameters
 
-
-class TestParameters_Light(TestParameters):
-    date = StringItem("D1", default="Replacement for unsupported DateItem")
-    dtime = StringItem("D2", default="Replacement for unsupported DateTimeItem")
-
+SHOW = True  # Show test in GUI-based test launcher
 
 if __name__ == "__main__":
     # Create QApplication
