@@ -156,11 +156,13 @@ class JSONWriter(JSONHandler, WriterMixin):
 class JSONReader(JSONHandler):
     """Class handling JSON deserialization"""
 
-    def __init__(self, filename):
-        JSONHandler.__init__(self, filename)
-        if filename is not None and not os.path.isfile(filename):
+    def __init__(self, fname_or_jsontext):
+        """JSONReader constructor:
+        * fname_or_jsontext: JSON filename or JSON text"""
+        JSONHandler.__init__(self, fname_or_jsontext)
+        if fname_or_jsontext is not None and not os.path.isfile(fname_or_jsontext):
             self.filename = None
-            self.jsontext = filename
+            self.jsontext = fname_or_jsontext
         self.load()
 
     def read(self, group_name=None, func=None, instance=None):
