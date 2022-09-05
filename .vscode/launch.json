@@ -9,14 +9,20 @@
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/guidata/tests/__init__.py",
-            "console": "integratedTerminal"
+            "console": "integratedTerminal",
+            "env": {
+                // "QT_COLOR_MODE": "light",
+            }
         },
         {
             "name": "Python : Current file",
             "type": "python",
             "request": "launch",
             "program": "${file}",
-            "console": "integratedTerminal"
+            "console": "integratedTerminal",
+            "env": {
+                // "QT_COLOR_MODE": "light",
+            }
         }
     ]
 }
