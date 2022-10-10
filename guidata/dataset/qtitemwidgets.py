@@ -420,6 +420,9 @@ class DateWidget(AbstractDataSetWidget):
         self.dateedit = self.group = QDateEdit()
         self.dateedit.setToolTip(item.get_help())
         self.dateedit.dateTimeChanged.connect(lambda value: self.notify_value_change())
+        fmt = self.item.get_prop("display", "format", None)
+        if fmt:
+            self.dateedit.setDisplayFormat(fmt)
 
     def get(self):
         """Override AbstractDataSetWidget method"""
@@ -451,6 +454,9 @@ class DateTimeWidget(AbstractDataSetWidget):
         self.dateedit.setCalendarPopup(True)
         self.dateedit.setToolTip(item.get_help())
         self.dateedit.dateTimeChanged.connect(lambda value: self.notify_value_change())
+        fmt = self.item.get_prop("display", "format", None)
+        if fmt:
+            self.dateedit.setDisplayFormat(fmt)
 
     def get(self):
         """Override AbstractDataSetWidget method"""

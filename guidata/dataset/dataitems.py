@@ -312,10 +312,15 @@ class DateItem(DataItem):
         * text [string]: form's field name (optional)
         * label [string]: name
         * default [datetime.date]: default value (optional)
+        * format [string]: display format for date (optional)
         * help [string]: text shown in tooltip (optional)
     """
 
     type = datetime.date
+
+    def __init__(self, label, default=None, format=None, help="", check=True):
+        DataItem.__init__(self, label, default=default, help=help)
+        self.set_prop("display", format=format)
 
 
 class DateTimeItem(DateItem):
