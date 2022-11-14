@@ -12,12 +12,12 @@ configtools
 The ``guidata.configtools`` module provides configuration related tools.
 """
 
+import gettext
 import os
 import os.path as osp
 import sys
-import gettext
 
-from guidata.utils import get_module_path, decode_fs_string
+from guidata.utils import decode_fs_string, get_module_path
 
 IMG_PATH = []
 
@@ -50,9 +50,12 @@ def get_translation(modname, dirname=None):
         if lang is not None:
             os.environ["LANG"] = lang
     try:
-        _trans = gettext.translation(
-            modname, get_module_locale_path(dirname), codeset="utf-8"
-        )
+        modlocpath = get_module_locale_path(dirname)
+        try:
+            _trans = gettext.translation(modname, modlocpath, codeset="utf-8")
+        except TypeError:
+            # Python >= 3.11 (codeset argument has been removed)
+            _trans = gettext.translation(modname, modlocpath)
         lgettext = _trans.gettext
 
         def translate_gettext(x):
@@ -162,8 +165,8 @@ def get_image_layout(imagename, text="", tooltip="", alignment=None):
     left-aligned text [with specified tooltip]
     Return (layout, label)
     """
-    from qtpy import QtWidgets as QW
     from qtpy import QtCore as QC
+    from qtpy import QtWidgets as QW
 
     if alignment is None:
         alignment = QC.Qt.AlignLeft
@@ -261,8 +264,8 @@ def get_pen(conf, section, option="", color="black", width=1, style="SolidLine")
     [width]: default width
     [style]: default style
     """
-    from qtpy import QtGui as QG
     from qtpy import QtCore as QC
+    from qtpy import QtGui as QG
 
     if "pen" not in option:
         option += "/pen"
