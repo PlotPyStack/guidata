@@ -13,7 +13,7 @@ Simple example of ``guidata`` datasets embedded in an application window:
 See [documentation](https://guidata.readthedocs.io/en/latest/) for more details on
 the library and [changelog](CHANGELOG.md) for recent history of changes.
 
-Copyright © 2009-2021 CEA, Pierre Raybaut, licensed under the terms of the
+Copyright © 2009-2022 CEA, Pierre Raybaut, licensed under the terms of the
 CECILL License (see ``Licence_CeCILL_V2-en.txt``).
 
 ## Overview

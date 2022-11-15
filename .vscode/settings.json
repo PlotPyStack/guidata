@@ -20,4 +20,5 @@
     ],
     "python.linting.pycodestyleEnabled": true,
     "python.formatting.provider": "black",
+    "esbonio.sphinx.confDir": "",
 }

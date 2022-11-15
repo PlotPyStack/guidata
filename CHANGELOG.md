@@ -1,5 +1,15 @@
 # guidata Releases #
 
+## Version 2.3.1 ##
+
+Bug fixes:
+
+* Fixed critical compatibility issue with Python 3.11 (`codeset` argument was removed
+  from `gettext.translation` function)
+* Fixed support for `DateTimeItem` and `DateItem` objects serializing (HDF5 and JSON)
+* Fixed JSONReader constructor documentation: more explicit docstring
+* Fixed test_dataframeeditor.py test script (issue with QApplication creation)
+
 ## Version 2.3.0 ##
 
 Changes:

@@ -20,17 +20,17 @@ Licensed under the terms of the CECILL License
 (see guidata/__init__.py for details)
 """
 
-import setuptools  # analysis:ignore
-from distutils.core import setup
-import sys
+import atexit
 import os
 import os.path as osp
 import shutil
-import atexit
 import subprocess
+import sys
+from distutils.core import setup
 
-from guidata.utils import get_subpackages, get_package_data
+import setuptools  # analysis:ignore
 
+from guidata.utils import get_package_data, get_subpackages
 
 LIBNAME = "guidata"
 from guidata import __version__ as version
@@ -49,7 +49,7 @@ Simple example of ``guidata`` datasets embedded in an application window:
 
 See `documentation`_ for more details on the library and `changelog`_ for recent history of changes.
 
-Copyright © 2009-2021 CEA, Pierre Raybaut, licensed under the terms of the
+Copyright © 2009-2022 CEA, Pierre Raybaut, licensed under the terms of the
 `CECILL License`_.
 
 .. _documentation: https://guidata.readthedocs.io/en/latest/
