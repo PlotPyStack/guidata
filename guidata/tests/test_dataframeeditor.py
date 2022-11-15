@@ -21,7 +21,6 @@ from guidata.widgets.dataframeeditor import DataFrameEditor
 
 def test_edit(data, title="", parent=None):
     """Test subroutine"""
-    app = qapplication()  # analysis:ignore
     dlg = DataFrameEditor(parent=parent)
 
     if dlg.setup_and_check(data, title=title):
@@ -35,6 +34,7 @@ def test_edit(data, title="", parent=None):
 
 def test_dataframeeditor():
     """DataFrame editor test"""
+    app = qapplication()  # analysis:ignore
 
     df1 = DataFrame(
         [
