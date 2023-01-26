@@ -580,6 +580,11 @@ class FirstChoice:
     is the first item.
     """
 
+    """
+    Special object that means the default value of a ChoiceItem
+    is the first item.
+    """
+
     pass
 
 
@@ -715,15 +720,19 @@ class MultipleChoiceItem(ChoiceItem):
         reader: Union["HDF5Reader", "JSONReader", "UserConfigReader"],
     ) -> None:
         """Deserialize this item"""
-        flags = reader.read_sequence()
-        # We could have trouble with objects providing their own choice
-        # function which depend on not yet deserialized values
-        _choices = self.get_prop_value("data", instance, "choices")
-        value = []
-        for idx, flag in enumerate(flags):
-            if flag:
-                value.append(_choices[idx][0])
-        self.__set__(instance, value)
+        try:
+            flags = reader.read_sequence()
+        except KeyError:
+            self.set_default(instance)
+        else:
+            # We could have trouble with objects providing their own choice
+            # function which depend on not yet deserialized values
+            _choices = self.get_prop_value("data", instance, "choices")
+            value = []
+            for idx, flag in enumerate(flags):
+                if flag:
+                    value.append(_choices[idx][0])
+            self.__set__(instance, value)
 
 
 class ImageChoiceItem(ChoiceItem):

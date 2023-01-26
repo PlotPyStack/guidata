@@ -18,8 +18,7 @@ Example: ChoiceWidget <--> ChoiceItem, ImageChoiceItem
 """
 import collections.abc
 import datetime
-import collections.abc
-import datetime
+
 import os
 import os.path as osp
 import sys
@@ -502,6 +501,11 @@ class DateWidget(AbstractDataSetWidget):
         self.item.set(self.value())
 
     def value(self) -> datetime:  # type:ignore
+        """
+        Returns the widget's current value
+
+        :rtype date:
+        """
         """
         Returns the widget's current value
 
