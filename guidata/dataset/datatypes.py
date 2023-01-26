@@ -17,12 +17,11 @@ ValueProp, ...).
 # pylint: disable-msg=W0622
 # pylint: disable-msg=W0212
 
-import sys
-import re
 import collections.abc
+import re
+import sys
 
-from guidata.utils import utf8_to_unicode, update_dataset
-
+from guidata.utils import update_dataset, utf8_to_unicode
 
 DEBUG_DESERIALIZE = False
 
@@ -351,6 +350,9 @@ class DataItem(object):
         """
         try:
             value = self.get_value_from_reader(reader)
+        except KeyError:
+            self.set_default(instance)
+            return
         except RuntimeError as e:
             if DEBUG_DESERIALIZE:
                 import traceback
@@ -714,7 +716,7 @@ class DataSet(Meta_Py3Compat):
         win = DataSetShowDialog(self, icon=self.__icon, parent=parent, size=size)
         return win.exec_()
 
-    def to_string(self, debug=False, indent=None, align=False):
+    def to_string(self, debug=False, indent=None, align=False, show_hidden=True):
         """
         Return readable string representation of the data set
         If debug is True, add more details on data items
@@ -736,6 +738,12 @@ class DataSet(Meta_Py3Compat):
                 if item_length > length:
                     length = item_length
         for item in self._items:
+            try:
+                hide = item.get_prop_value("display", self, "hide")
+                if not show_hidden and hide == True:
+                    continue
+            except KeyError:
+                pass
             if isinstance(item, ObjectItem):
                 composite_dataset = item.get_value(self)
                 txt += indent + composite_dataset.to_string(
@@ -891,6 +899,12 @@ class DataSetGroup(object):
         Return data set group comment --> not implemented (will return None)
         """
         return None
+
+    def get_icon(self):
+        """
+        Return data set icon
+        """
+        return self.__icon
 
     def check(self):
         """

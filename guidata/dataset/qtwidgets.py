@@ -20,27 +20,26 @@ Dialog boxes used to edit data sets:
     DataSetShowLayout
 """
 
+from qtpy.compat import getopenfilename, getopenfilenames, getsavefilename
+from qtpy.QtCore import QRect, QSize, Qt, Signal
+from qtpy.QtGui import QBrush, QColor, QIcon, QPainter, QPicture
 from qtpy.QtWidgets import (
+    QApplication,
     QDialog,
-    QMessageBox,
     QDialogButtonBox,
-    QWidget,
-    QVBoxLayout,
     QGridLayout,
+    QGroupBox,
     QLabel,
+    QMessageBox,
+    QPushButton,
     QSpacerItem,
     QTabWidget,
-    QApplication,
-    QGroupBox,
-    QPushButton,
+    QVBoxLayout,
+    QWidget,
 )
-from qtpy.QtGui import QColor, QIcon, QPainter, QPicture, QBrush
-from qtpy.QtCore import Qt, QRect, QSize, Signal
-from qtpy.compat import getopenfilename, getopenfilenames, getsavefilename
 
-from guidata.configtools import get_icon
 from guidata.config import _
-
+from guidata.configtools import get_icon
 from guidata.dataset.datatypes import BeginGroup, EndGroup, GroupItem, TabGroupItem
 from guidata.qthelpers import win32_fix_title_bar_background
 
@@ -348,45 +347,46 @@ class DataSetEditLayout(object):
             self.change_callback()
 
 
-# Enregistrement des correspondances avec les widgets
-from guidata.dataset.qtitemwidgets import (
-    LineEditWidget,
-    TextEditWidget,
-    CheckBoxWidget,
-    ColorWidget,
-    FileWidget,
-    DirectoryWidget,
-    ChoiceWidget,
-    MultipleChoiceWidget,
-    FloatArrayWidget,
-    GroupWidget,
-    AbstractDataSetWidget,
-    ButtonWidget,
-    TabGroupWidget,
-    DateWidget,
-    DateTimeWidget,
-    SliderWidget,
-    FloatSliderWidget,
-)
 from guidata.dataset.dataitems import (
-    FloatItem,
-    StringItem,
-    TextItem,
-    IntItem,
     BoolItem,
-    ColorItem,
-    FileOpenItem,
-    FilesOpenItem,
-    FileSaveItem,
-    DirectoryItem,
-    ChoiceItem,
-    ImageChoiceItem,
-    MultipleChoiceItem,
-    FloatArrayItem,
     ButtonItem,
+    ChoiceItem,
+    ColorItem,
     DateItem,
     DateTimeItem,
     DictItem,
+    DirectoryItem,
+    FileOpenItem,
+    FileSaveItem,
+    FilesOpenItem,
+    FloatArrayItem,
+    FloatItem,
+    ImageChoiceItem,
+    IntItem,
+    MultipleChoiceItem,
+    StringItem,
+    TextItem,
+)
+
+# Enregistrement des correspondances avec les widgets
+from guidata.dataset.qtitemwidgets import (
+    AbstractDataSetWidget,
+    ButtonWidget,
+    CheckBoxWidget,
+    ChoiceWidget,
+    ColorWidget,
+    DateTimeWidget,
+    DateWidget,
+    DirectoryWidget,
+    FileWidget,
+    FloatArrayWidget,
+    FloatSliderWidget,
+    GroupWidget,
+    LineEditWidget,
+    MultipleChoiceWidget,
+    SliderWidget,
+    TabGroupWidget,
+    TextEditWidget,
 )
 
 DataSetEditLayout.register(GroupItem, GroupWidget)
@@ -607,12 +607,12 @@ class DataSetEditGroupBox(DataSetShowGroupBox):
         """Method called when any widget's value has changed"""
         self.set_apply_button_state(True)
 
-    def set(self):
+    def set(self, check=True):
         """Update data item values from layout contents"""
         for widget in self.edit.widgets:
-            if widget.is_active() and widget.check():
-                widget.set()
-        self.SIG_APPLY_BUTTON_CLICKED.emit()
+            if widget.is_active():
+                if not check or widget.check():
+                    widget.set()
         self.set_apply_button_state(False)
 
     def set_apply_button_state(self, state):

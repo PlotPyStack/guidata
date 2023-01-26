@@ -13,14 +13,14 @@ The ``guidata.dataset.dataitems`` module contains implementation for
 concrete DataItems.
 """
 
+import collections.abc
+import datetime
 import os
 import re
-import datetime
-import collections.abc
 
-from guidata.dataset.datatypes import DataItem, ItemProperty
-from guidata.utils import utf8_to_unicode, add_extension
 from guidata.config import _
+from guidata.dataset.datatypes import DataItem, ItemProperty
+from guidata.utils import add_extension, utf8_to_unicode
 
 
 class NumericTypeItem(DataItem):
@@ -239,7 +239,7 @@ class StringItem(DataItem):
         * wordwrap [bool]: toggle word wrapping (optional)
     """
 
-    type = (str,)
+    type = str
 
     def __init__(self, label, default=None, notempty=None, wordwrap=False, help=""):
         DataItem.__init__(self, label, default=default, help=help)
@@ -319,6 +319,14 @@ class DateItem(DataItem):
 
 
 class DateTimeItem(DateItem):
+    """
+    Construct a date time data item.
+        * text [string]: form's field name (optional)
+        * label [string]: name
+        * default [datetime.date]: default value (optional)
+        * help [string]: text shown in tooltip (optional)
+    """
+
     pass
 
 
@@ -507,6 +515,11 @@ class DirectoryItem(StringItem):
 
 
 class FirstChoice(object):
+    """
+    Special object that means the default value of a ChoiceItem
+    is the first item.
+    """
+
     pass
 
 
@@ -616,15 +629,19 @@ class MultipleChoiceItem(ChoiceItem):
 
     def deserialize(self, instance, reader):
         """Deserialize this item"""
-        flags = reader.read_sequence()
-        # We could have trouble with objects providing their own choice
-        # function which depend on not yet deserialized values
-        _choices = self.get_prop_value("data", instance, "choices")
-        value = []
-        for idx, flag in enumerate(flags):
-            if flag:
-                value.append(_choices[idx][0])
-        self.__set__(instance, value)
+        try:
+            flags = reader.read_sequence()
+        except KeyError:
+            self.set_default(instance)
+        else:
+            # We could have trouble with objects providing their own choice
+            # function which depend on not yet deserialized values
+            _choices = self.get_prop_value("data", instance, "choices")
+            value = []
+            for idx, flag in enumerate(flags):
+                if flag:
+                    value.append(_choices[idx][0])
+            self.__set__(instance, value)
 
 
 class ImageChoiceItem(ChoiceItem):

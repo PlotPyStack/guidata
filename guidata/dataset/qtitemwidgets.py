@@ -17,40 +17,40 @@ There is one widget type for each data item type.
 Example: ChoiceWidget <--> ChoiceItem, ImageChoiceItem
 """
 
+import collections.abc
+import datetime
 import os
 import os.path as osp
 import sys
-import numpy
-import collections.abc
-import datetime
 
+import numpy
+from qtpy.compat import getexistingdirectory
+from qtpy.QtCore import Qt, Signal
+from qtpy.QtGui import QColor, QIcon, QPixmap
 from qtpy.QtWidgets import (
-    QHBoxLayout,
-    QGridLayout,
-    QColorDialog,
-    QPushButton,
-    QLineEdit,
     QCheckBox,
+    QColorDialog,
     QComboBox,
-    QTabWidget,
-    QGroupBox,
-    QDateTimeEdit,
-    QLabel,
-    QTextEdit,
-    QFrame,
     QDateEdit,
-    QSlider,
+    QDateTimeEdit,
+    QFrame,
+    QGridLayout,
+    QGroupBox,
+    QHBoxLayout,
+    QLabel,
+    QLineEdit,
+    QPushButton,
     QRadioButton,
+    QSlider,
+    QTabWidget,
+    QTextEdit,
     QVBoxLayout,
 )
-from qtpy.QtGui import QColor, QIcon, QPixmap
-from qtpy.QtCore import Qt, Signal
-from qtpy.compat import getexistingdirectory
 
-from guidata.utils import update_dataset, restore_dataset, utf8_to_unicode
-from guidata.qthelpers import text_to_qcolor, get_std_icon
-from guidata.configtools import get_icon, get_image_layout, get_image_file_path
 from guidata.config import _
+from guidata.configtools import get_icon, get_image_file_path, get_image_layout
+from guidata.qthelpers import get_std_icon, text_to_qcolor
+from guidata.utils import restore_dataset, update_dataset, utf8_to_unicode
 from guidata.widgets.arrayeditor import ArrayEditor
 
 # ========================== <!> IMPORTANT <!> =================================
@@ -434,6 +434,11 @@ class DateWidget(AbstractDataSetWidget):
         self.item.set(self.value())
 
     def value(self):
+        """
+        Returns the widget's current value
+
+        :rtype date:
+        """
         try:
             return self.dateedit.date().toPyDate()
         except AttributeError:
