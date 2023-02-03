@@ -15,8 +15,9 @@ for example when deriving a dataset from another.
 
 SHOW = True  # Show test in GUI-based test launcher
 
-import guidata.dataset.datatypes as gdt
 import guidata.dataset.dataitems as gdi
+import guidata.dataset.datatypes as gdt
+from utils.qthelpers import execenv
 
 
 class OriginalDataset(gdt.DataSet):
@@ -50,3 +51,4 @@ if __name__ == "__main__":
     e = DerivedDataset()
     e.edit()
     print(e)
+    execenv.print("OK")

@@ -16,6 +16,7 @@ import os
 
 from guidata.jsonio import JSONReader, JSONWriter
 from guidata.tests.all_items import TestParameters
+from utils.qthelpers import execenv
 
 SHOW = True  # Show test in GUI-based test launcher
 
@@ -38,3 +39,4 @@ if __name__ == "__main__":
         reader = JSONReader("test.json")
         e.deserialize(reader)
         e.edit()
+    execenv.print("OK")

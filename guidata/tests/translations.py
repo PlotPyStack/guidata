@@ -11,9 +11,11 @@
 SHOW = False  # Do not show test in GUI-based test launcher
 
 from guidata.config import _
+from utils.qthelpers import execenv
 
 translations = (_("Some required entries are incorrect"),)
 
 if __name__ == "__main__":
     for text in translations:
         print(text)
+    execenv.print("OK")

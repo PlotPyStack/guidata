@@ -50,7 +50,7 @@ def is_dark_mode():
 
 def win32_fix_title_bar_background(widget):
     """Fix window title bar background for Windows 10+ dark theme"""
-    if os.name != "nt" or not is_dark_mode() or sys.maxsize == 2**31-1:
+    if os.name != "nt" or not is_dark_mode() or sys.maxsize == 2**31 - 1:
         return
 
     import ctypes
@@ -313,7 +313,7 @@ def show_std_icons():
     app = QApplication(sys.argv)
     dialog = ShowStdIcons(None)
     dialog.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())
 
 
 if __name__ == "__main__":

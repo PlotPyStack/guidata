@@ -26,6 +26,7 @@ import os
 
 from guidata.hdf5io import HDF5Reader, HDF5Writer
 from guidata.tests.all_items import TestParameters
+from utils.qthelpers import execenv
 
 if __name__ == "__main__":
     # Create QApplication
@@ -47,3 +48,4 @@ if __name__ == "__main__":
         e.deserialize(reader)
         reader.close()
         e.edit()
+    execenv.print("OK")

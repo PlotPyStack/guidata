@@ -15,8 +15,8 @@ from uuid import uuid1
 import h5py
 import numpy as np
 
-from guidata.utils import utf8_to_unicode
 from guidata.userconfigio import BaseIOHandler, WriterMixin
+from guidata.utils import utf8_to_unicode
 
 
 class TypeConverter(object):
@@ -241,7 +241,7 @@ class HDF5Writer(HDF5Handler, WriterMixin):
     """Writer for HDF5 files"""
 
     def __init__(self, filename):
-        super(HDF5Writer, self).__init__(filename)
+        super().__init__(filename)
         self.open("w")
 
     def write_any(self, val):
@@ -294,7 +294,7 @@ class HDF5Reader(HDF5Handler):
     """Reader for HDF5 files"""
 
     def __init__(self, filename):
-        super(HDF5Reader, self).__init__(filename)
+        super().__init__(filename)
         self.open("r")
 
     def read(self, group_name=None, func=None, instance=None):

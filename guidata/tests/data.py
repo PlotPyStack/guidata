@@ -10,9 +10,11 @@
 SHOW = False  # Do not show test in GUI-based test launcher
 
 import unittest
-from guidata.dataset.datatypes import DataSet
+
 from guidata.dataset.dataitems import FloatItem, IntItem
+from guidata.dataset.datatypes import DataSet
 from guidata.utils import update_dataset
+from utils.qthelpers import execenv
 
 
 class Parameters(DataSet):
@@ -50,3 +52,4 @@ class TestCheck(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+    execenv.print("OK")

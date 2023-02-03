@@ -20,15 +20,15 @@ This package provides an Editor widget based on QtGui.QPlainTextEdit.
 # pylint: disable=R0911
 # pylint: disable=R0201
 
-from qtpy.QtWidgets import QWidget, QPlainTextEdit
-from qtpy.QtGui import QColor, QPainter
 from qtpy.QtCore import QRect, QSize, Qt
+from qtpy.QtGui import QColor, QPainter
+from qtpy.QtWidgets import QPlainTextEdit, QWidget
 
 import guidata.widgets.syntaxhighlighters as sh
-from guidata.configtools import get_font
 from guidata import encoding
-from guidata.qthelpers import is_dark_mode, win32_fix_title_bar_background
 from guidata.config import CONF, _
+from guidata.configtools import get_font
+from guidata.qthelpers import is_dark_mode, win32_fix_title_bar_background
 
 
 class LineNumberArea(QWidget):
@@ -361,4 +361,4 @@ if __name__ == "__main__":
     widget = CodeEditor(columns=80, rows=40)
     widget.set_text_from_file(__file__)
     widget.show()
-    app.exec_()
+    exec_application(app)

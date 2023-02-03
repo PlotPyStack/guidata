@@ -9,9 +9,12 @@ SHOW = True  # Show test in GUI-based test launcher
 Tests for codeeditor.py
 """
 
+from qtpy import QtCore as QC
+
 # Local imports
 from guidata import qapplication
 from guidata.widgets.console import Console
+from utils.qthelpers import execenv
 
 
 def test_console():
@@ -22,11 +25,14 @@ def test_console():
     widget = Console(debug=False, multithreaded=True)
     widget.resize(800, 600)
     widget.show()
-    try:
-        app.exec()
-    except AttributeError:
-        app.exec_()
+    if execenv.unattended:
+        QC.QTimer.singleShot(
+            execenv.delay * 1000,
+            lambda: Console.close(widget),
+        )
+    app.exec()
 
 
 if __name__ == "__main__":
     test_console()
+    execenv.print("OK")

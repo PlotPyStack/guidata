@@ -19,8 +19,9 @@ So this example with dialog boxes may be confusing.
 
 SHOW = True  # Show test in GUI-based test launcher
 
+from guidata.dataset.dataitems import BoolItem, ChoiceItem, ColorItem, FloatItem
 from guidata.dataset.datatypes import ActivableDataSet
-from guidata.dataset.dataitems import BoolItem, FloatItem, ChoiceItem, ColorItem
+from utils.qthelpers import execenv
 
 
 class ExampleDataSet(ActivableDataSet):
@@ -28,6 +29,9 @@ class ExampleDataSet(ActivableDataSet):
     Example
     <b>Activable dataset example</b>
     """
+
+    def __init__(self, title=None, comment=None, icon=""):
+        ActivableDataSet.__init__(self, title, comment, icon)
 
     enable = BoolItem(
         "Enable parameter set",
@@ -48,7 +52,6 @@ if __name__ == "__main__":
     import guidata
 
     _app = guidata.qapplication()
-
     # Editing mode:
     prm = ExampleDataSet()
     prm.set_writeable()
@@ -57,3 +60,4 @@ if __name__ == "__main__":
     # Showing mode:
     prm.set_readonly()
     prm.view()
+    execenv.print("OK")

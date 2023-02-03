@@ -16,10 +16,8 @@ from functools import partial as ft_partial
 from itertools import zip_longest
 
 from numpy import nan
-
-from guidata.configtools import get_icon
-from guidata.qthelpers import add_actions, create_action, win32_fix_title_bar_background
-from guidata.config import _
+from qtpy.QtCore import QAbstractTableModel, QModelIndex, Qt, Signal, Slot
+from qtpy.QtGui import QColor, QIntValidator
 from qtpy.QtWidgets import (
     QCheckBox,
     QDialog,
@@ -41,17 +39,10 @@ from qtpy.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
-from qtpy.QtGui import (
-    QColor,
-    QIntValidator,
-)
-from qtpy.QtCore import (
-    QAbstractTableModel,
-    QModelIndex,
-    Qt,
-    Signal,
-    Slot,
-)
+
+from guidata.config import _
+from guidata.configtools import get_icon
+from guidata.qthelpers import add_actions, create_action, win32_fix_title_bar_background
 
 try:
     import pandas as pd
@@ -88,14 +79,14 @@ def try_to_eval(value):
 
 
 # ----Numpy arrays support
-class FakeObject(object):
+class FakeObject:
     """Fake class used in replacement of missing modules"""
 
     pass
 
 
 try:
-    from numpy import ndarray, array
+    from numpy import array, ndarray
 except:
 
     class ndarray(FakeObject):  # analysis:ignore
@@ -281,7 +272,7 @@ class ContentsWidget(QWidget):
     def get_col_sep(self):
         """Return the column separator"""
         if self.tab_btn.isChecked():
-            return u"\t"
+            return "\t"
         elif self.ws_btn.isChecked():
             return None
         return str(self.line_edt.text())
@@ -289,7 +280,7 @@ class ContentsWidget(QWidget):
     def get_row_sep(self):
         """Return the row separator"""
         if self.eol_btn.isChecked():
-            return u"\n"
+            return "\n"
         return str(self.line_edt_row.text())
 
     def get_skiprows(self):
@@ -441,8 +432,8 @@ class PreviewTable(QTableView):
     def _shape_text(
         self,
         text,
-        colsep=u"\t",
-        rowsep=u"\n",
+        colsep="\t",
+        rowsep="\n",
         transpose=False,
         skiprows=0,
         comments="#",
@@ -477,8 +468,8 @@ class PreviewTable(QTableView):
     def process_data(
         self,
         text,
-        colsep=u"\t",
-        rowsep=u"\n",
+        colsep="\t",
+        rowsep="\n",
         transpose=False,
         skiprows=0,
         comments="#",
@@ -543,8 +534,8 @@ class PreviewWidget(QWidget):
     def open_data(
         self,
         text,
-        colsep=u"\t",
-        rowsep=u"\n",
+        colsep="\t",
+        rowsep="\n",
         transpose=False,
         skiprows=0,
         comments="#",

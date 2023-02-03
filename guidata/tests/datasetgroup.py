@@ -15,8 +15,9 @@ in a single dialog box (with one tab per DataSet object).
 
 SHOW = True  # Show test in GUI-based test launcher
 
-from guidata.tests.all_features import TestParameters
 from guidata.dataset.datatypes import DataSetGroup
+from guidata.tests.all_features import TestParameters
+from utils.qthelpers import execenv
 
 if __name__ == "__main__":
     # Create QApplication
@@ -30,3 +31,4 @@ if __name__ == "__main__":
     g.edit()
     print(e1)
     g.edit()
+    execenv.print("OK")

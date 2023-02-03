@@ -17,6 +17,7 @@ SHOW = True  # Show test in GUI-based test launcher
 import os.path as osp
 
 from guidata.disthelpers import Distribution
+from utils.qthelpers import execenv
 
 if __name__ == "__main__":
     dist = Distribution()
@@ -29,3 +30,4 @@ if __name__ == "__main__":
     )
     dist.add_modules("guidata")
     dist.build("cx_Freeze")
+    execenv.print("OK")

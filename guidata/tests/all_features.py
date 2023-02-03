@@ -12,37 +12,42 @@ All guidata item/group features demo
 
 SHOW = True  # Show test in GUI-based test launcher
 
-import tempfile, atexit, shutil
+import atexit
+import shutil
+import tempfile
+
 import numpy as np
 
-from guidata.dataset.datatypes import (
-    DataSet,
-    BeginTabGroup,
-    EndTabGroup,
-    BeginGroup,
-    EndGroup,
-    ObjectItem,
-)
 from guidata.dataset.dataitems import (
-    FloatItem,
-    IntItem,
     BoolItem,
+    ButtonItem,
     ChoiceItem,
-    MultipleChoiceItem,
-    ImageChoiceItem,
+    ColorItem,
+    DictItem,
+    DirectoryItem,
+    FileOpenItem,
+    FileSaveItem,
     FilesOpenItem,
+    FloatArrayItem,
+    FloatItem,
+    ImageChoiceItem,
+    IntItem,
+    MultipleChoiceItem,
     StringItem,
     TextItem,
-    ColorItem,
-    FileSaveItem,
-    FileOpenItem,
-    DirectoryItem,
-    FloatArrayItem,
 )
-
-from guidata.dataset.qtwidgets import DataSetEditLayout, DataSetShowLayout
+from guidata.dataset.datatypes import (
+    BeginGroup,
+    BeginTabGroup,
+    DataSet,
+    EndGroup,
+    EndTabGroup,
+    ObjectItem,
+)
 from guidata.dataset.qtitemwidgets import DataSetWidget
-
+from guidata.dataset.qtwidgets import DataSetEditLayout, DataSetShowLayout
+from guidata.env import execenv
+from utils.qthelpers import exec_action
 
 # Creating temporary files and registering cleanup functions
 TEMPDIR = tempfile.mkdtemp(prefix="test_")
@@ -80,7 +85,14 @@ class TestParameters(DataSet):
     as well as special characters (α, β, γ, δ, ...)
     """
 
-    files = SubDataSetItem("files")
+    dict_ = DictItem(
+        "dict_item",
+        {
+            "strings_col": ["a", "b", "c"],
+            "_col": [1, 2.0, 3],
+            "float_col": 1.0,
+        },
+    )
     string = StringItem("String")
     text = TextItem("Text")
     _bg = BeginGroup("A sub group")
@@ -131,7 +143,7 @@ class TestParameters(DataSet):
     )
     eg0 = EndTabGroup("group")
     integer_slider = IntItem(
-        "Integer (with slider)", default=5, min=-50, max=100, slider=True
+        "Integer (with slider)", default=5, min=-50, max=-50, slider=True
     )
     integer = IntItem("Integer", default=5, min=3, max=6).set_pos(col=1)
 
@@ -145,7 +157,9 @@ if __name__ == "__main__":
     e = TestParameters()
     e.floatarray[:, 0] = np.linspace(-5, 5, 50)
     print(e)
+
     if e.edit():
         e.edit()
         print(e)
     e.view()
+    execenv.print("OK")
