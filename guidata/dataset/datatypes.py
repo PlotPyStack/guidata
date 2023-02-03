@@ -76,7 +76,7 @@ class FormatProp(ItemProperty):
     """A Property that returns a string to help
     custom read-only representation of items"""
 
-    def __init__(self, fmt: str, ignore_error: Optional[bool] = True) -> None:
+    def __init__(self, fmt: str, ignore_error: bool = True) -> None:
         """fmt is a format string
         it can contain a single anonymous substition or
         several named substitions.
@@ -181,8 +181,8 @@ class DataItem:
         self,
         label: str,
         default: Optional[Any] = None,
-        help: Optional[str] = "",
-        check: Optional[bool] = True,
+        help: str = "",
+        check: bool = True,
     ) -> None:
         self._order = DataItem.count
         DataItem.count += 1
@@ -802,10 +802,10 @@ class DataSet(metaclass=DataSetMeta):
 
     def to_string(
         self,
-        debug: Optional[bool] = False,
+        debug: bool = False,
         indent: Optional[str] = None,
-        align: Optional[bool] = False,
-        show_hidden: Optional[bool] = True,
+        align: bool = False,
+        show_hidden: bool = True,
     ):
         """
         Return readable string representation of the data set
