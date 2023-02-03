@@ -10,10 +10,12 @@ import datetime
 
 import numpy as np
 import PIL.Image
+
 from guidata import qapplication
 from guidata.widgets.objecteditor import oedit
 
 SHOW = True  # Show test in GUI-based test launcher
+from utils.qthelpers import execenv
 
 
 def test():
@@ -32,7 +34,7 @@ def test():
     }
     image = oedit(image)
 
-    class Foobar(object):
+    class Foobar:
         """ """
 
         def __init__(self):
@@ -51,3 +53,4 @@ if __name__ == "__main__":
 
     app = qapplication()
     test()
+    execenv.print("OK")

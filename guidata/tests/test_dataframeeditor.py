@@ -17,6 +17,7 @@ from pandas.testing import assert_frame_equal, assert_series_equal
 # Local imports
 from guidata import qapplication
 from guidata.widgets.dataframeeditor import DataFrameEditor
+from utils.qthelpers import exec_dialog, execenv
 
 
 def test_edit(data, title="", parent=None):
@@ -24,7 +25,7 @@ def test_edit(data, title="", parent=None):
     dlg = DataFrameEditor(parent=parent)
 
     if dlg.setup_and_check(data, title=title):
-        dlg.exec_()
+        exec_dialog(dlg)
         return dlg.get_value()
     else:
         import sys
@@ -68,3 +69,4 @@ def test_dataframeeditor():
 
 if __name__ == "__main__":
     test_dataframeeditor()
+    execenv.print("OK")

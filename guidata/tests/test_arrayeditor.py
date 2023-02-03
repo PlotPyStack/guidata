@@ -14,13 +14,14 @@ import numpy as np
 # Local imports
 from guidata import qapplication
 from guidata.widgets.arrayeditor import ArrayEditor
+from utils.qthelpers import exec_dialog, execenv
 
 
 def launch_arrayeditor(data, title="", xlabels=None, ylabels=None):
     """Helper routine to launch an arrayeditor and return its result"""
     dlg = ArrayEditor()
     dlg.setup_and_check(data, title, xlabels=xlabels, ylabels=ylabels)
-    dlg.exec_()
+    exec_dialog(dlg)
     return dlg.get_value()
 
 
@@ -28,7 +29,7 @@ def test_arrayeditor():
     """Test array editor for all supported data types"""
     for title, data in (
         ("string array", np.array(["kjrekrjkejr"])),
-        ("unicode array", np.array([u"ñññéáíó"])),
+        ("unicode array", np.array(["ñññéáíó"])),
         (
             "masked array",
             np.ma.array([[1, 0], [1, 0]], mask=[[True, False], [False, False]]),
@@ -77,3 +78,4 @@ def test_arrayeditor():
 if __name__ == "__main__":
     app = qapplication()
     test_arrayeditor()
+    execenv.print("OK")

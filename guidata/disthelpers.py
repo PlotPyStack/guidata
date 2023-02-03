@@ -16,15 +16,15 @@ package distribution on Microsoft Windows platforms with ``py2exe`` or on
 all platforms thanks to ``cx_Freeze``.
 """
 
-import sys
+import atexit
+import imp
 import os
 import os.path as osp
 import shutil
+import sys
 import traceback
-import atexit
-import imp
-from subprocess import Popen, PIPE
 import warnings
+from subprocess import PIPE, Popen
 
 # Local imports
 from guidata.configtools import get_module_path
@@ -152,7 +152,7 @@ def get_msvc_dlls(msvc_version, architecture=None, check_architecture=False):
 
     architecture: integer (32 or 64) -- if None, take the Python build arch
     python_version: X.Y"""
-    current_architecture = 64 if sys.maxsize > 2 ** 32 else 32
+    current_architecture = 64 if sys.maxsize > 2**32 else 32
     if architecture is None:
         architecture = current_architecture
     assert architecture in (32, 64)
@@ -916,6 +916,7 @@ class Distribution(object):
             * 'move': move target directory to a ZIP archive
         """
         from distutils.core import setup
+
         import py2exe  # Patching distutils -- analysis:ignore
 
         self._py2exe_is_loaded = True
@@ -975,10 +976,8 @@ class Distribution(object):
             * 'move': move target directory to a ZIP archive
         """
         assert not self._py2exe_is_loaded, "cx_Freeze can't be executed after py2exe"
-        from cx_Freeze import setup
-
         # ===== Monkey-patching cx_Freeze (backported from v5.0 dev) ===========
-        from cx_Freeze import hooks
+        from cx_Freeze import hooks, setup
 
         def load_h5py(finder, module):
             """h5py module has a number of implicit imports"""

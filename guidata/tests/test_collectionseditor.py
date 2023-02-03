@@ -10,11 +10,13 @@ Tests for collectionseditor.py
 """
 
 import datetime
+
 import numpy as np
 
 # Local imports
 from guidata import qapplication
 from guidata.widgets.collectionseditor import CollectionsEditor
+from utils.qthelpers import exec_application, execenv
 
 
 def get_test_data():
@@ -49,7 +51,7 @@ def get_test_data():
             }
         )
 
-    class Foobar(object):
+    class Foobar:
         """ """
 
         def __init__(self):
@@ -114,8 +116,9 @@ def test_collectionseditor():
     dialog = CollectionsEditor()
     dialog.setup(get_test_data())
     dialog.show()
-    app.exec_()
+    exec_application(app)
 
 
 if __name__ == "__main__":
     test_collectionseditor()
+    execenv.print("OK")

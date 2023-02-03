@@ -11,8 +11,9 @@ SHOW = False  # Do not show test in GUI-based test launcher
 
 import unittest
 
-from guidata.tests.all_features import TestParameters
 from guidata.config import UserConfig
+from guidata.tests.all_features import TestParameters
+from utils.qthelpers import execenv
 
 
 class TestBasic(unittest.TestCase):
@@ -56,3 +57,4 @@ class TestBasic(unittest.TestCase):
 if __name__ == "__main__":
     CONF = UserConfig({})
     unittest.main()
+    execenv.print("OK")

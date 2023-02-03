@@ -14,9 +14,10 @@ version = 1.0.0
 b/f = 1.0
 """
 
-from guidata.dataset import datatypes as gdt
-from guidata.dataset import dataitems as gdi
 from guidata import userconfig
+from guidata.dataset import dataitems as gdi
+from guidata.dataset import datatypes as gdt
+from utils.qthelpers import execenv
 
 
 class DS(gdt.DataSet):
@@ -30,3 +31,4 @@ if __name__ == "__main__":
     ds.write_config(uc, "a", "b")
 
     print("Settings saved in: ", uc.filename())
+    execenv.print("OK")

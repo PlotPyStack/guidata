@@ -15,16 +15,17 @@ The ``guidata.utils`` module provides various utility helper functions
 (pure python).
 """
 
-import sys
-import time
-import subprocess
+import collections.abc
+import locale  # Warning: 2to3 false alarm ('import' fixer)
 import os
 import os.path as osp
-import locale  # Warning: 2to3 false alarm ('import' fixer)
-import collections.abc
+import subprocess
+import sys
+import time
 
 # Local imports
 from guidata.userconfig import get_home_dir
+
 
 # ==============================================================================
 # Misc.
@@ -49,7 +50,7 @@ def pairs(iterable):
         first = second
 
 
-def add_extension(item, value):
+def add_extension(item, value) -> str:
     """Add extension to filename
     `item`: data item representing a file path
     `value`: possible value for data item"""

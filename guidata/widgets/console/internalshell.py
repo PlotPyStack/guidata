@@ -21,21 +21,22 @@ import sys
 import threading
 from time import time
 
+from qtpy.QtCore import QEventLoop, QObject, Signal, Slot
+from qtpy.QtWidgets import QMessageBox
+
 from guidata.config import CONF, _
 from guidata.qthelpers import create_action, get_std_icon, is_dark_mode
 from guidata.utils import getcwd_or_home, run_program
 from guidata.widgets.console.dochelpers import getargtxt, getdoc, getobjdir, getsource
 from guidata.widgets.console.interpreter import Interpreter
 from guidata.widgets.console.shell import PythonShellWidget
-from qtpy.QtCore import QEventLoop, QObject, Signal, Slot
-from qtpy.QtWidgets import QMessageBox
 
 
 def create_banner(message):
     """Create internal shell banner"""
     system = platform.system()
     if message is None:
-        bitness = 64 if sys.maxsize > 2 ** 32 else 32
+        bitness = 64 if sys.maxsize > 2**32 else 32
         return "Python %s %dbits [%s]" % (platform.python_version(), bitness, system)
     else:
         return message
@@ -280,7 +281,7 @@ class InternalShell(PythonShellWidget):
         self.setFocus()
         self.input_mode = True
         self.input_loop = QEventLoop()
-        self.input_loop.exec_()
+        self.input_loop.exec()
         self.input_loop = None
 
     def end_input(self, cmd):
@@ -364,7 +365,7 @@ class InternalShell(PythonShellWidget):
             t0 = time()
             for _ in range(10):
                 self.execute_command(command)
-            self.insert_text(u"\n<Δt>=%dms\n" % (1e2 * (time() - t0)))
+            self.insert_text("\n<Δt>=%dms\n" % (1e2 * (time() - t0)))
             self.new_prompt(self.interpreter.p1)
         else:
             self.execute_command(command)

@@ -16,23 +16,29 @@ Widget factories used to edit data items
 There is one widget type for each data item type.
 Example: ChoiceWidget <--> ChoiceItem, ImageChoiceItem
 """
-
+import collections.abc
+import datetime
 import collections.abc
 import datetime
 import os
 import os.path as osp
 import sys
+from abc import abstractmethod
+from typing import TYPE_CHECKING, Any, Callable, List, Optional, Protocol
 
 import numpy
 from qtpy.compat import getexistingdirectory
-from qtpy.QtCore import Qt, Signal
+from qtpy.QtCore import Qt, QVariant, Signal
 from qtpy.QtGui import QColor, QIcon, QPixmap
 from qtpy.QtWidgets import (
+    QAbstractButton,
+    QBoxLayout,
     QCheckBox,
     QColorDialog,
     QComboBox,
     QDateEdit,
     QDateTimeEdit,
+    QFileDialog,
     QFrame,
     QGridLayout,
     QGroupBox,
@@ -45,6 +51,7 @@ from qtpy.QtWidgets import (
     QTabWidget,
     QTextEdit,
     QVBoxLayout,
+    QWidget,
 )
 
 from guidata.config import _
@@ -62,8 +69,11 @@ from guidata.widgets.arrayeditor import ArrayEditor
 
 # XXX: consider providing an interface here...
 
+if TYPE_CHECKING:
+    from guidata.dataset.qtwidgets import DataSetEditLayout
 
-class AbstractDataSetWidget(object):
+
+class AbstractDataSetWidget:
     """
     Base class for 'widgets' handled by `DataSetEditLayout` and it's derived
     classes.
@@ -77,17 +87,19 @@ class AbstractDataSetWidget(object):
 
     READ_ONLY = False
 
-    def __init__(self, item, parent_layout):
+    def __init__(
+        self, item: "DataItemVariable", parent_layout: "DataSetEditLayout"
+    ) -> None:
         """Derived constructors should create the necessary widgets
         The base class keeps a reference to item and parent
         """
         self.item = item
         self.parent_layout = parent_layout
-        self.group = None  # Layout/Widget grouping items
-        self.label = None
+        self.group: Any = None  # Layout/Widget grouping items
+        self.label: Optional[QLabel] = None
         self.build_mode = False
 
-    def place_label(self, layout, row, column):
+    def place_label(self, layout: QGridLayout, row: int, column: int) -> None:
         """
         Place item label on layout at specified position (row, column)
         """
@@ -100,46 +112,52 @@ class AbstractDataSetWidget(object):
         layout.addWidget(self.label, row, column)
 
     def place_on_grid(
-        self, layout, row, label_column, widget_column, row_span=1, column_span=1
-    ):
+        self,
+        layout: QGridLayout,
+        row: int,
+        label_column: int,
+        widget_column: int,
+        row_span: int = 1,
+        column_span: int = 1,
+    ) -> None:
         """
         Place widget on layout at specified position
         """
         self.place_label(layout, row, label_column)
         layout.addWidget(self.group, row, widget_column, row_span, column_span)
 
-    def is_active(self):
+    def is_active(self) -> bool:
         """
         Return True if associated item is active
         """
         return self.item.get_prop_value("display", "active", True)
 
-    def check(self):
+    def check(self) -> bool:
         """
         Item validator
         """
         return True
 
-    def set(self):
+    def set(self) -> None:
         """
         Update data item value from widget contents
         """
         # XXX: consider using item.set instead of item.set_from_string...
         self.item.set_from_string(self.value())
 
-    def get(self):
+    def get(self) -> Any:
         """
         Update widget contents from data item value
         """
         pass
 
-    def value(self):
+    def value(self) -> Any:
         """
         Returns the widget's current value
         """
         return None
 
-    def set_state(self):
+    def set_state(self) -> None:
         """
         Update the visual status of the widget
         """
@@ -149,7 +167,7 @@ class AbstractDataSetWidget(object):
         if self.label:
             self.label.setEnabled(active)
 
-    def notify_value_change(self):
+    def notify_value_change(self) -> None:
         """
         Notify parent layout that widget value has changed
         """
@@ -162,8 +180,10 @@ class GroupWidget(AbstractDataSetWidget):
     GroupItem widget
     """
 
-    def __init__(self, item, parent_layout):
-        super(GroupWidget, self).__init__(item, parent_layout)
+    def __init__(
+        self, item: "DataItemVariable", parent_layout: "DataSetEditLayout"
+    ) -> None:
+        super().__init__(item, parent_layout)
         embedded = item.get_prop_value("display", "embedded", False)
         if not embedded:
             self.group = QGroupBox(item.get_prop_value("display", "label"))
@@ -180,30 +200,38 @@ class GroupWidget(AbstractDataSetWidget):
         )
         self.group.setLayout(self.layout)
 
-    def get(self):
+    def get(self) -> None:
         """Override AbstractDataSetWidget method"""
         self.edit.update_widgets()
 
-    def set(self):
+    def set(self) -> None:
         """Override AbstractDataSetWidget method"""
         self.edit.accept_changes()
 
-    def check(self):
+    def check(self) -> bool:
         """Override AbstractDataSetWidget method"""
         return self.edit.check_all_values()
 
     def place_on_grid(
-        self, layout, row, label_column, widget_column, row_span=1, column_span=1
-    ):
+        self,
+        layout: QGridLayout,
+        row: int,
+        label_column: int,
+        widget_column: int,
+        row_span: int = 1,
+        column_span: int = 1,
+    ) -> None:
         """Override AbstractDataSetWidget method"""
         layout.addWidget(self.group, row, label_column, row_span, column_span + 1)
 
 
 class TabGroupWidget(AbstractDataSetWidget):
-    def __init__(self, item, parent_layout):
-        super(TabGroupWidget, self).__init__(item, parent_layout)
+    def __init__(
+        self, item_var: "DataItemVariable", parent_layout: "DataSetEditLayout"
+    ) -> None:
+        super().__init__(item_var, parent_layout)
         self.tabs = QTabWidget()
-        items = item.item.group
+        items = item_var.item.group
         self.widgets = []
         for item in items:
             if item.get_prop_value("display", parent_layout.instance, "hide", False):
@@ -218,7 +246,7 @@ class TabGroupWidget(AbstractDataSetWidget):
             else:
                 self.tabs.addTab(frame, label)
             layout = QGridLayout()
-            layout.setAlignment(Qt.AlignTop)
+            layout.setAlignment(Qt.AlignTop)  # type:ignore
             frame.setLayout(layout)
             widget.place_on_grid(layout, 0, 0, 1)
             try:
@@ -228,23 +256,29 @@ class TabGroupWidget(AbstractDataSetWidget):
                 raise
             self.widgets.append(widget)
 
-    def get(self):
+    def get(self) -> Any:
         """Override AbstractDataSetWidget method"""
         for widget in self.widgets:
             widget.get()
 
-    def set(self):
+    def set(self) -> Any:
         """Override AbstractDataSetWidget method"""
         for widget in self.widgets:
             widget.set()
 
-    def check(self):
+    def check(self) -> bool:
         """Override AbstractDataSetWidget method"""
         return True
 
     def place_on_grid(
-        self, layout, row, label_column, widget_column, row_span=1, column_span=1
-    ):
+        self,
+        layout: QGridLayout,
+        row: int,
+        label_column: int,
+        widget_column: int,
+        row_span: int = 1,
+        column_span: int = 1,
+    ) -> None:
         """Override AbstractDataSetWidget method"""
         layout.addWidget(self.tabs, row, label_column, row_span, column_span + 1)
 
@@ -266,17 +300,21 @@ class LineEditWidget(AbstractDataSetWidget):
     QLineEdit-based widget
     """
 
-    def __init__(self, item, parent_layout):
-        super(LineEditWidget, self).__init__(item, parent_layout)
+    def __init__(
+        self, item: "DataItemVariable", parent_layout: "DataSetEditLayout"
+    ) -> None:
+        super().__init__(item, parent_layout)
         self.edit = self.group = QLineEdit()
         self.edit.setToolTip(item.get_help())
-        if hasattr(item, "min_equals_max") and item.min_equals_max():
-            if item.check_item():
-                self.edit.setEnabled(False)
-            self.edit.setToolTip(_("Value is forced to %d") % item.get_max())
-        self.edit.textChanged.connect(self.line_edit_changed)
+        # if hasattr(item, "min_equals_max") and item.min_equals_max():
+        #     if item.check_item():
+        #         self.edit.setEnabled(False)
+        #     self.edit.setToolTip(
+        #         _("Value is forced to %d") % item.get_max()
+        #     )  # TODO:Aucune utilité
+        self.edit.textChanged.connect(self.line_edit_changed)  # type:ignore
 
-    def get(self):
+    def get(self) -> None:
         """Override AbstractDataSetWidget method"""
         value = self.item.get()
         old_value = str(self.value())
@@ -289,7 +327,7 @@ class LineEditWidget(AbstractDataSetWidget):
         else:
             self.line_edit_changed(value)
 
-    def line_edit_changed(self, qvalue):
+    def line_edit_changed(self, qvalue: Optional[QVariant]) -> None:
         """QLineEdit validator"""
         if qvalue is not None:
             value = self.item.from_string(str(qvalue))
@@ -303,16 +341,16 @@ class LineEditWidget(AbstractDataSetWidget):
         self.update(value)
         self.notify_value_change()
 
-    def update(self, value):
+    def update(self, value: Any) -> None:
         """Override AbstractDataSetWidget method"""
         cb = self.item.get_prop_value("display", "value_callback", None)
         if cb is not None:
             cb(value)
 
-    def value(self):
+    def value(self) -> str:
         return str(self.edit.text())
 
-    def check(self):
+    def check(self) -> Any:
         """Override AbstractDataSetWidget method"""
         value = self.item.from_string(str(self.edit.text()))
         return self.item.check_value(value)
@@ -323,28 +361,32 @@ class TextEditWidget(AbstractDataSetWidget):
     QTextEdit-based widget
     """
 
-    def __init__(self, item, parent_layout):
-        super(TextEditWidget, self).__init__(item, parent_layout)
+    def __init__(
+        self, item: "DataItemVariable", parent_layout: "DataSetEditLayout"
+    ) -> None:
+        super().__init__(item, parent_layout)
         self.edit = self.group = QTextEdit()
         self.edit.setToolTip(item.get_help())
-        if hasattr(item, "min_equals_max") and item.min_equals_max():
-            if item.check_item():
-                self.edit.setEnabled(False)
-            self.edit.setToolTip(_("Value is forced to %d") % item.get_max())
-        self.edit.textChanged.connect(self.text_changed)
+        # if hasattr(item, "min_equals_max") and item.min_equals_max():
+        #     if item.check_item():
+        #         self.edit.setEnabled(False)
+        #     self.edit.setToolTip(
+        #         _("Value is forced to %d") % item.get_max()
+        #     )  # TODO:Aucune utilité
+        self.edit.textChanged.connect(self.text_changed)  # type:ignore
 
-    def __get_text(self):
+    def __get_text(self) -> str:
         """Get QTextEdit text, replacing UTF-8 EOL chars by os.linesep"""
         return str(self.edit.toPlainText()).replace("\u2029", os.linesep)
 
-    def get(self):
+    def get(self) -> None:
         """Override AbstractDataSetWidget method"""
         value = self.item.get()
         if value is not None:
             self.edit.setPlainText(utf8_to_unicode(value))
         self.text_changed()
 
-    def text_changed(self):
+    def text_changed(self) -> None:
         """QLineEdit validator"""
         value = self.item.from_string(self.__get_text())
         if not self.item.check_value(value):
@@ -354,14 +396,19 @@ class TextEditWidget(AbstractDataSetWidget):
         self.update(value)
         self.notify_value_change()
 
-    def update(self, value):
+    def update(self, value: Any) -> Any:
         """Override AbstractDataSetWidget method"""
         pass
 
-    def value(self):
+    def value(self) -> str:
+        """
+        Returns the widget's current value
+
+        :rtype str:
+        """
         return self.edit.toPlainText()
 
-    def check(self):
+    def check(self) -> Any:
         """Override AbstractDataSetWidget method"""
         value = self.item.from_string(self.__get_text())
         return self.item.check_value(value)
@@ -372,31 +419,39 @@ class CheckBoxWidget(AbstractDataSetWidget):
     BoolItem widget
     """
 
-    def __init__(self, item, parent_layout):
-        super(CheckBoxWidget, self).__init__(item, parent_layout)
+    def __init__(
+        self, item: "DataItemVariable", parent_layout: "DataSetEditLayout"
+    ) -> None:
+        super().__init__(item, parent_layout)
         self.checkbox = QCheckBox(self.item.get_prop_value("display", "text"))
         self.checkbox.setToolTip(item.get_help())
         self.group = self.checkbox
 
         self.store = self.item.get_prop("display", "store", None)
-        self.checkbox.stateChanged.connect(self.state_changed)
+        self.checkbox.stateChanged.connect(self.state_changed)  # type:ignore
 
-    def get(self):
+    def get(self) -> None:
         """Override AbstractDataSetWidget method"""
         value = self.item.get()
         if value is not None:
             self.checkbox.setChecked(value)
 
-    def set(self):
+    def set(self) -> None:
         """Override AbstractDataSetWidget method"""
         self.item.set(self.value())
 
-    def value(self):
+    def value(self) -> bool:
         return self.checkbox.isChecked()
 
     def place_on_grid(
-        self, layout, row, label_column, widget_column, row_span=1, column_span=1
-    ):
+        self,
+        layout: "QGridLayout",
+        row: int,
+        label_column: int,
+        widget_column: int,
+        row_span: int = 1,
+        column_span: int = 1,
+    ) -> None:
         """Override AbstractDataSetWidget method"""
         if not self.item.get_prop_value("display", "label"):
             widget_column = label_column
@@ -405,12 +460,12 @@ class CheckBoxWidget(AbstractDataSetWidget):
             self.place_label(layout, row, label_column)
         layout.addWidget(self.group, row, widget_column, row_span, column_span)
 
-    def state_changed(self, state):
+    def state_changed(self, state: bool) -> None:
         self.notify_value_change()
         if self.store:
             self.do_store(state)
 
-    def do_store(self, state):
+    def do_store(self, state: bool) -> None:
         self.store.set(self.item.instance, self.item.item, state)
         self.parent_layout.refresh_widgets()
 
@@ -420,18 +475,21 @@ class DateWidget(AbstractDataSetWidget):
     DateItem widget
     """
 
-    def __init__(self, item, parent_layout):
-        super(DateWidget, self).__init__(item, parent_layout)
+    def __init__(
+        self, item: "DataItemVariable", parent_layout: "DataSetEditLayout"
+    ) -> None:
+        super().__init__(item, parent_layout)
         self.dateedit = self.group = QDateEdit()
         self.dateedit.setToolTip(item.get_help())
         self.dateedit.dateTimeChanged.connect(self.date_changed)
+
 
     def date_changed(self, value):
         """Date changed"""
         _display_callback(self, value)
         self.notify_value_change()
 
-    def get(self):
+    def get(self) -> None:
         """Override AbstractDataSetWidget method"""
         value = self.item.get()
         if value:
@@ -439,15 +497,20 @@ class DateWidget(AbstractDataSetWidget):
                 value = datetime.date.fromordinal(value)
             self.dateedit.setDate(value)
 
-    def set(self):
+    def set(self) -> None:
         """Override AbstractDataSetWidget method"""
         self.item.set(self.value())
 
-    def value(self):
+    def value(self) -> datetime:  # type:ignore
+        """
+        Returns the widget's current value
+
+        :rtype date:
+        """
         try:
             return self.dateedit.date().toPyDate()
         except AttributeError:
-            return self.dateedit.dateTime().toPython().date()  # PySide
+            return self.dateedit.dateTime().toPython().date()  # type:ignore # PySide
 
 
 class DateTimeWidget(AbstractDataSetWidget):
@@ -455,12 +518,16 @@ class DateTimeWidget(AbstractDataSetWidget):
     DateTimeItem widget
     """
 
-    def __init__(self, item, parent_layout):
-        super(DateTimeWidget, self).__init__(item, parent_layout)
+    def __init__(
+        self, item: "DataItemVariable", parent_layout: "DataSetEditLayout"
+    ) -> None:
+        super().__init__(item, parent_layout)
         self.dateedit = self.group = QDateTimeEdit()
         self.dateedit.setCalendarPopup(True)
         self.dateedit.setToolTip(item.get_help())
-        self.dateedit.dateTimeChanged.connect(self.date_changed)
+        self.dateedit.dateTimeChanged.connect(  # type:ignore
+            lambda value: self.notify_value_change()
+        )
 
     def date_changed(self, value):
         """Date changed"""
@@ -475,40 +542,59 @@ class DateTimeWidget(AbstractDataSetWidget):
                 value = datetime.datetime.fromtimestamp(value)
             self.dateedit.setDateTime(value)
 
-    def set(self):
+    def set(self) -> None:
         """Override AbstractDataSetWidget method"""
         self.item.set(self.value())
 
-    def value(self):
+    def value(self) -> datetime:  # type:ignore
         try:
             return self.dateedit.dateTime().toPyDateTime()
         except AttributeError:
-            return self.dateedit.dateTime().toPython()  # PySide
+            return self.dateedit.dateTime().toPython()  # type:ignore # PySide
 
 
 class GroupLayout(QHBoxLayout):
-    def __init__(self):
+    def __init__(self) -> None:
         QHBoxLayout.__init__(self)
-        self.widgets = []
+        self.widgets: List["QWidget"] = []
 
-    def addWidget(self, widget):
+    def addWidget(self, widget: "QWidget") -> None:  # type:ignore
         QHBoxLayout.addWidget(self, widget)
         self.widgets.append(widget)
 
-    def setEnabled(self, state):
+    def setEnabled(self, state: bool) -> None:
         for widget in self.widgets:
             widget.setEnabled(state)
 
 
-class HLayoutMixin(object):
-    def __init__(self, item, parent_layout):
-        super(HLayoutMixin, self).__init__(item, parent_layout)
+class HasGroupProtocol(Protocol):
+    @property
+    def group(self):
+        pass
+
+    def place_label(self, layout: QGridLayout, row: int, column: int) -> None:
+        pass
+
+
+class HLayoutMixin:
+    def __init__(
+        self: "HasGroupProtocol",
+        item: "DataItemVariable",
+        parent_layout: "DataSetEditLayout",
+    ) -> None:
+        super().__init__(item, parent_layout)  # type:ignore
         old_group = self.group
         self.group = GroupLayout()
         self.group.addWidget(old_group)
 
     def place_on_grid(
-        self, layout, row, label_column, widget_column, row_span=1, column_span=1
+        self: "HasGroupProtocol",
+        layout: "QGridLayout",
+        row: int,
+        label_column: int,
+        widget_column: int,
+        row_span: int = 1,
+        column_span: int = 1,
     ):
         """Override AbstractDataSetWidget method"""
         self.place_label(layout, row, label_column)
@@ -520,14 +606,16 @@ class ColorWidget(HLayoutMixin, LineEditWidget):
     ColorItem widget
     """
 
-    def __init__(self, item, parent_layout):
-        super(ColorWidget, self).__init__(item, parent_layout)
+    def __init__(
+        self, item: "DataItemVariable", parent_layout: "DataSetEditLayout"
+    ) -> None:
+        super().__init__(item, parent_layout)
         self.button = QPushButton("")
         self.button.setMaximumWidth(32)
-        self.button.clicked.connect(self.select_color)
+        self.button.clicked.connect(self.select_color)  # type:ignore
         self.group.addWidget(self.button)
 
-    def update(self, value):
+    def update(self, value: str) -> None:
         """Reimplement LineEditWidget method"""
         LineEditWidget.update(self, value)
         color = text_to_qcolor(value)
@@ -539,11 +627,11 @@ class ColorWidget(HLayoutMixin, LineEditWidget):
             icon = get_icon("not_found")
         self.button.setIcon(icon)
 
-    def select_color(self):
+    def select_color(self) -> None:
         """Open a color selection dialog box"""
         color = text_to_qcolor(self.edit.text())
         if not color.isValid():
-            color = Qt.gray
+            color = Qt.gray  # type:ignore
         color = QColorDialog.getColor(color, self.parent_layout.parent)
         if color.isValid():
             value = color.name()
@@ -557,10 +645,12 @@ class SliderWidget(HLayoutMixin, LineEditWidget):
     IntItem with Slider
     """
 
-    DATA_TYPE = int
+    DATA_TYPE: type = int
 
-    def __init__(self, item, parent_layout):
-        super(SliderWidget, self).__init__(item, parent_layout)
+    def __init__(
+        self, item: DataItemVariable, parent_layout: "DataSetEditLayout"
+    ) -> None:
+        super().__init__(item, parent_layout)
         self.slider = self.vmin = self.vmax = None
         if item.get_prop_value("display", "slider"):
             self.vmin = item.get_prop_value("data", "min")
@@ -569,9 +659,9 @@ class SliderWidget(HLayoutMixin, LineEditWidget):
                 self.vmin is not None and self.vmax is not None
             ), "SliderWidget requires that item min/max have been defined"
             self.slider = QSlider()
-            self.slider.setOrientation(Qt.Horizontal)
+            self.slider.setOrientation(Qt.Horizontal)  # type:ignore
             self.setup_slider(item)
-            self.slider.valueChanged.connect(self.value_changed)
+            self.slider.valueChanged.connect(self.value_changed)  # type:ignore
             self.group.addWidget(self.slider)
 
     def value_to_slider(self, value):
@@ -603,7 +693,7 @@ class FloatSliderWidget(SliderWidget):
     FloatItem with Slider
     """
 
-    DATA_TYPE = float
+    DATA_TYPE: type = float
 
     def value_to_slider(self, value):
         return int((value - self.vmin) * 100 / (self.vmax - self.vmin))
@@ -633,25 +723,30 @@ class FileWidget(HLayoutMixin, LineEditWidget):
     File path item widget
     """
 
-    def __init__(self, item, parent_layout, filedialog):
-        super(FileWidget, self).__init__(item, parent_layout)
+    def __init__(
+        self,
+        item: "DataItemVariable",
+        parent_layout: "DataSetEditLayout",
+        filedialog: Callable,
+    ) -> None:
+        super().__init__(item, parent_layout)
         self.filedialog = filedialog
         button = QPushButton()
         fmt = item.get_prop_value("data", "formats")
         button.setIcon(get_icon("%s.png" % fmt[0].lower(), default="file.png"))
-        button.clicked.connect(self.select_file)
+        button.clicked.connect(self.select_file)  # type:ignore
         self.group.addWidget(button)
         self.basedir = item.get_prop_value("data", "basedir")
         self.all_files_first = item.get_prop_value("data", "all_files_first")
 
-    def select_file(self):
+    def select_file(self) -> None:
         """Open a file selection dialog box"""
         fname = self.item.from_string(str(self.edit.text()))
         if isinstance(fname, list):
             fname = osp.dirname(fname[0])
         parent = self.parent_layout.parent
         _temp = sys.stdout
-        sys.stdout = None
+        sys.stdout = None  # type:ignore
         if len(fname) == 0:
             fname = self.basedir
         _formats = self.item.get_prop_value("data", "formats")
@@ -665,6 +760,7 @@ class FileWidget(HLayoutMixin, LineEditWidget):
                 filter_lines.insert(0, all_filter)
             else:
                 filter_lines.append(all_filter)
+
         if fname is None:
             fname = ""
         child_title = _get_child_title_func(parent)
@@ -683,14 +779,16 @@ class DirectoryWidget(HLayoutMixin, LineEditWidget):
     Directory path item widget
     """
 
-    def __init__(self, item, parent_layout):
-        super(DirectoryWidget, self).__init__(item, parent_layout)
+    def __init__(
+        self, item: "DataItemVariable", parent_layout: "DataSetEditLayout"
+    ) -> None:
+        super().__init__(item, parent_layout)
         button = QPushButton()
         button.setIcon(get_std_icon("DirOpenIcon"))
-        button.clicked.connect(self.select_directory)
+        button.clicked.connect(self.select_directory)  # type:ignore
         self.group.addWidget(button)
 
-    def select_directory(self):
+    def select_directory(self) -> None:
         """Open a directory selection dialog box"""
         value = self.item.from_string(str(self.edit.text()))
         parent = self.parent_layout.parent
@@ -705,8 +803,10 @@ class ChoiceWidget(AbstractDataSetWidget):
     Choice item widget
     """
 
-    def __init__(self, item, parent_layout):
-        super(ChoiceWidget, self).__init__(item, parent_layout)
+    def __init__(
+        self, item: "DataItemVariable", parent_layout: "DataSetEditLayout"
+    ) -> None:
+        super().__init__(item, parent_layout)
         self._first_call = True
         self.is_radio = item.get_prop_value("display", "radio")
         self.store = self.item.get_prop("display", "store", None)
@@ -715,23 +815,23 @@ class ChoiceWidget(AbstractDataSetWidget):
             self.group.setToolTip(item.get_help())
             self.vbox = QVBoxLayout()
             self.group.setLayout(self.vbox)
-            self._buttons = []
+            self._buttons: List["QAbstractButton"] = []
         else:
             self.combobox = self.group = QComboBox()
             self.combobox.setToolTip(item.get_help())
-            self.combobox.currentIndexChanged.connect(self.index_changed)
+            self.combobox.currentIndexChanged.connect(self.index_changed)  # type:ignore
 
-    def index_changed(self, index):
+    def index_changed(self, index: int) -> None:
         if self.store:
             self.store.set(self.item.instance, self.item.item, self.value())
             self.parent_layout.refresh_widgets()
         _display_callback(self, self.value())
         self.notify_value_change()
 
-    def initialize_widget(self):
+    def initialize_widget(self) -> None:
         if self.is_radio:
             for button in self._buttons:
-                button.toggled.disconnect(self.index_changed)
+                button.toggled.disconnect(self.index_changed)  # type:ignore
                 self.vbox.removeWidget(button)
                 button.deleteLater()
             self._buttons = []
@@ -748,7 +848,7 @@ class ChoiceWidget(AbstractDataSetWidget):
                     if not osp.isfile(img):
                         img = get_image_file_path(img)
                     img = QIcon(img)
-                elif isinstance(img, collections.abc.Callable):
+                elif isinstance(img, collections.abc.Callable):  # type:ignore
                     img = img(key)
                 if self.is_radio:
                     button.setIcon(img)
@@ -759,11 +859,11 @@ class ChoiceWidget(AbstractDataSetWidget):
             if self.is_radio:
                 self._buttons.append(button)
                 self.vbox.addWidget(button)
-                button.toggled.connect(self.index_changed)
+                button.toggled.connect(self.index_changed)  # type:ignore
         if not self.is_radio:
             self.combobox.blockSignals(False)
 
-    def set_widget_value(self, idx):
+    def set_widget_value(self, idx: int) -> None:
         if self.is_radio:
             for button in self._buttons:
                 button.blockSignals(True)
@@ -775,15 +875,16 @@ class ChoiceWidget(AbstractDataSetWidget):
             self.combobox.setCurrentIndex(idx)
             self.combobox.blockSignals(False)
 
-    def get_widget_value(self):
+    def get_widget_value(self) -> Optional[int]:
         if self.is_radio:
             for index, widget in enumerate(self._buttons):
                 if widget.isChecked():
                     return index
+            return None  # TODO:Faire comme ca ?
         else:
             return self.combobox.currentIndex()
 
-    def get(self):
+    def get(self) -> None:
         """Override AbstractDataSetWidget method"""
         self.initialize_widget()
         value = self.item.get()
@@ -799,7 +900,7 @@ class ChoiceWidget(AbstractDataSetWidget):
                 self.index_changed(idx)
                 self._first_call = False
 
-    def set(self):
+    def set(self) -> None:
         """Override AbstractDataSetWidget method"""
         try:
             value = self.value()
@@ -807,7 +908,7 @@ class ChoiceWidget(AbstractDataSetWidget):
             return
         self.item.set(value)
 
-    def value(self):
+    def value(self) -> Any:
         index = self.get_widget_value()
         choices = self.item.get_prop_value("data", "choices")
         return choices[index][0]
@@ -818,8 +919,10 @@ class MultipleChoiceWidget(AbstractDataSetWidget):
     Multiple choice item widget
     """
 
-    def __init__(self, item, parent_layout):
-        super(MultipleChoiceWidget, self).__init__(item, parent_layout)
+    def __init__(
+        self, item: "DataItemVariable", parent_layout: "DataSetEditLayout"
+    ) -> None:
+        super().__init__(item, parent_layout)
         self.groupbox = self.group = QGroupBox(item.get_prop_value("display", "label"))
         layout = QGridLayout()
         self.boxes = []
@@ -842,7 +945,7 @@ class MultipleChoiceWidget(AbstractDataSetWidget):
             self.boxes.append(checkbox)
         self.groupbox.setLayout(layout)
 
-    def get(self):
+    def get(self) -> None:
         """Override AbstractDataSetWidget method"""
         value = self.item.get()
         _choices = self.item.get_prop_value("data", "choices")
@@ -850,18 +953,24 @@ class MultipleChoiceWidget(AbstractDataSetWidget):
             if value is not None and i in value:
                 checkbox.setChecked(True)
 
-    def set(self):
+    def set(self) -> None:
         """Override AbstractDataSetWidget method"""
         _choices = self.item.get_prop_value("data", "choices")
         choices = [_choices[i][0] for i in self.value()]
         self.item.set(choices)
 
-    def value(self):
+    def value(self) -> List[int]:
         return [i for i, w in enumerate(self.boxes) if w.isChecked()]
 
     def place_on_grid(
-        self, layout, row, label_column, widget_column, row_span=1, column_span=1
-    ):
+        self,
+        layout: "QGridLayout",
+        row: int,
+        label_column: int,
+        widget_column: int,
+        row_span: int = 1,
+        column_span: int = 1,
+    ) -> None:
         """Override AbstractDataSetWidget method"""
         layout.addWidget(self.group, row, label_column, row_span, column_span + 1)
 
@@ -871,12 +980,14 @@ class FloatArrayWidget(AbstractDataSetWidget):
     FloatArrayItem widget
     """
 
-    def __init__(self, item, parent_layout):
-        super(FloatArrayWidget, self).__init__(item, parent_layout)
+    def __init__(
+        self, item: "DataItemVariable", parent_layout: "DataSetEditLayout"
+    ) -> None:
+        super().__init__(item, parent_layout)
         _label = item.get_prop_value("display", "label")
         self.groupbox = self.group = QGroupBox(_label)
         self.layout = QGridLayout()
-        self.layout.setAlignment(Qt.AlignLeft)
+        self.layout.setAlignment(Qt.AlignLeft)  # type:ignore
         self.groupbox.setLayout(self.layout)
 
         self.first_line, self.dim_label = get_image_layout(
@@ -897,31 +1008,31 @@ class FloatArrayWidget(AbstractDataSetWidget):
         )
         self.layout.addLayout(self.max_line, 2, 0)
 
-        edit_button.clicked.connect(self.edit_array)
-        self.arr = None  # le tableau si il a été modifié
+        edit_button.clicked.connect(self.edit_array)  # type:ignore
+        self.arr = numpy.array([])  # le tableau si il a été modifié
         self.instance = None
 
         self.dtype_line, self.dtype_label = get_image_layout("dtype.png", "")
         self.first_line.insertSpacing(2, 5)
         self.first_line.insertLayout(3, self.dtype_line)
 
-    def edit_array(self):
+    def edit_array(self) -> None:
         """Open an array editor dialog"""
         parent = self.parent_layout.parent
         label = self.item.get_prop_value("display", "label")
         editor = ArrayEditor(parent)
         if editor.setup_and_check(self.arr, title=label):
-            if editor.exec_():
+            if editor.exec():
                 self.update(self.arr)
 
-    def get(self):
+    def get(self) -> None:
         """Override AbstractDataSetWidget method"""
         self.arr = numpy.array(self.item.get(), copy=False)
         if self.item.get_prop_value("display", "transpose"):
             self.arr = self.arr.T
         self.update(self.arr)
 
-    def update(self, arr):
+    def update(self, arr: numpy.ndarray) -> None:
         """Override AbstractDataSetWidget method"""
         shape = arr.shape
         if len(shape) == 1:
@@ -957,7 +1068,7 @@ class FloatArrayWidget(AbstractDataSetWidget):
         typestr = str(arr.dtype)
         self.dtype_label.setText("-" if typestr == "object" else typestr)
 
-    def set(self):
+    def set(self) -> None:
         """Override AbstractDataSetWidget method"""
         if self.item.get_prop_value("display", "transpose"):
             value = self.value().T
@@ -965,12 +1076,18 @@ class FloatArrayWidget(AbstractDataSetWidget):
             value = self.value()
         self.item.set(value)
 
-    def value(self):
+    def value(self) -> numpy.ndarray:
         return self.arr
 
     def place_on_grid(
-        self, layout, row, label_column, widget_column, row_span=1, column_span=1
-    ):
+        self,
+        layout: "QGridLayout",
+        row: int,
+        label_column: int,
+        widget_column: int,
+        row_span: int = 1,
+        column_span: int = 1,
+    ) -> None:
         """Override AbstractDataSetWidget method"""
         layout.addWidget(self.group, row, label_column, row_span, column_span + 1)
 
@@ -980,8 +1097,10 @@ class ButtonWidget(AbstractDataSetWidget):
     BoolItem widget
     """
 
-    def __init__(self, item, parent_layout):
-        super(ButtonWidget, self).__init__(item, parent_layout)
+    def __init__(
+        self, item: "DataItemVariable", parent_layout: "DataSetEditLayout"
+    ) -> None:
+        super().__init__(item, parent_layout)
         _label = self.item.get_prop_value("display", "label")
         self.button = self.group = QPushButton(_label)
         self.button.setToolTip(item.get_help())
@@ -990,27 +1109,33 @@ class ButtonWidget(AbstractDataSetWidget):
             if isinstance(_icon, str):
                 _icon = get_icon(_icon)
             self.button.setIcon(_icon)
-        self.button.clicked.connect(self.clicked)
+        self.button.clicked.connect(self.clicked)  # type:ignore
         self.cb_value = None
 
-    def get(self):
+    def get(self) -> None:
         """Override AbstractDataSetWidget method"""
         self.cb_value = self.item.get()
 
-    def set(self):
+    def set(self) -> None:
         """Override AbstractDataSetWidget method"""
         self.item.set(self.value())
 
-    def value(self):
+    def value(self) -> Optional[Any]:
         return self.cb_value
 
     def place_on_grid(
-        self, layout, row, label_column, widget_column, row_span=1, column_span=1
+        self,
+        layout: "QGridLayout",
+        row: int,
+        label_column: int,
+        widget_column: int,
+        row_span: int = 1,
+        column_span: int = 1,
     ):
         """Override AbstractDataSetWidget method"""
         layout.addWidget(self.group, row, label_column, row_span, column_span + 1)
 
-    def clicked(self, *args):
+    def clicked(self, *args) -> None:
         self.parent_layout.update_dataitems()
         callback = self.item.get_prop_value("display", "callback")
         self.cb_value = callback(
@@ -1025,8 +1150,15 @@ class DataSetWidget(AbstractDataSetWidget):
     DataSet widget
     """
 
-    def __init__(self, item, parent_layout):
-        super(DataSetWidget, self).__init__(item, parent_layout)
+    @property
+    @abstractmethod
+    def klass(self) -> type:
+        pass
+
+    def __init__(
+        self, item: "DataItemVariable", parent_layout: "DataSetEditLayout"
+    ) -> None:
+        super().__init__(item, parent_layout)
         self.dataset = self.klass()
         # Création du layout contenant les champs d'édition du signal
         embedded = item.get_prop_value("display", "embedded", False)
@@ -1041,19 +1173,19 @@ class DataSetWidget(AbstractDataSetWidget):
             self.parent_layout.parent, self.dataset, self.layout
         )
 
-    def get(self):
+    def get(self) -> None:
         """Override AbstractDataSetWidget method"""
         self.get_dataset()
         for widget in self.edit.widgets:
             widget.get()
 
-    def set(self):
+    def set(self) -> None:
         """Override AbstractDataSetWidget method"""
         for widget in self.edit.widgets:
             widget.set()
         self.set_dataset()
 
-    def get_dataset(self):
+    def get_dataset(self) -> None:
         """update's internal parameter representation
         from the item's stored value
 
@@ -1063,7 +1195,7 @@ class DataSetWidget(AbstractDataSetWidget):
         item = self.item.get()
         update_dataset(self.dataset, item)
 
-    def set_dataset(self):
+    def set_dataset(self) -> None:
         """update the item's value from the internal
         data representation
 
@@ -1074,7 +1206,13 @@ class DataSetWidget(AbstractDataSetWidget):
         restore_dataset(self.dataset, item)
 
     def place_on_grid(
-        self, layout, row, label_column, widget_column, row_span=1, column_span=1
-    ):
+        self,
+        layout: "QGridLayout",
+        row: int,
+        label_column: int,
+        widget_column: int,
+        row_span: int = 1,
+        column_span: int = 1,
+    ) -> None:
         """Override AbstractDataSetWidget method"""
         layout.addWidget(self.group, row, label_column, row_span, column_span + 1)

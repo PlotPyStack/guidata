@@ -16,19 +16,21 @@ SHOW = True  # Show test in GUI-based test launcher
 
 from qtpy.QtWidgets import QMainWindow, QSplitter
 
-from guidata.dataset import datatypes as gdt
-from guidata.dataset import dataitems as gdi
-from guidata.dataset.qtwidgets import DataSetShowGroupBox, DataSetEditGroupBox
 from guidata.configtools import get_icon
+from guidata.dataset import dataitems as gdi
+from guidata.dataset import datatypes as gdt
+from guidata.dataset.qtwidgets import DataSetEditGroupBox, DataSetShowGroupBox
+from guidata.env import execenv
 from guidata.qthelpers import (
-    create_action,
     add_actions,
+    create_action,
     get_std_icon,
     win32_fix_title_bar_background,
 )
 
 # Local test import:
 from guidata.tests.activable_dataset import ExampleDataSet
+from utils.qthelpers import exec_application, execenv
 
 
 class AnotherDataSet(gdt.DataSet):
@@ -169,4 +171,5 @@ if __name__ == "__main__":
     app = qapplication()
     window = MainWindow()
     window.show()
-    app.exec_()
+    exec_application(app)
+    execenv.print("OK")

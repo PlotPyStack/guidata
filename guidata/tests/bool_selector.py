@@ -16,8 +16,9 @@ using one group parameter (a boolean item).
 
 SHOW = True  # Show test in GUI-based test launcher
 
-from guidata.dataset.datatypes import DataSet, BeginGroup, EndGroup, ValueProp
 from guidata.dataset.dataitems import BoolItem, FloatItem
+from guidata.dataset.datatypes import BeginGroup, DataSet, EndGroup, ValueProp
+from utils.qthelpers import execenv
 
 prop1 = ValueProp(False)
 prop2 = ValueProp(False)
@@ -62,3 +63,4 @@ if __name__ == "__main__":
     prm = GroupSelection()
     prm.edit()
     print(prm)
+    execenv.print("OK")

@@ -16,12 +16,14 @@ This package provides a generic object editor widget.
 
 
 import PIL.Image
+from numpy.core.multiarray import ndarray
+from qtpy.QtCore import QObject
+
 from guidata.widgets.arrayeditor import ArrayEditor
 from guidata.widgets.collectionseditor import CollectionsEditor
 from guidata.widgets.nsview import DataFrame, FakeObject, Series, is_known_type
 from guidata.widgets.texteditor import TextEditor
-from numpy.core.multiarray import ndarray
-from qtpy.QtCore import QObject
+from utils.qthelpers import exec_dialog
 
 try:
     from guidata.widgets.dataframeeditor import DataFrameEditor
@@ -88,6 +90,6 @@ def oedit(obj, title=None, parent=None):
     if result is None:
         return
     dialog, end_func = result
-    if dialog.exec_():
+    if exec_dialog(dialog):
         return end_func(dialog)
     return None

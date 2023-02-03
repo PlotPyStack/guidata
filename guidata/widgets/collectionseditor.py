@@ -32,6 +32,27 @@ import sys
 import warnings
 
 import PIL.Image
+from qtpy.compat import getsavefilename
+from qtpy.QtCore import QAbstractTableModel, QDateTime, QModelIndex, Qt, Signal, Slot
+from qtpy.QtGui import QColor, QKeySequence
+from qtpy.QtWidgets import (
+    QAbstractItemDelegate,
+    QApplication,
+    QDateEdit,
+    QDateTimeEdit,
+    QDialog,
+    QHBoxLayout,
+    QInputDialog,
+    QItemDelegate,
+    QLineEdit,
+    QMenu,
+    QMessageBox,
+    QPushButton,
+    QTableView,
+    QVBoxLayout,
+    QWidget,
+)
+
 from guidata.config import CONF, _
 from guidata.configtools import get_font, get_icon
 from guidata.qthelpers import (
@@ -66,26 +87,6 @@ from guidata.widgets.nsview import (
     value_to_display,
 )
 from guidata.widgets.texteditor import TextEditor
-from qtpy.compat import getsavefilename
-from qtpy.QtCore import QAbstractTableModel, QDateTime, QModelIndex, Qt, Signal, Slot
-from qtpy.QtGui import QColor, QKeySequence
-from qtpy.QtWidgets import (
-    QAbstractItemDelegate,
-    QApplication,
-    QDateEdit,
-    QDateTimeEdit,
-    QDialog,
-    QHBoxLayout,
-    QInputDialog,
-    QItemDelegate,
-    QLineEdit,
-    QMenu,
-    QMessageBox,
-    QPushButton,
-    QTableView,
-    QVBoxLayout,
-    QWidget,
-)
 
 if ndarray is not FakeObject:
     from guidata.widgets.arrayeditor import ArrayEditor
@@ -117,7 +118,7 @@ def fix_reference_name(name, blacklist=None):
     return name
 
 
-class ProxyObject(object):
+class ProxyObject:
     """Dictionary proxy to an unknown object."""
 
     def __init__(self, obj):
@@ -1342,7 +1343,7 @@ class BaseTableView(QTableView):
             contents_title=_("Clipboard contents"),
             varname=fix_reference_name("data", blacklist=list(data.keys())),
         )
-        if editor.exec_():
+        if editor.exec():
             var_name, clip_data = editor.get_data()
             self.new_value(var_name, clip_data)
 

@@ -19,6 +19,8 @@ Now located at qtconsole/call_tip_widget.py as part of the
 
 from unicodedata import category
 
+from qtpy.QtCore import QBasicTimer, QCoreApplication, QEvent, Qt
+from qtpy.QtGui import QCursor, QPalette
 from qtpy.QtWidgets import (
     QFrame,
     QLabel,
@@ -28,16 +30,6 @@ from qtpy.QtWidgets import (
     QStylePainter,
     QTextEdit,
     QToolTip,
-)
-from qtpy.QtGui import (
-    QCursor,
-    QPalette,
-)
-from qtpy.QtCore import (
-    QBasicTimer,
-    QEvent,
-    QCoreApplication,
-    Qt,
 )
 
 
@@ -53,7 +45,7 @@ class CallTipWidget(QLabel):
         text edit widget.
         """
         assert isinstance(text_edit, (QTextEdit, QPlainTextEdit))
-        super(CallTipWidget, self).__init__(None, Qt.ToolTip)
+        super().__init__(None, Qt.ToolTip)
         self.app = QCoreApplication.instance()
 
         self.hide_timer_on = hide_timer_on
@@ -105,7 +97,7 @@ class CallTipWidget(QLabel):
             elif etype == QEvent.Leave:
                 self._leave_event_hide()
 
-        return super(CallTipWidget, self).eventFilter(obj, event)
+        return super().eventFilter(obj, event)
 
     def timerEvent(self, event):
         """Reimplemented to hide the widget when the hide timer fires."""
@@ -119,19 +111,19 @@ class CallTipWidget(QLabel):
 
     def enterEvent(self, event):
         """Reimplemented to cancel the hide timer."""
-        super(CallTipWidget, self).enterEvent(event)
+        super().enterEvent(event)
         if self._hide_timer.isActive() and self.app.topLevelAt(QCursor.pos()) == self:
             self._hide_timer.stop()
 
     def hideEvent(self, event):
         """Reimplemented to disconnect signal handlers and event filter."""
-        super(CallTipWidget, self).hideEvent(event)
+        super().hideEvent(event)
         self._text_edit.cursorPositionChanged.disconnect(self._cursor_position_changed)
         self._text_edit.removeEventFilter(self)
 
     def leaveEvent(self, event):
         """Reimplemented to start the hide timer."""
-        super(CallTipWidget, self).leaveEvent(event)
+        super().leaveEvent(event)
         self._leave_event_hide()
 
     def mousePressEvent(self, event):
@@ -139,7 +131,7 @@ class CallTipWidget(QLabel):
 
         :param event:
         """
-        super(CallTipWidget, self).mousePressEvent(event)
+        super().mousePressEvent(event)
         self.hide()
 
     def paintEvent(self, event):
@@ -150,15 +142,15 @@ class CallTipWidget(QLabel):
         painter.drawPrimitive(QStyle.PE_PanelTipLabel, option)
         painter.end()
 
-        super(CallTipWidget, self).paintEvent(event)
+        super().paintEvent(event)
 
     def setFont(self, font):
         """Reimplemented to allow use of this method as a slot."""
-        super(CallTipWidget, self).setFont(font)
+        super().setFont(font)
 
     def showEvent(self, event):
         """Reimplemented to connect signal handlers and event filter."""
-        super(CallTipWidget, self).showEvent(event)
+        super().showEvent(event)
         self._text_edit.cursorPositionChanged.connect(self._cursor_position_changed)
         self._text_edit.installEventFilter(self)
 

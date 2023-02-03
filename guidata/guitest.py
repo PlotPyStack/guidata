@@ -8,29 +8,29 @@
 """
 GUI-based test launcher
 """
-
-import sys
 import os
 import os.path as osp
 import subprocess
+import sys
 import traceback
+
+from qtpy.QtCore import QSize, Qt
+from qtpy.QtGui import QColor, QKeySequence
 
 # Local imports
 from qtpy.QtWidgets import (
-    QWidget,
-    QVBoxLayout,
-    QSplitter,
-    QListWidget,
-    QPushButton,
-    QLabel,
+    QFrame,
     QGroupBox,
     QHBoxLayout,
-    QShortcut,
+    QLabel,
+    QListWidget,
     QMainWindow,
-    QFrame,
+    QPushButton,
+    QShortcut,
+    QSplitter,
+    QVBoxLayout,
+    QWidget,
 )
-from qtpy.QtGui import QKeySequence, QColor
-from qtpy.QtCore import Qt, QSize
 
 from guidata.config import _
 from guidata.configtools import get_icon
@@ -100,7 +100,7 @@ class TestModule(object):
         # Keep the same sys.path environment in child process:
         # (useful when the program is executed from Spyder, for example)
         os.environ["PYTHONPATH"] = os.pathsep.join(sys.path)
-
+        coverage = "coverage "
         command = [sys.executable, '"' + self.path + '"']
         if args:
             command.append(args)
@@ -219,4 +219,4 @@ def run_testlauncher(package):
     app = qapplication()
     win = TestLauncherWindow(package)
     win.show()
-    app.exec_()
+    app.exec()

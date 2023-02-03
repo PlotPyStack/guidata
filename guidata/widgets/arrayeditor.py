@@ -23,14 +23,6 @@ This package provides a NumPy Array Editor Dialog based on Qt.
 import io
 
 import numpy as np
-from guidata.config import CONF, _
-from guidata.configtools import get_font, get_icon
-from guidata.qthelpers import (
-    add_actions,
-    create_action,
-    keybinding,
-    win32_fix_title_bar_background,
-)
 from qtpy.QtCore import (
     QAbstractTableModel,
     QItemSelection,
@@ -62,6 +54,15 @@ from qtpy.QtWidgets import (
     QTableView,
     QVBoxLayout,
     QWidget,
+)
+
+from guidata.config import CONF, _
+from guidata.configtools import get_font, get_icon
+from guidata.qthelpers import (
+    add_actions,
+    create_action,
+    keybinding,
+    win32_fix_title_bar_background,
 )
 
 # Note: string and unicode data types will be formatted with '%s' (see below)
@@ -950,7 +951,7 @@ def launch_arrayeditor(data, title="", xlabels=None, ylabels=None):
     """Helper routine to launch an arrayeditor and return its result"""
     dlg = ArrayEditor()
     assert dlg.setup_and_check(data, title, xlabels=xlabels, ylabels=ylabels)
-    dlg.exec_()
+    dlg.exec()
     # dlg.accept()  # trigger slot connected to OK button
     return dlg.get_value()
 

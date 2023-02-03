@@ -13,14 +13,15 @@ Demonstrates how items may trigger callbacks when activated
 SHOW = True  # Show test in GUI-based test launcher
 
 
-from guidata.dataset.datatypes import DataSet
 from guidata.dataset.dataitems import (
     ChoiceItem,
-    StringItem,
-    TextItem,
     ColorItem,
     FloatItem,
+    StringItem,
+    TextItem,
 )
+from guidata.dataset.datatypes import DataSet
+from utils.qthelpers import execenv
 
 
 class TestParameters(DataSet):
@@ -68,3 +69,4 @@ if __name__ == "__main__":
     if e.edit():
         print(e)
     e.view()
+    execenv.print("OK")

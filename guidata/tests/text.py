@@ -10,8 +10,9 @@
 
 SHOW = False  # Do not show test in GUI-based test launcher
 
-from guidata.dataset.datatypes import DataSet
 from guidata.dataset.dataitems import FloatItem, IntItem
+from guidata.dataset.datatypes import DataSet
+from utils.qthelpers import execenv
 
 
 class Parameters(DataSet):
@@ -24,3 +25,4 @@ if __name__ == "__main__":
     p = Parameters()
     p.text_edit()
     print(p)
+    execenv.print("OK")

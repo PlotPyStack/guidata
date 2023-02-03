@@ -17,7 +17,20 @@ import re
 import sys
 from collections import OrderedDict
 
+from qtpy.QtCore import QEvent, QEventLoop, QPoint, Qt, Signal, Slot
+from qtpy.QtGui import (
+    QClipboard,
+    QColor,
+    QFont,
+    QMouseEvent,
+    QPalette,
+    QTextCharFormat,
+    QTextCursor,
+    QTextFormat,
+    QTextOption,
+)
 from qtpy.QtWidgets import (
+    QAbstractItemView,
     QApplication,
     QListWidget,
     QListWidgetItem,
@@ -25,33 +38,13 @@ from qtpy.QtWidgets import (
     QPlainTextEdit,
     QTextEdit,
     QToolTip,
-    QAbstractItemView,
-)
-from qtpy.QtGui import (
-    QPalette,
-    QColor,
-    QFont,
-    QTextCharFormat,
-    QTextCursor,
-    QTextFormat,
-    QTextOption,
-    QClipboard,
-    QMouseEvent,
-)
-from qtpy.QtCore import (
-    QEvent,
-    QEventLoop,
-    QPoint,
-    Signal,
-    Slot,
-    Qt,
 )
 
+from guidata.config import CONF
+from guidata.configtools import get_font, get_icon
 from guidata.widgets.console.calltip import CallTipWidget
 from guidata.widgets.console.mixins import BaseEditMixin
 from guidata.widgets.console.terminal import ANSIEscapeCodeHandler
-from guidata.configtools import get_font, get_icon
-from guidata.config import CONF
 
 
 def insert_text_to(cursor, text, fmt):
@@ -202,16 +195,12 @@ class CompletionWidget(QListWidget):
             key in (Qt.Key_Return, Qt.Key_Enter) and self.enter_select
         ) or key == Qt.Key_Tab:
             self.item_selected()
-        elif (
-            key
-            in (
-                Qt.Key_Return,
-                Qt.Key_Enter,
-                Qt.Key_Left,
-                Qt.Key_Right,
-            )
-            or text in (".", ":")
-        ):
+        elif key in (
+            Qt.Key_Return,
+            Qt.Key_Enter,
+            Qt.Key_Left,
+            Qt.Key_Right,
+        ) or text in (".", ":"):
             self.hide()
             self.textedit.keyPressEvent(event)
         elif (
@@ -656,7 +645,7 @@ class TextEditBaseWidget(QPlainTextEdit, BaseEditMixin):
                 .replace("\u0085", "\n")
             )
         else:
-            return super(TextEditBaseWidget, self).toPlainText()
+            return super().toPlainText()
 
     def keyPressEvent(self, event):
         """
@@ -671,7 +660,7 @@ class TextEditBaseWidget(QPlainTextEdit, BaseEditMixin):
         if (ctrl or meta) and key == Qt.Key_C:
             self.copy()
         else:
-            super(TextEditBaseWidget, self).keyPressEvent(event)
+            super().keyPressEvent(event)
 
     # ------Text: get, set, ...
     def get_selection_as_executable_code(self):

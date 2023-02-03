@@ -1,11 +1,21 @@
 {
+    "[bat]": {
+        "files.encoding": "cp850",
+    },
     "editor.rulers": [
         88
     ],
+    "files.exclude": {
+        "**/__pycache__": true,
+        "**/*.pyc": true,
+        "**/*.pyo": true,
+        ".venv": true
+    },
     "files.trimFinalNewlines": true,
     "files.trimTrailingWhitespace": true,
+    "python.defaultInterpreterPath": "${env:GUIDATA_PYTHON_DEV}",
     "editor.formatOnSave": true,
-    "python.sortImports.args": [
+    "isort.args": [
         "--profile",
         "black"
     ],
@@ -20,5 +30,7 @@
     ],
     "python.linting.pycodestyleEnabled": true,
     "python.formatting.provider": "black",
-    "esbonio.sphinx.confDir": "",
+    "python.linting.mypyCategorySeverity.error": "Error",
+    "python.linting.mypyCategorySeverity.note": "Information",
+    "python.analysis.typeCheckingMode": "off"
 }
