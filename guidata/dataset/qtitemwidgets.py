@@ -17,40 +17,40 @@ There is one widget type for each data item type.
 Example: ChoiceWidget <--> ChoiceItem, ImageChoiceItem
 """
 
+import collections.abc
+import datetime
 import os
 import os.path as osp
 import sys
-import numpy
-import collections.abc
-import datetime
 
+import numpy
+from qtpy.compat import getexistingdirectory
+from qtpy.QtCore import Qt, Signal
+from qtpy.QtGui import QColor, QIcon, QPixmap
 from qtpy.QtWidgets import (
-    QHBoxLayout,
-    QGridLayout,
-    QColorDialog,
-    QPushButton,
-    QLineEdit,
     QCheckBox,
+    QColorDialog,
     QComboBox,
-    QTabWidget,
-    QGroupBox,
-    QDateTimeEdit,
-    QLabel,
-    QTextEdit,
-    QFrame,
     QDateEdit,
-    QSlider,
+    QDateTimeEdit,
+    QFrame,
+    QGridLayout,
+    QGroupBox,
+    QHBoxLayout,
+    QLabel,
+    QLineEdit,
+    QPushButton,
     QRadioButton,
+    QSlider,
+    QTabWidget,
+    QTextEdit,
     QVBoxLayout,
 )
-from qtpy.QtGui import QColor, QIcon, QPixmap
-from qtpy.QtCore import Qt, Signal
-from qtpy.compat import getexistingdirectory
 
-from guidata.utils import update_dataset, restore_dataset, utf8_to_unicode
-from guidata.qthelpers import text_to_qcolor, get_std_icon
-from guidata.configtools import get_icon, get_image_layout, get_image_file_path
 from guidata.config import _
+from guidata.configtools import get_icon, get_image_file_path, get_image_layout
+from guidata.qthelpers import get_std_icon, text_to_qcolor
+from guidata.utils import restore_dataset, update_dataset, utf8_to_unicode
 from guidata.widgets.arrayeditor import ArrayEditor
 
 # ========================== <!> IMPORTANT <!> =================================
@@ -249,6 +249,18 @@ class TabGroupWidget(AbstractDataSetWidget):
         layout.addWidget(self.tabs, row, label_column, row_span, column_span + 1)
 
 
+def _display_callback(widget: AbstractDataSetWidget, value):
+    """Handling of display callback"""
+    cb = widget.item.get_prop_value("display", "callback", None)
+    if cb is not None:
+        if widget.build_mode:
+            widget.set()
+        else:
+            widget.parent_layout.update_dataitems()
+        cb(widget.item.instance, widget.item.item, value)
+        widget.parent_layout.update_widgets(except_this_one=widget)
+
+
 class LineEditWidget(AbstractDataSetWidget):
     """
     QLineEdit-based widget
@@ -287,14 +299,7 @@ class LineEditWidget(AbstractDataSetWidget):
             self.edit.setStyleSheet("background-color:rgb(255, 175, 90);")
         else:
             self.edit.setStyleSheet("")
-            cb = self.item.get_prop_value("display", "callback", None)
-            if cb is not None:
-                if self.build_mode:
-                    self.set()
-                else:
-                    self.parent_layout.update_dataitems()
-                cb(self.item.instance, self.item.item, value)
-                self.parent_layout.update_widgets(except_this_one=self)
+            _display_callback(self, value)
         self.update(value)
         self.notify_value_change()
 
@@ -419,7 +424,12 @@ class DateWidget(AbstractDataSetWidget):
         super(DateWidget, self).__init__(item, parent_layout)
         self.dateedit = self.group = QDateEdit()
         self.dateedit.setToolTip(item.get_help())
-        self.dateedit.dateTimeChanged.connect(lambda value: self.notify_value_change())
+        self.dateedit.dateTimeChanged.connect(self.date_changed)
+
+    def date_changed(self, value):
+        """Date changed"""
+        _display_callback(self, value)
+        self.notify_value_change()
 
     def get(self):
         """Override AbstractDataSetWidget method"""
@@ -450,7 +460,12 @@ class DateTimeWidget(AbstractDataSetWidget):
         self.dateedit = self.group = QDateTimeEdit()
         self.dateedit.setCalendarPopup(True)
         self.dateedit.setToolTip(item.get_help())
-        self.dateedit.dateTimeChanged.connect(lambda value: self.notify_value_change())
+        self.dateedit.dateTimeChanged.connect(self.date_changed)
+
+    def date_changed(self, value):
+        """Date changed"""
+        _display_callback(self, value)
+        self.notify_value_change()
 
     def get(self):
         """Override AbstractDataSetWidget method"""
@@ -710,14 +725,7 @@ class ChoiceWidget(AbstractDataSetWidget):
         if self.store:
             self.store.set(self.item.instance, self.item.item, self.value())
             self.parent_layout.refresh_widgets()
-        cb = self.item.get_prop_value("display", "callback", None)
-        if cb is not None:
-            if self.build_mode:
-                self.set()
-            else:
-                self.parent_layout.update_dataitems()
-            cb(self.item.instance, self.item.item, self.value())
-            self.parent_layout.update_widgets(except_this_one=self)
+        _display_callback(self, self.value())
         self.notify_value_change()
 
     def initialize_widget(self):
