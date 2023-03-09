@@ -9,12 +9,18 @@ Tests for importwizard.py
 """
 
 # Local imports
-from guidata import qapplication
+import pytest
+
 from guidata.env import execenv
 from guidata.qthelpers import exec_dialog, qt_app_context
 from guidata.widgets.importwizard import ImportWizard
 
 SHOW = True  # Show test in GUI-based test launcher
+
+
+@pytest.fixture()
+def text():
+    return "17/11/1976\t1.34\n14/05/09\t3.14"
 
 
 def test(text):

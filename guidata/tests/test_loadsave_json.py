@@ -17,7 +17,7 @@ import os
 from guidata.env import execenv
 from guidata.jsonio import JSONReader, JSONWriter
 from guidata.qthelpers import qt_app_context
-from guidata.tests.all_items import TestParameters
+from guidata.tests.test_all_items import TestParameters
 
 SHOW = True  # Show test in GUI-based test launcher
 
@@ -28,7 +28,7 @@ def test():
             os.unlink("test.json")
 
         e = TestParameters()
-        if e.edit():
+        if execenv.unattended or e.edit():
             writer = JSONWriter("test.json")
             e.serialize(writer)
             writer.save()

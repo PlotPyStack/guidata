@@ -29,7 +29,7 @@ from guidata.qthelpers import (
 )
 
 # Local test import:
-from guidata.tests.activable_dataset import ExampleDataSet
+from guidata.tests.test_activable_dataset import ExampleDataSet
 
 SHOW = True  # Show test in GUI-based test launcher
 
