@@ -8,6 +8,7 @@ doctmp/
 *.h5
 *.stats
 .venv
+test.json
 
 # Created by https://www.gitignore.io/api/python
 
