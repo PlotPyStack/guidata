@@ -375,10 +375,14 @@ def close_widgets_and_quit(screenshot=False):
 
 def close_dialog_and_quit(widget, screenshot=False):
     """Close QDialog and quit Qt event loop"""
-    wname = widget.objectName()
-    if screenshot and wname and widget.isVisible():  # pragma: no cover
-        grab_save_window(widget, wname.lower())
-    widget.done(QDialog.Accepted)
+    try:  # Workaround for pytest
+        wname = widget.objectName()
+        if screenshot and wname and widget.isVisible():  # pragma: no cover
+            grab_save_window(widget, wname.lower())
+
+        widget.done(QDialog.Accepted)
+    except:
+        pass
 
 
 @contextmanager
