@@ -32,5 +32,14 @@
     "python.formatting.provider": "black",
     "python.linting.mypyCategorySeverity.error": "Error",
     "python.linting.mypyCategorySeverity.note": "Information",
-    "python.analysis.typeCheckingMode": "off"
+    "python.analysis.typeCheckingMode": "off",
+    "python.testing.pytestEnabled": true,
+    "python.testing.pytestPath": "pytest",
+    "python.testing.pytestArgs": [
+        "-v",
+        "--cov",
+        "--cov-report=html",
+        "--mode=unattended",
+        "guidata",
+    ],
 }
