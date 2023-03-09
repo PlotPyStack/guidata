@@ -106,9 +106,9 @@ class GuidataExecEnv:
     def parse_args(self):
         """Parse command line arguments"""
         parser = argparse.ArgumentParser(description="Run guidata")
-        parser.add_argument(
-            "-v", "--version", action="store_true", help="show Guidata version"
-        )
+        # parser.add_argument(
+        #     "-v", "--version", action="store_true", help="show Guidata version"
+        # )
         parser.add_argument(
             "--mode",
             choices=[self.UNATTENDED_ARG, self.SCREENSHOT_ARG],
@@ -130,10 +130,10 @@ class GuidataExecEnv:
             help="verbosity level: for debugging/testing purpose",
         )
         args, _unknown = parser.parse_known_args()
-        if args.version:
-            version = os.environ["Guidata_VERSION"]
-            print(f"Guidata {version} on {platform.system()}")
-            sys.exit()
+        # if args.version:
+        #     version = os.environ["GUIDATA_VERSION"]
+        #     print(f"Guidata {version} on {platform.system()}")
+        #     sys.exit()
         self.set_env_from_args(args)
 
     def set_env_from_args(self, args):
