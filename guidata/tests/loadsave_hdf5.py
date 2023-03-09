@@ -20,32 +20,35 @@ try:
 except ImportError:
     hdf5_is_available = False
 
-SHOW = hdf5_is_available  # Show test in GUI-based test launcher
 
 import os
 
+from guidata.env import execenv
 from guidata.hdf5io import HDF5Reader, HDF5Writer
+from guidata.qthelpers import qt_app_context
 from guidata.tests.all_items import TestParameters
-from utils.qthelpers import execenv
 
-if __name__ == "__main__":
-    # Create QApplication
-    import guidata
+SHOW = hdf5_is_available  # Show test in GUI-based test launcher
 
-    _app = guidata.qapplication()
 
-    if os.path.exists("test.h5"):
-        os.unlink("test.h5")
-
-    e = TestParameters()
-    if e.edit():
-        writer = HDF5Writer("test.h5")
-        e.serialize(writer)
-        writer.close()
+def test():
+    with qt_app_context():
+        if os.path.exists("test.h5"):
+            os.unlink("test.h5")
 
         e = TestParameters()
-        reader = HDF5Reader("test.h5")
-        e.deserialize(reader)
-        reader.close()
-        e.edit()
-    execenv.print("OK")
+        if e.edit():
+            writer = HDF5Writer("test.h5")
+            e.serialize(writer)
+            writer.close()
+
+            e = TestParameters()
+            reader = HDF5Reader("test.h5")
+            e.deserialize(reader)
+            reader.close()
+            e.edit()
+        execenv.print("OK")
+
+
+if __name__ == "__main__":
+    test()

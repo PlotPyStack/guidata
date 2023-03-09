@@ -17,14 +17,14 @@ b/f = 1.0
 from guidata import userconfig
 from guidata.dataset import dataitems as gdi
 from guidata.dataset import datatypes as gdt
-from utils.qthelpers import execenv
+from guidata.env import execenv
 
 
 class DS(gdt.DataSet):
     f = gdi.FloatItem("F", 1.0)
 
 
-if __name__ == "__main__":
+def test():
     ds = DS("")
     uc = userconfig.UserConfig({})
     uc.set_application("app", "1.0.0")
@@ -32,3 +32,7 @@ if __name__ == "__main__":
 
     print("Settings saved in: ", uc.filename())
     execenv.print("OK")
+
+
+if __name__ == "__main__":
+    test()

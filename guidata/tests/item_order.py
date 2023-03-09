@@ -13,11 +13,12 @@ for example when deriving a dataset from another.
 """
 
 
-SHOW = True  # Show test in GUI-based test launcher
-
 import guidata.dataset.dataitems as gdi
 import guidata.dataset.datatypes as gdt
-from utils.qthelpers import execenv
+from guidata.env import execenv
+from guidata.qthelpers import qt_app_context
+
+SHOW = True  # Show test in GUI-based test launcher
 
 
 class OriginalDataset(gdt.DataSet):
@@ -38,17 +39,17 @@ class DerivedDataset(OriginalDataset):
     param6 = gdi.DateItem("P6 | Date", default=0).set_pos(row=4)
 
 
+def test():
+    with qt_app_context():
+        e = OriginalDataset()
+        e.edit()
+        execenv.print(e)
+
+        e = DerivedDataset()
+        e.edit()
+        execenv.print(e)
+        execenv.print("OK")
+
+
 if __name__ == "__main__":
-    # Create QApplication
-    import guidata
-
-    _app = guidata.qapplication()
-
-    e = OriginalDataset()
-    e.edit()
-    print(e)
-
-    e = DerivedDataset()
-    e.edit()
-    print(e)
-    execenv.print("OK")
+    test()

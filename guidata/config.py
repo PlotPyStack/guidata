@@ -15,7 +15,7 @@ import os.path as osp
 from guidata.configtools import add_image_module_path, get_translation
 from guidata.userconfig import UserConfig
 
-
+APP_NAME = "guidata"
 APP_PATH = osp.dirname(__file__)
 add_image_module_path("guidata", "images")
 _ = get_translation("guidata")
@@ -35,7 +35,13 @@ def gen_mono_font_settings(size, other_settings=None):
     return settings
 
 
+def get_old_log_fname(fname):
+    """Return old log fname from current log fname"""
+    return osp.splitext(fname)[0] + ".1.log"
+
+
 DEFAULTS = {
+    "faulthandler": {"enabled": False, "log_path": f".{APP_NAME}_faulthandler.log"},
     "arrayeditor": gen_mono_font_settings(9),
     "dicteditor": gen_mono_font_settings(9),
     "texteditor": gen_mono_font_settings(9),

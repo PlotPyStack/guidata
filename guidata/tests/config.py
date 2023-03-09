@@ -7,13 +7,14 @@
 
 """Config test"""
 
-SHOW = False  # Do not show test in GUI-based test launcher
 
 import unittest
 
 from guidata.config import UserConfig
+from guidata.env import execenv
 from guidata.tests.all_features import TestParameters
-from utils.qthelpers import execenv
+
+SHOW = False  # Do not show test in GUI-based test launcher
 
 
 class TestBasic(unittest.TestCase):

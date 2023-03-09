@@ -3,30 +3,28 @@
 # Copyright © Spyder Project Contributors
 # Licensed under the terms of the MIT License
 
-SHOW = True  # Show test in GUI-based test launcher
 
 """
 Tests for codeeditor.py
 """
 
 # Local imports
-from guidata import qapplication
+from guidata.env import execenv
+from guidata.qthelpers import qt_app_context
 from guidata.widgets import codeeditor
-from utils.qthelpers import exec_application, execenv
+
+SHOW = True  # Show test in GUI-based test launcher
 
 
 def test_codeeditor():
     """Test Code editor."""
-
-    app = qapplication()
-
-    widget = codeeditor.CodeEditor(language="python")
-    widget.set_text_from_file(codeeditor.__file__)
-    widget.resize(800, 600)
-    widget.show()
-    exec_application(app)
+    with qt_app_context(exec_loop=True):
+        widget = codeeditor.CodeEditor(language="python")
+        widget.set_text_from_file(codeeditor.__file__)
+        widget.resize(800, 600)
+        widget.show()
+        execenv.print("OK")
 
 
 if __name__ == "__main__":
     test_codeeditor()
-    execenv.print("OK")

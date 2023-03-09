@@ -19,11 +19,11 @@ import PIL.Image
 from numpy.core.multiarray import ndarray
 from qtpy.QtCore import QObject
 
+from guidata.qthelpers import exec_dialog
 from guidata.widgets.arrayeditor import ArrayEditor
 from guidata.widgets.collectionseditor import CollectionsEditor
 from guidata.widgets.nsview import DataFrame, FakeObject, Series, is_known_type
 from guidata.widgets.texteditor import TextEditor
-from utils.qthelpers import exec_dialog
 
 try:
     from guidata.widgets.dataframeeditor import DataFrameEditor

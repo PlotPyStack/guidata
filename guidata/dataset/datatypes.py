@@ -36,10 +36,10 @@ from typing import (
 from qtpy.QtWidgets import QWidget
 from guidata.utils import update_dataset, utf8_to_unicode
 
+from guidata.qthelpers import exec_dialog
 from guidata.userconfig import UserConfig
 from guidata.userconfigio import UserConfigReader, UserConfigWriter
 from guidata.utils import update_dataset, utf8_to_unicode
-from utils.qthelpers import exec_dialog
 
 DEBUG_DESERIALIZE = False
 
@@ -682,7 +682,6 @@ class DataSet(metaclass=DataSetMeta):
         comment: Optional[str] = None,
         icon: str = "",
     ):
-
         self.__comment = comment
         self.__icon = icon
         comp_title, comp_comment = self._compute_title_and_comment()
@@ -843,7 +842,6 @@ class DataSet(metaclass=DataSetMeta):
                 )
                 continue
             elif isinstance(item, BeginGroup):
-
                 txt += "%s%s:" % (indent, item._name)
                 indent += "  "
                 continue

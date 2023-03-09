@@ -8,11 +8,11 @@
 """Test in text mode"""
 
 
-SHOW = False  # Do not show test in GUI-based test launcher
-
 from guidata.dataset.dataitems import FloatItem, IntItem
 from guidata.dataset.datatypes import DataSet
-from utils.qthelpers import execenv
+from guidata.env import execenv
+
+SHOW = False  # Do not show test in GUI-based test launcher
 
 
 class Parameters(DataSet):
@@ -21,8 +21,12 @@ class Parameters(DataSet):
     number = IntItem("Number", min=3, max=20)
 
 
-if __name__ == "__main__":
+def test():
     p = Parameters()
     p.text_edit()
-    print(p)
+    execenv.print(p)
     execenv.print("OK")
+
+
+if __name__ == "__main__":
+    test()

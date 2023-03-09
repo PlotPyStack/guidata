@@ -12,14 +12,16 @@ How to create an executable with py2exe or cx_Freeze with less efforts than
 writing a complete setup script.
 """
 
-SHOW = True  # Show test in GUI-based test launcher
 
 import os.path as osp
 
 from guidata.disthelpers import Distribution
-from utils.qthelpers import execenv
+from guidata.env import execenv
 
-if __name__ == "__main__":
+SHOW = True  # Show test in GUI-based test launcher
+
+
+def test():
     dist = Distribution()
     dist.setup(
         name="Application demo",
@@ -31,3 +33,7 @@ if __name__ == "__main__":
     dist.add_modules("guidata")
     dist.build("cx_Freeze")
     execenv.print("OK")
+
+
+if __name__ == "__main__":
+    test()

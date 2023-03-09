@@ -3,7 +3,6 @@
 # Copyright © Spyder Project Contributors
 # Licensed under the terms of the MIT License
 
-SHOW = True  # Show test in GUI-based test launcher
 
 """
 Tests for collectionseditor.py
@@ -11,12 +10,13 @@ Tests for collectionseditor.py
 
 import datetime
 
-import numpy as np
-
 # Local imports
 from guidata import qapplication
+from guidata.env import execenv
+from guidata.qthelpers import qt_app_context
 from guidata.widgets.collectionseditor import CollectionsEditor
-from utils.qthelpers import exec_application, execenv
+
+SHOW = True  # Show test in GUI-based test launcher
 
 
 def get_test_data():
@@ -111,14 +111,12 @@ def get_test_data():
 
 def test_collectionseditor():
     """Test Collections editor."""
-    app = qapplication()
-
-    dialog = CollectionsEditor()
-    dialog.setup(get_test_data())
-    dialog.show()
-    exec_application(app)
+    with qt_app_context(exec_loop=True):
+        dialog = CollectionsEditor()
+        dialog.setup(get_test_data())
+        dialog.show()
+        execenv.print("OK")
 
 
 if __name__ == "__main__":
     test_collectionseditor()
-    execenv.print("OK")

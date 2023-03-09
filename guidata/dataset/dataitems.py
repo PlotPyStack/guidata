@@ -23,9 +23,9 @@ from numpy import ndarray
 
 from guidata.config import _
 from guidata.dataset.datatypes import DataItem, DataSet, ItemProperty
+from guidata.qthelpers import exec_dialog
 from guidata.userconfigio import UserConfigReader, UserConfigWriter, WriterMixin
 from guidata.utils import add_extension, utf8_to_unicode
-from utils.qthelpers import exec_dialog
 
 if TYPE_CHECKING:
     from guidata.hdf5io import HDF5Reader, HDF5Writer

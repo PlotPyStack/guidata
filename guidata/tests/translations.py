@@ -8,14 +8,19 @@
 """Little translation test"""
 
 
-SHOW = False  # Do not show test in GUI-based test launcher
-
 from guidata.config import _
-from utils.qthelpers import execenv
+from guidata.env import execenv
+
+SHOW = False  # Do not show test in GUI-based test launcher
 
 translations = (_("Some required entries are incorrect"),)
 
-if __name__ == "__main__":
+
+def test():
     for text in translations:
-        print(text)
+        execenv.print(text)
     execenv.print("OK")
+
+
+if __name__ == "__main__":
+    test()

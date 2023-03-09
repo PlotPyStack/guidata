@@ -13,11 +13,12 @@ application is to extend a parameter set with additionnal parameters.
 """
 
 
-SHOW = True  # Show test in GUI-based test launcher
-
 import guidata.dataset.dataitems as gdi
 import guidata.dataset.datatypes as gdt
-from utils.qthelpers import execenv
+from guidata.env import execenv
+from guidata.qthelpers import qt_app_context
+
+SHOW = True  # Show test in GUI-based test launcher
 
 
 class OriginalDataset(gdt.DataSet):
@@ -40,17 +41,17 @@ class DerivedDataset(OriginalDataset):
     c = gdi.FloatItem("Level 3 (added in derived dataset)", default=0)
 
 
+def test():
+    with qt_app_context():
+        e = OriginalDataset()
+        e.edit()
+        execenv.print(e)
+
+        e = DerivedDataset()
+        e.edit()
+        execenv.print(e)
+        execenv.print("OK")
+
+
 if __name__ == "__main__":
-    # Create QApplication
-    import guidata
-
-    _app = guidata.qapplication()
-
-    e = OriginalDataset()
-    e.edit()
-    print(e)
-
-    e = DerivedDataset()
-    e.edit()
-    print(e)
-    execenv.print("OK")
+    test()
