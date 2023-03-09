@@ -15,3 +15,9 @@ sphinx-rtd-theme
 sphinx-intl
 Pillow
 pandas
+pytest
+pytest-qt
+pytest-cov
+pytest-xvfb
+cx_Freeze
+sip
