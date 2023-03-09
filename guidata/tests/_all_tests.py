@@ -12,8 +12,6 @@ import guidata
 from guidata import __version__
 from guidata.guitest import get_tests
 
-TST_PATH = []  # type: ignore
-
 
 def run_all_tests(args="", contains="", timeout=None):
     """Run all guidata tests"""
@@ -27,11 +25,8 @@ def run_all_tests(args="", contains="", timeout=None):
     print("")
     print("Test parameters:")
     print(f"  Selected {tnb} tests ({len(get_tests(guidata)) - 1} total available)")
-    print("  Test data path:")
-    for path in TST_PATH:
-        print(f"    {path}")
     print("  Environment:")
-    for vname in ("DATA_GUIDATA", "PYTHONPATH", "DEBUG"):
+    for vname in ("PYTHONPATH", "DEBUG"):
         print(f"    {vname}={os.environ.get(vname, '')}")
     print("")
     print("Please wait while test scripts are executed (a few minutes).")
