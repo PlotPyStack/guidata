@@ -3,7 +3,6 @@
 # Copyright © Spyder Project Contributors
 # Licensed under the terms of the MIT License
 
-SHOW = True  # Show test in GUI-based test launcher
 
 """
 Tests for arrayeditor.py
@@ -12,9 +11,11 @@ Tests for arrayeditor.py
 import numpy as np
 
 # Local imports
-from guidata import qapplication
+from guidata.env import execenv
+from guidata.qthelpers import exec_dialog, qt_app_context
 from guidata.widgets.arrayeditor import ArrayEditor
-from utils.qthelpers import exec_dialog, execenv
+
+SHOW = True  # Show test in GUI-based test launcher
 
 
 def launch_arrayeditor(data, title="", xlabels=None, ylabels=None):
@@ -75,7 +76,11 @@ def test_arrayeditor():
     launch_arrayeditor(arr, "3D array")
 
 
+def test():
+    with qt_app_context():
+        test_arrayeditor()
+        execenv.print("OK")
+
+
 if __name__ == "__main__":
-    app = qapplication()
-    test_arrayeditor()
-    execenv.print("OK")
+    test()

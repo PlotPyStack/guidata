@@ -10,8 +10,6 @@ All guidata item/group features demo
 """
 
 
-SHOW = True  # Show test in GUI-based test launcher
-
 import atexit
 import shutil
 import tempfile
@@ -20,7 +18,6 @@ import numpy as np
 
 from guidata.dataset.dataitems import (
     BoolItem,
-    ButtonItem,
     ChoiceItem,
     ColorItem,
     DictItem,
@@ -47,7 +44,9 @@ from guidata.dataset.datatypes import (
 from guidata.dataset.qtitemwidgets import DataSetWidget
 from guidata.dataset.qtwidgets import DataSetEditLayout, DataSetShowLayout
 from guidata.env import execenv
-from utils.qthelpers import exec_action
+from guidata.qthelpers import qt_app_context
+
+SHOW = True  # Show test in GUI-based test launcher
 
 # Creating temporary files and registering cleanup functions
 TEMPDIR = tempfile.mkdtemp(prefix="test_")
@@ -148,18 +147,18 @@ class TestParameters(DataSet):
     integer = IntItem("Integer", default=5, min=3, max=6).set_pos(col=1)
 
 
+def test():
+    with qt_app_context():
+        e = TestParameters()
+        e.floatarray[:, 0] = np.linspace(-5, 5, 50)
+        execenv.print(e)
+
+        if e.edit():
+            e.edit()
+            execenv.print(e)
+        e.view()
+        execenv.print("OK")
+
+
 if __name__ == "__main__":
-    # Create QApplication
-    import guidata
-
-    _app = guidata.qapplication()
-
-    e = TestParameters()
-    e.floatarray[:, 0] = np.linspace(-5, 5, 50)
-    print(e)
-
-    if e.edit():
-        e.edit()
-        print(e)
-    e.view()
-    execenv.print("OK")
+    test()

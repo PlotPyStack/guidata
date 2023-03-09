@@ -14,29 +14,31 @@ This script shows how to save in and then reload data from a JSON file.
 
 import os
 
+from guidata.env import execenv
 from guidata.jsonio import JSONReader, JSONWriter
+from guidata.qthelpers import qt_app_context
 from guidata.tests.all_items import TestParameters
-from utils.qthelpers import execenv
 
 SHOW = True  # Show test in GUI-based test launcher
 
-if __name__ == "__main__":
-    # Create QApplication
-    import guidata
 
-    _app = guidata.qapplication()
-
-    if os.path.exists("test.json"):
-        os.unlink("test.json")
-
-    e = TestParameters()
-    if e.edit():
-        writer = JSONWriter("test.json")
-        e.serialize(writer)
-        writer.save()
+def test():
+    with qt_app_context():
+        if os.path.exists("test.json"):
+            os.unlink("test.json")
 
         e = TestParameters()
-        reader = JSONReader("test.json")
-        e.deserialize(reader)
-        e.edit()
-    execenv.print("OK")
+        if e.edit():
+            writer = JSONWriter("test.json")
+            e.serialize(writer)
+            writer.save()
+
+            e = TestParameters()
+            reader = JSONReader("test.json")
+            e.deserialize(reader)
+            e.edit()
+        execenv.print("OK")
+
+
+if __name__ == "__main__":
+    test()

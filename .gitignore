@@ -7,6 +7,7 @@ Thumbs.db
 doctmp/
 *.h5
 *.stats
+.venv
 
 # Created by https://www.gitignore.io/api/python
 
@@ -69,4 +70,3 @@ docs/_build/
 
 # PyBuilder
 target/
-

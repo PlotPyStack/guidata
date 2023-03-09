@@ -12,7 +12,6 @@ These group box widgets are intended to be integrated in a GUI application
 layout, showing read-only parameter sets or allowing to edit parameter values.
 """
 
-SHOW = True  # Show test in GUI-based test launcher
 
 from qtpy.QtWidgets import QMainWindow, QSplitter
 
@@ -25,12 +24,14 @@ from guidata.qthelpers import (
     add_actions,
     create_action,
     get_std_icon,
+    qt_app_context,
     win32_fix_title_bar_background,
 )
 
 # Local test import:
 from guidata.tests.activable_dataset import ExampleDataSet
-from utils.qthelpers import exec_application, execenv
+
+SHOW = True  # Show test in GUI-based test launcher
 
 
 class AnotherDataSet(gdt.DataSet):
@@ -165,11 +166,12 @@ class MainWindow(QMainWindow):
             self.update_groupboxes()
 
 
-if __name__ == "__main__":
-    from guidata import qapplication
+def test():
+    with qt_app_context(exec_loop=True):
+        window = MainWindow()
+        window.show()
+        execenv.print("OK")
 
-    app = qapplication()
-    window = MainWindow()
-    window.show()
-    exec_application(app)
-    execenv.print("OK")
+
+if __name__ == "__main__":
+    test()

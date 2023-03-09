@@ -10,9 +10,6 @@ Demonstrates how items may trigger callbacks when activated
 """
 
 
-SHOW = True  # Show test in GUI-based test launcher
-
-
 from guidata.dataset.dataitems import (
     ChoiceItem,
     ColorItem,
@@ -21,19 +18,22 @@ from guidata.dataset.dataitems import (
     TextItem,
 )
 from guidata.dataset.datatypes import DataSet
-from utils.qthelpers import execenv
+from guidata.env import execenv
+from guidata.qthelpers import qt_app_context
+
+SHOW = True  # Show test in GUI-based test launcher
 
 
 class TestParameters(DataSet):
     def cb_example(self, item, value):
-        print("\nitem: ", item, "\nvalue:", value)
+        execenv.print("\nitem: ", item, "\nvalue:", value)
         if self.results is None:
             self.results = ""
         self.results += str(value) + "\n"
-        print("results:", self.results)
+        execenv.print("results:", self.results)
 
     def update_x1plusx2(self, item, value):
-        print("\nitem: ", item, "\nvalue:", value)
+        execenv.print("\nitem: ", item, "\nvalue:", value)
         if self.x1 is not None and self.x2 is not None:
             self.x1plusx2 = self.x1 + self.x2
         else:
@@ -58,15 +58,15 @@ class TestParameters(DataSet):
     results = TextItem("Results")
 
 
+def test():
+    with qt_app_context():
+        e = TestParameters()
+        execenv.print(e)
+        if e.edit():
+            execenv.print(e)
+        e.view()
+        execenv.print("OK")
+
+
 if __name__ == "__main__":
-    # Create QApplication
-    import guidata
-
-    _app = guidata.qapplication()
-
-    e = TestParameters()
-    print(e)
-    if e.edit():
-        print(e)
-    e.view()
-    execenv.print("OK")
+    test()

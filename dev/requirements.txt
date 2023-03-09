@@ -13,3 +13,5 @@ scipy
 sphinx
 sphinx-rtd-theme
 sphinx-intl
+Pillow
+pandas

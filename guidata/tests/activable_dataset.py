@@ -17,11 +17,12 @@ So this example with dialog boxes may be confusing.
 # When showing dataset in read-only mode (e.g. inside another layout), all items
 # are shown except the enable item.
 
-SHOW = True  # Show test in GUI-based test launcher
-
 from guidata.dataset.dataitems import BoolItem, ChoiceItem, ColorItem, FloatItem
 from guidata.dataset.datatypes import ActivableDataSet
-from utils.qthelpers import execenv
+from guidata.env import execenv
+from guidata.qthelpers import qt_app_context
+
+SHOW = True  # Show test in GUI-based test launcher
 
 
 class ExampleDataSet(ActivableDataSet):
@@ -47,17 +48,15 @@ class ExampleDataSet(ActivableDataSet):
 ExampleDataSet.active_setup()
 
 
+def test():
+    with qt_app_context():
+        prm = ExampleDataSet()
+        prm.set_writeable()
+        prm.edit()
+        prm.set_readonly()
+        prm.view()
+        execenv.print("OK")
+
+
 if __name__ == "__main__":
-    # Create QApplication
-    import guidata
-
-    _app = guidata.qapplication()
-    # Editing mode:
-    prm = ExampleDataSet()
-    prm.set_writeable()
-    prm.edit()
-
-    # Showing mode:
-    prm.set_readonly()
-    prm.view()
-    execenv.print("OK")
+    test()

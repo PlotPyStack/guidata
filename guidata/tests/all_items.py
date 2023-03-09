@@ -16,8 +16,6 @@ DataSet class definition: each parameter type has its own DataItem class
 """
 
 
-SHOW = True  # Show test in GUI-based test launcher
-
 import atexit
 import datetime
 import shutil
@@ -27,7 +25,10 @@ import numpy as np
 
 import guidata.dataset.dataitems as gdi
 import guidata.dataset.datatypes as gdt
-from utils.qthelpers import execenv
+from guidata.env import execenv
+from guidata.qthelpers import qt_app_context
+
+SHOW = True  # Show test in GUI-based test launcher
 
 # Creating temporary files and registering cleanup functions
 TEMPDIR = tempfile.mkdtemp(prefix="test_")
@@ -92,17 +93,17 @@ class TestParameters(gdt.DataSet):
     )
 
 
+def test():
+    with qt_app_context():
+        e = TestParameters()
+
+        e.floatarray[:, 0] = np.linspace(-5, 5, 50)
+        execenv.print(e)
+        if e.edit():
+            execenv.print(e)
+        e.view()
+        execenv.print("OK")
+
+
 if __name__ == "__main__":
-    # Create QApplication
-    import guidata
-
-    _app = guidata.qapplication()
-
-    e = TestParameters()
-
-    e.floatarray[:, 0] = np.linspace(-5, 5, 50)
-    print(e)
-    if e.edit():
-        print(e)
-    e.view()
-    execenv.print("OK")
+    test()

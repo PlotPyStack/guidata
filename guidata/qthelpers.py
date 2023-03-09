@@ -13,19 +13,26 @@ The ``guidata.qthelpers`` module provides helper functions for developing
 easily Qt-based graphical user interfaces.
 """
 
+import faulthandler
 import os
 import os.path as osp
+import shutil
 import sys
+import time
+from contextlib import contextmanager
+from datetime import datetime
 
-from qtpy.QtCore import Qt
+from qtpy.QtCore import Qt, QTimer
 from qtpy.QtGui import QColor, QIcon, QKeySequence
 from qtpy.QtWidgets import (
     QAction,
     QApplication,
+    QDialog,
     QGroupBox,
     QHBoxLayout,
     QLabel,
     QLineEdit,
+    QMainWindow,
     QMenu,
     QPushButton,
     QStyle,
@@ -34,10 +41,14 @@ from qtpy.QtWidgets import (
     QWidget,
 )
 
-from guidata.configtools import get_icon
+import guidata
+from guidata.config import CONF, get_old_log_fname
+from guidata.configtools import get_icon, get_module_data_path
+from guidata.env import execenv
 
 # Local imports:
 from guidata.external import darkdetect
+from guidata.utils import to_string
 
 
 def is_dark_mode():
@@ -314,6 +325,161 @@ def show_std_icons():
     dialog = ShowStdIcons(None)
     dialog.show()
     sys.exit(app.exec())
+
+
+QAPP_INSTANCE = None
+SHOTPATH = osp.join(
+    get_module_data_path("guidata"), os.pardir, "doc", "images", "shots"
+)
+
+
+def initialize_log_file(fname):
+    """Eventually keep the previous log file
+    Returns True if there was a previous log file"""
+    contents = get_log_contents(fname)
+    if contents:
+        try:
+            shutil.move(fname, get_old_log_fname(fname))
+        except Exception:  # pylint: disable=broad-except
+            pass
+        return True
+    return False
+
+
+def remove_empty_log_file(fname):
+    """Eventually remove empty log files"""
+    if not get_log_contents(fname):
+        try:
+            os.remove(fname)
+        except Exception:  # pylint: disable=broad-except
+            pass
+
+
+def get_log_contents(fname):
+    """Return True if file exists and something was logged in it"""
+    if osp.exists(fname):
+        with open(fname, "rb") as fdesc:
+            return to_string(fdesc.read()).strip()
+    return None
+
+
+def close_widgets_and_quit(screenshot=False):
+    """Close Qt top level widgets and quit Qt event loop"""
+    for widget in QApplication.instance().topLevelWidgets():
+        wname = widget.objectName()
+        if screenshot and wname and widget.isVisible():  # pragma: no cover
+            grab_save_window(widget, wname.lower())
+        assert widget.close()
+    QApplication.instance().quit()
+
+
+def close_dialog_and_quit(widget, screenshot=False):
+    """Close QDialog and quit Qt event loop"""
+    wname = widget.objectName()
+    if screenshot and wname and widget.isVisible():  # pragma: no cover
+        grab_save_window(widget, wname.lower())
+    widget.done(QDialog.Accepted)
+
+
+@contextmanager
+def qt_app_context(exec_loop=False):
+    """Context manager handling Qt application creation and persistance"""
+    global QAPP_INSTANCE  # pylint: disable=global-statement
+    if QAPP_INSTANCE is None:
+        QAPP_INSTANCE = guidata.qapplication()
+
+    # === Use faulthandler for exceptions ----------------------------------------------
+    fh_log_fname = CONF.get("faulthandler", "log_path")
+    CONF.set("faulthandler", "enabled", initialize_log_file(fh_log_fname))
+
+    with open(fh_log_fname, "w", encoding="utf-8") as fh_log_fn:
+        faulthandler.enable(file=fh_log_fn)
+        try:
+            yield QAPP_INSTANCE
+        finally:
+            if execenv.unattended:  # pragma: no cover
+                if execenv.delay > 0:
+                    mode = "Screenshot" if execenv.screenshot else "Unattended"
+                    message = f"{mode} mode (delay: {execenv.delay}s)"
+                    msec = execenv.delay * 1000 - 200
+                    for widget in QApplication.instance().topLevelWidgets():
+                        if isinstance(widget, QMainWindow):
+                            widget.statusBar().showMessage(message, msec)
+                QTimer.singleShot(
+                    execenv.delay * 1000,
+                    lambda: close_widgets_and_quit(screenshot=execenv.screenshot),
+                )
+            if exec_loop:
+                QAPP_INSTANCE.exec()
+
+    if CONF.get("faulthandler", "enabled"):
+        faulthandler.disable()
+    remove_empty_log_file(fh_log_fname)
+
+
+def exec_dialog(dlg):
+    """Run QDialog Qt execution loop without blocking,
+    depending on environment test mode"""
+    if execenv.unattended:
+        QTimer.singleShot(
+            execenv.delay * 1000,
+            lambda: close_dialog_and_quit(dlg, screenshot=execenv.screenshot),
+        )
+    return dlg.exec()
+
+
+def grab_save_window(widget: QWidget, name: str) -> None:  # pragma: no cover
+    """Grab window screenshot and save it"""
+    widget.activateWindow()
+    widget.raise_()
+    QApplication.processEvents()
+    pixmap = widget.grab()
+    suffix = ""
+    if not name[-1].isdigit() and not name.startswith(("s_", "i_")):
+        suffix = "_" + datetime.now().strftime("%Y-%m-%d-%H%M%S")
+    pixmap.save(osp.join(SHOTPATH, f"{name}{suffix}.png"))
+
+
+def click_on_widget(widget):
+    wname = widget.objectName()
+    if wname and widget.isVisible():  # pragma: no cover
+        grab_save_window(widget, wname.lower())
+    widget.clicked()
+
+
+@contextmanager
+def block_signals(widget: QWidget, enable: bool):
+    """Eventually block/unblock widget Qt signals before/after doing some things
+    (enable: True if feature is enabled)"""
+    if enable:
+        widget.blockSignals(True)
+    try:
+        yield
+    finally:
+        if enable:
+            widget.blockSignals(False)
+
+
+def qt_wait(timeout, except_unattended=False):  # pragma: no cover
+    """Freeze GUI during timeout (seconds) while processing Qt events"""
+    if except_unattended and execenv.unattended:
+        return
+    start = time.time()
+    while time.time() <= start + timeout:
+        time.sleep(0.01)
+        QApplication.processEvents()
+
+
+@contextmanager
+def save_restore_stds():
+    """Save/restore standard I/O before/after doing some things
+    (e.g. calling Qt open/save dialogs)"""
+    saved_in, saved_out, saved_err = sys.stdin, sys.stdout, sys.stderr
+    sys.stdout = None
+    try:
+        yield
+    finally:
+        sys.stdin, sys.stdout, sys.stderr = saved_in, saved_out, saved_err
 
 
 if __name__ == "__main__":

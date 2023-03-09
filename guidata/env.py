@@ -30,14 +30,12 @@ class GuidataExecEnv:
     VERBOSE_ARG = "verbose"
     SCREENSHOT_ARG = "screenshot"
     DELAY_ARG = "delay"
-    UNATTENDED_ENV = "Guidata_UNATTENDED_TESTS"
-    VERBOSE_ENV = "Guidata_VERBOSITY_LEVEL"
-    SCREENSHOT_ENV = "Guidata_TAKE_SCREENSHOT"
+    UNATTENDED_ENV = "GUIDATA_UNATTENDED_TESTS"
+    VERBOSE_ENV = "GUIDATA_VERBOSITY_LEVEL"
+    SCREENSHOT_ENV = "GUIDATA_TAKE_SCREENSHOT"
     DELAY_ENV = "GUIDATA_DELAY_BEFORE_QUIT"
 
     def __init__(self):
-        self.h5files = None
-        self.h5browser_file = None
         self.demo_mode = False
         self.parse_args()
 
@@ -109,21 +107,6 @@ class GuidataExecEnv:
         """Parse command line arguments"""
         parser = argparse.ArgumentParser(description="Run guidata")
         parser.add_argument(
-            "h5",
-            nargs="?",
-            type=str,
-            help="HDF5 file names (separated by ';'), "
-            "optionally with dataset name (separated by ',')",
-        )
-        parser.add_argument(
-            "-b",
-            "--h5browser",
-            required=False,
-            type=str,
-            metavar="path",
-            help="path to open with HDF5 browser",
-        )
-        parser.add_argument(
             "-v", "--version", action="store_true", help="show Guidata version"
         )
         parser.add_argument(
@@ -147,10 +130,6 @@ class GuidataExecEnv:
             help="verbosity level: for debugging/testing purpose",
         )
         args, _unknown = parser.parse_known_args()
-        if args.h5:
-            self.h5files = args.h5.split(";")
-        if args.h5browser:
-            self.h5browser_file = args.h5browser
         if args.version:
             version = os.environ["Guidata_VERSION"]
             print(f"Guidata {version} on {platform.system()}")
