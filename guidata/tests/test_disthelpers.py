@@ -27,7 +27,7 @@ def test():
         name="Application demo",
         version="1.0.0",
         description="Application demo based on editgroupbox.py",
-        script=osp.join(osp.dirname(__file__), "editgroupbox.py"),
+        script=osp.join(osp.dirname(__file__), "test_editgroupbox.py"),
         target_name="demo.exe",
     )
     dist.add_modules("guidata")

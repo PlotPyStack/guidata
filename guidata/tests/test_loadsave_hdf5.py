@@ -26,7 +26,7 @@ import os
 from guidata.env import execenv
 from guidata.hdf5io import HDF5Reader, HDF5Writer
 from guidata.qthelpers import qt_app_context
-from guidata.tests.all_items import TestParameters
+from guidata.tests.test_all_items import TestParameters
 
 SHOW = hdf5_is_available  # Show test in GUI-based test launcher
 
@@ -37,7 +37,7 @@ def test():
             os.unlink("test.h5")
 
         e = TestParameters()
-        if e.edit():
+        if execenv.unattended or e.edit():
             writer = HDF5Writer("test.h5")
             e.serialize(writer)
             writer.close()

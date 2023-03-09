@@ -16,7 +16,7 @@ in a single dialog box (with one tab per DataSet object).
 from guidata.dataset.datatypes import DataSetGroup
 from guidata.env import execenv
 from guidata.qthelpers import qt_app_context
-from guidata.tests.all_features import TestParameters
+from guidata.tests.test_all_features import TestParameters
 
 SHOW = True  # Show test in GUI-based test launcher
 

@@ -22,21 +22,21 @@ from guidata.widgets.dataframeeditor import DataFrameEditor
 SHOW = True  # Show test in GUI-based test launcher
 
 
-def test_edit(data, title="", parent=None):
-    """Test subroutine"""
-    dlg = DataFrameEditor(parent=parent)
-
-    if dlg.setup_and_check(data, title=title):
-        exec_dialog(dlg)
-        return dlg.get_value()
-    else:
-        import sys
-
-        sys.exit(1)
-
-
 def test_dataframeeditor():
     """DataFrame editor test"""
+
+    def test_edit(data, title="", parent=None):
+        """Test subroutine"""
+        dlg = DataFrameEditor(parent=parent)
+
+        if dlg.setup_and_check(data, title=title):
+            exec_dialog(dlg)
+            return dlg.get_value()
+        else:
+            import sys
+
+            sys.exit(1)
+
     with qt_app_context():
         df1 = DataFrame(
             [
