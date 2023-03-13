@@ -54,7 +54,7 @@ class CustomJSONDecoder(json.JSONDecoder):
                 dtype = np.dtype(dtypestr)
                 if family == "array":
                     return np.asarray(data, dtype)
-            except TypeError:
+            except (TypeError, ValueError):
                 pass
         elif isinstance(obj, dict):
             for key, value in list(obj.items()):
