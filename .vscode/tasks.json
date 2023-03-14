@@ -4,37 +4,31 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Coverage auto",
+            "label": "Run Coverage",
             "type": "shell",
             "command": "cmd",
             "args": [
                 "/c",
-                "scripts\\run_coverage.bat"
+                "run_coverage.bat",
             ],
             "options": {
+                "cwd": "scripts",
                 "env": {
                     "UNATTENDED": "1",
                     "PYTHON": "${env:GUIDATA_PYTHON_DEV}",
-                    "COVERAGE_PROCESS_START": "C:\\Projet\\guidata\\guidata\\tests\\.coveragerc",
-                    "MODULE": "guidata.tests._all_tests"
                 }
-            }
-        },
-        {
-            "label": "Coverage manuel",
-            "type": "shell",
-            "command": "cmd",
-            "args": [
-                "/c",
-                "scripts\\run_coverage.bat"
-            ],
-            "options": {
-                "env": {
-                    "UNATTENDED": "1",
-                    "PYTHON": "${env:GUIDATA_PYTHON_DEV}",
-                    "COVERAGE_PROCESS_START": "C:\\Projet\\guidata\\guidata\\tests\\.coveragerc",
-                    "MODULE": "guidata.tests.__init__"
-                }
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "dedicated",
+                "showReuseMessage": true,
+                "clear": true
             }
         },
         {

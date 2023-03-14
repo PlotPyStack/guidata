@@ -7,12 +7,12 @@ REM Licensed under the terms of the MIT License
 REM Copyright (c) 2020 Pierre Raybaut
 REM (see PythonQwt LICENSE file for more details)
 REM ======================================================
-echo %CD%
-echo import coverage; coverage.process_startup() > .venv\3.10\Lib\site-packages\temp.pth
-%PYTHON% -m coverage run --concurrency=multiprocessing -m %MODULE%
-%PYTHON% -m coverage combine
-%PYTHON% -m coverage xml --data-file=.coverage
-%PYTHON% -m coverage html
-start .\htmlcov\index.html
+setlocal
+call %~dp0utils GetScriptPath SCRIPTPATH
+call %FUNC% SetPythonPath
+call %FUNC% UsePython
 
-del .venv\3.10\Lib\site-packages\temp.pth
+set COVERAGE_PROCESS_START=%SCRIPTPATH%\..\.coveragerc
+pytest -v --cov --cov-report=html --mode=unattended guidata
+start .\htmlcov\index.html
+call %FUNC% EndOfScript
