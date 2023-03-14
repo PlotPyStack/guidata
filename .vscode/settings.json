@@ -9,7 +9,9 @@
         "**/__pycache__": true,
         "**/*.pyc": true,
         "**/*.pyo": true,
-        ".venv": true
+        ".venv": true,
+        "htmlcov": true,
+        ".coverage": true
     },
     "files.trimFinalNewlines": true,
     "files.trimTrailingWhitespace": true,
