@@ -580,11 +580,6 @@ class FirstChoice:
     is the first item.
     """
 
-    """
-    Special object that means the default value of a ChoiceItem
-    is the first item.
-    """
-
     pass
 
 
