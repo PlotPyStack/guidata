@@ -34,7 +34,6 @@ from typing import (
 )
 
 from qtpy.QtWidgets import QWidget
-from guidata.utils import update_dataset, utf8_to_unicode
 
 from guidata.qthelpers import exec_dialog
 from guidata.userconfig import UserConfig
@@ -798,8 +797,6 @@ class DataSet(metaclass=DataSetMeta):
 
         dial = DataSetShowDialog(self, icon=self.__icon, parent=parent, size=size)
         return exec_dialog(dial)
-
-
 
     def to_string(
         self,

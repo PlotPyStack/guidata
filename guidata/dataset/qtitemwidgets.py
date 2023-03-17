@@ -18,7 +18,6 @@ Example: ChoiceWidget <--> ChoiceItem, ImageChoiceItem
 """
 import collections.abc
 import datetime
-
 import os
 import os.path as osp
 import sys
@@ -27,17 +26,15 @@ from typing import TYPE_CHECKING, Any, Callable, List, Optional, Protocol
 
 import numpy
 from qtpy.compat import getexistingdirectory
-from qtpy.QtCore import Qt, QVariant, Signal
+from qtpy.QtCore import Qt, QVariant
 from qtpy.QtGui import QColor, QIcon, QPixmap
 from qtpy.QtWidgets import (
     QAbstractButton,
-    QBoxLayout,
     QCheckBox,
     QColorDialog,
     QComboBox,
     QDateEdit,
     QDateTimeEdit,
-    QFileDialog,
     QFrame,
     QGridLayout,
     QGroupBox,
@@ -55,6 +52,7 @@ from qtpy.QtWidgets import (
 
 from guidata.config import _
 from guidata.configtools import get_icon, get_image_file_path, get_image_layout
+from guidata.dataset.datatypes import DataItemVariable
 from guidata.qthelpers import get_std_icon, text_to_qcolor
 from guidata.utils import restore_dataset, update_dataset, utf8_to_unicode
 from guidata.widgets.arrayeditor import ArrayEditor
@@ -481,7 +479,6 @@ class DateWidget(AbstractDataSetWidget):
         self.dateedit = self.group = QDateEdit()
         self.dateedit.setToolTip(item.get_help())
         self.dateedit.dateTimeChanged.connect(self.date_changed)
-
 
     def date_changed(self, value):
         """Date changed"""

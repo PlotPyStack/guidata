@@ -91,7 +91,7 @@
                 "/c",
                 "run_pylint.bat",
                 "--disable=fixme",
-                "plotpy",
+                "guidata",
             ],
             "options": {
                 "cwd": "scripts",
