@@ -17,7 +17,9 @@ all platforms thanks to ``cx_Freeze``.
 """
 
 import atexit
-import imp
+import importlib
+import importlib.machinery
+import inspect
 import os
 import os.path as osp
 import shutil
@@ -26,8 +28,124 @@ import traceback
 import warnings
 from subprocess import PIPE, Popen
 
+if os.name == "nt":
+    try:
+        import py2exe  # Patching distutils -- analysis:ignore
+
+        PY2EXE_INSTALLED = True
+    except ImportError:
+        PY2EXE_INSTALLED = False
+
+try:
+    import cx_Freeze
+
+    CX_FREEZE_INSTALLED = True
+
+    # Workaround against duplicated ddl files
+    # https://github.com/anthony-tuininga/cx_Freeze/issues/366
+    # https://github.com/anthony-tuininga/cx_Freeze/pull/400
+    def _CopyFile(self, source, target, copyDependentFiles, includeMode=False):
+        normalizedSource = os.path.normcase(os.path.normpath(source))
+        normalizedTarget = os.path.normcase(os.path.normpath(target))
+        if normalizedTarget in self.filesCopied:
+            return
+        if normalizedSource == normalizedTarget:
+            return
+        self._RemoveFile(target)
+        targetDir = os.path.dirname(target)
+        self._CreateDirectory(targetDir)
+        if not self.silent:
+            sys.stdout.write("copying %s -> %s\n" % (source, target))
+        shutil.copyfile(source, target)
+        shutil.copystat(source, target)
+        if includeMode:
+            shutil.copymode(source, target)
+        self.filesCopied[normalizedTarget] = None
+        if copyDependentFiles and source not in self.finder.excludeDependentFiles:
+            for source in self._GetDependentFiles(source):
+                target = os.path.join(self.targetDir, os.path.basename(source))
+                self._CopyFile(source, target, copyDependentFiles)
+
+    from cx_Freeze import freezer
+
+    freezer.Freezer._CopyFile = _CopyFile
+except ImportError:
+    CX_FREEZE_INSTALLED = False
+
 # Local imports
 from guidata.configtools import get_module_path
+
+
+# ==============================================================================
+# modules management
+# ==============================================================================
+def atexit_deletion(path):
+    """
+    Function to call each time user want to delete file/folder at script end. To use with atexit.register()
+
+    :param path: the absolute path of the file/folder to delete
+    :type path: str
+    """
+
+    # We check if path really exists
+    if os.path.exists(path):
+        # We check if path is a file or a folder to use the right command
+        try:
+            if os.path.isfile(path):
+                os.remove(path)
+            else:
+                shutil.rmtree(path)
+        except:
+            print("Error during deleting path {0}".format(path))
+            traceback.print_exc()
+        else:
+            print("Path {0} deleting with success".format(path))
+    else:
+        print("file/folder {0} is not existing".format(path))
+
+
+def get_package_data(name, extlist, exclude_dirs=[]):
+    """
+    Return data files for package *name* with extensions in *extlist*
+    (search recursively in package directories)
+    """
+    assert isinstance(extlist, (list, tuple))
+    flist = []
+    # Workaround to replace os.path.relpath (not available until Python 2.6):
+    offset = len(name) + len(os.pathsep)
+    for dirpath, _dirnames, filenames in os.walk(name):
+        if dirpath not in exclude_dirs:
+            for fname in filenames:
+                if osp.splitext(fname)[1].lower() in extlist:
+                    flist.append(osp.join(dirpath, fname)[offset:])
+    return flist
+
+
+def get_subpackages(name):
+    """Return subpackages of package *name*"""
+    splist = []
+    for dirpath, _dirnames, _filenames in os.walk(name):
+        if osp.isfile(osp.join(dirpath, "__init__.py")):
+            splist.append(".".join(dirpath.split(os.sep)))
+    return splist
+
+
+def cythonize_all(relpath):
+    """Cythonize all Cython modules in relative path"""
+    from Cython.Compiler import Main
+
+    for fname in os.listdir(relpath):
+        if osp.splitext(fname)[1] == ".pyx":
+            Main.compile(osp.join(relpath, fname))
+
+
+# This is a list of module extensions (.pyd, .cp36-win_amd64.pyd, ...)
+# used to detect if a filename refers to a module
+# and to get the module from the filename.
+# The list is sorted by length in descending order
+# so that .cp36-win64.pyd like extensions are tested before .pyd.
+_MODULE_SUFFIXES = importlib.machinery.all_suffixes()
+_MODULE_SUFFIXES.sort(key=len, reverse=True)
 
 
 # ==============================================================================
@@ -118,6 +236,11 @@ def get_msvc_version(python_version):
         # Python 3.3+ were built with Visual Studio 10.0.30319.1
         # (i.e. Visual C++ 2010)
         return "10.0"
+    elif python_version in ("3.5", "3.6"):
+        # Python 3.5+ were built with Visual Studio 14
+        # (i.e. Visual Studio 2015)
+        return "14.0"
+    # TODO : Add missing python versions
     else:
         raise RuntimeError("Unsupported Python version %s" % python_version)
 
@@ -178,18 +301,18 @@ def get_msvc_dlls(msvc_version, architecture=None, check_architecture=False):
                 dlls += '    <file name="%s" />%s' % (dll, os.linesep)
 
             manifest = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<!-- Copyright (c) Microsoft Corporation.  All rights reserved. -->
-<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
-    <noInheritable/>
-    <assemblyIdentity
-        type="%(atype)s"
-        name="Microsoft.VC90.%(group)s"
-        version="%(version)s"
-        processorArchitecture="%(arch)s"
-        publicKeyToken="%(key)s"
-    />
-%(dlls)s</assembly>
-""" % dict(
+            <!-- Copyright (c) Microsoft Corporation.  All rights reserved. -->
+            <assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
+                <noInheritable/>
+                <assemblyIdentity
+                    type="%(atype)s"
+                    name="Microsoft.VC90.%(group)s"
+                    version="%(version)s"
+                    processorArchitecture="%(arch)s"
+                    publicKeyToken="%(key)s"
+                />
+            %(dlls)s</assembly>
+            """ % dict(
                 version=msvc_version,
                 key=key,
                 atype=atype,
@@ -398,6 +521,20 @@ class Distribution(object):
         self._pyside_added = False
         # Attributes relative to cx_Freeze:
         self.executables = []
+        self.include_msvcr = False
+        self.module_import_func_dict = {
+            "PyQt5": self.add_pyqt,
+            "PySide": self.add_pyside,
+            "scipy": self.add_module_dir,
+            "matplotlib": self.add_matplotlib,
+            "h5py": self.add_h5py,
+            "docutils": self.add_doc_module,
+            "rst2pdf": self.add_doc_module,
+            "sphinx": self.add_doc_module,
+            "pygments": self.add_pygments,
+            "zmq": self.add_zmq,
+            "zmq": self.add_guidata,
+        }
 
     @property
     def target_dir(self):
@@ -429,6 +566,7 @@ class Distribution(object):
         bin_path_includes=None,
         bin_path_excludes=None,
         msvc=None,
+        include_msvcr=False,
     ):
         """Setup distribution object
 
@@ -470,6 +608,7 @@ class Distribution(object):
                     file=sys.stderr,
                 )
                 raise
+        self.include_msvcr = include_msvcr
         # cx_Freeze:
         self.add_executable(self.script, self.target_name, icon=self.icon)
 
@@ -478,7 +617,7 @@ class Distribution(object):
         and add it to *data_files*"""
         open(filename, "wb").write(bytes(contents, "utf-8"))
         self.data_files += [("", (filename,))]
-        _remove_later(filename)
+        atexit.register(atexit_deletion, os.path.abspath(filename))
 
     def add_data_file(self, filename, destdir=""):
         self.data_files += [(destdir, (filename,))]
@@ -496,9 +635,9 @@ class Distribution(object):
         qtver = 5
         self.includes += [
             "sip",
-            "PyQt%d.Qt" % qtver,
-            "PyQt%d.QtSvg" % qtver,
-            "PyQt%d.QtNetwork" % qtver,
+            f"PyQt{qtver}.Qt",
+            f"PyQt{qtver}.QtSvg",
+            f"PyQt{qtver}.QtNetwork",
         ]
 
         pyqt_path = osp.dirname(PyQt.__file__)
@@ -543,7 +682,7 @@ class Distribution(object):
                 (dirpath[len(pyqt_path) + len(os.pathsep) :], filelist)
             )
         if self.msvc:
-            atexit.register(remove_dir, pyqt_tmp)
+            atexit.register(atexit_deletion, os.path.abspath(pyqt_tmp))
 
         # Including french translation
         fr_trans = osp.join(pyqt_path, "translations", "qt_fr.qm")
@@ -627,7 +766,7 @@ class Distribution(object):
     def add_qt_bindings(self):
         """Include Qt bindings, i.e. PyQt or PySide"""
         try:
-            imp.find_module("PyQt5")
+            importlib.find_module("PyQt5")
             self.add_modules("PyQt5")
         except ImportError:
             self.add_modules("PySide")
@@ -665,83 +804,79 @@ class Distribution(object):
             ),
         )
 
+    def add_h5py(self):
+        self.add_module_dir("h5py")
+        if self.bin_path_excludes is not None and os.name == "nt":
+            # Specific to cx_Freeze on Windows: avoid including a zlib dll
+            # built with another version of Microsoft Visual Studio
+            self.bin_path_excludes += [
+                r"C:\Program Files",
+                r"C:\Program Files (x86)",
+            ]
+            self.data_files.append(  # necessary for cx_Freeze only
+                ("", (osp.join(get_module_path("h5py"), "zlib1.dll"),))
+            )
+
+    def add_doc_module(self, module_name):
+        self.includes += [
+            "docutils.writers.null",
+            "docutils.languages.en",
+            "docutils.languages.fr",
+        ]
+        if module_name == "rst2pdf":
+            self.add_module_data_files(
+                "rst2pdf", ("styles",), (".json", ".style"), copy_to_root=True
+            )
+        if module_name == "sphinx":
+            import sphinx.ext
+
+            for fname in os.listdir(osp.dirname(sphinx.ext.__file__)):
+                if osp.splitext(fname)[1] == ".py":
+                    modname = "sphinx.ext.%s" % osp.splitext(fname)[0]
+                    self.includes.append(modname)
+
+    def add_pygments(self):
+        self.includes += [
+            "pygments",
+            "pygments.formatters",
+            "pygments.lexers",
+            "pygments.lexers.agile",
+        ]
+
+    def add_zmq(self):
+        # FIXME: this is not working, yet... (missing DLL)
+        self.includes += [
+            "zmq",
+            "zmq.core._poll",
+            "zmq.core._version",
+            "zmq.core.constants",
+            "zmq.core.context",
+            "zmq.core.device",
+            "zmq.core.error",
+            "zmq.core.message",
+            "zmq.core.socket",
+            "zmq.core.stopwatch",
+        ]
+        if os.name == "nt":
+            self.bin_includes += ["libzmq.dll"]
+
+    def add_guidata(self):
+        self.add_module_data_files(
+            "guidata", ("images",), (".png", ".svg"), copy_to_root=False
+        )
+        self.add_qt_bindings()
+
     def add_modules(self, *module_names):
         """Include module *module_name*"""
+        # TODO: Add support for PyQt6
         for module_name in module_names:
-            print("Configuring module '%s'" % module_name)
-            # TODO: Add support for PyQt6
-            if module_name == "PyQt5":
-                self.add_pyqt()
-            elif module_name == "PySide":
-                self.add_pyside()
-            elif module_name == "scipy":
-                self.add_module_dir("scipy")
-            elif module_name == "matplotlib":
-                self.add_matplotlib()
-            elif module_name == "h5py":
-                self.add_module_dir("h5py")
-                if self.bin_path_excludes is not None and os.name == "nt":
-                    # Specific to cx_Freeze on Windows: avoid including a zlib dll
-                    # built with another version of Microsoft Visual Studio
-                    self.bin_path_excludes += [
-                        r"C:\Program Files",
-                        r"C:\Program Files (x86)",
-                    ]
-                    self.data_files.append(  # necessary for cx_Freeze only
-                        ("", (osp.join(get_module_path("h5py"), "zlib1.dll"),))
-                    )
-            elif module_name in ("docutils", "rst2pdf", "sphinx"):
-                self.includes += [
-                    "docutils.writers.null",
-                    "docutils.languages.en",
-                    "docutils.languages.fr",
-                ]
-                if module_name == "rst2pdf":
-                    self.add_module_data_files(
-                        "rst2pdf", ("styles",), (".json", ".style"), copy_to_root=True
-                    )
-                if module_name == "sphinx":
-                    import sphinx.ext
-
-                    for fname in os.listdir(osp.dirname(sphinx.ext.__file__)):
-                        if osp.splitext(fname)[1] == ".py":
-                            modname = "sphinx.ext.%s" % osp.splitext(fname)[0]
-                            self.includes.append(modname)
-            elif module_name == "pygments":
-                self.includes += [
-                    "pygments",
-                    "pygments.formatters",
-                    "pygments.lexers",
-                    "pygments.lexers.agile",
-                ]
-            elif module_name == "zmq":
-                # FIXME: this is not working, yet... (missing DLL)
-                self.includes += [
-                    "zmq",
-                    "zmq.core._poll",
-                    "zmq.core._version",
-                    "zmq.core.constants",
-                    "zmq.core.context",
-                    "zmq.core.device",
-                    "zmq.core.error",
-                    "zmq.core.message",
-                    "zmq.core.socket",
-                    "zmq.core.stopwatch",
-                ]
-                if os.name == "nt":
-                    self.bin_includes += ["libzmq.dll"]
-            elif module_name == "guidata":
-                self.add_module_data_files(
-                    "guidata", ("images",), (".png", ".svg"), copy_to_root=False
-                )
-                self.add_qt_bindings()
-            elif module_name == "guiqwt":
-                self.add_module_data_files(
-                    "guiqwt", ("images",), (".png", ".svg"), copy_to_root=False
-                )
-                if os.name == "nt":
-                    # Specific to cx_Freeze: including manually MinGW DLLs
-                    self.bin_includes += ["libgcc_s_dw2-1.dll", "libstdc++-6.dll"]
+            print(f"Configuring module '{module_name}'")
+            if module_name in self.module_import_func_dict.keys():
+                func = self.module_import_func_dict[module_name]
+                if not inspect.getargspec().args:
+                    func()
+                else:
+                    func(module_name)
             else:
                 try:
                     # Modules based on the same scheme as guidata and guiqwt
@@ -749,7 +884,15 @@ class Distribution(object):
                         module_name, ("images",), (".png", ".svg"), copy_to_root=False
                     )
                 except IOError:
-                    raise RuntimeError("Module not supported: %s" % module_name)
+                    raise RuntimeError(f"Module not supported:{module_name}")
+            # XXX: guiqwt ref, delete ?
+            # if module_name == "guiqwt":
+            #     self.add_module_data_files(
+            #         "guiqwt", ("images",), (".png", ".svg"), copy_to_root=False
+            #     )
+            #     if os.name == "nt":
+            #         # Specific to cx_Freeze: including manually MinGW DLLs
+            #         self.bin_includes += ["libgcc_s_dw2-1.dll", "libstdc++-6.dll"]
 
     def add_module_data_dir(
         self,
@@ -769,7 +912,7 @@ class Distribution(object):
         nstrip = len(module_dir) + len(osp.sep)
         data_dir = osp.join(module_dir, data_dir_name)
         if not osp.isdir(data_dir):
-            raise IOError("Directory not found: %s" % data_dir)
+            raise IOError(f"Directory not found: {data_dir}")
         for dirpath, _dirnames, filenames in os.walk(data_dir):
             dirname = dirpath[nstrip:]
             if osp.basename(dirpath) in exclude_dirs:
@@ -806,7 +949,10 @@ class Distribution(object):
                     if filename == "__init__.py":
                         fn = dirname
                     else:
-                        fn = osp.splitext(osp.join(dirname, filename))[0]
+                        for suffix in _MODULE_SUFFIXES:
+                            if filename.endswith(suffix):
+                                fn = osp.join(dirname, filename[: -len(suffix)])
+                                break
                     if fn.endswith(os.sep):
                         fn = fn[:-1]
                     modname = ".".join(fn.split(os.sep))
@@ -829,8 +975,11 @@ class Distribution(object):
         *extensions*: list of file extensions, e.g. ('.png', '.svg')
         """
         print(
-            "Adding module '%s' data files in %s (%s)"
-            % (module_name, ", ".join(data_dir_names), ", ".join(extensions))
+            "Adding module '{}' data files in {} ({})".format(
+                module_name,
+                ", ".join(data_dir_names),
+                ", ".join(extensions),
+            )
         )
         module_dir = get_module_path(module_name)
         for data_dir_name in data_dir_names:
@@ -843,7 +992,7 @@ class Distribution(object):
                 exclude_dirs,
             )
         translation_file = osp.join(
-            module_dir, "locale", "fr", "LC_MESSAGES", "%s.mo" % module_name
+            module_dir, "locale", "fr", "LC_MESSAGES", f"{module_name}.mo"
         )
         if osp.isfile(translation_file):
             self.data_files.append(
@@ -853,8 +1002,10 @@ class Distribution(object):
                 )
             )
             print(
-                "Adding module '%s' translation file: %s"
-                % (module_name, osp.basename(translation_file))
+                "Adding module '{}' translation file: {}".format(
+                    module_name,
+                    osp.basename(translation_file),
+                )
             )
 
     def build(self, library, cleanup=True, create_archive=None):
@@ -893,7 +1044,7 @@ class Distribution(object):
             * 'move': move target directory to a ZIP archive
         """
         name = self.target_dir
-        os.system('zip "%s.zip" -r "%s"' % (name, name))
+        os.system(f'python -m zipfile -c "{name}.zip" "{name}"')
         if option == "move":
             shutil.rmtree(name)
 
@@ -915,9 +1066,12 @@ class Distribution(object):
             * 'add': add target directory to a ZIP archive
             * 'move': move target directory to a ZIP archive
         """
-        from distutils.core import setup
+        if not PY2EXE_INSTALLED:
+            raise RuntimeError(
+                "You must install py2exe in order to build the executable"
+            )
 
-        import py2exe  # Patching distutils -- analysis:ignore
+        from distutils.core import setup
 
         self._py2exe_is_loaded = True
         if cleanup:
@@ -956,6 +1110,8 @@ class Distribution(object):
     def add_executable(self, script, target_name, icon=None):
         """Add executable to the cx_Freeze distribution
         Not supported for py2exe"""
+        if not CX_FREEZE_INSTALLED:
+            return
         from cx_Freeze import Executable
 
         base = None
@@ -975,6 +1131,10 @@ class Distribution(object):
             * 'add': add target directory to a ZIP archive
             * 'move': move target directory to a ZIP archive
         """
+        if not CX_FREEZE_INSTALLED:
+            raise RuntimeError(
+                "You must install cx_Freeze in order to build the executable"
+            )
         assert not self._py2exe_is_loaded, "cx_Freeze can't be executed after py2exe"
         # ===== Monkey-patching cx_Freeze (backported from v5.0 dev) ===========
         from cx_Freeze import hooks, setup
@@ -1007,7 +1167,8 @@ class Distribution(object):
             self.__cleanup()
         sys.argv += ["build"]
         excv = "3" if sys.version[0] == "2" else "2"
-        self.excludes += ["sympy.mpmath.libmp.exec_py%s" % excv]
+        self.excludes += [f"sympy.mpmath.libmp.exec_py{excv}"]
+        self.excludes += [f"PyQt4.uic.port_v{excv}"]
         build_exe = dict(
             include_files=to_include_files(self.data_files),
             includes=self.includes,
@@ -1017,6 +1178,10 @@ class Distribution(object):
             bin_path_includes=self.bin_path_includes,
             bin_path_excludes=self.bin_path_excludes,
             build_exe=self.target_dir,
+            optimize=0,
+            zip_include_packages="*",
+            zip_exclude_packages=["numpy", "pandas"],
+            include_msvcr=self.include_msvcr,
         )
         setup(
             name=self.name,

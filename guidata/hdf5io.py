@@ -16,7 +16,6 @@ import h5py
 import numpy as np
 
 from guidata.userconfigio import BaseIOHandler, WriterMixin
-from guidata.utils import utf8_to_unicode
 
 
 class TypeConverter(object):
@@ -30,7 +29,7 @@ class TypeConverter(object):
     def to_hdf(self, value):
         try:
             return self._to_type(value)
-        except:
+        except Exception:
             print("ERR", repr(value), file=sys.stderr)
             raise
 
@@ -38,11 +37,16 @@ class TypeConverter(object):
         return self._from_type(value)
 
 
-unicode_hdf = TypeConverter(lambda x: x.encode("utf-8"), lambda x: str(x, "utf-8"))
+try:
+    unicode_hdf = TypeConverter(
+        lambda x: x.encode("utf-8"), lambda x: str(x, encoding="utf-8")
+    )
+except Exception:
+    unicode_hdf = TypeConverter(lambda x: x.encode("utf-8"), lambda x: x)
 int_hdf = TypeConverter(int)
 
 
-class Attr(object):
+class Attr:
     """Helper class representing class attribute that
     should be saved/restored to/from a corresponding HDF5 attribute
 
@@ -72,13 +76,13 @@ class Attr(object):
     def save(self, group, struct):
         value = self.get_value(struct)
         if self.optional and value is None:
-            # print ".-", self.hdf_name, value
+            # print(".-", self.hdf_name, value)
             if self.hdf_name in group.attrs:
                 del group.attrs[self.hdf_name]
             return
         if self.type is not None:
             value = self.type.to_hdf(value)
-        # print ".", self.hdf_name, value, self.optional
+        # print(".", self.hdf_name, value, self.optional)
         try:
             group.attrs[self.hdf_name] = value
         except:
@@ -94,7 +98,7 @@ class Attr(object):
         try:
             value = group.attrs[self.hdf_name]
         except KeyError:
-            raise KeyError("Unable to locate attribute %s" % self.hdf_name)
+            raise KeyError(f"Unable to locate attribute {self.hdf_name}")
         if self.type is not None:
             value = self.type.from_hdf(value)
         self.set_value(struct, value)
@@ -148,7 +152,7 @@ class Dset(Attr):
         try:
             value = group[self.hdf_name][...]
         except KeyError:
-            raise KeyError("Unable to locate dataset %s" % self.hdf_name)
+            raise KeyError("Unable to locate dataset {}".format(self.hdf_name))
         if self.scalar is not None:
             value = self.scalar(value)
         self.set_value(struct, value)
@@ -192,6 +196,12 @@ class H5Store(object):
         if self.h5:
             self.h5.close()
         self.h5 = None
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        self.close()
 
     def generic_save(self, parent, source, structure):
         """save the data from source into the file using 'structure'
@@ -378,14 +388,17 @@ class HDF5Reader(HDF5Handler):
                     if progress_callback(int(100 * float(idx) / count)):
                         break
                 with self.group(name):
-                    group = self.get_parent_group()
-                    if name in group.attrs:
-                        # This is an attribute (not a group), meaning that
-                        # the object was None when deserializing it
-                        obj = None
-                    else:
-                        obj = klass()
-                        obj.deserialize(self)
+                    try:
+                        group = self.get_parent_group()
+                        if name in group.attrs:
+                            # This is an attribute (not a group), meaning that
+                            # the object was None when deserializing it
+                            obj = None
+                        else:
+                            obj = klass()
+                            obj.deserialize(self)
+                    except ValueError as err:
+                        break
                 seq.append(obj)
         return seq
 
