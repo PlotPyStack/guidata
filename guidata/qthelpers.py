@@ -407,7 +407,7 @@ def qt_app_context(exec_loop=False) -> None:
     remove_empty_log_file(fh_log_fname)
 
 
-def exec_dialog(dlg):
+def exec_dialog(dlg: QW.QDialog) -> int:
     """Run QDialog Qt execution loop without blocking,
     depending on environment test mode"""
     if execenv.unattended:
@@ -415,8 +415,10 @@ def exec_dialog(dlg):
             execenv.delay * 1000,
             lambda: close_dialog_and_quit(dlg, screenshot=execenv.screenshot),
         )
+    delete_later = not dlg.testAttribute(QC.Qt.WA_DeleteOnClose)
     result = dlg.exec()
-    dlg.deleteLater()
+    if delete_later:
+        dlg.deleteLater()
     return result
 
 
