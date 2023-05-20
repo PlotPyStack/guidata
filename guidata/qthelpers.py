@@ -13,6 +13,8 @@ The ``guidata.qthelpers`` module provides helper functions for developing
 easily Qt-based graphical user interfaces.
 """
 
+from __future__ import annotations
+
 import faulthandler
 import os
 import os.path as osp
@@ -22,24 +24,9 @@ import time
 from contextlib import contextmanager
 from datetime import datetime
 
-from qtpy.QtCore import Qt, QTimer
-from qtpy.QtGui import QColor, QIcon, QKeySequence
-from qtpy.QtWidgets import (
-    QAction,
-    QApplication,
-    QDialog,
-    QGroupBox,
-    QHBoxLayout,
-    QLabel,
-    QLineEdit,
-    QMainWindow,
-    QMenu,
-    QPushButton,
-    QStyle,
-    QToolButton,
-    QVBoxLayout,
-    QWidget,
-)
+from qtpy import QtCore as QC
+from qtpy import QtGui as QG
+from qtpy import QtWidgets as QW
 
 import guidata
 from guidata.config import CONF, get_old_log_fname
@@ -98,13 +85,13 @@ def win32_fix_title_bar_background(widget):
 
 def text_to_qcolor(text):
     """Create a QColor from specified string"""
-    color = QColor()
+    color = QG.QColor()
     if text is not None and text.startswith("#") and len(text) == 7:
         correct = "#0123456789abcdef"
         for char in text:
             if char.lower() not in correct:
                 return color
-    elif text not in list(QColor.colorNames()):
+    elif text not in list(QG.QColor.colorNames()):
         return color
     color.setNamedColor(text)
     return color
@@ -119,13 +106,13 @@ def create_action(
     icon=None,
     tip=None,
     checkable=None,
-    context=Qt.WindowShortcut,
+    context=QC.Qt.WindowShortcut,
     enabled=None,
 ):
     """
     Create a new QAction
     """
-    action = QAction(title, parent)
+    action = QW.QAction(title, parent)
     if triggered:
         if checkable:
             action.triggered.connect(triggered)
@@ -138,7 +125,7 @@ def create_action(
         action.toggled.connect(toggled)
         action.setCheckable(True)
     if icon is not None:
-        assert isinstance(icon, QIcon)
+        assert isinstance(icon, QG.QIcon)
         action.setIcon(icon)
     if shortcut is not None:
         action.setShortcut(shortcut)
@@ -164,9 +151,9 @@ def create_toolbutton(
 ):
     """Create a QToolButton"""
     if autoraise:
-        button = QToolButton(parent)
+        button = QW.QToolButton(parent)
     else:
-        button = QPushButton(parent)
+        button = QW.QPushButton(parent)
     if text is not None:
         button.setText(text)
     if icon is not None:
@@ -176,7 +163,7 @@ def create_toolbutton(
     if text is not None or tip is not None:
         button.setToolTip(text if tip is None else tip)
     if autoraise:
-        button.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
+        button.setToolButtonStyle(QC.Qt.ToolButtonTextBesideIcon)
         button.setAutoRaise(True)
     if triggered is not None:
         button.clicked.connect(lambda checked=False: triggered())
@@ -195,9 +182,9 @@ def create_groupbox(
 ):
     """Create a QGroupBox"""
     if title is None:
-        group = QGroupBox(parent)
+        group = QW.QGroupBox(parent)
     else:
-        group = QGroupBox(title, parent)
+        group = QW.QGroupBox(title, parent)
     group.setFlat(flat)
     if toggled is not None:
         group.setCheckable(True)
@@ -211,8 +198,8 @@ def create_groupbox(
 
 def keybinding(attr):
     """Return keybinding"""
-    ks = getattr(QKeySequence, attr)
-    return QKeySequence.keyBindings(ks)[0].toString()
+    ks = getattr(QG.QKeySequence, attr)
+    return QG.QKeySequence.keyBindings(ks)[0].toString()
 
 
 def add_separator(target):
@@ -228,9 +215,9 @@ def add_actions(target, actions):
     Add actions (list of QAction instances) to target (menu, toolbar)
     """
     for action in actions:
-        if isinstance(action, QAction):
+        if isinstance(action, QW.QAction):
             target.addAction(action)
-        elif isinstance(action, QMenu):
+        elif isinstance(action, QW.QMenu):
             target.addMenu(action)
         elif action is None:
             add_separator(target)
@@ -273,41 +260,41 @@ def mimedata2url(source, extlist=None):
         return pathlist
 
 
-def get_std_icon(name, size=None):
+def get_std_icon(name, size=None) -> QG.QIcon:
     """
     Get standard platform icon
     Call 'show_std_icons()' for details
     """
     if not name.startswith("SP_"):
         name = "SP_" + name
-    icon = QWidget().style().standardIcon(getattr(QStyle, name))
+    icon = QW.QWidget().style().standardIcon(getattr(QW.QStyle, name))
     if size is None:
         return icon
     else:
-        return QIcon(icon.pixmap(size, size))
+        return QG.QIcon(icon.pixmap(size, size))
 
 
-class ShowStdIcons(QWidget):
+class ShowStdIcons(QW.QWidget):
     """
     Dialog showing standard icons
     """
 
-    def __init__(self, parent):
-        QWidget.__init__(self, parent)
-        layout = QHBoxLayout()
+    def __init__(self, parent) -> None:
+        QW.QWidget.__init__(self, parent)
+        layout = QW.QHBoxLayout()
         row_nb = 14
         cindex = 0
-        col_layout = QVBoxLayout()
-        for child in dir(QStyle):
+        col_layout = QW.QVBoxLayout()
+        for child in dir(QW.QStyle):
             if child.startswith("SP_"):
                 if cindex == 0:
-                    col_layout = QVBoxLayout()
-                icon_layout = QHBoxLayout()
+                    col_layout = QW.QVBoxLayout()
+                icon_layout = QW.QHBoxLayout()
                 icon = get_std_icon(child)
-                label = QLabel()
+                label = QW.QLabel()
                 label.setPixmap(icon.pixmap(32, 32))
                 icon_layout.addWidget(label)
-                icon_layout.addWidget(QLineEdit(child.replace("SP_", "")))
+                icon_layout.addWidget(QW.QLineEdit(child.replace("SP_", "")))
                 col_layout.addLayout(icon_layout)
                 cindex = (cindex + 1) % row_nb
                 if cindex == 0:
@@ -317,11 +304,11 @@ class ShowStdIcons(QWidget):
         self.setWindowIcon(get_std_icon("TitleBarMenuButton"))
 
 
-def show_std_icons():
+def show_std_icons() -> None:
     """
     Show all standard Icons
     """
-    app = QApplication(sys.argv)
+    app = QW.QApplication(sys.argv)
     dialog = ShowStdIcons(None)
     dialog.show()
     sys.exit(app.exec())
@@ -333,7 +320,7 @@ SHOTPATH = osp.join(
 )
 
 
-def initialize_log_file(fname):
+def initialize_log_file(fname) -> bool:
     """Eventually keep the previous log file
     Returns True if there was a previous log file"""
     contents = get_log_contents(fname)
@@ -346,7 +333,7 @@ def initialize_log_file(fname):
     return False
 
 
-def remove_empty_log_file(fname):
+def remove_empty_log_file(fname) -> None:
     """Eventually remove empty log files"""
     if not get_log_contents(fname):
         try:
@@ -355,7 +342,7 @@ def remove_empty_log_file(fname):
             pass
 
 
-def get_log_contents(fname):
+def get_log_contents(fname) -> str | None:
     """Return True if file exists and something was logged in it"""
     if osp.exists(fname):
         with open(fname, "rb") as fdesc:
@@ -363,30 +350,29 @@ def get_log_contents(fname):
     return None
 
 
-def close_widgets_and_quit(screenshot=False):
+def close_widgets_and_quit(screenshot=False) -> None:
     """Close Qt top level widgets and quit Qt event loop"""
-    for widget in QApplication.instance().topLevelWidgets():
+    for widget in QW.QApplication.instance().topLevelWidgets():
         wname = widget.objectName()
         if screenshot and wname and widget.isVisible():  # pragma: no cover
             grab_save_window(widget, wname.lower())
         assert widget.close()
-    QApplication.instance().quit()
+    QW.QApplication.instance().quit()
 
 
-def close_dialog_and_quit(widget, screenshot=False):
+def close_dialog_and_quit(widget, screenshot=False) -> None:
     """Close QDialog and quit Qt event loop"""
     try:  # Workaround for pytest
         wname = widget.objectName()
         if screenshot and wname and widget.isVisible():  # pragma: no cover
             grab_save_window(widget, wname.lower())
-
-        widget.done(QDialog.Accepted)
-    except:
+        widget.done(QW.QDialog.Accepted)
+    except Exception:  # pylint: disable=broad-except
         pass
 
 
 @contextmanager
-def qt_app_context(exec_loop=False):
+def qt_app_context(exec_loop=False) -> None:
     """Context manager handling Qt application creation and persistance"""
     global QAPP_INSTANCE  # pylint: disable=global-statement
     if QAPP_INSTANCE is None:
@@ -406,10 +392,10 @@ def qt_app_context(exec_loop=False):
                     mode = "Screenshot" if execenv.screenshot else "Unattended"
                     message = f"{mode} mode (delay: {execenv.delay}s)"
                     msec = execenv.delay * 1000 - 200
-                    for widget in QApplication.instance().topLevelWidgets():
-                        if isinstance(widget, QMainWindow):
+                    for widget in QW.QApplication.instance().topLevelWidgets():
+                        if isinstance(widget, QW.QMainWindow):
                             widget.statusBar().showMessage(message, msec)
-                QTimer.singleShot(
+                QC.QTimer.singleShot(
                     execenv.delay * 1000,
                     lambda: close_widgets_and_quit(screenshot=execenv.screenshot),
                 )
@@ -425,18 +411,20 @@ def exec_dialog(dlg):
     """Run QDialog Qt execution loop without blocking,
     depending on environment test mode"""
     if execenv.unattended:
-        QTimer.singleShot(
+        QC.QTimer.singleShot(
             execenv.delay * 1000,
             lambda: close_dialog_and_quit(dlg, screenshot=execenv.screenshot),
         )
-    return dlg.exec()
+    result = dlg.exec()
+    dlg.deleteLater()
+    return result
 
 
-def grab_save_window(widget: QWidget, name: str) -> None:  # pragma: no cover
+def grab_save_window(widget: QW.QWidget, name: str) -> None:  # pragma: no cover
     """Grab window screenshot and save it"""
     widget.activateWindow()
     widget.raise_()
-    QApplication.processEvents()
+    QW.QApplication.processEvents()
     pixmap = widget.grab()
     suffix = ""
     if not name[-1].isdigit() and not name.startswith(("s_", "i_")):
@@ -452,7 +440,7 @@ def click_on_widget(widget):
 
 
 @contextmanager
-def block_signals(widget: QWidget, enable: bool):
+def block_signals(widget: QW.QWidget, enable: bool) -> None:
     """Eventually block/unblock widget Qt signals before/after doing some things
     (enable: True if feature is enabled)"""
     if enable:
@@ -464,18 +452,18 @@ def block_signals(widget: QWidget, enable: bool):
             widget.blockSignals(False)
 
 
-def qt_wait(timeout, except_unattended=False):  # pragma: no cover
+def qt_wait(timeout, except_unattended=False) -> None:  # pragma: no cover
     """Freeze GUI during timeout (seconds) while processing Qt events"""
     if except_unattended and execenv.unattended:
         return
     start = time.time()
     while time.time() <= start + timeout:
         time.sleep(0.01)
-        QApplication.processEvents()
+        QW.QApplication.processEvents()
 
 
 @contextmanager
-def save_restore_stds():
+def save_restore_stds() -> None:
     """Save/restore standard I/O before/after doing some things
     (e.g. calling Qt open/save dialogs)"""
     saved_in, saved_out, saved_err = sys.stdin, sys.stdout, sys.stderr

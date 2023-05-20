@@ -467,7 +467,6 @@ class CollectionsModel(ReadOnlyCollectionsModel):
 class CollectionsDelegate(QItemDelegate):
     """CollectionsEditor Item Delegate"""
 
-    sig_free_memory = Signal()
 
     def __init__(self, parent=None):
         QItemDelegate.__init__(self, parent)
@@ -690,7 +689,8 @@ class CollectionsDelegate(QItemDelegate):
             conv_func = data.get("conv", lambda v: v)
             self.set_value(index, conv_func(value))
         self._editors.pop(editor_id)
-        self.free_memory()
+        editor = self.sender()
+        editor.deleteLater()
 
     def editor_rejected(self, editor_id):
         """
@@ -698,14 +698,8 @@ class CollectionsDelegate(QItemDelegate):
         :param editor_id:
         """
         self._editors.pop(editor_id)
-        self.free_memory()
-
-    def free_memory(self):
-        """Free memory after closing an editor."""
-        try:
-            self.sig_free_memory.emit()
-        except RuntimeError:
-            pass
+        editor = self.sender()
+        editor.deleteLater()
 
     def commitAndCloseEditor(self):
         """Overriding method commitAndCloseEditor"""
@@ -792,7 +786,6 @@ class BaseTableView(QTableView):
     sig_option_changed = Signal(str, object)
     sig_files_dropped = Signal(list)
     redirect_stdio = Signal(bool)
-    sig_free_memory = Signal()
 
     def __init__(self, parent):
         QTableView.__init__(self, parent)
