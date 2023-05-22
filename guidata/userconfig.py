@@ -36,66 +36,65 @@ The ``guidata.userconfig`` module provides user configuration file (.ini file)
 management features based on ``ConfigParser`` (standard Python library).
 
 It is the exact copy of the open-source package `userconfig` (MIT license).
-
-19/12/2021: Removed Python 2 compatibility
 """
 
-
-__version__ = "1.1.0"
-
-import os
-import re
-import os.path as osp
-import sys
 import configparser as cp
+import os
+import os.path as osp
+import re
+import sys
 
 
-def _check_values(sections):
-    # Checks if all key/value pairs are writable
-    err = False
-    for section, data in list(sections.items()):
-        for key, value in list(data.items()):
-            try:
-                _s = str(value)
-            except Exception as _e:
-                print("Can't convert:")
-                print(section, key, repr(value))
-                err = True
-    if err:
-        assert False
-    else:
-        import traceback
-
-        print("-" * 30)
-        traceback.print_stack()
-
-
-def get_home_dir():
-    """
-    Return user home directory
-    """
+def get_home_dir() -> str:
+    """Return user home directory"""
     try:
-        path = osp.expanduser("~")
-    except:
+        # expanduser() returns a raw byte string which needs to be
+        # decoded with the codec that the OS is using to represent
+        # file paths.
+        path = os.fsdecode(osp.expanduser("~"))
+    except Exception:
         path = ""
-    for env_var in ("HOME", "USERPROFILE", "TMP"):
-        if osp.isdir(path):
-            break
-        path = os.environ.get(env_var, "")
-    if path:
+
+    if osp.isdir(path):
         return path
     else:
-        raise RuntimeError("Please define environment variable $HOME")
+        # Get home from alternative locations
+        for env_var in ("HOME", "USERPROFILE", "TMP"):
+            # os.environ.get() returns a raw byte string which needs to be
+            # decoded with the codec that the OS is using to represent
+            # environment variables.
+            path = os.fsdecode(os.environ.get(env_var, ""))
+            if osp.isdir(path):
+                return path
+            else:
+                path = ""
+
+        if not path:
+            raise RuntimeError(
+                "Please set the environment variable HOME to "
+                "your user/home directory path."
+            )
 
 
-def get_config_dir():
-    if sys.platform == "win32":
-        # TODO: on windows config files usually go in
-        return get_home_dir()
-    return osp.join(get_home_dir(), ".config")
+def get_config_basedir() -> str:
+    """Return user configuration base directory."""
+    if sys.platform.startswith("linux"):
+        # Follow the XDG standard to save settings
+        home = os.environ.get("XDG_CONFIG_HOME", "")
+        if not home:
+            home = osp.join(get_home_dir(), ".config")
+        if not osp.isdir(home):
+            os.makedirs(home)
+        return home
+    return get_home_dir()
 
 
 class NoDefault:
+    """
+    Custom object used to explicitly mark that no default value were
+    provided.
+    """
+
     pass
 
 
@@ -106,7 +105,7 @@ class UserConfig(cp.ConfigParser):
     options: dictionnary containing options *or* list of tuples
     (section_name, options)
 
-    Note that 'get' and 'set' arguments number and type
+    Note that "get" and "set" arguments number and type
     differ from the overriden methods
     """
 
@@ -115,7 +114,7 @@ class UserConfig(cp.ConfigParser):
     def __init__(self, defaults):
         cp.ConfigParser.__init__(self)
         self.name = "none"
-        self.raw = 0  # 0=substitutions are enabled / 1=raw config parser
+        self.raw = 0  # 0 = substitutions are enabled / 1 = raw config parser
         assert isinstance(defaults, dict)
         for _key, val in list(defaults.items()):
             assert isinstance(val, dict)
@@ -126,6 +125,10 @@ class UserConfig(cp.ConfigParser):
         self.check_default_values()
 
     def update_defaults(self, defaults):
+        """Update the default configuration
+
+        :param defaults: dict section -> dict {option: default value}
+        """
         for key, sectdict in list(defaults.items()):
             if key not in self.defaults:
                 self.defaults[key] = sectdict
@@ -134,15 +137,24 @@ class UserConfig(cp.ConfigParser):
         self.reset_to_defaults(save=False)
 
     def save(self):
+        """Save the configuration."""
         # In any case, the resulting config is saved in config file:
         self.__save()
 
     def set_application(self, name, version, load=True, raw_mode=False):
+        """
+        Set the application name and version
+
+        :param name: name of the application
+        :param version: current version in format "X.Y.Z"
+        :param load: If True, load the configuration from dict
+        :param raw_mode: If True, enable raw mode of ConfigParser
+        """
         self.name = name
         self.raw = 1 if raw_mode else 0
-        if (version is not None) and (re.match("^(\d+).(\d+).(\d+)$", version) is None):
+        if (version is not None) and (re.match(r"^(\d+).(\d+).(\d+)", version) is None):
             raise RuntimeError(
-                "Version number %r is incorrect - must be in X.Y.Z format" % version
+                f"Version number {version!r} is incorrect - must be in X.Y.Z format"
             )
 
         if load:
@@ -174,7 +186,7 @@ class UserConfig(cp.ConfigParser):
                     _check(key + "[]", v)
             else:
                 if not isinstance(value, (bool, int, float, str)):
-                    errors.append("Invalid value for %s: %r" % (key, value))
+                    errors.append(f"Invalid value for {key}: {value}")
 
         for name, section in list(self.defaults.items()):
             assert isinstance(name, str)
@@ -220,14 +232,20 @@ class UserConfig(cp.ConfigParser):
         fname = self.filename()
         if osp.isfile(fname):
             os.remove(fname)
+        os.makedirs(osp.dirname(fname), mode=0o700, exist_ok=True)
         with open(fname, "w", encoding="utf-8") as configfile:
             self.write(configfile)
 
-    def filename(self):
-        """
-        Create a .ini filename located in user home directory
-        """
-        return osp.join(get_config_dir(), ".%s.ini" % self.name)
+    def get_path(self, basename: str) -> str:
+        """Return filename path inside configuration directory"""
+        config_dir = osp.join(get_config_basedir(), f".{self.name}")
+        if not osp.isdir(config_dir):
+            os.makedirs(config_dir)
+        return osp.join(config_dir, basename)
+
+    def filename(self) -> str:
+        """Return configuration file name"""
+        return self.get_path(f"{self.name}.ini")
 
     def cleanup(self):
         """
@@ -293,13 +311,13 @@ class UserConfig(cp.ConfigParser):
 
         if not self.has_section(section):
             if default is NoDefault:
-                raise RuntimeError("Unknown section %r" % section)
+                raise RuntimeError(f"Unknown section {section!r}")
             else:
                 self.add_section(section)
 
         if not self.has_option(section, option):
             if default is NoDefault:
-                raise RuntimeError("Unknown option %r/%r" % (section, option))
+                raise RuntimeError(f"Unknown option {section!r}/{option!r}")
             else:
                 self.set(section, option, default)
                 return default
@@ -319,11 +337,19 @@ class UserConfig(cp.ConfigParser):
             try:
                 # lists, tuples, ...
                 value = eval(value)
-            except:
+            except Exception:
                 pass
+
         return value
 
     def get_section(self, section):
+        """Returns configuration values of the given section.
+
+        The returned dict includes unset default values.
+
+        :param section: section name
+        :return: dict option name -> value
+        """
         sect = self.defaults.get(section, {}).copy()
         for opt in self.options(section):
             sect[opt] = self.get(section, opt)
@@ -338,7 +364,7 @@ class UserConfig(cp.ConfigParser):
         if not isinstance(value, str):
             value = repr(value)
         if verbose:
-            print("%s[ %s ] = %s" % (section, option, value))
+            print("{}[ {} ] = {}".format(section, option, value))
         cp.ConfigParser.set(self, section, option, value)
 
     def set_default(self, section, option, default_value):
@@ -373,9 +399,14 @@ class UserConfig(cp.ConfigParser):
             self.__save()
 
     def remove_section(self, section):
+        """Remove the given section and save the configuration."""
         cp.ConfigParser.remove_section(self, section)
         self.__save()
 
     def remove_option(self, section, option):
+        """
+        Remove the given option from the given section
+        and save the configuration.
+        """
         cp.ConfigParser.remove_option(self, section, option)
         self.__save()

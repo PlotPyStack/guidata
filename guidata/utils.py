@@ -15,6 +15,8 @@ The ``guidata.utils`` module provides various utility helper functions
 (pure python).
 """
 
+from __future__ import annotations
+
 import collections.abc
 import locale  # Warning: 2to3 false alarm ('import' fixer)
 import os
@@ -22,9 +24,13 @@ import os.path as osp
 import subprocess
 import sys
 import time
+from typing import TYPE_CHECKING, Any
 
 # Local imports
 from guidata.userconfig import get_home_dir
+
+if TYPE_CHECKING:
+    import guidata.dataset.datatypes as gdt
 
 
 # ==============================================================================
@@ -141,18 +147,27 @@ def unicode_to_stdout(ustr):
 # ==============================================================================
 # Updating, restoring datasets
 # ==============================================================================
-def update_dataset(dest, source, visible_only=False):
+def update_dataset(
+    dest: gdt.DataSet, source: Any | dict[str, Any], visible_only: bool = False
+) -> None:
     """
-    Update `dest` dataset items from `source` dataset
+    Update `dest` dataset items from `source` dataset.
 
-    dest should inherit from DataSet, whereas source can be:
-        * any Python object containing matching attribute names
-        * or a dictionary with matching key names
+    Args:
+        dest (DataSet): The destination dataset object to update.
+        source (Union[Any, Dict[str, Any]]): The source object or dictionary
+            containing matching attribute names.
+        visible_only (bool, optional): If True, update only visible items.
+            Defaults to False.
 
     For each DataSet item, the function will try to get the attribute
     of the same name from the source.
 
-    visible_only: if True, update only visible items
+    If the attribute exists in the source object or the key exists in the dictionary,
+    it will be set as the corresponding attribute in the destination dataset.
+
+    Returns:
+        None
     """
     for item in dest._items:
         key = item._name
@@ -169,14 +184,21 @@ def update_dataset(dest, source, visible_only=False):
             setattr(dest, key, source[key])
 
 
-def restore_dataset(source, dest):
+def restore_dataset(source: gdt.DataSet, dest: Any | dict[str, Any]) -> None:
     """
-    Restore `dest` dataset items from `source` dataset
+    Restore `dest` dataset items from `source` dataset.
 
-    This function is almost the same as update_dataset but requires
+    Args:
+        source (DataSet): The source dataset object to restore from.
+        dest (Union[Any, Dict[str, Any]]): The destination object or dictionary.
+
+    This function is almost the same as `update_dataset` but requires
     the source to be a DataSet instead of the destination.
 
-    Symetrically from update_dataset, `dest` may also be a dictionary.
+    Symmetrically from `update_dataset`, `dest` may also be a dictionary.
+
+    Returns:
+        None
     """
     for item in source._items:
         key = item._name
@@ -299,23 +321,50 @@ toc = _TIMER.toc
 # ==============================================================================
 # Module, scripts, programs
 # ==============================================================================
-def get_module_path(modname):
-    """Return module *modname* base path"""
+def get_module_path(modname: str) -> str:
+    """Return module *modname* base path.
+
+    Args:
+        modname (str): The module name.
+
+    Returns:
+        str: The module base path.
+    """
     module = sys.modules.get(modname, __import__(modname))
     return osp.abspath(osp.dirname(module.__file__))
 
 
-def is_program_installed(basename):
-    """Return program absolute path if installed in PATH
-    Otherwise, return None"""
+def is_program_installed(basename: str) -> str | None:
+    """Return program absolute path if installed in PATH, otherwise None.
+
+    Args:
+        basename (str): The program base name.
+
+    Returns:
+        str | None: The program absolute path if installed in PATH,
+            otherwise None.
+    """
     for path in os.environ["PATH"].split(os.pathsep):
         abspath = osp.join(path, basename)
         if osp.isfile(abspath):
             return abspath
 
 
-def run_program(name, args="", cwd=None, shell=True, wait=False):
-    """Run program in a separate process"""
+def run_program(
+    name, args: str = "", cwd: str = None, shell: bool = True, wait: bool = False
+) -> None:
+    """Run program in a separate process.
+
+    Args:
+        name (str): The program name.
+        args (str, optional): The program arguments. Defaults to "".""
+        cwd (str, optional): The current working directory. Defaults to None.
+        shell (bool, optional): If True, run program in a shell. Defaults to True.
+        wait (bool, optional): If True, wait for program to finish. Defaults to False.
+
+    Raises:
+        RuntimeError: If program is not installed.
+    """
     path = is_program_installed(name)
     if not path:
         raise RuntimeError("Program %s was not found" % name)
@@ -390,8 +439,15 @@ def run_shell_command(cmdstr, **subprocess_kwargs):
     return subprocess.Popen(cmdstr, **subprocess_kwargs)
 
 
-def is_module_available(module_name):
-    """Return True if Python module is available"""
+def is_module_available(module_name: str) -> bool:
+    """Return True if Python module is available, False otherwise.
+
+    Args:
+        module_name (str): The module name.
+
+    Returns:
+        bool: True if Python module is available, False otherwise.
+    """
     try:
         __import__(module_name)
         return True

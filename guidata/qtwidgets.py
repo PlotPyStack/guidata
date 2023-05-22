@@ -13,10 +13,11 @@ The ``guidata.qtwidgets`` module provides ready-to-use or generic widgets
 for developing easily Qt-based graphical user interfaces.
 """
 
-from math import cos, sin, pi
-from qtpy.QtWidgets import QLabel, QWidget, QDockWidget
-from qtpy.QtGui import QPainter, QPen
+from math import cos, pi, sin
+
 from qtpy.QtCore import QSize, Qt
+from qtpy.QtGui import QPainter, QPen
+from qtpy.QtWidgets import QDockWidget, QLabel, QWidget
 
 # Local imports:
 from guidata.configtools import get_family

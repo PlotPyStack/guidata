@@ -112,6 +112,10 @@ def create_action(
     """
     Create a new QAction
     """
+
+    if isinstance(title, bytes):
+        title = str(title, "utf8")
+
     action = QW.QAction(title, parent)
     if triggered:
         if checkable:
@@ -219,6 +223,8 @@ def add_actions(target, actions):
             target.addAction(action)
         elif isinstance(action, QW.QMenu):
             target.addMenu(action)
+        elif isinstance(action, QW.QToolButton) or isinstance(action, QW.QPushButton):
+            target.addWidget(action)
         elif action is None:
             add_separator(target)
 
