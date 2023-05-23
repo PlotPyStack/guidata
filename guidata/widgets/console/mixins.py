@@ -15,28 +15,16 @@ IPython console plugin.
 import os
 import os.path as osp
 import re
-import sre_constants
 import textwrap
 from xml.sax.saxutils import escape
 
-from qtpy.QtWidgets import (
-    QApplication,
-    QToolTip,
-)
-from qtpy.QtGui import (
-    QCursor,
-    QTextCursor,
-    QTextDocument,
-)
-from qtpy.QtCore import Qt, QPoint, QRegularExpression
-
-from guidata.widgets.console.dochelpers import (
-    getargspecfromtext,
-    getobj,
-    getsignaturefromtext,
-)
 from guidata import encoding
 from guidata.config import _
+from guidata.widgets.console.dochelpers import (getargspecfromtext, getobj,
+                                                getsignaturefromtext)
+from qtpy.QtCore import QPoint, QRegularExpression, Qt
+from qtpy.QtGui import QCursor, QTextCursor, QTextDocument
+from qtpy.QtWidgets import QApplication, QToolTip
 
 # Order is important:
 EOL_CHARS = (("\r\n", "nt"), ("\n", "posix"), ("\r", "mac"))
@@ -486,7 +474,7 @@ class BaseEditMixin(object):
         text = str(self.toPlainText())
         try:
             regobj = re.compile(pattern)
-        except sre_constants.error:
+        except re.error:
             return
         if findflag & QTextDocument.FindBackward:
             # Find backward
@@ -578,7 +566,7 @@ class BaseEditMixin(object):
                 regobj = re.compile(pattern)
             else:
                 regobj = re.compile(pattern, re.IGNORECASE)
-        except sre_constants.error:
+        except re.error:
             return None
 
         number_matches = 0
