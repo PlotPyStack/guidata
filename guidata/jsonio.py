@@ -27,7 +27,10 @@ class CustomJSONEncoder(json.JSONEncoder):
     def default(self, o):
         """Override JSONEncoder method"""
         if isinstance(o, np.ndarray):
-            return ["array", o.tolist(), str(o.dtype)]
+            olist = o.tolist()
+            if o.dtype in (np.complex64, np.complex128):
+                olist = o.real.tolist() + o.imag.tolist()
+            return ["array", olist, str(o.dtype)]
         if isinstance(o, np.generic):
             if isinstance(o, np.integer):
                 return int(o)
@@ -53,6 +56,10 @@ class CustomJSONDecoder(json.JSONDecoder):
             try:
                 dtype = np.dtype(dtypestr)
                 if family == "array":
+                    if dtype in (np.complex64, np.complex128):
+                        return np.asarray(
+                            data[: len(data) // 2], dtype
+                        ) + 1j * np.asarray(data[len(data) // 2 :], dtype)
                     return np.asarray(data, dtype)
             except (TypeError, ValueError):
                 pass
