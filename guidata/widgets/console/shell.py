@@ -21,42 +21,22 @@ import re
 import sys
 import time
 
-from qtpy.QtWidgets import (
-    QApplication,
-    QToolTip,
-    QMenu,
-)
-from qtpy.QtGui import (
-    QTextCursor,
-    QTextCharFormat,
-    QTextCursor,
-    QKeyEvent,
-)
-from qtpy.QtCore import (
-    QCoreApplication,
-    Qt,
-    QTimer,
-    Signal,
-    Slot,
-    Property,
-)
 from qtpy.compat import getsavefilename
+from qtpy.QtCore import Property, QCoreApplication, Qt, QTimer, Signal, Slot
+from qtpy.QtGui import QKeyEvent, QTextCharFormat, QTextCursor
+from qtpy.QtWidgets import QApplication, QMenu, QToolTip
 
+from guidata import encoding
+from guidata.config import CONF, _
+from guidata.configtools import get_icon
+from guidata.qthelpers import add_actions, create_action, keybinding
+from guidata.widgets.console.base import ConsoleBaseWidget
 from guidata.widgets.console.mixins import (
     BrowseHistoryMixin,
     GetHelpMixin,
     SaveHistoryMixin,
     TracebackLinksMixin,
 )
-from guidata.widgets.console.base import ConsoleBaseWidget
-from guidata.configtools import get_icon
-from guidata import encoding
-from guidata.qthelpers import (
-    add_actions,
-    create_action,
-    keybinding,
-)
-from guidata.config import CONF, _
 
 DEBUG = False
 STDERR = sys.stderr
@@ -95,13 +75,17 @@ class ShellBaseWidget(ConsoleBaseWidget, SaveHistoryMixin, BrowseHistoryMixin):
     execute = Signal(str)
     append_to_history = Signal(str, str)
 
-    def __init__(self, parent, profile=False, initial_message=None):
+    def __init__(self, parent, profile=False, initial_message=None, read_only=False):
         """
         parent : specifies the parent widget
         """
         ConsoleBaseWidget.__init__(self, parent)
         SaveHistoryMixin.__init__(self)
         BrowseHistoryMixin.__init__(self)
+
+        # Read-only console is not the more used case, but it may be useful in
+        # some cases (e.g. when using the console as a log window)
+        self.setReadOnly(read_only)
 
         self.historylog_filename = "history.log"
 
@@ -712,8 +696,8 @@ class PythonShellWidget(TracebackLinksMixin, ShellBaseWidget, GetHelpMixin):
     SEPARATOR = "%s##---(%s)---" % (os.linesep * 2, time.ctime())
     go_to_error = Signal(str)
 
-    def __init__(self, parent, profile=False, initial_message=None):
-        ShellBaseWidget.__init__(self, parent, profile, initial_message)
+    def __init__(self, parent, profile=False, initial_message=None, read_only=False):
+        ShellBaseWidget.__init__(self, parent, profile, initial_message, read_only)
         TracebackLinksMixin.__init__(self)
         GetHelpMixin.__init__(self)
 
@@ -727,24 +711,24 @@ class PythonShellWidget(TracebackLinksMixin, ShellBaseWidget, GetHelpMixin):
             icon=get_icon("copywop.png"),
             triggered=self.copy_without_prompts,
         )
-        clear_line_action = create_action(
-            self,
-            _("Clear line"),
-            icon=get_icon("editdelete.png"),
-            tip=_("Clear line"),
-            triggered=self.clear_line,
-        )
-        clear_action = create_action(
-            self,
-            _("Clear shell"),
-            icon=get_icon("editclear.png"),
-            tip=_("Clear shell contents " "('cls' command)"),
-            triggered=self.clear_terminal,
-        )
-        add_actions(
-            self.menu,
-            (self.copy_without_prompts_action, clear_line_action, clear_action),
-        )
+        actions = [self.copy_without_prompts_action]
+        if not self.isReadOnly():
+            clear_line_action = create_action(
+                self,
+                _("Clear line"),
+                icon=get_icon("editdelete.png"),
+                tip=_("Clear line"),
+                triggered=self.clear_line,
+            )
+            clear_action = create_action(
+                self,
+                _("Clear shell"),
+                icon=get_icon("editclear.png"),
+                tip=_("Clear shell contents " "('cls' command)"),
+                triggered=self.clear_terminal,
+            )
+            actions += [clear_line_action, clear_action]
+        add_actions(self.menu, actions)
 
     def contextMenuEvent(self, event):
         """Reimplements ShellBaseWidget method"""
