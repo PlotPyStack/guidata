@@ -588,12 +588,12 @@ def set_color_mode(app):
     if qthelpers.is_dark_mode():
         app.setStyle(QStyleFactory.create("Fusion"))
         dark_palette = QPalette()
-        dark_color = QColor(45, 45, 45)
+        dark_color = QColor(50, 50, 50)
         disabled_color = QColor(127, 127, 127)
         dpsc = dark_palette.setColor
         dpsc(QPalette.Window, dark_color)
         dpsc(QPalette.WindowText, Qt.white)
-        dpsc(QPalette.Base, QColor(18, 18, 18))
+        dpsc(QPalette.Base, QColor(31, 31, 31))
         dpsc(QPalette.AlternateBase, dark_color)
         dpsc(QPalette.ToolTipBase, Qt.white)
         dpsc(QPalette.ToolTipText, Qt.white)
