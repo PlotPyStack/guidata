@@ -1,5 +1,19 @@
 # guidata Releases #
 
+## Version 2.4.0 ##
+
+Changes:
+
+* guitest: added support for test subpackages (before, only test modules were supported)
+* JSON serialization: added support for complex NumPy arrays (`numpy.complex128`)
+* Dark theme: adjusted colors to match usual dark theme colors (e.g. Spyder)
+* ShellBase/PythonShellWidget: added read_only mode. Read-only console is not the most useful feature, but it may be of interest for some applications (e.g. when using the console as a log window)
+* Date items: added support for callbacks
+
+Bug fixes:
+
+* JSON deserialization: fixed decoding for data similar to dictionary layout
+
 ## Version 2.3.1 ##
 
 Bug fixes:
