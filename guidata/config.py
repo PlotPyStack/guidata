@@ -112,7 +112,7 @@ DEFAULTS = {
         # ---- Monokai ----
         "monokai/name": "Monokai",
         #      Name              Color     Bold  Italic
-        "monokai/background": "#121212",
+        "monokai/background": "#1f1f1f",
         "monokai/currentline": "#484848",
         "monokai/currentcell": "#3d3d3d",
         "monokai/occurrence": "#666666",
@@ -188,7 +188,7 @@ DEFAULTS = {
         # ---- Spyder/Dark ----
         "spyder/dark/name": "Spyder Dark",
         #           Name             Color     Bold  Italic
-        "spyder/dark/background": "#121212",
+        "spyder/dark/background": "#1f1f1f",
         "spyder/dark/currentline": "#2b2b43",
         "spyder/dark/currentcell": "#31314e",
         "spyder/dark/occurrence": "#abab67",
@@ -207,7 +207,7 @@ DEFAULTS = {
         # ---- Zenburn ----
         "zenburn/name": "Zenburn",
         #        Name            Color     Bold  Italic
-        "zenburn/background": "#121212",
+        "zenburn/background": "#1f1f1f",
         "zenburn/currentline": "#333333",
         "zenburn/currentcell": "#2c2c2c",
         "zenburn/occurrence": "#7a738f",
@@ -245,7 +245,7 @@ DEFAULTS = {
         # ---- Solarized Dark ----
         "solarized/dark/name": "Solarized Dark",
         #        Name            Color     Bold  Italic
-        "solarized/dark/background": "#121212",
+        "solarized/dark/background": "#1f1f1f",
         "solarized/dark/currentline": "#083f4d",
         "solarized/dark/currentcell": "#073642",
         "solarized/dark/occurrence": "#657b83",
