@@ -6,14 +6,14 @@
 # (see guidata/__init__.py for details)
 
 """
-Example with activable items: items which active state is changed depending 
+Example with activable items: items which active state is changed depending
 on another item's value.
 """
 
-SHOW = True  # Show test in GUI-based test launcher
+# guitest: show
 
 from guidata.dataset.dataitems import ChoiceItem, FloatItem
-from guidata.dataset.datatypes import DataSet, GetAttrProp, FuncProp
+from guidata.dataset.datatypes import DataSet, FuncProp, GetAttrProp
 
 choices = (("A", "Choice #1: A"), ("B", "Choice #2: B"), ("C", "Choice #3: C"))
 

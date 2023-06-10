@@ -17,10 +17,10 @@ So this example with dialog boxes may be confusing.
 # When showing dataset in read-only mode (e.g. inside another layout), all items
 # are shown except the enable item.
 
-SHOW = True  # Show test in GUI-based test launcher
+# guitest: show
 
+from guidata.dataset.dataitems import BoolItem, ChoiceItem, ColorItem, FloatItem
 from guidata.dataset.datatypes import ActivableDataSet
-from guidata.dataset.dataitems import BoolItem, FloatItem, ChoiceItem, ColorItem
 
 
 class ExampleDataSet(ActivableDataSet):

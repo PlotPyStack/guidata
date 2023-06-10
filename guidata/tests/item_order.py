@@ -12,11 +12,10 @@ From time to time, it may be useful to change the item order,
 for example when deriving a dataset from another.
 """
 
+# guitest: show
 
-SHOW = True  # Show test in GUI-based test launcher
-
-import guidata.dataset.datatypes as gdt
 import guidata.dataset.dataitems as gdi
+import guidata.dataset.datatypes as gdt
 
 
 class OriginalDataset(gdt.DataSet):

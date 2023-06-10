@@ -3,7 +3,7 @@
 # Copyright © Spyder Project Contributors
 # Licensed under the terms of the MIT License
 
-SHOW = True  # Show test in GUI-based test launcher
+# guitest: show
 
 """
 Tests for arrayeditor.py
@@ -28,7 +28,7 @@ def test_arrayeditor():
     """Test array editor for all supported data types"""
     for title, data in (
         ("string array", np.array(["kjrekrjkejr"])),
-        ("unicode array", np.array([u"ñññéáíó"])),
+        ("unicode array", np.array(["ñññéáíó"])),
         (
             "masked array",
             np.ma.array([[1, 0], [1, 0]], mask=[[True, False], [False, False]]),

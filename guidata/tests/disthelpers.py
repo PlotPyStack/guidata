@@ -12,7 +12,7 @@ How to create an executable with py2exe or cx_Freeze with less efforts than
 writing a complete setup script.
 """
 
-SHOW = True  # Show test in GUI-based test launcher
+# guitest: show
 
 import os.path as osp
 

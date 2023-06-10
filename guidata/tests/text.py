@@ -7,11 +7,8 @@
 
 """Test in text mode"""
 
-
-SHOW = False  # Do not show test in GUI-based test launcher
-
-from guidata.dataset.datatypes import DataSet
 from guidata.dataset.dataitems import FloatItem, IntItem
+from guidata.dataset.datatypes import DataSet
 
 
 class Parameters(DataSet):

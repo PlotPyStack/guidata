@@ -9,18 +9,16 @@
 Demonstrates how items may trigger callbacks when activated
 """
 
+# guitest: show
 
-SHOW = True  # Show test in GUI-based test launcher
-
-
-from guidata.dataset.datatypes import DataSet
 from guidata.dataset.dataitems import (
     ChoiceItem,
-    StringItem,
-    TextItem,
     ColorItem,
     FloatItem,
+    StringItem,
+    TextItem,
 )
+from guidata.dataset.datatypes import DataSet
 
 
 class TestParameters(DataSet):

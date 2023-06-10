@@ -9,40 +9,40 @@
 All guidata item/group features demo
 """
 
+# guitest: show
 
-SHOW = True  # Show test in GUI-based test launcher
+import atexit
+import shutil
+import tempfile
 
-import tempfile, atexit, shutil
 import numpy as np
 
-from guidata.dataset.datatypes import (
-    DataSet,
-    BeginTabGroup,
-    EndTabGroup,
-    BeginGroup,
-    EndGroup,
-    ObjectItem,
-)
 from guidata.dataset.dataitems import (
-    FloatItem,
-    IntItem,
     BoolItem,
     ChoiceItem,
-    MultipleChoiceItem,
-    ImageChoiceItem,
+    ColorItem,
+    DirectoryItem,
+    FileOpenItem,
+    FileSaveItem,
     FilesOpenItem,
+    FloatArrayItem,
+    FloatItem,
+    ImageChoiceItem,
+    IntItem,
+    MultipleChoiceItem,
     StringItem,
     TextItem,
-    ColorItem,
-    FileSaveItem,
-    FileOpenItem,
-    DirectoryItem,
-    FloatArrayItem,
 )
-
-from guidata.dataset.qtwidgets import DataSetEditLayout, DataSetShowLayout
+from guidata.dataset.datatypes import (
+    BeginGroup,
+    BeginTabGroup,
+    DataSet,
+    EndGroup,
+    EndTabGroup,
+    ObjectItem,
+)
 from guidata.dataset.qtitemwidgets import DataSetWidget
-
+from guidata.dataset.qtwidgets import DataSetEditLayout, DataSetShowLayout
 
 # Creating temporary files and registering cleanup functions
 TEMPDIR = tempfile.mkdtemp(prefix="test_")

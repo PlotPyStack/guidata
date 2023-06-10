@@ -12,11 +12,10 @@ From time to time, it may be useful to derive a DataSet from another. The main
 application is to extend a parameter set with additionnal parameters.
 """
 
+# guitest: show
 
-SHOW = True  # Show test in GUI-based test launcher
-
-import guidata.dataset.datatypes as gdt
 import guidata.dataset.dataitems as gdi
+import guidata.dataset.datatypes as gdt
 
 
 class OriginalDataset(gdt.DataSet):

@@ -7,11 +7,10 @@
 
 """Unit tests"""
 
-SHOW = False  # Do not show test in GUI-based test launcher
-
 import unittest
-from guidata.dataset.datatypes import DataSet
+
 from guidata.dataset.dataitems import FloatItem, IntItem
+from guidata.dataset.datatypes import DataSet
 from guidata.utils import update_dataset
 
 

@@ -10,10 +10,11 @@ import datetime
 
 import numpy as np
 import PIL.Image
+
 from guidata import qapplication
 from guidata.widgets.objecteditor import oedit
 
-SHOW = True  # Show test in GUI-based test launcher
+# guitest: show
 
 
 def test():

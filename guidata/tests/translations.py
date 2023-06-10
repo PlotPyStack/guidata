@@ -7,9 +7,6 @@
 
 """Little translation test"""
 
-
-SHOW = False  # Do not show test in GUI-based test launcher
-
 from guidata.config import _
 
 translations = (_("Some required entries are incorrect"),)

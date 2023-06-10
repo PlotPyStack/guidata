@@ -15,14 +15,17 @@ DataSet class definition: each parameter type has its own DataItem class
 (IntItem for integers, FloatItem for floats, StringItem for strings, etc.)
 """
 
+# guitest: show
 
-SHOW = True  # Show test in GUI-based test launcher
+import atexit
+import datetime
+import shutil
+import tempfile
 
-import tempfile, atexit, shutil, datetime, numpy as np
+import numpy as np
 
-import guidata.dataset.datatypes as gdt
 import guidata.dataset.dataitems as gdi
-
+import guidata.dataset.datatypes as gdt
 
 # Creating temporary files and registering cleanup functions
 TEMPDIR = tempfile.mkdtemp(prefix="test_")

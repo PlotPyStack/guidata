@@ -3,7 +3,7 @@
 # Copyright © Spyder Project Contributors
 # Licensed under the terms of the MIT License
 
-SHOW = True  # Show test in GUI-based test launcher
+# guitest: show
 
 """
 Tests for codeeditor.py
