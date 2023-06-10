@@ -9,6 +9,7 @@
 All guidata item/group features demo
 """
 
+# guitest: show
 
 import atexit
 import shutil
@@ -45,8 +46,6 @@ from guidata.dataset.qtitemwidgets import DataSetWidget
 from guidata.dataset.qtwidgets import DataSetEditLayout, DataSetShowLayout
 from guidata.env import execenv
 from guidata.qthelpers import qt_app_context
-
-SHOW = True  # Show test in GUI-based test launcher
 
 # Creating temporary files and registering cleanup functions
 TEMPDIR = tempfile.mkdtemp(prefix="test_")

@@ -12,13 +12,12 @@ DataSet objects may be grouped into DataSetGroup, allowing them to be edited
 in a single dialog box (with one tab per DataSet object).
 """
 
+# guitest: show
 
 from guidata.dataset.datatypes import DataSetGroup
 from guidata.env import execenv
 from guidata.qthelpers import qt_app_context
 from guidata.tests.test_all_features import TestParameters
-
-SHOW = True  # Show test in GUI-based test launcher
 
 
 def test():

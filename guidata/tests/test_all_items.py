@@ -15,6 +15,7 @@ DataSet class definition: each parameter type has its own DataItem class
 (IntItem for integers, FloatItem for floats, StringItem for strings, etc.)
 """
 
+# guitest: show
 
 import atexit
 import datetime
@@ -27,8 +28,6 @@ import guidata.dataset.dataitems as gdi
 import guidata.dataset.datatypes as gdt
 from guidata.env import execenv
 from guidata.qthelpers import qt_app_context
-
-SHOW = True  # Show test in GUI-based test launcher
 
 # Creating temporary files and registering cleanup functions
 TEMPDIR = tempfile.mkdtemp(prefix="test_")

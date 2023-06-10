@@ -22,7 +22,7 @@ from guidata.dataset.datatypes import ActivableDataSet
 from guidata.env import execenv
 from guidata.qthelpers import qt_app_context
 
-SHOW = True  # Show test in GUI-based test launcher
+# guitest: show
 
 
 class ExampleDataSet(ActivableDataSet):

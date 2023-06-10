@@ -12,6 +12,7 @@ These group box widgets are intended to be integrated in a GUI application
 layout, showing read-only parameter sets or allowing to edit parameter values.
 """
 
+# guitest: show
 
 from qtpy.QtWidgets import QMainWindow, QSplitter
 
@@ -30,8 +31,6 @@ from guidata.qthelpers import (
 
 # Local test import:
 from guidata.tests.test_activable_dataset import ExampleDataSet
-
-SHOW = True  # Show test in GUI-based test launcher
 
 
 class AnotherDataSet(gdt.DataSet):

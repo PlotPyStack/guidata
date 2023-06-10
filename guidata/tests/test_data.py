@@ -15,8 +15,6 @@ from guidata.dataset.datatypes import DataSet
 from guidata.env import execenv
 from guidata.utils import update_dataset
 
-SHOW = False  # Do not show test in GUI-based test launcher
-
 
 class Parameters(DataSet):
     float1 = FloatItem("float #1", min=1, max=250, help="height in cm")

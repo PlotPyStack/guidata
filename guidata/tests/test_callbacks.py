@@ -9,6 +9,7 @@
 Demonstrates how items may trigger callbacks when activated
 """
 
+# guitest: show
 
 from guidata.dataset.dataitems import (
     ChoiceItem,
@@ -20,8 +21,6 @@ from guidata.dataset.dataitems import (
 from guidata.dataset.datatypes import DataSet
 from guidata.env import execenv
 from guidata.qthelpers import qt_app_context
-
-SHOW = True  # Show test in GUI-based test launcher
 
 
 class TestParameters(DataSet):

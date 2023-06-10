@@ -10,13 +10,12 @@ Example with activable items: items which active state is changed depending
 on another item's value.
 """
 
+# guitest: show
 
 from guidata.dataset.dataitems import ChoiceItem, FloatItem
 from guidata.dataset.datatypes import DataSet, FuncProp, GetAttrProp
 from guidata.env import execenv
 from guidata.qthelpers import qt_app_context
-
-SHOW = True  # Show test in GUI-based test launcher
 
 choices = (("A", "Choice #1: A"), ("B", "Choice #2: B"), ("C", "Choice #3: C"))
 

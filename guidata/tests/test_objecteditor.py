@@ -6,17 +6,16 @@
 Tests for objecteditor.py
 """
 
+# guitest: show
+
 import datetime
 
 import numpy as np
 import PIL.Image
 
-from guidata import qapplication
 from guidata.env import execenv
 from guidata.qthelpers import qt_app_context
 from guidata.widgets.objecteditor import oedit
-
-SHOW = True  # Show test in GUI-based test launcher
 
 
 def test():

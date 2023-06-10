@@ -8,14 +8,13 @@
 Tests for arrayeditor.py
 """
 
+# guitest: show
+
 import numpy as np
 
-# Local imports
 from guidata.env import execenv
 from guidata.qthelpers import exec_dialog, qt_app_context
 from guidata.widgets.arrayeditor import ArrayEditor
-
-SHOW = True  # Show test in GUI-based test launcher
 
 
 def launch_arrayeditor(data, title="", xlabels=None, ylabels=None):

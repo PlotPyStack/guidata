@@ -12,8 +12,6 @@ from guidata.dataset.dataitems import FloatItem, IntItem
 from guidata.dataset.datatypes import DataSet
 from guidata.env import execenv
 
-SHOW = False  # Do not show test in GUI-based test launcher
-
 
 class Parameters(DataSet):
     height = FloatItem("Height", min=1, max=250, help="height in cm")

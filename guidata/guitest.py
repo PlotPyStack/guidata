@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import os
 import os.path as osp
+import re
 import subprocess
 import sys
 import traceback
@@ -28,14 +29,30 @@ from guidata.widgets.codeeditor import CodeEditor
 
 
 def get_test_package(package) -> str:
-    """Return test package for package"""
+    """Return test package for package
+
+    Args:
+        package (module): package to test
+
+    Returns:
+        str: test package
+    """
     test_package_name = "%s.tests" % package.__name__
     _temp = __import__(test_package_name)
     return sys.modules[test_package_name]
 
 
-def get_tests(package) -> list[TestModule]:
-    """Retrieve test scripts from test package"""
+def get_tests(package, category: str) -> list[TestModule]:
+    """Retrieve test scripts from test package
+
+    Args:
+        package (module): package to test
+        category (str): test category (values: "all", "visible", "batch")
+
+    Returns:
+        list[TestModule]: list of test modules
+    """
+    assert category in ("all", "visible", "batch")
     tests = []
     test_package = get_test_package(package)
     test_path = osp.dirname(osp.realpath(test_package.__file__))
@@ -45,13 +62,22 @@ def get_tests(package) -> list[TestModule]:
             path = osp.join(root, fname)
             if fname.endswith((".py", ".pyw")) and not fname.startswith("_"):
                 test = TestModule(test_package, path)
-                if test.is_visible():
+                if (
+                    category == "all"
+                    or (category == "visible" and test.is_visible())
+                    or (category == "batch" and not test.is_skipped())
+                ):
                     tests.append(test)
     return tests
 
 
 class TestModule:
-    """Object representing a test module (Python script)"""
+    """Object representing a test module (Python script)
+
+    Args:
+        test_package (module): test package
+        path (str): test module path
+    """
 
     def __init__(self, test_package, path: str) -> None:
         self.path = path
@@ -68,12 +94,36 @@ class TestModule:
         except ImportError:
             self.error_msg = traceback.format_exc()
             self.module = None
+        self.__is_visible = False
+        self.__is_skipped = False
+        self.__contents = ""
+        self.__read_contents()
+
+    def __read_contents(self) -> str:
+        """Read test module contents"""
+        with open(self.path, "r", encoding="utf-8") as fdesc:
+            lines = fdesc.readlines()
+        startline = 0
+        for lineno, line in enumerate(lines):
+            if re.match(r"^#[ ]*guitest[ ]*:", line.strip()):
+                if "show" in line:
+                    self.__is_visible = True
+                    startline = lineno + 1
+                if "skip" in line:
+                    self.__is_skipped = True
+        self.__contents = "".join(lines[startline:]).strip()
 
     def is_visible(self) -> bool:
-        """Returns True if this script is intended to be shown in test launcher"""
-        return self.module is None or (
-            hasattr(self.module, "SHOW") and self.module.SHOW
-        )
+        """Returns True if test module is visible"""
+        return self.__is_visible
+
+    def is_skipped(self) -> bool:
+        """Returns True if test module is skipped"""
+        return self.__is_skipped
+
+    def get_contents(self) -> str:
+        """Returns test module contents"""
+        return self.__contents
 
     def is_valid(self) -> bool:
         """Returns True if test module is valid and can be executed"""
@@ -92,7 +142,12 @@ class TestModule:
         return self.error_msg
 
     def run(self, args: str = "", timeout: int = None) -> None:
-        """Run test script"""
+        """Run test script
+
+        Args:
+            args (str, optional): arguments to pass to the script
+            timeout (int, optional): timeout in seconds
+        """
         # Keep the same sys.path environment in child process:
         # (useful when the program is executed from Spyder, for example)
         os.environ["PYTHONPATH"] = os.pathsep.join(sys.path)
@@ -106,7 +161,11 @@ class TestModule:
 
 
 class TestPropertiesWidget(QW.QWidget):
-    """Test module properties panel"""
+    """Test module properties panel
+
+    Args:
+        parent (QWidget, optional): parent widget
+    """
 
     def __init__(self, parent: QW.QWidget = None) -> None:
         super().__init__(parent)
@@ -137,19 +196,28 @@ class TestPropertiesWidget(QW.QWidget):
         self.setLayout(vlayout)
 
     def set_item(self, test: TestModule) -> None:
-        """Set current item"""
+        """Set current item
+
+        Args:
+            test (TestModule): test module
+        """
         self.desc_label.setText(test.get_description())
-        self.editor.set_text_from_file(test.path)
+        self.editor.setPlainText(test.get_contents())
         txt = "Information" if test.is_valid() else "Critical"
         self.lbl_icon.setPixmap(get_std_icon("MessageBox" + txt).pixmap(24, 24))
 
 
 class TestMainView(QW.QSplitter):
-    """Test launcher main view"""
+    """Test launcher main view
+
+    Args:
+        package (module): test package
+        parent (QWidget, optional): parent widget
+    """
 
     def __init__(self, package, parent=None):
         super().__init__(parent)
-        self.tests = get_tests(package)
+        self.tests = get_tests(package, category="visible")
 
         listgroup = QW.QFrame()
         self.addWidget(listgroup)
@@ -165,10 +233,21 @@ class TestMainView(QW.QSplitter):
         listgroup.setLayout(vlayout)
 
         self.setStretchFactor(1, 1)
-        self.props.set_item(self.tests[0])
+
+        enabled = len(self.tests) > 0
+        self.run_button.setEnabled(enabled)
+        if enabled:
+            self.props.set_item(self.tests[0])
 
     def create_test_listwidget(self, font: QG.QFont) -> QW.QListWidget:
-        """Create and setup test list widget"""
+        """Create and setup test list widget
+
+        Args:
+            font (QFont): font to use
+
+        Returns:
+            QListWidget: test list widget
+        """
         listw = QW.QListWidget(self)
         listw.addItems([test.name for test in self.tests])
         for index in range(listw.count()):
@@ -183,14 +262,25 @@ class TestMainView(QW.QSplitter):
         return listw
 
     def create_run_button(self, font: QG.QFont) -> QW.QPushButton:
-        """Create and setup run button"""
+        """Create and setup run button
+
+        Args:
+            font (QFont): font to use
+
+        Returns:
+            QPushButton: run button
+        """
         btn = QW.QPushButton(get_icon("apply.png"), _("Run this script"), self)
         btn.setFont(font)
         btn.clicked.connect(self.run_current_script)
         return btn
 
     def current_row_changed(self, row: int) -> None:
-        """Current list widget row has changed"""
+        """Current list widget row has changed
+
+        Args:
+            row (int): row index
+        """
         current_test = self.tests[row]
         self.props.set_item(current_test)
         self.run_button.setEnabled(current_test.is_valid())
@@ -201,7 +291,12 @@ class TestMainView(QW.QSplitter):
 
 
 class TestLauncherWindow(QW.QMainWindow):
-    """Test launcher main window"""
+    """Test launcher main window
+
+    Args:
+        package (module): test package
+        parent (QWidget, optional): parent widget
+    """
 
     def __init__(self, package, parent: QW.QWidget = None) -> None:
         super().__init__(parent)
@@ -212,9 +307,20 @@ class TestLauncherWindow(QW.QMainWindow):
         self.setCentralWidget(self.mainview)
         QW.QShortcut(QG.QKeySequence("Escape"), self, self.close)
 
+    def show(self):
+        """Show window"""
+        super().show()
+        if not self.mainview.tests:
+            msg = _("No test found in this package.")
+            QW.QMessageBox.critical(self, _("Error"), msg)
+
 
 def run_testlauncher(package) -> None:
-    """Run test launcher"""
+    """Run test launcher
+
+    Args:
+        package (module): test package
+    """
     from guidata import qapplication
 
     app = qapplication()

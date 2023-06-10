@@ -12,14 +12,14 @@ DataSet objects may be saved in JSON files.
 This script shows how to save in and then reload data from a JSON file.
 """
 
+# guitest: show
+
 import os
 
 from guidata.env import execenv
 from guidata.jsonio import JSONReader, JSONWriter
 from guidata.qthelpers import qt_app_context
 from guidata.tests.test_all_items import TestParameters
-
-SHOW = True  # Show test in GUI-based test launcher
 
 
 def test():

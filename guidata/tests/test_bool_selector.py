@@ -13,6 +13,7 @@ box widgets in the editing dialog box) and item groups may be enabled/disabled
 using one group parameter (a boolean item).
 """
 
+# guitest: show
 
 from guidata.dataset.dataitems import BoolItem, FloatItem
 from guidata.dataset.datatypes import BeginGroup, DataSet, EndGroup, ValueProp
@@ -21,8 +22,6 @@ from guidata.qthelpers import qt_app_context
 
 prop1 = ValueProp(False)
 prop2 = ValueProp(False)
-
-SHOW = True  # Show test in GUI-based test launcher
 
 
 class GroupSelection(DataSet):

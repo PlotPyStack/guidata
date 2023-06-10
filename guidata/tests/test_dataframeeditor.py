@@ -8,18 +8,16 @@
 Tests for dataframeeditor.py
 """
 
+# guitest: show
+
 import numpy as np
 from numpy import nan
 from pandas import DataFrame, Series
 from pandas.testing import assert_frame_equal, assert_series_equal
 
-# Local imports
-from guidata import qapplication
 from guidata.env import execenv
 from guidata.qthelpers import exec_dialog, qt_app_context
 from guidata.widgets.dataframeeditor import DataFrameEditor
-
-SHOW = True  # Show test in GUI-based test launcher
 
 
 def test_dataframeeditor():

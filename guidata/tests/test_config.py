@@ -12,8 +12,6 @@ import pytest
 from guidata.config import UserConfig
 from guidata.tests.test_all_features import TestParameters
 
-SHOW = False  # Do not show test in GUI-based test launcher
-
 
 @pytest.fixture()
 def config():

@@ -8,15 +8,13 @@
 Tests for collectionseditor.py
 """
 
+# guitest: show
+
 import datetime
 
-# Local imports
-from guidata import qapplication
 from guidata.env import execenv
 from guidata.qthelpers import qt_app_context
 from guidata.widgets.collectionseditor import CollectionsEditor
-
-SHOW = True  # Show test in GUI-based test launcher
 
 
 def get_test_data():

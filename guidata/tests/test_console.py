@@ -8,15 +8,11 @@
 Tests for codeeditor.py
 """
 
-from qtpy import QtCore as QC
+# guitest: show
 
-# Local imports
-from guidata import qapplication
 from guidata.env import execenv
 from guidata.qthelpers import qt_app_context
 from guidata.widgets.console import Console
-
-SHOW = True  # Show test in GUI-based test launcher
 
 
 def test_console():

@@ -12,13 +12,12 @@ From time to time, it may be useful to change the item order,
 for example when deriving a dataset from another.
 """
 
+# guitest: show
 
 import guidata.dataset.dataitems as gdi
 import guidata.dataset.datatypes as gdt
 from guidata.env import execenv
 from guidata.qthelpers import qt_app_context
-
-SHOW = True  # Show test in GUI-based test launcher
 
 
 class OriginalDataset(gdt.DataSet):

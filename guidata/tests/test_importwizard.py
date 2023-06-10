@@ -8,14 +8,13 @@
 Tests for importwizard.py
 """
 
-# Local imports
+# guitest: show
+
 import pytest
 
 from guidata.env import execenv
 from guidata.qthelpers import exec_dialog, qt_app_context
 from guidata.widgets.importwizard import ImportWizard
-
-SHOW = True  # Show test in GUI-based test launcher
 
 
 @pytest.fixture()
