@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 
-# Note: the two following lines are not required
-#       if a QApplication has already been created
 import guidata
-
-_app = guidata.qapplication()
-
-import guidata.dataset.datatypes as dt
 import guidata.dataset.dataitems as di
+import guidata.dataset.datatypes as dt
+
+# Note: the following line is not required if a QApplication has already been created
+_app = guidata.qapplication()
 
 
 class Processing(dt.DataSet):
@@ -23,3 +21,7 @@ param.edit()
 print(param)  # Showing param contents
 param.b = 4  # Modifying item value
 param.view()
+
+# Alternative way for creating a DataSet instance:
+param = Processing.create(a=7.323, b=4)
+print(param)

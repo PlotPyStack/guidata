@@ -17,12 +17,11 @@ ValueProp, ...).
 # pylint: disable-msg=W0622
 # pylint: disable-msg=W0212
 
-import sys
-import re
 import collections.abc
+import re
+import sys
 
-from guidata.utils import utf8_to_unicode, update_dataset
-
+from guidata.utils import update_dataset, utf8_to_unicode
 
 DEBUG_DESERIALIZE = False
 
@@ -614,6 +613,24 @@ class DataSet(Meta_Py3Compat):
         self.__changed = False
         # Set default values
         self.set_defaults()
+
+    @classmethod
+    def create(cls, **kwargs):
+        """
+        Create a new instance of the DataSet class
+
+        Args:
+            **kwargs: keyword arguments to set the DataSet attributes
+
+        Returns:
+            DataSet instance
+        """
+        instance = cls()
+        for item in instance._items:
+            name = item._name
+            if name in kwargs:
+                setattr(instance, name, kwargs[name])
+        return instance
 
     def _get_translation(self):
         """We try to find the translation function (_) from the module
