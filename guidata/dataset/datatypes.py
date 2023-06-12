@@ -694,6 +694,24 @@ class DataSet(metaclass=DataSetMeta):
         # Set default values
         self.set_defaults()
 
+    @classmethod
+    def create(cls, **kwargs) -> "DataSet":
+        """
+        Create a new instance of the DataSet class
+
+        Args:
+            **kwargs: keyword arguments to set the DataSet attributes
+
+        Returns:
+            DataSet instance
+        """
+        instance = cls()
+        for item in instance._items:
+            name = item._name
+            if name in kwargs:
+                setattr(instance, name, kwargs[name])
+        return instance
+
     def _get_translation(self):
         """We try to find the translation function (_) from the module
         this class was created in

@@ -156,6 +156,10 @@ def test():
             e.edit()
             execenv.print(e)
         e.view()
+
+        f = TestParameters.create(integer=10101010, string="Using create class method")
+        print(f)
+
         execenv.print("OK")
 
 
