@@ -390,8 +390,11 @@ def qt_app_context(exec_loop=False) -> None:
 
     with open(fh_log_fname, "w", encoding="utf-8") as fh_log_fn:
         faulthandler.enable(file=fh_log_fn)
+        exception_occured = False
         try:
             yield QAPP_INSTANCE
+        except Exception:  # pylint: disable=broad-except
+            exception_occured = True
         finally:
             if execenv.unattended:  # pragma: no cover
                 if execenv.delay > 0:
@@ -405,8 +408,10 @@ def qt_app_context(exec_loop=False) -> None:
                     execenv.delay * 1000,
                     lambda: close_widgets_and_quit(screenshot=execenv.screenshot),
                 )
-            if exec_loop:
+            if exec_loop and not exception_occured:
                 QAPP_INSTANCE.exec()
+        if exception_occured:
+            raise
 
     if CONF.get("faulthandler", "enabled"):
         faulthandler.disable()
