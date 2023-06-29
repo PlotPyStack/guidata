@@ -18,6 +18,11 @@ if exist build ( rmdir /s /q build )
 if exist dist ( rmdir /s /q dist )
 if exist doc\_build ( rmdir /s /q doc\_build )
 
+@REM Removing files produced by tests
+del *.h5
+del *.json
+del *.pickle
+
 @REM Removing cache files/directories related to Python execution
 del /s /q *.pyc 1>nul 2>&1
 del /s /q *.pyo 1>nul 2>&1

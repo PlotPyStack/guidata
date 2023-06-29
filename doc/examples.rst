@@ -48,7 +48,7 @@ The two lines above execute the `guidata test launcher` :
 All `guidata` items demo
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. literalinclude:: ../guidata/tests/all_items.py
+.. literalinclude:: ../guidata/tests/test_all_items.py
    :start-after: guitest:
 
 .. image:: images/screenshots/all_items.png
@@ -56,7 +56,7 @@ All `guidata` items demo
 All (GUI-related) `guidata` features demo
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. literalinclude:: ../guidata/tests/all_features.py
+.. literalinclude:: ../guidata/tests/test_all_features.py
    :start-after: guitest:
 
 .. image:: images/screenshots/all_features.png
@@ -64,7 +64,7 @@ All (GUI-related) `guidata` features demo
 Embedding guidata objects in GUI layouts
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. literalinclude:: ../guidata/tests/editgroupbox.py
+.. literalinclude:: ../guidata/tests/test_editgroupbox.py
    :start-after: guitest:
 
 .. image:: images/screenshots/editgroupbox.png
@@ -72,7 +72,7 @@ Embedding guidata objects in GUI layouts
 Data item groups and group selection
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. literalinclude:: ../guidata/tests/bool_selector.py
+.. literalinclude:: ../guidata/tests/test_bool_selector.py
    :start-after: guitest:
 
 .. image:: images/screenshots/bool_selector.png
@@ -80,7 +80,7 @@ Data item groups and group selection
 Activable data sets
 ~~~~~~~~~~~~~~~~~~~
 
-.. literalinclude:: ../guidata/tests/activable_dataset.py
+.. literalinclude:: ../guidata/tests/test_activable_dataset.py
    :start-after: guitest:
 
 .. image:: images/screenshots/activable_dataset.png
@@ -88,7 +88,7 @@ Activable data sets
 Data set groups
 ~~~~~~~~~~~~~~~
 
-.. literalinclude:: ../guidata/tests/datasetgroup.py
+.. literalinclude:: ../guidata/tests/test_datasetgroup.py
    :start-after: guitest:
 
 .. image:: images/screenshots/datasetgroup.png

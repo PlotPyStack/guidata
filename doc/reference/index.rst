@@ -4,12 +4,9 @@ Reference
 guidata API:
 
 .. toctree::
-    :maxdepth: 2
+   :maxdepth: 2
+   :caption: Contents:
 
-    dataset
-    qthelpers
-    widgets
-    disthelpers
-    configtools
-    userconfig
-    utils
+   core
+   utils
+   widgets

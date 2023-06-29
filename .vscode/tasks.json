@@ -4,6 +4,64 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "gettext - Scan",
+            "type": "shell",
+            "command": "cmd",
+            "args": [
+                "/c",
+                "gettext.bat",
+                "rescan",
+            ],
+            "options": {
+                "cwd": "scripts",
+                "env": {
+                    "UNATTENDED": "1",
+                    "PYTHON": "${env:GUIDATA_PYTHONEXE}",
+                }
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            }
+        },
+        {
+            "label": "gettext - Compile",
+            "type": "shell",
+            "command": "cmd",
+            "args": [
+                "/c",
+                "gettext.bat",
+                "compile",
+            ],
+            "options": {
+                "cwd": "scripts",
+                "env": {
+                    "UNATTENDED": "1",
+                    "PYTHON": "${env:GUIDATA_PYTHONEXE}",
+                }
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            }
+        },
+        {
             "label": "Run Coverage",
             "type": "shell",
             "command": "cmd",
@@ -114,6 +172,35 @@
             }
         },
         {
+            "label": "Build documentation",
+            "type": "shell",
+            "command": "cmd",
+            "options": {
+                "cwd": "scripts",
+                "env": {
+                    "PYTHON": "${env:GUIDATA_PYTHONEXE}",
+                    "UNATTENDED": "1",
+                }
+            },
+            "args": [
+                "/c",
+                "build_doc.bat"
+            ],
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": true
+            }
+        },
+        {
             "label": "Build Python packages",
             "type": "shell",
             "command": "cmd",
@@ -141,168 +228,10 @@
                 "showReuseMessage": true,
                 "clear": true
             },
-            // "dependsOrder": "sequence",
-            // "dependsOn": [
-            //     "Build documentation",
-            // ]
-        },
-        /* {
-            "label": "Build documentation",
-            "type": "shell",
-            "command": "cmd",
-            "options": {
-                "cwd": "scripts",
-                "env": {
-                    "PYTHON": "${env:GUIDATA_PYTHONEXE}",
-                    "PYTHONPATH": "${env:PYTHONPATH_CODRAFT}",
-                    "UNATTENDED": "1",
-                }
-            },
-            "args": [
-                "/c",
-                "build_doc.bat"
-            ],
-            "problemMatcher": [],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared",
-                "showReuseMessage": true,
-                "clear": true
-            }
-        }, */
-        /* {
-            "label": "Run Coverage",
-            "type": "shell",
-            "command": "cmd",
-            "args": [
-                "/c",
-                "run_coverage.bat",
-                // "--contains",
-                // "scenario",
-            ],
-            "options": {
-                "cwd": "scripts",
-                "env": {
-                    "UNATTENDED": "1",
-                    "PYTHON": "${env:PYTHON_CODRAFT_DEV}",
-                }
-            },
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "dedicated",
-                "showReuseMessage": true,
-                "clear": true
-            }
-        },
-        {
-            "label": "Create executable",
-            "type": "shell",
-            "command": "cmd",
-            "options": {
-                "cwd": "scripts",
-                "env": {
-                    "PYTHON": "${env:PYTHON_CODRAFT_DEV}",
-                    "UNATTENDED": "1",
-                }
-            },
-            "args": [
-                "/c",
-                "build_exe.bat"
-            ],
-            "problemMatcher": [],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared",
-                "showReuseMessage": true,
-                "clear": true
-            }
-        },
-        {
-            "label": "Create installer",
-            "type": "shell",
-            "command": "cmd",
-            "options": {
-                "cwd": "scripts",
-                "env": {
-                    "PYTHON": "${env:PYTHON_CODRAFT_DEV}",
-                    "UNATTENDED": "1",
-                    "NSIS_COPYRIGHT_INFO": "Copyright (c) CEA-CODRA 2019-2022",
-                    "NSIS_HELP_LINK": "https://codraft.readthedocs.io/en/latest/",
-                    "NSIS_URLUPDATEINFO": "https://github.com/CODRA-Ingenierie-Informatique/CodraFT/releases",
-                    "NSIS_URLINFOABOUT": "https://github.com/CODRA-Ingenierie-Informatique/CodraFT",
-                }
-            },
-            "args": [
-                "/c",
-                "build_installer.bat"
-            ],
-            "problemMatcher": [],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared",
-                "showReuseMessage": true,
-                "clear": true
-            }
-        },*/
-        /*{
-            "label": "New release",
-            "type": "shell",
-            "command": "cmd",
-            "args": [
-                "/c",
-                "release.bat"
-            ],
-            "options": {
-                "cwd": "scripts",
-                "env": {
-                    "PYTHON": "${env:PYTHON_CODRAFT_DEV}",
-                    "UNATTENDED": "1",
-                }
-            },
-            "problemMatcher": [],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared",
-                "showReuseMessage": true,
-                "clear": true
-            },
             "dependsOrder": "sequence",
             "dependsOn": [
                 "Clean Up",
-                "Build Python packages",
-                "Create executable",
-                "Create installer",
+                "Build documentation",
             ]
-        }, */
-    ]
-}
+        },
+    }

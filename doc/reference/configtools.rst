@@ -1,2 +1,0 @@
-.. automodule:: guidata.configtools
-   :members:
