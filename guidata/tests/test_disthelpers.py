@@ -16,11 +16,15 @@ writing a complete setup script.
 
 import os.path as osp
 
+import pytest
+
 from guidata.disthelpers import Distribution
 from guidata.env import execenv
 
 
-def test():
+@pytest.mark.skip(reason="Currently not supporting Python > 3.6")
+def test_disthelpers():
+    """Test disthelpers"""
     dist = Distribution()
     dist.setup(
         name="Application demo",
@@ -35,4 +39,4 @@ def test():
 
 
 if __name__ == "__main__":
-    test()
+    test_disthelpers()

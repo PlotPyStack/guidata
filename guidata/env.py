@@ -174,9 +174,7 @@ class ExecEnv:
         """Print in file, depending on verbosity level"""
         # print(f"unattended={self.unattended} ; verbose={self.verbose} ; ")
         # print(f"screenshot={self.screenshot}; delay={self.delay}")
-        if (self.verbose != VerbosityLevels.QUIET.value) and (
-            self.verbose != VerbosityLevels.MINIMAL.value or file == sys.stderr
-        ):
+        if self.verbose != VerbosityLevels.QUIET.value or DEBUG:
             print(*objects, sep=sep, end=end, file=file, flush=flush)
 
     def pprint(

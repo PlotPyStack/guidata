@@ -75,7 +75,7 @@ DataSetEditLayout.register(SubDataSetItem, SubDataSetWidget)
 DataSetShowLayout.register(SubDataSetItem, SubDataSetWidget)
 
 
-class TestParameters(DataSet):
+class Parameters(DataSet):
     """
     DataSet test
     The following text is the DataSet 'comment': <br>Plain text or
@@ -146,9 +146,10 @@ class TestParameters(DataSet):
     integer = IntItem("Integer", default=5, min=3, max=6).set_pos(col=1)
 
 
-def test():
+def test_all_features():
+    """Test all guidata item/group features"""
     with qt_app_context():
-        e = TestParameters()
+        e = Parameters()
         e.floatarray[:, 0] = np.linspace(-5, 5, 50)
         execenv.print(e)
 
@@ -157,11 +158,11 @@ def test():
             execenv.print(e)
         e.view()
 
-        f = TestParameters.create(integer=10101010, string="Using create class method")
+        f = Parameters.create(integer=10101010, string="Using create class method")
         print(f)
 
         execenv.print("OK")
 
 
 if __name__ == "__main__":
-    test()
+    test_all_features()

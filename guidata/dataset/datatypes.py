@@ -33,16 +33,15 @@ from typing import (
     Union,
 )
 
-from qtpy.QtWidgets import QWidget
-
 from guidata.qthelpers import exec_dialog
 from guidata.userconfig import UserConfig
 from guidata.userconfigio import UserConfigReader, UserConfigWriter
 from guidata.utils import update_dataset, utf8_to_unicode
+from qtpy.QtWidgets import QWidget
 
 DEBUG_DESERIALIZE = False
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from guidata.dataset.qtwidgets import DataSetEditDialog
     from guidata.hdf5io import HDF5Reader, HDF5Writer
     from guidata.jsonio import JSONReader, JSONWriter

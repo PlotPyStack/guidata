@@ -29,7 +29,7 @@ from typing import TYPE_CHECKING, Any
 # Local imports
 from guidata.userconfig import get_home_dir
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     import guidata.dataset.datatypes as gdt
 
 

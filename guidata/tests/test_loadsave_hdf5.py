@@ -20,21 +20,22 @@ import os
 from guidata.env import execenv
 from guidata.hdf5io import HDF5Reader, HDF5Writer
 from guidata.qthelpers import qt_app_context
-from guidata.tests.test_all_items import TestParameters
+from guidata.tests.test_all_items import Parameters
 
 
-def test():
+def test_loadsave_hdf5():
+    """Test HDF5 I/O"""
     with qt_app_context():
         if os.path.exists("test.h5"):
             os.unlink("test.h5")
 
-        e = TestParameters()
+        e = Parameters()
         if execenv.unattended or e.edit():
             writer = HDF5Writer("test.h5")
             e.serialize(writer)
             writer.close()
 
-            e = TestParameters()
+            e = Parameters()
             reader = HDF5Reader("test.h5")
             e.deserialize(reader)
             reader.close()
@@ -43,4 +44,4 @@ def test():
 
 
 if __name__ == "__main__":
-    test()
+    test_loadsave_hdf5()

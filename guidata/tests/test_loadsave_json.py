@@ -19,21 +19,22 @@ import os
 from guidata.env import execenv
 from guidata.jsonio import JSONReader, JSONWriter
 from guidata.qthelpers import qt_app_context
-from guidata.tests.test_all_items import TestParameters
+from guidata.tests.test_all_items import Parameters
 
 
-def test():
+def test_loadsave_json():
+    """Test JSON I/O"""
     with qt_app_context():
         if os.path.exists("test.json"):
             os.unlink("test.json")
 
-        e = TestParameters()
+        e = Parameters()
         if execenv.unattended or e.edit():
             writer = JSONWriter("test.json")
             e.serialize(writer)
             writer.save()
 
-            e = TestParameters()
+            e = Parameters()
             reader = JSONReader("test.json")
             e.deserialize(reader)
             e.edit()
@@ -41,4 +42,4 @@ def test():
 
 
 if __name__ == "__main__":
-    test()
+    test_loadsave_json()

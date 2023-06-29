@@ -15,11 +15,12 @@ from guidata.env import execenv
 translations = (_("Some required entries are incorrect"),)
 
 
-def test():
+def test_translations():
+    """Test translations"""
     for text in translations:
         execenv.print(text)
     execenv.print("OK")
 
 
 if __name__ == "__main__":
-    test()
+    test_translations()

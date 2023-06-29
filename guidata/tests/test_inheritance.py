@@ -40,7 +40,8 @@ class DerivedDataset(OriginalDataset):
     c = gdi.FloatItem("Level 3 (added in derived dataset)", default=0)
 
 
-def test():
+def test_inheritance():
+    """Test DataSet inheritance"""
     with qt_app_context():
         e = OriginalDataset()
         e.edit()
@@ -53,4 +54,4 @@ def test():
 
 
 if __name__ == "__main__":
-    test()
+    test_inheritance()

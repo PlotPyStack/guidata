@@ -33,4 +33,4 @@ Visual Studio Code configuration used in `launch.json` and `tasks.json`
     @REM Development environment
     set PYTHON_PLOTPY_DEV=path\to\python.exe
     @REM Release environment
-    set GUIDATA_PYTHON_DEV=path\to\python.exe
+    set GUIDATA_PYTHONEXE=path\to\python.exe

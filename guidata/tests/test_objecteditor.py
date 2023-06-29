@@ -18,7 +18,7 @@ from guidata.qthelpers import qt_app_context
 from guidata.widgets.objecteditor import oedit
 
 
-def test():
+def test_objecteditor():
     """Run object editor test"""
     with qt_app_context():
         data = np.random.randint(255, size=(100, 100)).astype("uint8")
@@ -51,4 +51,4 @@ def test():
 
 
 if __name__ == "__main__":
-    test()
+    test_objecteditor()

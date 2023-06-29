@@ -30,7 +30,7 @@ from guidata.qthelpers import (
 )
 
 # Local test import:
-from guidata.tests.test_activable_dataset import ExampleDataSet
+from guidata.tests.test_activable_dataset import Parameters
 
 
 class AnotherDataSet(gdt.DataSet):
@@ -48,6 +48,8 @@ class AnotherDataSet(gdt.DataSet):
 
 
 class ExampleMultiGroupDataSet(gdt.DataSet):
+    """Example DS with multiple groups"""
+
     param0 = gdi.ChoiceItem("Choice", ["deazdazk", "aeazee", "87575757"])
     param1 = gdi.FloatItem("Foobar 1", default=0, min=0)
     t_group = gdt.BeginTabGroup("T group")
@@ -69,6 +71,8 @@ class ExampleMultiGroupDataSet(gdt.DataSet):
 
 
 class OtherDataSet(gdt.DataSet):
+    """Another example dataset"""
+
     title = gdi.StringItem("Title", default="Title")
     icon = gdi.ChoiceItem(
         "Icon",
@@ -82,6 +86,8 @@ class OtherDataSet(gdt.DataSet):
 
 
 class MainWindow(QMainWindow):
+    """Main window"""
+
     def __init__(self):
         QMainWindow.__init__(self)
         win32_fix_title_bar_background(self)
@@ -90,7 +96,7 @@ class MainWindow(QMainWindow):
 
         # Instantiate dataset-related widgets:
         self.groupbox1 = DataSetShowGroupBox(
-            "Activable dataset", ExampleDataSet, comment=""
+            "Activable dataset", Parameters, comment=""
         )
         self.groupbox2 = DataSetShowGroupBox(
             "Standard dataset", AnotherDataSet, comment=""
@@ -140,32 +146,38 @@ class MainWindow(QMainWindow):
         )
 
     def update_window(self):
+        """Update window"""
         dataset = self.groupbox3.dataset
         self.setWindowTitle(dataset.title)
         self.setWindowIcon(get_icon(dataset.icon))
         self.setWindowOpacity(dataset.opacity)
 
     def update_groupboxes(self):
+        """Update groupboxes"""
         self.groupbox1.dataset.set_readonly()  # This is an activable dataset
         self.groupbox1.get()
         self.groupbox2.get()
         self.groupbox4.get()
 
     def edit_dataset1(self):
+        """Edit dataset 1"""
         self.groupbox1.dataset.set_writeable()  # This is an activable dataset
         if self.groupbox1.dataset.edit(self):
             self.update_groupboxes()
 
     def edit_dataset2(self):
+        """Edit dataset 2"""
         if self.groupbox2.dataset.edit(self):
             self.update_groupboxes()
 
     def edit_dataset4(self):
+        """Edit dataset 4"""
         if self.groupbox4.dataset.edit(self):
             self.update_groupboxes()
 
 
-def test():
+def test_editgroupbox():
+    """Test editgroupbox"""
     with qt_app_context(exec_loop=True):
         window = MainWindow()
         window.show()
@@ -173,4 +185,4 @@ def test():
 
 
 if __name__ == "__main__":
-    test()
+    test_editgroupbox()

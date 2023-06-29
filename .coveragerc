@@ -2,6 +2,8 @@
 parallel = True
 omit =
     */guidata/tests/*
+    */guidata/external/*
+    */guidata/widgets/*
 
 [report]
 exclude_lines =

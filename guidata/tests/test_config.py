@@ -10,36 +10,40 @@
 import pytest
 
 from guidata.config import UserConfig
-from guidata.tests.test_all_features import TestParameters
+from guidata.tests.test_all_features import Parameters
 
 
 @pytest.fixture()
 def config():
+    """Create a config object"""
     CONF = UserConfig({})
-    eta = TestParameters()
+    eta = Parameters()
     eta.write_config(CONF, "TestParameters", "")
     yield CONF
 
 
 def test_load(config):
-    eta = TestParameters()
+    """Test load config"""
+    eta = Parameters()
     eta.read_config(config, "TestParameters", "")
 
 
 def test_default(config):
-    eta = TestParameters()
+    """Test default config"""
+    eta = Parameters()
     eta.write_config(config, "etagere2", "")
-    eta = TestParameters()
+    eta = Parameters()
     eta.read_config(config, "etagere2", "")
 
 
 def test_restore(config):
-    eta = TestParameters()
+    """Test restore config"""
+    eta = Parameters()
     eta.fl2 = 2
     eta.integer = 6
     eta.write_config(config, "etagere3", "")
 
-    eta = TestParameters()
+    eta = Parameters()
     eta.read_config(config, "etagere3", "")
 
     assert eta.fl2 == 2.0

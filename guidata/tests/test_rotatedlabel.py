@@ -22,6 +22,8 @@ from guidata.qtwidgets import RotatedLabel
 
 
 class Frame(QFrame):
+    """Test frame"""
+
     def __init__(self, parent=None):
         QFrame.__init__(self, parent)
         win32_fix_title_bar_background(self)
@@ -41,7 +43,8 @@ class Frame(QFrame):
                 angle += 10
 
 
-def test():
+def test_rotatedlabel():
+    """Test RotatedLabel"""
     with qt_app_context(exec_loop=True):
         frame = Frame()
         frame.show()
@@ -49,4 +52,4 @@ def test():
 
 
 if __name__ == "__main__":
-    test()
+    test_rotatedlabel()

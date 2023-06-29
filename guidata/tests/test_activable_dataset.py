@@ -25,7 +25,7 @@ from guidata.qthelpers import qt_app_context
 # guitest: show
 
 
-class ExampleDataSet(ActivableDataSet):
+class Parameters(ActivableDataSet):
     """
     Example
     <b>Activable dataset example</b>
@@ -45,12 +45,13 @@ class ExampleDataSet(ActivableDataSet):
     color = ColorItem("Color", default="red")
 
 
-ExampleDataSet.active_setup()
+Parameters.active_setup()
 
 
-def test():
+def test_activable_dataset():
+    """Test activable dataset"""
     with qt_app_context():
-        prm = ExampleDataSet()
+        prm = Parameters()
         prm.set_writeable()
         prm.edit()
         prm.set_readonly()
@@ -59,4 +60,4 @@ def test():
 
 
 if __name__ == "__main__":
-    test()
+    test_activable_dataset()

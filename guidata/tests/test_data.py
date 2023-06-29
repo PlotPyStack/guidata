@@ -17,6 +17,8 @@ from guidata.utils import update_dataset
 
 
 class Parameters(DataSet):
+    """Example dataset"""
+
     float1 = FloatItem("float #1", min=1, max=250, help="height in cm")
     float2 = FloatItem("float #2", min=1, max=250, help="width in cm")
     number = IntItem("number", min=3, max=20)
@@ -30,7 +32,7 @@ class TestCheck(unittest.TestCase):
         e.float2 = 400.0
         e.number = 4
         errors = e.check()
-        self.assertEquals(errors, ["float2"])
+        self.assertEqual(errors, ["float2"])
 
     def test_typechecking(self):
         """Test type checking of FloatItem"""
@@ -39,14 +41,14 @@ class TestCheck(unittest.TestCase):
         e.float2 = 400
         e.number = 4.0
         errors = e.check()
-        self.assertEquals(errors, ["float1", "float2", "number"])
+        self.assertEqual(errors, ["float1", "float2", "number"])
 
     def test_update(self):
         e1 = Parameters()
         e2 = Parameters()
         e1.float1 = 23
         update_dataset(e2, e1)
-        self.assertEquals(e2.float1, 23)
+        self.assertEqual(e2.float1, 23)
 
 
 if __name__ == "__main__":

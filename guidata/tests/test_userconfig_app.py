@@ -21,10 +21,13 @@ from guidata.env import execenv
 
 
 class DS(gdt.DataSet):
+    """Example dataset"""
+
     f = gdi.FloatItem("F", 1.0)
 
 
-def test():
+def test_userconfig_app():
+    """Test userconfig"""
     ds = DS("")
     uc = userconfig.UserConfig({})
     uc.set_application("app", "1.0.0")
@@ -35,4 +38,4 @@ def test():
 
 
 if __name__ == "__main__":
-    test()
+    test_userconfig_app()

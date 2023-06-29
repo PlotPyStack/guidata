@@ -19,17 +19,18 @@ from guidata.widgets.importwizard import ImportWizard
 
 @pytest.fixture()
 def text():
+    """Return text to test"""
     return "17/11/1976\t1.34\n14/05/09\t3.14"
 
 
-def test(text):
+def test_importwizard(text):
     """Test"""
     with qt_app_context():
         dialog = ImportWizard(None, text)
         if exec_dialog(dialog):
-            execenv.print(dialog.get_data())  # spyder: test-skip
+            execenv.print(dialog.get_data())
         execenv.print("OK")
 
 
 if __name__ == "__main__":
-    test("17/11/1976\t1.34\n14/05/09\t3.14")
+    test_importwizard("17/11/1976\t1.34\n14/05/09\t3.14")

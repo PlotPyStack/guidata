@@ -19,15 +19,14 @@ import os
 import re
 from typing import TYPE_CHECKING, Any, Callable, List, Optional, Tuple, Type, Union
 
-from numpy import ndarray
-
 from guidata.config import _
 from guidata.dataset.datatypes import DataItem, DataSet, ItemProperty
 from guidata.qthelpers import exec_dialog
 from guidata.userconfigio import UserConfigReader, UserConfigWriter
 from guidata.utils import add_extension, utf8_to_unicode
+from numpy import ndarray
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from guidata.hdf5io import HDF5Reader, HDF5Writer
     from guidata.jsonio import JSONReader, JSONWriter
 

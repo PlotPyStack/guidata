@@ -24,7 +24,7 @@ prop1 = ValueProp(False)
 prop2 = ValueProp(False)
 
 
-class GroupSelection(DataSet):
+class Parameters(DataSet):
     """
     Group selection test
     <b>Group selection example:</b>
@@ -54,13 +54,14 @@ class GroupSelection(DataSet):
     _g2 = EndGroup("group 2")
 
 
-def test():
+def test_bool_selector():
+    """Test bool selector"""
     with qt_app_context():
-        prm = GroupSelection()
+        prm = Parameters()
         prm.edit()
         execenv.print(prm)
         execenv.print("OK")
 
 
 if __name__ == "__main__":
-    test()
+    test_bool_selector()

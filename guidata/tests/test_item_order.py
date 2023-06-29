@@ -38,7 +38,8 @@ class DerivedDataset(OriginalDataset):
     param6 = gdi.DateItem("P6 | Date", default=0).set_pos(row=4)
 
 
-def test():
+def test_item_order():
+    """Test DataSet item order"""
     with qt_app_context():
         e = OriginalDataset()
         e.edit()
@@ -51,4 +52,4 @@ def test():
 
 
 if __name__ == "__main__":
-    test()
+    test_item_order()

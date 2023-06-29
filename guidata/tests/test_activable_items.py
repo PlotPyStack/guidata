@@ -20,7 +20,9 @@ from guidata.qthelpers import qt_app_context
 choices = (("A", "Choice #1: A"), ("B", "Choice #2: B"), ("C", "Choice #3: C"))
 
 
-class Test(DataSet):
+class Parameters(DataSet):
+    """Example dataset"""
+
     _prop = GetAttrProp("choice")
     choice = ChoiceItem("Choice", choices).set_prop("display", store=_prop)
     x1 = FloatItem("x1")
@@ -28,12 +30,13 @@ class Test(DataSet):
     x3 = FloatItem("x3").set_prop("display", active=FuncProp(_prop, lambda x: x == "C"))
 
 
-def test():
+def test_activable_items():
+    """Test activable items"""
     with qt_app_context():
-        test = Test()
+        test = Parameters()
         test.edit()
         execenv.print("OK")
 
 
 if __name__ == "__main__":
-    test()
+    test_activable_items()

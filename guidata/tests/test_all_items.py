@@ -38,7 +38,7 @@ FILE_CSV = tempfile.NamedTemporaryFile(suffix=".csv", dir=TEMPDIR)
 atexit.register(FILE_CSV.close)
 
 
-class TestParameters(gdt.DataSet):
+class Parameters(gdt.DataSet):
     """
     DataSet test
     The following text is the DataSet 'comment': <br>Plain text or
@@ -92,9 +92,10 @@ class TestParameters(gdt.DataSet):
     )
 
 
-def test():
+def test_all_items():
+    """Test all DataItem objects"""
     with qt_app_context():
-        e = TestParameters()
+        e = Parameters()
 
         e.floatarray[:, 0] = np.linspace(-5, 5, 50)
         execenv.print(e)
@@ -105,4 +106,4 @@ def test():
 
 
 if __name__ == "__main__":
-    test()
+    test_all_items()

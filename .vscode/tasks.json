@@ -15,7 +15,7 @@
                 "cwd": "scripts",
                 "env": {
                     "UNATTENDED": "1",
-                    "PYTHON": "${env:GUIDATA_PYTHON_DEV}",
+                    "PYTHON": "${env:GUIDATA_PYTHONEXE}",
                 }
             },
             "group": {
@@ -67,7 +67,7 @@
                 "cwd": "scripts",
                 "env": {
                     "UNATTENDED": "1",
-                    "PYTHON": "${env:GUIDATA_PYTHON_DEV}",
+                    "PYTHON": "${env:GUIDATA_PYTHONEXE}",
                 }
             },
             "group": {
@@ -97,7 +97,7 @@
                 "cwd": "scripts",
                 "env": {
                     "UNATTENDED": "1",
-                    "PYTHON": "${env:GUIDATA_PYTHON_DEV}",
+                    "PYTHON": "${env:GUIDATA_PYTHONEXE}",
                 }
             },
             "group": {
@@ -120,7 +120,7 @@
             "options": {
                 "cwd": "scripts",
                 "env": {
-                    "PYTHON": "${env:GUIDATA_PYTHON_DEV}",
+                    "PYTHON": "${env:GUIDATA_PYTHONEXE}",
                     "UNATTENDED": "1",
                 }
             },
@@ -153,7 +153,7 @@
             "options": {
                 "cwd": "scripts",
                 "env": {
-                    "PYTHON": "${env:GUIDATA_PYTHON_DEV}",
+                    "PYTHON": "${env:GUIDATA_PYTHONEXE}",
                     "PYTHONPATH": "${env:PYTHONPATH_CODRAFT}",
                     "UNATTENDED": "1",
                 }

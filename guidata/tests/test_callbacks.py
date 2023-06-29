@@ -23,7 +23,9 @@ from guidata.env import execenv
 from guidata.qthelpers import qt_app_context
 
 
-class TestParameters(DataSet):
+class Parameters(DataSet):
+    """Example dataset"""
+
     def cb_example(self, item, value):
         execenv.print("\nitem: ", item, "\nvalue:", value)
         if self.results is None:
@@ -57,9 +59,10 @@ class TestParameters(DataSet):
     results = TextItem("Results")
 
 
-def test():
+def test_callbacks():
+    """Test callbacks"""
     with qt_app_context():
-        e = TestParameters()
+        e = Parameters()
         execenv.print(e)
         if e.edit():
             execenv.print(e)
@@ -68,4 +71,4 @@ def test():
 
 
 if __name__ == "__main__":
-    test()
+    test_callbacks()

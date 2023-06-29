@@ -17,13 +17,14 @@ in a single dialog box (with one tab per DataSet object).
 from guidata.dataset.datatypes import DataSetGroup
 from guidata.env import execenv
 from guidata.qthelpers import qt_app_context
-from guidata.tests.test_all_features import TestParameters
+from guidata.tests.test_all_features import Parameters
 
 
-def test():
+def test_dataset_group():
+    """Test DataSetGroup"""
     with qt_app_context():
-        e1 = TestParameters("DataSet #1")
-        e2 = TestParameters("DataSet #2")
+        e1 = Parameters("DataSet #1")
+        e2 = Parameters("DataSet #2")
         g = DataSetGroup([e1, e2], title="Parameters group")
         g.edit()
         execenv.print(e1)
@@ -32,4 +33,4 @@ def test():
 
 
 if __name__ == "__main__":
-    test()
+    test_dataset_group()

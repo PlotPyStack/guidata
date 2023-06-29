@@ -54,7 +54,7 @@ from guidata.dataset.datatypes import (
 )
 from guidata.qthelpers import win32_fix_title_bar_background
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from guidata.dataset.datatypes import DataSetGroup
     from guidata.dataset.qtitemwidgets import AbstractDataSetWidget
 
@@ -455,7 +455,7 @@ DataSetEditLayout.register(ButtonItem, ButtonWidget)
 DataSetEditLayout.register(DictItem, ButtonWidget)
 
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from guidata.dataset.qtitemwidgets import AbstractDataSetWidget
 
 LABEL_CSS = """
