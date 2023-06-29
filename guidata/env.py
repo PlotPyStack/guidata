@@ -1,30 +1,32 @@
 # -*- coding: utf-8 -*-
 #
 # Licensed under the terms of the BSD 3-Clause or the CeCILL-B License
-# (see Guidata/__init__.py for details)
+# (see guidata/__init__.py for details)
 
 """
-Guidata environmnent utilities
+Execution environmnent utilities
 """
 
 import argparse
 import enum
 import os
-import platform
 import pprint
 import sys
+from typing import Any
+
+DEBUG = os.environ.get("DEBUG", "").lower() in ("1", "true")
 
 
 class VerbosityLevels(enum.Enum):
     """Print verbosity levels (for testing purpose)"""
 
     QUIET = "quiet"
-    MINIMAL = "minimal"
     NORMAL = "normal"
+    DEBUG = "debug"
 
 
-class GuidataExecEnv:
-    """Object representing Guidata test environment"""
+class ExecEnv:
+    """Object representing execution environment"""
 
     UNATTENDED_ARG = "unattended"
     VERBOSE_ARG = "verbose"
@@ -36,19 +38,30 @@ class GuidataExecEnv:
     DELAY_ENV = "GUIDATA_DELAY_BEFORE_QUIT"
 
     def __init__(self):
-        self.demo_mode = False
         self.parse_args()
 
-    def enable_demo_mode(self, delay: int):
-        """Enable demo mode"""
-        self.demo_mode = True
-        self.unattended = True
-        self.delay = delay
+    def to_dict(self):
+        """Return a dictionary representation of the object"""
+        # Return textual representation of object attributes and properties
+        props = [
+            "unattended",
+            "screenshot",
+            "verbose",
+            "delay",
+        ]
+        return {p: getattr(self, p) for p in props}
+
+    def __str__(self):
+        """Return a string representation of the object"""
+        return pprint.pformat(self.to_dict())
 
     @staticmethod
     def __get_mode(env):
         """Get mode value"""
-        return os.environ.get(env) is not None
+        env_val = os.environ.get(env)
+        if env_val is None:
+            return False
+        return env_val.lower() in ("1", "true", "yes", "on", "enable", "enabled")
 
     @staticmethod
     def __set_mode(env, value):
@@ -77,13 +90,14 @@ class GuidataExecEnv:
     def screenshot(self, value):
         """Set screenshot value"""
         self.__set_mode(self.SCREENSHOT_ENV, value)
-        if value:  # pragma: no cover
-            self.unattended = value
 
     @property
     def verbose(self):
         """Get verbosity level"""
-        return os.environ.get(self.VERBOSE_ENV, VerbosityLevels.NORMAL.value)
+        env_val = os.environ.get(self.VERBOSE_ENV)
+        if env_val in (None, ""):
+            return VerbosityLevels.NORMAL.value
+        return env_val.lower()
 
     @verbose.setter
     def verbose(self, value):
@@ -105,16 +119,18 @@ class GuidataExecEnv:
 
     def parse_args(self):
         """Parse command line arguments"""
-        parser = argparse.ArgumentParser(description="Run guidata")
-        # parser.add_argument(
-        #     "-v", "--version", action="store_true", help="show Guidata version"
-        # )
+        parser = argparse.ArgumentParser(description="Run test")
         parser.add_argument(
-            "--mode",
-            choices=[self.UNATTENDED_ARG, self.SCREENSHOT_ARG],
-            required=False,
-            help="unattended: non-interactive test mode ; "
-            "screenshot: unattended mode, with automatic screenshots",
+            "--" + self.UNATTENDED_ARG,
+            action="store_true",
+            help="non-interactive mode",
+            default=None,
+        )
+        parser.add_argument(
+            "--" + self.SCREENSHOT_ARG,
+            action="store_true",
+            help="automatic screenshots",
+            default=None,
         )
         parser.add_argument(
             "--" + self.DELAY_ARG,
@@ -130,20 +146,29 @@ class GuidataExecEnv:
             help="verbosity level: for debugging/testing purpose",
         )
         args, _unknown = parser.parse_known_args()
-        # if args.version:
-        #     version = os.environ["GUIDATA_VERSION"]
-        #     print(f"Guidata {version} on {platform.system()}")
-        #     sys.exit()
         self.set_env_from_args(args)
 
     def set_env_from_args(self, args):
         """Set appropriate environment variables"""
-        if args.mode is not None:
-            self.unattended = args.mode == self.UNATTENDED_ARG
-            self.screenshot = args.mode == self.SCREENSHOT_ARG
-        if args.verbose is not None:
-            self.verbose = args.verbose
-        self.delay = args.delay
+        for argname in (
+            self.UNATTENDED_ARG,
+            self.SCREENSHOT_ARG,
+            self.VERBOSE_ARG,
+            self.DELAY_ARG,
+        ):
+            argvalue = getattr(args, argname)
+            if argvalue is not None:
+                setattr(self, argname, argvalue)
+
+    def log(self, source: Any, *objects: Any) -> None:
+        """Log text on screen
+
+        Args:
+            source: object from which the log is issued
+            *objects: objects to log
+        """
+        if DEBUG or self.verbose == VerbosityLevels.DEBUG.value:
+            print(str(source) + ":", *objects)
 
     def print(self, *objects, sep=" ", end="\n", file=sys.stdout, flush=False):
         """Print in file, depending on verbosity level"""
@@ -153,7 +178,6 @@ class GuidataExecEnv:
             self.verbose != VerbosityLevels.MINIMAL.value or file == sys.stderr
         ):
             print(*objects, sep=sep, end=end, file=file, flush=flush)
-        # TODO: [P4] Eventually add logging here
 
     def pprint(
         self,
@@ -166,9 +190,7 @@ class GuidataExecEnv:
         sort_dicts=True,
     ):
         """Pretty-print in stream, depending on verbosity level"""
-        if (self.verbose != VerbosityLevels.QUIET.value) and (
-            self.verbose != VerbosityLevels.MINIMAL.value or stream == sys.stderr
-        ):
+        if self.verbose != VerbosityLevels.QUIET.value or DEBUG:
             pprint.pprint(
                 obj,
                 stream=stream,
@@ -180,4 +202,4 @@ class GuidataExecEnv:
             )
 
 
-execenv = GuidataExecEnv()
+execenv = ExecEnv()
