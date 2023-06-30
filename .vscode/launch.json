@@ -5,24 +5,16 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Dev: run current file",
+            "name": "Run current file",
             "type": "python",
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "envFile": "${workspaceFolder}/dev.env",
-            "python": "${env:GUIDATA_PYTHONEXE}",
+            "envFile": "${workspaceFolder}/.env",
+            "python": "${config:python.defaultInterpreterPath}",
             "justMyCode": false,
             "args": [],
             "env": {}
-        },
-        {
-            "name": "Release: current file",
-            "type": "python",
-            "request": "launch",
-            "program": "${file}",
-            "console": "integratedTerminal",
-            "python": "${env:GUIDATA_PYTHONEXE}",
         },
     ]
 }
