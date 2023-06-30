@@ -18,7 +18,7 @@ from uuid import uuid1
 
 import numpy as np
 
-from guidata.userconfigio import BaseIOHandler, WriterMixin
+from guidata.dataset.iniio import BaseIOHandler, WriterMixin
 
 
 class CustomJSONEncoder(json.JSONEncoder):
