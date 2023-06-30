@@ -8,11 +8,31 @@
 # pylint: disable=C0103
 
 """
-utils
------
+Miscellaneous utility functions
+-------------------------------
 
-The ``guidata.utils`` module provides various utility helper functions
-(pure python).
+Data sets
+^^^^^^^^^
+
+.. autofunction:: update_dataset
+
+.. autofunction:: restore_dataset
+
+Running programs
+^^^^^^^^^^^^^^^^
+
+.. autofunction:: run_program
+
+.. autofunction:: is_program_installed
+
+.. autofunction:: run_shell_command
+
+Strings
+^^^^^^^
+
+.. autofunction:: to_string
+
+.. autofunction:: decode_fs_string
 """
 
 from __future__ import annotations
@@ -23,7 +43,6 @@ import os
 import os.path as osp
 import subprocess
 import sys
-import time
 from typing import TYPE_CHECKING, Any
 
 # Local imports
@@ -34,119 +53,10 @@ if TYPE_CHECKING:  # pragma: no cover
 
 
 # ==============================================================================
-# Misc.
-# ==============================================================================
-def min_equals_max(min, max):
-    """
-    Return True if minimium value equals maximum value
-    Return False if not, or if maximum or minimum value is not defined
-    """
-    return min is not None and max is not None and min == max
-
-
-def pairs(iterable):
-    """A simple generator that takes a list and generates
-    pairs [ (l[0],l[1]), ..., (l[n-2], l[n-1])]
-    """
-    iterator = iter(iterable)
-    first = next(iterator)
-    while True:
-        second = next(iterator)
-        yield (first, second)
-        first = second
-
-
-def add_extension(item, value) -> str:
-    """Add extension to filename
-    `item`: data item representing a file path
-    `value`: possible value for data item"""
-    value = str(value)
-    formats = item.get_prop("data", "formats")
-    if len(formats) == 1 and formats[0] != "*":
-        if not value.endswith("." + formats[0]) and len(value) > 0:
-            return value + "." + formats[0]
-    return value
-
-
-def bind(fct, value):
-    """
-    Returns a callable representing the function 'fct' with it's
-    first argument bound to the value
-
-    if g = bind(f,1) and f is a function of x,y,z
-    then g(y,z) will return f(1,y,z)
-    """
-
-    def callback(*args, **kwargs):
-        return fct(value, *args, **kwargs)
-
-    return callback
-
-
-def trace(fct):
-    """A decorator that traces function entry/exit
-    used for debugging only
-    """
-    from functools import wraps
-
-    @wraps(fct)
-    def wrapper(*args, **kwargs):
-        """Tracing function entry/exit (debugging only)"""
-        print("enter:", fct.__name__)
-        res = fct(*args, **kwargs)
-        print("leave:", fct.__name__)
-        return res
-
-    return wrapper
-
-
-def to_string(obj):
-    """Convert to string, trying utf-8 then latin-1 codec"""
-    if isinstance(obj, bytes):
-        try:
-            return obj.decode()
-        except UnicodeDecodeError:
-            return obj.decode("latin-1")
-    try:
-        return str(obj)
-    except UnicodeDecodeError:
-        return str(obj, encoding="latin-1")
-
-
-# ==============================================================================
-# Strings
-# ==============================================================================
-def decode_fs_string(string):
-    """Convert string from file system charset to unicode"""
-    charset = sys.getfilesystemencoding()
-    if charset is None:
-        charset = locale.getpreferredencoding()
-    return string.decode(charset)
-
-
-def utf8_to_unicode(string):
-    """Convert UTF-8 string to Unicode str"""
-    if not isinstance(string, str):
-        string = str(string)
-    return string
-
-
-# Findout the encoding used for stdout or use ascii as default
-STDOUT_ENCODING = "ascii"
-if hasattr(sys.stdout, "encoding"):
-    if sys.stdout.encoding:
-        STDOUT_ENCODING = sys.stdout.encoding
-
-
-def unicode_to_stdout(ustr):
-    """convert a unicode string to a byte string encoded
-    for stdout output"""
-    return ustr.encode(STDOUT_ENCODING, "replace")
-
-
-# ==============================================================================
 # Updating, restoring datasets
 # ==============================================================================
+
+
 def update_dataset(
     dest: gdt.DataSet, source: Any | dict[str, Any], visible_only: bool = False
 ) -> None:
@@ -214,8 +124,50 @@ def restore_dataset(source: gdt.DataSet, dest: Any | dict[str, Any]) -> None:
 
 
 # ==============================================================================
+# Strings
+# ==============================================================================
+
+
+def to_string(obj: Any) -> str:
+    """Convert to string, trying utf-8 then latin-1 codec
+
+    Args:
+        obj (Any): Object to convert to string
+
+    Returns:
+        str: String representation of object
+    """
+    if isinstance(obj, bytes):
+        try:
+            return obj.decode()
+        except UnicodeDecodeError:
+            return obj.decode("latin-1")
+    try:
+        return str(obj)
+    except UnicodeDecodeError:
+        return str(obj, encoding="latin-1")
+
+
+def decode_fs_string(string: str) -> str:
+    """Convert string from file system charset to unicode
+
+    Args:
+        string (str): String to convert
+
+    Returns:
+        str: Converted string
+    """
+    charset = sys.getfilesystemencoding()
+    if charset is None:
+        charset = locale.getpreferredencoding()
+    return string.decode(charset)
+
+
+# ==============================================================================
 # Interface checking
 # ==============================================================================
+
+
 def assert_interface_supported(klass, iface):
     """Makes sure a class supports an interface"""
     for name, func in list(iface.__dict__.items()):
@@ -254,73 +206,10 @@ def assert_interfaces_valid(klass):
 
 
 # ==============================================================================
-# Date, time, timer
-# ==============================================================================
-def localtime_to_isodate(time_struct):
-    """Convert local time to ISO date"""
-    s = time.strftime("%Y-%m-%d %H:%M:%S ", time_struct)
-    s += "%+05d" % time.timezone
-    return s
-
-
-def isodate_to_localtime(datestr):
-    """Convert ISO date to local time"""
-    return time.strptime(datestr[:16], "%Y-%m-%d %H:%M:%S")
-
-
-class FormatTime(object):
-    """Helper object that substitute as a string to
-    format seconds into (nn H mm min ss s)"""
-
-    def __init__(self, hours_fmt="%d H ", min_fmt="%d min ", sec_fmt="%d s"):
-        self.sec_fmt = sec_fmt
-        self.hours_fmt = hours_fmt
-        self.min_fmt = min_fmt
-
-    def __mod__(self, val):
-        val = val[0]
-        hours = val // 3600.0
-        minutes = (val % 3600.0) // 60
-        seconds = val % 60.0
-        if hours:
-            return (
-                (self.hours_fmt % hours)
-                + (self.min_fmt % minutes)
-                + (self.sec_fmt % seconds)
-            )
-        elif minutes:
-            return (self.min_fmt % minutes) + (self.sec_fmt % seconds)
-        else:
-            return self.sec_fmt % seconds
-
-
-format_hms = FormatTime()
-
-
-class Timer(object):
-    """MATLAB-like timer: tic, toc"""
-
-    def __init__(self):
-        self.t0_dict = {}
-
-    def tic(self, cat):
-        """Starting timer"""
-        print(">", cat)
-        self.t0_dict[cat] = time.perf_counter()
-
-    def toc(self, cat, msg="delta:"):
-        """Stopping timer"""
-        print("<", cat, ":", msg, time.perf_counter() - self.t0_dict[cat])
-
-
-_TIMER = Timer()
-tic = _TIMER.tic
-toc = _TIMER.toc
-
-
-# ==============================================================================
 # Module, scripts, programs
 # ==============================================================================
+
+
 def get_module_path(modname: str) -> str:
     """Return module *modname* base path.
 
@@ -439,22 +328,6 @@ def run_shell_command(cmdstr, **subprocess_kwargs):
     return subprocess.Popen(cmdstr, **subprocess_kwargs)
 
 
-def is_module_available(module_name: str) -> bool:
-    """Return True if Python module is available, False otherwise.
-
-    Args:
-        module_name (str): The module name.
-
-    Returns:
-        bool: True if Python module is available, False otherwise.
-    """
-    try:
-        __import__(module_name)
-        return True
-    except ImportError:
-        return False
-
-
 # ==============================================================================
 # Path utils
 # ==============================================================================
@@ -494,43 +367,3 @@ def remove_backslashes(path):
         path = path.replace("\\", "/")
         path = path.replace("/'", "\\'")
     return path
-
-
-# ==============================================================================
-# Utilities for setup.py scripts
-# ==============================================================================
-
-
-def get_package_data(name, extlist, exclude_dirs=[]):
-    """
-    Return data files for package *name* with extensions in *extlist*
-    (search recursively in package directories)
-    """
-    assert isinstance(extlist, (list, tuple))
-    flist = []
-    # Workaround to replace os.path.relpath (not available until Python 2.6):
-    offset = len(name) + len(os.pathsep)
-    for dirpath, _dirnames, filenames in os.walk(name):
-        if dirpath not in exclude_dirs:
-            for fname in filenames:
-                if osp.splitext(fname)[1].lower() in extlist:
-                    flist.append(osp.join(dirpath, fname)[offset:])
-    return flist
-
-
-def get_subpackages(name):
-    """Return subpackages of package *name*"""
-    splist = []
-    for dirpath, _dirnames, _filenames in os.walk(name):
-        if osp.isfile(osp.join(dirpath, "__init__.py")):
-            splist.append(".".join(dirpath.split(os.sep)))
-    return splist
-
-
-def cythonize_all(relpath):
-    """Cythonize all Cython modules in relative path"""
-    from Cython.Compiler import Main
-
-    for fname in os.listdir(relpath):
-        if osp.splitext(fname)[1] == ".pyx":
-            Main.compile(osp.join(relpath, fname))
