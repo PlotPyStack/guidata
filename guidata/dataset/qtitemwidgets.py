@@ -311,7 +311,7 @@ class LineEditWidget(AbstractDataSetWidget):
         if value is not None:
             if isinstance(value, QColor):  # if item is a ColorItem object
                 value = value.name()
-            assert isinstance(value, str)
+            value = str(value)
             if value != old_value:
                 self.edit.setText(value)
         else:
