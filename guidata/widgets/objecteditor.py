@@ -14,21 +14,27 @@ This package provides a generic object editor widget.
 
 """
 
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 import PIL.Image
-from numpy.core.multiarray import ndarray
-from qtpy.QtCore import QObject
-
 from guidata.qthelpers import exec_dialog
 from guidata.widgets.arrayeditor import ArrayEditor
 from guidata.widgets.collectionseditor import CollectionsEditor
 from guidata.widgets.nsview import DataFrame, FakeObject, Series, is_known_type
 from guidata.widgets.texteditor import TextEditor
+from numpy.core.multiarray import ndarray
 
 try:
     from guidata.widgets.dataframeeditor import DataFrameEditor
 except ImportError:
     DataFrameEditor = FakeObject()
+
+
+if TYPE_CHECKING:
+    import numpy as np
+    from qtpy import QtWidgets as QW
 
 
 def create_dialog(obj, title, parent=None):
@@ -76,14 +82,21 @@ def create_dialog(obj, title, parent=None):
     return dialog, end_func
 
 
-def oedit(obj, title=None, parent=None):
+def oedit(
+    obj: dict | list | tuple | str | np.ndarray,
+    title: str = None,
+    parent: QW.QWidget = None,
+) -> dict | list | tuple | str | np.ndarray:
     """Edit the object 'obj' in a GUI-based editor and return the edited copy
     (if Cancel is pressed, return None)
 
-    The object 'obj' is a container
+    Args:
+        obj (dict | list | tuple | str | np.ndarray): object to edit
+        title (str, optional): dialog title
+        parent (QW.QWidget, optional): parent widget
 
-    Supported container types:
-    dict, list, tuple, str/unicode or numpy.array
+    Returns:
+        dict | list | tuple | str | np.ndarray: edited object
     """
     title = "" if title is None else title
     result = create_dialog(obj, title, parent)

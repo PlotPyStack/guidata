@@ -6,18 +6,34 @@
 # (see guidata/__init__.py for details)
 
 """
-dataset.qtwidgets
-=================
+Qt widgets for data sets
+------------------------
 
-Dialog boxes used to edit data sets:
-    DataSetEditDialog
-    DataSetGroupEditDialog
-    DataSetShowDialog
+Dialog boxes for DataSet editing and showing
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-...and layouts:
-    GroupItem
-    DataSetEditLayout
-    DataSetShowLayout
+.. autoclass:: DataSetEditDialog
+    :show-inheritance:
+    :members:
+
+.. autoclass:: DataSetShowDialog
+    :show-inheritance:
+    :members:
+
+.. autoclass:: DataSetGroupEditDialog
+    :show-inheritance:
+    :members:
+
+Layouts for DataSet editing and showing
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: DataSetEditLayout
+    :show-inheritance:
+    :members:
+
+.. autoclass:: DataSetShowLayout
+    :show-inheritance:
+    :members:
 """
 
 from typing import *

@@ -6,25 +6,68 @@
 # (see guidata/__init__.py for details)
 
 """
-configtools
------------
+Configuration related functions
+-------------------------------
 
-The ``guidata.configtools`` module provides configuration related tools.
+Access configured options
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. autofunction:: get_icon
+
+.. autofunction:: get_image_file_path
+
+.. autofunction:: get_image_label
+
+.. autofunction:: get_image_layout
+
+.. autofunction:: get_family
+
+.. autofunction:: get_font
+
+.. autofunction:: get_pen
+
+.. autofunction:: get_brush
+
+Add image paths
+^^^^^^^^^^^^^^^
+
+.. autofunction:: add_image_path
+
+.. autofunction:: add_image_module_path
 """
+
+from __future__ import annotations
 
 import gettext
 import os
 import os.path as osp
 import sys
+from collections.abc import Callable
+from typing import TYPE_CHECKING
 
-from guidata.utils import decode_fs_string, get_module_path
+from guidata.utils.misc import decode_fs_string, get_module_path
+
+if TYPE_CHECKING:
+    from qtpy import QtCore as QC
+    from qtpy import QtGui as QG
+    from qtpy import QtWidgets as QW
+
+    from guidata.userconfig import UserConfig
 
 IMG_PATH = []
 
 
-def get_module_data_path(modname, relpath=None):
+def get_module_data_path(modname: str, relpath: str | None = None) -> str:
     """Return module *modname* data path
-    Handles py2exe/cx_Freeze distributions"""
+    Handles py2exe/cx_Freeze distributions
+
+    Args:
+        modname (str): module name
+        relpath (str, optional): relative path to module data directory
+
+    Returns:
+        str: module data path
+    """
     datapath = getattr(sys.modules[modname], "DATAPATH", "")
     if not datapath:
         datapath = get_module_path(modname)
@@ -38,8 +81,16 @@ def get_module_data_path(modname, relpath=None):
     return datapath
 
 
-def get_translation(modname, dirname=None):
-    """Return translation callback for module *modname*"""
+def get_translation(modname: str, dirname: str | None = None) -> Callable[[str], str]:
+    """Return translation callback for module *modname*
+
+    Args:
+        modname (str): module name
+        dirname (str, optional): module directory
+
+    Returns:
+        Callable[[str], str]: translation callback
+    """
     if dirname is None:
         dirname = modname
     # fixup environment var LANG in case it's unknown
@@ -76,16 +127,28 @@ def get_translation(modname, dirname=None):
         return translate_dumb
 
 
-def get_module_locale_path(modname):
-    """Return module *modname* gettext translation path"""
+def get_module_locale_path(modname: str) -> str:
+    """Return module *modname* gettext translation path
+
+    Args:
+        modname (str): module name
+
+    Returns:
+        str: module gettext translation path
+    """
     localepath = getattr(sys.modules[modname], "LOCALEPATH", "")
     if not localepath:
         localepath = get_module_data_path(modname, relpath="locale")
     return localepath
 
 
-def add_image_path(path, subfolders=True):
-    """Append image path (opt. with its subfolders) to global list IMG_PATH"""
+def add_image_path(path: str, subfolders: bool = True) -> None:
+    """Append image path (opt. with its subfolders) to global list IMG_PATH
+
+    Args:
+        path (str): image path
+        subfolders (bool, optional): include subfolders
+    """
     if not isinstance(path, str):
         path = decode_fs_string(path)
     global IMG_PATH
@@ -97,7 +160,7 @@ def add_image_path(path, subfolders=True):
                 IMG_PATH.append(pth)
 
 
-def add_image_module_path(modname, relpath, subfolders=True):
+def add_image_module_path(modname: str, relpath: str, subfolders: bool = True) -> None:
     """
     Appends image data path relative to a module name.
     Used to add module local data that resides in a module directory
@@ -105,14 +168,29 @@ def add_image_module_path(modname, relpath, subfolders=True):
 
     modname must be the name of an already imported module as found in
     sys.modules
+
+    Args:
+        modname (str): module name
+        relpath (str): relative path to module data directory
+        subfolders (bool, optional): include subfolders
     """
     add_image_path(get_module_data_path(modname, relpath=relpath), subfolders)
 
 
-def get_image_file_path(name, default="not_found.png"):
+def get_image_file_path(name: str, default: str = "not_found.png") -> str:
     """
     Return the absolute path to image with specified name
     name, default: filenames with extensions
+
+    Args:
+        name (str): name of the image
+        default (str, optional): default image name. Defaults to "not_found.png".
+
+    Raises:
+        RuntimeError: if image file not found
+
+    Returns:
+        str: absolute path to image
     """
     for pth in IMG_PATH:
         full_path = osp.join(pth, name)
@@ -130,28 +208,44 @@ def get_image_file_path(name, default="not_found.png"):
 ICON_CACHE = {}
 
 
-def get_icon(name, default="not_found.png"):
+def get_icon(name: str, default: str = "not_found.png") -> QG.QIcon:
     """
     Construct a QIcon from the file with specified name
     name, default: filenames with extensions
+
+    Args:
+        name (str): name of the icon
+        default (str, optional): default icon name. Defaults to "not_found.png".
+
+    Returns:
+        QG.QIcon: icon
     """
     try:
         return ICON_CACHE[name]
     except KeyError:
-        from qtpy import QtGui as QG
+        # Importing Qt here because this module should be independent from it
+        from qtpy import QtGui as QG  # pylint: disable=import-outside-toplevel
 
         icon = QG.QIcon(get_image_file_path(name, default))
         ICON_CACHE[name] = icon
         return icon
 
 
-def get_image_label(name, default="not_found.png"):
+def get_image_label(name, default="not_found.png") -> QW.QLabel:
     """
     Construct a QLabel from the file with specified name
     name, default: filenames with extensions
+
+    Args:
+        name (str): name of the icon
+        default (str, optional): default icon name. Defaults to "not_found.png".
+
+    Returns:
+        QW.QLabel: label
     """
-    from qtpy import QtGui as QG
-    from qtpy import QtWidgets as QW
+    # Importing Qt here because this module should be independent from it
+    from qtpy import QtGui as QG  # pylint: disable=import-outside-toplevel
+    from qtpy import QtWidgets as QW  # pylint: disable=import-outside-toplevel
 
     label = QW.QLabel()
     pixmap = QG.QPixmap(get_image_file_path(name, default))
@@ -159,14 +253,25 @@ def get_image_label(name, default="not_found.png"):
     return label
 
 
-def get_image_layout(imagename, text="", tooltip="", alignment=None):
+def get_image_layout(
+    imagename: str, text: str = "", tooltip: str = "", alignment: QC.Qt.Alignment = None
+) -> tuple[QW.QHBoxLayout, QW.QLabel]:
     """
     Construct a QHBoxLayout including image from the file with specified name,
     left-aligned text [with specified tooltip]
-    Return (layout, label)
+
+    Args:
+        imagename (str): name of the icon
+        text (str, optional): text to display. Defaults to "".
+        tooltip (str, optional): tooltip to display. Defaults to "".
+        alignment (QC.Qt.Alignment, optional): alignment of the text. Defaults to None.
+
+    Returns:
+        tuple[QW.QHBoxLayout, QW.QLabel]: layout, label
     """
-    from qtpy import QtCore as QC
-    from qtpy import QtWidgets as QW
+    # Importing Qt here because this module should be independent from it
+    from qtpy import QtGui as QG  # pylint: disable=import-outside-toplevel
+    from qtpy import QtWidgets as QW  # pylint: disable=import-outside-toplevel
 
     if alignment is None:
         alignment = QC.Qt.AlignLeft
@@ -182,9 +287,17 @@ def get_image_layout(imagename, text="", tooltip="", alignment=None):
     return (layout, label)
 
 
-def font_is_installed(font):
-    """Check if font is installed"""
-    from qtpy import QtGui as QG
+def font_is_installed(font: str) -> list[str]:
+    """Check if font is installed
+
+    Args:
+        font (str): font name
+
+    Returns:
+        list[str]: list of installed fonts
+    """
+    # Importing Qt here because this module should be independent from it
+    from qtpy import QtGui as QG  # pylint: disable=import-outside-toplevel
 
     return [fam for fam in QG.QFontDatabase().families() if str(fam) == font]
 
@@ -207,8 +320,15 @@ MONOSPACE = [
 ]
 
 
-def get_family(families):
-    """Return the first installed font family in family list"""
+def get_family(families: str | list[str]) -> str:
+    """Return the first installed font family in family list
+
+    Args:
+        families (str|list[str]): font family or list of font families
+
+    Returns:
+        str: first installed font family
+    """
     if not isinstance(families, list):
         families = [families]
     for family in families:
@@ -219,13 +339,22 @@ def get_family(families):
         return ""
 
 
-def get_font(conf, section, option=""):
+def get_font(conf: UserConfig, section: str, option: str = "") -> QG.QFont:
     """
     Construct a QFont from the specified configuration file entry
     conf: UserConfig instance
     section [, option]: configuration entry
+
+    Args:
+        conf (UserConfig): UserConfig instance
+        section (str): configuration entry
+        option (str, optional): configuration entry. Defaults to "".
+
+    Returns:
+        QG.QFont: font
     """
-    from qtpy import QtGui as QG
+    # Importing Qt here because this module should be independent from it
+    from qtpy import QtGui as QG  # pylint: disable=import-outside-toplevel
 
     if not option:
         option = "font"
@@ -255,7 +384,14 @@ def get_font(conf, section, option=""):
     return font
 
 
-def get_pen(conf, section, option="", color="black", width=1, style="SolidLine"):
+def get_pen(
+    conf: UserConfig,
+    section: str,
+    option: str = "",
+    color: str = "black",
+    width: int = 1,
+    style: str = "SolidLine",
+) -> QG.QPen:
     """
     Construct a QPen from the specified configuration file entry
     conf: UserConfig instance
@@ -263,9 +399,21 @@ def get_pen(conf, section, option="", color="black", width=1, style="SolidLine")
     [color]: default color
     [width]: default width
     [style]: default style
+
+    Args:
+        conf (UserConfig): UserConfig instance
+        section (str): configuration entry
+        option (str, optional): configuration entry. Defaults to "".
+        color (str, optional): default color. Defaults to "black".
+        width (int, optional): default width. Defaults to 1.
+        style (str, optional): default style. Defaults to "SolidLine".
+
+    Returns:
+        QG.QPen: pen
     """
-    from qtpy import QtCore as QC
-    from qtpy import QtGui as QG
+    # Importing Qt here because this module should be independent from it
+    from qtpy import QtGui as QG  # pylint: disable=import-outside-toplevel
+    from qtpy import QtWidgets as QW  # pylint: disable=import-outside-toplevel
 
     if "pen" not in option:
         option += "/pen"
@@ -277,15 +425,32 @@ def get_pen(conf, section, option="", color="black", width=1, style="SolidLine")
     return QG.QPen(color, width, style)
 
 
-def get_brush(conf, section, option="", color="black", alpha=1.0):
+def get_brush(
+    conf: UserConfig,
+    section: str,
+    option: str = "",
+    color: str = "black",
+    alpha: float = 1.0,
+) -> QG.QBrush:
     """
     Construct a QBrush from the specified configuration file entry
     conf: UserConfig instance
     section [, option]: configuration entry
     [color]: default color
     [alpha]: default alpha-channel
+
+    Args:
+        conf (UserConfig): UserConfig instance
+        section (str): configuration entry
+        option (str, optional): configuration entry. Defaults to "".
+        color (str, optional): default color. Defaults to "black".
+        alpha (float, optional): default alpha-channel. Defaults to 1.0.
+
+    Returns:
+        QG.QBrush: brush
     """
-    from qtpy import QtGui as QG
+    # Importing Qt here because this module should be independent from it
+    from qtpy import QtGui as QG  # pylint: disable=import-outside-toplevel
 
     if "brush" not in option:
         option += "/brush"

@@ -6,12 +6,53 @@
 # (see guidata/__init__.py for details)
 
 """
-dataset.datatypes
-=================
+Data sets
+---------
 
-The ``guidata.dataset.datatypes`` module contains implementation for
-DataSets (DataSet, DataSetGroup, ...) and related objects (ItemProperty,
-ValueProp, ...).
+Defining data sets
+^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: DataSet
+    :members:
+
+.. autoclass:: DataSetGroup
+    :members:
+
+.. autoclass:: ActivableDataSet
+    :members:
+
+Grouping items
+^^^^^^^^^^^^^^
+
+.. autoclass:: BeginGroup
+    :members:
+
+.. autoclass:: EndGroup
+    :members:
+
+.. autoclass:: BeginTabGroup
+    :members:
+
+.. autoclass:: EndTabGroup
+    :members:
+
+Handling item properties
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: FormatProp
+    :members:
+
+.. autoclass:: GetAttrProp
+    :members:
+
+.. autoclass:: ValueProp
+    :members:
+
+.. autoclass:: NotProp
+    :members:
+
+.. autoclass:: FuncProp
+    :members:
 """
 
 # pylint: disable-msg=W0622
@@ -33,18 +74,18 @@ from typing import (
     Union,
 )
 
+from guidata.dataset.iniio import UserConfigReader, UserConfigWriter
 from guidata.qthelpers import exec_dialog
 from guidata.userconfig import UserConfig
-from guidata.userconfigio import UserConfigReader, UserConfigWriter
-from guidata.utils import update_dataset, utf8_to_unicode
+from guidata.utils import update_dataset
 from qtpy.QtWidgets import QWidget
 
 DEBUG_DESERIALIZE = False
 
 if TYPE_CHECKING:  # pragma: no cover
+    from guidata.dataset.hdf5io import HDF5Reader, HDF5Writer
+    from guidata.dataset.jsonio import JSONReader, JSONWriter
     from guidata.dataset.qtwidgets import DataSetEditDialog
-    from guidata.hdf5io import HDF5Reader, HDF5Writer
-    from guidata.jsonio import JSONReader, JSONWriter
 
 
 class NoDefault:
@@ -187,13 +228,11 @@ class DataItem:
         DataItem.count += 1
         self._name: Optional[str] = None
         self._default = default
-        self._help = utf8_to_unicode(help)
+        self._help = help
         self._props: Dict[
             Any, Any
         ] = {}  # a dict realm->dict containing realm-specific properties
-        self.set_prop(
-            "display", col=0, colspan=None, row=None, label=utf8_to_unicode(label)
-        )
+        self.set_prop("display", col=0, colspan=None, row=None, label=label)
         self.set_prop("data", check_value=check)
 
     def get_prop(self, realm: str, name: str, default: Any = NoDefault) -> Any:
@@ -245,7 +284,7 @@ class DataItem:
         """
         Return data item's tooltip
         """
-        auto_help = utf8_to_unicode(self.get_auto_help(instance))
+        auto_help = self.get_auto_help(instance)
         help = self._help
         if auto_help:
             if help:
@@ -529,17 +568,6 @@ class DataItemProxy:
         return DataItemVariable(self, instance)
 
 
-#    def __getattr__(self, name):
-#        assert name in ["min_equals_max", "get_min", "get_max",
-#                        "_formats", "_text", "_choices", "_shape",
-#                        "_format", "_label", "_xy"]
-#        val = getattr(self.item, name)
-#        if callable(val):
-#            return bind(val, self.instance)
-#        else:
-#            return val
-
-
 class DataItemVariable:
     """An instance of a DataItemVariable represent a binding between
     an item and a dataset.
@@ -568,20 +596,6 @@ class DataItemVariable:
     ) -> Any:
         """DataItem method proxy"""
         return self.item.get_prop(realm, name, default)
-
-    #    def set_prop(self, realm, **kwargs):
-    #        """DataItem method proxy"""
-    #        self.item.set_prop(realm, **kwargs)
-    #
-    #    def __getattr__(self, name):
-    #        assert name in ["min_equals_max", "get_min", "get_max",
-    #                        "_formats","_text", "_choices", "_shape",
-    #                        "_format", "_label", "_xy"]
-    #        val = getattr(self.item, name)
-    #        if callable(val):
-    #            return bind(val, self.instance)
-    #        else:
-    #            return val
 
     def get_help(self) -> str:
         """Re-implement DataItem method"""
@@ -695,11 +709,10 @@ class DataSet(metaclass=DataSetMeta):
 
     @classmethod
     def create(cls, **kwargs) -> "DataSet":
-        """
-        Create a new instance of the DataSet class
+        """Create a new instance of the DataSet class
 
         Args:
-            **kwargs: keyword arguments to set the DataSet attributes
+            \*\*kwargs: keyword arguments to set the DataItem values
 
         Returns:
             DataSet instance
@@ -731,7 +744,7 @@ class DataSet(metaclass=DataSetMeta):
         comp_title = self.__class__.__name__
         comp_comment = None
         if self.__doc__:
-            doc_lines = utf8_to_unicode(self.__doc__).splitlines()
+            doc_lines = self.__doc__.splitlines()
             # Remove empty lines at the begining of comment
             while doc_lines and not doc_lines[0].strip():
                 del doc_lines[0]
@@ -912,13 +925,13 @@ class DataSet(metaclass=DataSetMeta):
                     item.set_default(self)
 
     def read_config(self, conf: "UserConfig", section: str, option: str) -> None:
-        from guidata.userconfigio import UserConfigReader
+        from guidata.dataset.iniio import UserConfigReader
 
         reader = UserConfigReader(conf, section, option)
         self.deserialize(reader)
 
     def write_config(self, conf: "UserConfig", section: str, option: str) -> None:
-        from guidata.userconfigio import UserConfigWriter
+        from guidata.dataset.iniio import UserConfigWriter
 
         writer = UserConfigWriter(conf, section, option)
         self.serialize(writer)

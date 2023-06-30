@@ -6,29 +6,29 @@
 # (see guidata/__init__.py for details)
 
 """
-widgets
-=======
+Ready-to-use Qt widgets
+-----------------------
 
-The ``guidata.widgets`` package provides useful Qt-based widgets.
+Data editors
+^^^^^^^^^^^^
 
-.. automodule:: guidata.widgets.console
-   :members:
+.. autoclass:: guidata.widgets.arrayeditor.ArrayEditor
 
-.. automodule:: guidata.widgets.codeeditor
-   :members:
+.. autoclass:: guidata.widgets.collectionseditor.CollectionsEditor
 
-.. automodule:: guidata.widgets.arrayeditor
-   :members:
+.. autoclass:: guidata.widgets.dataframeeditor.DataFrameEditor
 
-.. automodule:: guidata.widgets.collectionseditor
-   :members:
+.. autoclass:: guidata.widgets.texteditor.TextEditor
 
-.. automodule:: guidata.widgets.dataframeeditor
-   :members:
+.. autofunction:: guidata.widgets.objecteditor.oedit
 
-.. automodule:: guidata.widgets.texteditor
-   :members:
+Console and code editor
+^^^^^^^^^^^^^^^^^^^^^^^
 
-.. automodule:: guidata.widgets.objecteditor
-   :members:
+.. autoclass:: guidata.widgets.console.Console
+
+.. autoclass:: guidata.widgets.console.DockableConsole
+
+.. autoclass:: guidata.widgets.codeeditor.CodeEditor
+
 """

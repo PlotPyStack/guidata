@@ -1,11 +1,8 @@
 Utilities
----------
+=========
 
 .. automodule:: guidata.utils
-    :members:
+
+.. automodule:: guidata.utils.misc
 
 .. automodule:: guidata.configtools
-    :members:
-
-.. automodule:: guidata.userconfig
-    :members:

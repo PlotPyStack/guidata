@@ -1,12 +1,12 @@
 Reference
-=========
+---------
 
 guidata API:
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
 
-   core
+   dataset/index
    utils
    widgets
+   guitest

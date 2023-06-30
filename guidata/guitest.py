@@ -7,6 +7,29 @@
 
 """
 GUI-based test launcher
+-----------------------
+
+Overview
+^^^^^^^^
+
+This module provides a GUI-based test launcher for any Python package.
+
+Usage example::
+
+    import your_package
+
+    from guidata.guitest import run_testlauncher
+    run_testlauncher(your_package)
+
+Reference/API
+^^^^^^^^^^^^^
+
+.. autofunction:: run_testlauncher
+
+.. autoclass:: TestModule
+
+.. autofunction:: get_tests
+
 """
 
 from __future__ import annotations
@@ -17,6 +40,7 @@ import re
 import subprocess
 import sys
 import traceback
+from types import ModuleType
 
 from qtpy import QtCore as QC
 from qtpy import QtGui as QG
@@ -315,13 +339,13 @@ class TestLauncherWindow(QW.QMainWindow):
             QW.QMessageBox.critical(self, _("Error"), msg)
 
 
-def run_testlauncher(package) -> None:
+def run_testlauncher(package: ModuleType) -> None:
     """Run test launcher
 
     Args:
         package (module): test package
     """
-    from guidata import qapplication
+    from guidata import qapplication  # pylint: disable=import-outside-toplevel
 
     app = qapplication()
     win = TestLauncherWindow(package)

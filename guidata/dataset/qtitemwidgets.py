@@ -25,6 +25,12 @@ from abc import abstractmethod
 from typing import TYPE_CHECKING, Any, Callable, List, Optional, Protocol
 
 import numpy
+from guidata.config import _
+from guidata.configtools import get_icon, get_image_file_path, get_image_layout
+from guidata.dataset.datatypes import DataItemVariable
+from guidata.qthelpers import get_std_icon, text_to_qcolor
+from guidata.utils import restore_dataset, update_dataset
+from guidata.widgets.arrayeditor import ArrayEditor
 from qtpy.compat import getexistingdirectory
 from qtpy.QtCore import Qt, QVariant
 from qtpy.QtGui import QColor, QIcon, QPixmap
@@ -49,13 +55,6 @@ from qtpy.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
-
-from guidata.config import _
-from guidata.configtools import get_icon, get_image_file_path, get_image_layout
-from guidata.dataset.datatypes import DataItemVariable
-from guidata.qthelpers import get_std_icon, text_to_qcolor
-from guidata.utils import restore_dataset, update_dataset, utf8_to_unicode
-from guidata.widgets.arrayeditor import ArrayEditor
 
 # ========================== <!> IMPORTANT <!> =================================
 #
@@ -303,12 +302,6 @@ class LineEditWidget(AbstractDataSetWidget):
         super().__init__(item, parent_layout)
         self.edit = self.group = QLineEdit()
         self.edit.setToolTip(item.get_help())
-        # if hasattr(item, "min_equals_max") and item.min_equals_max():
-        #     if item.check_item():
-        #         self.edit.setEnabled(False)
-        #     self.edit.setToolTip(
-        #         _("Value is forced to %d") % item.get_max()
-        #     )  # TODO:Aucune utilité
         self.edit.textChanged.connect(self.line_edit_changed)  # type:ignore
 
     def get(self) -> None:
@@ -318,9 +311,9 @@ class LineEditWidget(AbstractDataSetWidget):
         if value is not None:
             if isinstance(value, QColor):  # if item is a ColorItem object
                 value = value.name()
-            uvalue = utf8_to_unicode(value)
-            if uvalue != old_value:
-                self.edit.setText(utf8_to_unicode(value))
+            assert isinstance(value, str)
+            if value != old_value:
+                self.edit.setText(value)
         else:
             self.line_edit_changed(value)
 
@@ -364,12 +357,6 @@ class TextEditWidget(AbstractDataSetWidget):
         super().__init__(item, parent_layout)
         self.edit = self.group = QTextEdit()
         self.edit.setToolTip(item.get_help())
-        # if hasattr(item, "min_equals_max") and item.min_equals_max():
-        #     if item.check_item():
-        #         self.edit.setEnabled(False)
-        #     self.edit.setToolTip(
-        #         _("Value is forced to %d") % item.get_max()
-        #     )  # TODO:Aucune utilité
         self.edit.textChanged.connect(self.text_changed)  # type:ignore
 
     def __get_text(self) -> str:
@@ -380,7 +367,7 @@ class TextEditWidget(AbstractDataSetWidget):
         """Override AbstractDataSetWidget method"""
         value = self.item.get()
         if value is not None:
-            self.edit.setPlainText(utf8_to_unicode(value))
+            self.edit.setPlainText(value)
         self.text_changed()
 
     def text_changed(self) -> None:

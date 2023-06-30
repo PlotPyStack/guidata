@@ -6,18 +6,9 @@ guidata
 Based on the Qt library `guidata` is a Python library generating graphical
 user interfaces for easy dataset editing and display. It also provides helpers
 and application development tools for Qt.
-
-External resources:
-    * Python Package Index: `PyPI`_
-    * Bug reports and feature requests: `GitHub`_
-    * Help, support and discussions around the project: `GoogleGroup`_
-
-.. _PyPI: https://pypi.python.org/pypi/guidata
-.. _GitHub: https://github.com/PierreRaybaut/guidata
-.. _GoogleGroup: http://groups.google.fr/group/guidata_guiqwt
 """
 
-__version__ = "2.3.1"
+__version__ = "3.0.0"
 
 
 # Dear (Debian, RPM, ...) package makers, please feel free to customize the

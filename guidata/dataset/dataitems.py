@@ -6,11 +6,86 @@
 # (see guidata/__init__.py for details)
 
 """
-dataset.dataitems
-=================
+Data items
+----------
 
-The ``guidata.dataset.dataitems`` module contains implementation for
-concrete DataItems.
+Numeric items
+^^^^^^^^^^^^^
+
+.. autoclass:: FloatItem
+    :members:
+
+.. autoclass:: IntItem
+    :members:
+
+.. autoclass:: FloatArrayItem
+    :members:
+
+Text items
+^^^^^^^^^^
+
+.. autoclass:: StringItem
+    :members:
+
+.. autoclass:: TextItem
+    :members:
+
+Date and time items
+^^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: DateItem
+    :members:
+
+.. autoclass:: DateTimeItem
+    :members:
+
+Color items
+^^^^^^^^^^^
+
+.. autoclass:: ColorItem
+    :members:
+
+File items
+^^^^^^^^^^
+
+.. autoclass:: FileSaveItem
+    :members:
+
+.. autoclass:: FileOpenItem
+    :members:
+
+.. autoclass:: FilesOpenItem
+    :members:
+
+.. autoclass:: DirectoryItem
+    :members:
+
+Choice items
+^^^^^^^^^^^^
+
+.. autoclass:: BoolItem
+    :members:
+
+.. autoclass:: ChoiceItem
+    :members:
+
+.. autoclass:: MultipleChoiceItem
+    :members:
+
+.. autoclass:: ImageChoiceItem
+    :members:
+
+Other items
+^^^^^^^^^^^
+
+.. autoclass:: ButtonItem
+    :members:
+
+.. autoclass:: DictItem
+    :members:
+
+.. autoclass:: FontFamilyItem
+    :members:
 """
 
 import collections.abc
@@ -21,14 +96,13 @@ from typing import TYPE_CHECKING, Any, Callable, List, Optional, Tuple, Type, Un
 
 from guidata.config import _
 from guidata.dataset.datatypes import DataItem, DataSet, ItemProperty
+from guidata.dataset.iniio import UserConfigReader, UserConfigWriter
 from guidata.qthelpers import exec_dialog
-from guidata.userconfigio import UserConfigReader, UserConfigWriter
-from guidata.utils import add_extension, utf8_to_unicode
 from numpy import ndarray
 
 if TYPE_CHECKING:  # pragma: no cover
-    from guidata.hdf5io import HDF5Reader, HDF5Writer
-    from guidata.jsonio import JSONReader, JSONWriter
+    from guidata.dataset.hdf5io import HDF5Reader, HDF5Writer
+    from guidata.dataset.jsonio import JSONReader, JSONWriter
 
 
 class NumericTypeItem(DataItem):
@@ -460,7 +534,17 @@ class FileSaveItem(StringItem):
 
     def from_string(self, value) -> str:
         """Override DataItem method"""
-        return add_extension(self, value)
+        return self.add_extension(value)
+
+    def add_extension(self, value) -> str:
+        """Add extension to filename
+        `value`: possible value for data item"""
+        value = str(value)
+        formats = self.get_prop("data", "formats")
+        if len(formats) == 1 and formats[0] != "*":
+            if not value.endswith("." + formats[0]) and len(value) > 0:
+                return value + "." + formats[0]
+        return value
 
 
 class FileOpenItem(FileSaveItem):
@@ -536,7 +620,7 @@ class FilesOpenItem(FileSaveItem):
             value = eval(value)
         else:
             value = [value]
-        return [add_extension(self, path) for path in value]
+        return [self.add_extension(path) for path in value]
 
     def serialize(
         self,
@@ -631,16 +715,7 @@ class ChoiceItem(DataItem):
         else:
             key = idx
             value = choice_tuple
-
-        if isinstance(value, str):
-            value = utf8_to_unicode(value)
         return (key, value, None)
-
-    #    def _choices(self, item):
-    #        _choices_data = self.get_prop("data", "choices")
-    #        if callable(_choices_data):
-    #            return _choices_data(self, item)
-    #        return _choices_data
 
     def get_string_value(self, instance: "DataSet") -> str:
         """Override DataItem method"""
@@ -752,9 +827,6 @@ class ImageChoiceItem(ChoiceItem):
         else:
             key = idx
             value, img = choice_tuple
-
-        if isinstance(value, str):
-            value = utf8_to_unicode(value)
         return (key, value, img)
 
 
