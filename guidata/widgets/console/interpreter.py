@@ -16,7 +16,7 @@ import sys
 import threading
 from code import InteractiveConsole
 
-from guidata.utils import run_shell_command, getcwd_or_home, remove_backslashes
+from guidata.utils.misc import getcwd_or_home, remove_backslashes, run_shell_command
 from guidata.widgets.console.dochelpers import isdefined
 
 sys.path.insert(0, "")

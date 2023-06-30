@@ -26,7 +26,7 @@ from qtpy.QtWidgets import QMessageBox
 
 from guidata.config import CONF, _
 from guidata.qthelpers import create_action, get_std_icon, is_dark_mode
-from guidata.utils import getcwd_or_home, run_program
+from guidata.utils.misc import getcwd_or_home, run_program
 from guidata.widgets.console.dochelpers import getargtxt, getdoc, getobjdir, getsource
 from guidata.widgets.console.interpreter import Interpreter
 from guidata.widgets.console.shell import PythonShellWidget
