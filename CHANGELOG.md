@@ -1,5 +1,39 @@
 # guidata Releases #
 
+## Version 3.0.0 ##
+
+New major release:
+
+* Black code formatting on all Python files
+* New automated test suite:
+  * Added module `guidata.env` to handle execution environment
+  * Added support for an "unattended" execution mode (Qt loop is bypassed)
+  * Added support for pytest fixtures
+  * Added support for coverage testing: 70% coverage to date
+* Documentation was entirely rewritten using Sphinx
+* Reorganized modules:
+  * Moved `guidata.hd5io` to `guidata.dataset.hdf5io`
+  * Moved `guidata.jsonio` to `guidata.dataset.jsonio`
+  * Renamed `guidata.userconfigio` to `guidata.dataset.iniio`
+  * New package `guidata.utils` for utility functions:
+    * Removed deprecated or unused functions in old `guidata.utils` module
+    * Moved old `guidata.utils` module to `guidata.utils.misc`, except the
+      functions `update_dataset` and `restore_dataset` which are still in
+      `guidata.utils` (root module)
+    * Moved `guidata.encoding` to `guidata.utils.encoding`
+    * Moved `guidata.gettext_helpers` to `guidata.utils.gettext_helpers`
+  * Splitted `guidata.qtwidgets` in two modules:
+    * `guidata.widgets.dockable` for dockable widgets
+    * `guidata.widgets.rotatedlabel` for rotated label
+* Other changes:
+  * `guidata.guitest`:
+    * Added support for subpackages
+    * New comment directive (``# guitest: show``) to add test module to test suite or
+      to show test module in test launcher (this replaces the old ``SHOW = True`` line)
+  * `guidata.dataset.datatypes.DataSet`: new `create` class method for concise
+    dataset creation, allowing to create a dataset with a single line of code by
+    passing default item values as keyword arguments
+
 ## Version 2.3.1 ##
 
 Bug fixes:
