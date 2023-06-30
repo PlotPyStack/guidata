@@ -18,8 +18,8 @@ import os.path as osp
 
 import pytest
 
-from guidata.disthelpers import Distribution
 from guidata.env import execenv
+from guidata.utils.disthelpers import Distribution
 
 
 @pytest.mark.skip(reason="Currently not supporting Python > 3.6")

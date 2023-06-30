@@ -17,8 +17,8 @@ file.
 
 import os
 
+from guidata.dataset.hdf5io import HDF5Reader, HDF5Writer
 from guidata.env import execenv
-from guidata.hdf5io import HDF5Reader, HDF5Writer
 from guidata.qthelpers import qt_app_context
 from guidata.tests.test_all_items import Parameters
 

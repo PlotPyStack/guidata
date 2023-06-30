@@ -32,61 +32,29 @@ import sys
 import warnings
 
 import PIL.Image
-from qtpy.compat import getsavefilename
-from qtpy.QtCore import QAbstractTableModel, QDateTime, QModelIndex, Qt, Signal, Slot
-from qtpy.QtGui import QColor, QKeySequence
-from qtpy.QtWidgets import (
-    QAbstractItemDelegate,
-    QApplication,
-    QDateEdit,
-    QDateTimeEdit,
-    QDialog,
-    QHBoxLayout,
-    QInputDialog,
-    QItemDelegate,
-    QLineEdit,
-    QMenu,
-    QMessageBox,
-    QPushButton,
-    QTableView,
-    QVBoxLayout,
-    QWidget,
-)
-
 from guidata.config import CONF, _
 from guidata.configtools import get_font, get_icon
-from guidata.qthelpers import (
-    add_actions,
-    create_action,
-    mimedata2url,
-    win32_fix_title_bar_background,
-)
-from guidata.utils import getcwd_or_home
+from guidata.qthelpers import (add_actions, create_action, mimedata2url,
+                               win32_fix_title_bar_background)
+from guidata.utils.misc import getcwd_or_home
 from guidata.widgets.importwizard import ImportWizard
-from guidata.widgets.nsview import (
-    DataFrame,
-    DatetimeIndex,
-    FakeObject,
-    Image,
-    MaskedArray,
-    Series,
-    array,
-    display_to_value,
-    get_color_name,
-    get_human_readable_type,
-    get_object_attrs,
-    get_size,
-    get_type_string,
-    is_editable_type,
-    is_known_type,
-    ndarray,
-    np_savetxt,
-    sort_against,
-    try_to_eval,
-    unsorted_unique,
-    value_to_display,
-)
+from guidata.widgets.nsview import (DataFrame, DatetimeIndex, FakeObject,
+                                    Image, MaskedArray, Series, array,
+                                    display_to_value, get_color_name,
+                                    get_human_readable_type, get_object_attrs,
+                                    get_size, get_type_string,
+                                    is_editable_type, is_known_type, ndarray,
+                                    np_savetxt, sort_against, try_to_eval,
+                                    unsorted_unique, value_to_display)
 from guidata.widgets.texteditor import TextEditor
+from qtpy.compat import getsavefilename
+from qtpy.QtCore import (QAbstractTableModel, QDateTime, QModelIndex, Qt,
+                         Signal, Slot)
+from qtpy.QtGui import QColor, QKeySequence
+from qtpy.QtWidgets import (QAbstractItemDelegate, QApplication, QDateEdit,
+                            QDateTimeEdit, QDialog, QHBoxLayout, QInputDialog,
+                            QItemDelegate, QLineEdit, QMenu, QMessageBox,
+                            QPushButton, QTableView, QVBoxLayout, QWidget)
 
 if ndarray is not FakeObject:
     from guidata.widgets.arrayeditor import ArrayEditor

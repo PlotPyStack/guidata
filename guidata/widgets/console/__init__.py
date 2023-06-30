@@ -12,13 +12,12 @@ This package provides a Python console widget.
 
 """
 
-from qtpy.QtCore import Qt
-
-from guidata.widgets.console.internalshell import InternalShell
-from guidata.qtwidgets import DockableWidgetMixin
-from guidata.qthelpers import win32_fix_title_bar_background
-from guidata.configtools import get_font
 from guidata.config import CONF, _
+from guidata.configtools import get_font
+from guidata.qthelpers import win32_fix_title_bar_background
+from guidata.widgets.console.internalshell import InternalShell
+from guidata.widgets.dockable import DockableWidgetMixin
+from qtpy.QtCore import Qt
 
 
 class Console(InternalShell):

@@ -18,13 +18,17 @@ import re
 import textwrap
 from xml.sax.saxutils import escape
 
-from guidata import encoding
-from guidata.config import _
-from guidata.widgets.console.dochelpers import (getargspecfromtext, getobj,
-                                                getsignaturefromtext)
 from qtpy.QtCore import QPoint, QRegularExpression, Qt
 from qtpy.QtGui import QCursor, QTextCursor, QTextDocument
 from qtpy.QtWidgets import QApplication, QToolTip
+
+from guidata.config import _
+from guidata.utils import encoding
+from guidata.widgets.console.dochelpers import (
+    getargspecfromtext,
+    getobj,
+    getsignaturefromtext,
+)
 
 # Order is important:
 EOL_CHARS = (("\r\n", "nt"), ("\n", "posix"), ("\r", "mac"))
@@ -310,7 +314,7 @@ class BaseEditMixin(object):
         if text and not all_text:
             while text.endswith("\n"):
                 text = text[:-1]
-            while text.endswith(u"\u2029"):
+            while text.endswith("\u2029"):
                 text = text[:-1]
         return text
 
@@ -409,7 +413,7 @@ class BaseEditMixin(object):
         """Return line at *coordinates* (QPoint)"""
         cursor = self.cursorForPosition(coordinates)
         cursor.select(QTextCursor.BlockUnderCursor)
-        return str(cursor.selectedText()).replace(u"\u2029", "")
+        return str(cursor.selectedText()).replace("\u2029", "")
 
     def get_word_at(self, coordinates):
         """Return word at *coordinates* (QPoint)"""
@@ -444,7 +448,7 @@ class BaseEditMixin(object):
         the line separator characters returned by :py:meth:`get_line_separator`
         """
         return str(self.textCursor().selectedText()).replace(
-            u"\u2029", self.get_line_separator()
+            "\u2029", self.get_line_separator()
         )
 
     def remove_selected_text(self):
@@ -526,7 +530,7 @@ class BaseEditMixin(object):
         else:
             text = re.escape(str(text))
 
-        pattern = QRegularExpression(u"\\b{}\\b".format(text) if words else text)
+        pattern = QRegularExpression("\\b{}\\b".format(text) if words else text)
         if case:
             pattern.setPatternOptions(QRegularExpression.CaseInsensitiveOption)
 

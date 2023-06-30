@@ -26,10 +26,10 @@ from qtpy.QtCore import Property, QCoreApplication, Qt, QTimer, Signal, Slot
 from qtpy.QtGui import QKeyEvent, QTextCharFormat, QTextCursor
 from qtpy.QtWidgets import QApplication, QMenu, QToolTip
 
-from guidata import encoding
 from guidata.config import CONF, _
 from guidata.configtools import get_icon
 from guidata.qthelpers import add_actions, create_action, keybinding
+from guidata.utils import encoding
 from guidata.widgets.console.base import ConsoleBaseWidget
 from guidata.widgets.console.mixins import (
     BrowseHistoryMixin,
