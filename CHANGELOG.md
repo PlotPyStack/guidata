@@ -349,7 +349,7 @@ Other changes:
 * qtwidgets: removed ProgressPopUp dialog (it is now recommended to use QProgressDialog instead, which is pretty much identical)
 * Replaced QScintilla by spyderlib (as a dependency for array editor, code editor (test launcher) and dict editor)
 * qtwidgets.DockWidgetMixin: added method 'setup_dockwidget' to change dockwidget's features, location and allowed areas after class instantiation
-* guidata.utils.utf8_to_unicode: translated error message in english
+* guidata.utils.misc.utf8_to_unicode: translated error message in english
 * Add support for 'int' in hdf5 save function
 * guidata.dataset/Numeric items (FloatItem, IntItem): added option 'unit' (automatically add suffix ' (unit)' to label in edit mode and suffix ' unit' to value in read-only mode)
 * Improved dataset __str__ method: code refactoring with read-only dataset widgets (DataItem: added methods 'format_string' and 'get_string_value', DataSet: added method 'to_string')
