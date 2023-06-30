@@ -103,6 +103,7 @@ def get_translation(modname: str, dirname: str | None = None) -> Callable[[str],
     try:
         modlocpath = get_module_locale_path(dirname)
         try:
+            # pylint: disable=unexpected-keyword-arg
             _trans = gettext.translation(modname, modlocpath, codeset="utf-8")
         except TypeError:
             # Python >= 3.11 (codeset argument has been removed)
@@ -270,7 +271,7 @@ def get_image_layout(
         tuple[QW.QHBoxLayout, QW.QLabel]: layout, label
     """
     # Importing Qt here because this module should be independent from it
-    from qtpy import QtGui as QG  # pylint: disable=import-outside-toplevel
+    from qtpy import QtCore as QC  # pylint: disable=import-outside-toplevel
     from qtpy import QtWidgets as QW  # pylint: disable=import-outside-toplevel
 
     if alignment is None:
@@ -412,8 +413,8 @@ def get_pen(
         QG.QPen: pen
     """
     # Importing Qt here because this module should be independent from it
+    from qtpy import QtCore as QC  # pylint: disable=import-outside-toplevel
     from qtpy import QtGui as QG  # pylint: disable=import-outside-toplevel
-    from qtpy import QtWidgets as QW  # pylint: disable=import-outside-toplevel
 
     if "pen" not in option:
         option += "/pen"

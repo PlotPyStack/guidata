@@ -15,16 +15,17 @@ from guidata.guitest import get_tests
 
 def run_all_tests(args="", contains="", timeout=None):
     """Run all guidata tests"""
+    all_testmodules = get_tests(guidata, "batch")
     testmodules = [
         tmod
-        for tmod in get_tests(guidata)
+        for tmod in all_testmodules
         if not osp.samefile(tmod.path, __file__) and contains in tmod.path
     ]
     tnb = len(testmodules)
     print("*** guidata automatic unit tests ***")
     print("")
     print("Test parameters:")
-    print(f"  Selected {tnb} tests ({len(get_tests(guidata)) - 1} total available)")
+    print(f"  Selected {tnb} tests ({len(all_testmodules) - 1} total available)")
     print("  Environment:")
     for vname in ("PYTHONPATH", "DEBUG"):
         print(f"    {vname}={os.environ.get(vname, '')}")

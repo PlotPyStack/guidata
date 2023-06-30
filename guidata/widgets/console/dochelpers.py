@@ -78,7 +78,7 @@ def getdoc(obj):
     # multi-byte file encoding (which also covers ascii).
     try:
         docstring = str(docstring)
-    except:
+    except:  # pylint: disable=bare-except
         pass
 
     # Doc dict keys
@@ -103,25 +103,8 @@ def getdoc(obj):
             doc["note"] = "Function"
         doc["name"] = obj.__name__
         if inspect.isfunction(obj):
-            (
-                args,
-                varargs,
-                varkw,
-                defaults,
-                kwonlyargs,
-                kwonlydefaults,
-                annotations,
-            ) = inspect.getfullargspec(obj)
-            doc["argspec"] = inspect.formatargspec(
-                args,
-                varargs,
-                varkw,
-                defaults,
-                kwonlyargs,
-                kwonlydefaults,
-                annotations,
-                formatvalue=lambda o: "=" + repr(o),
-            )
+            sig = inspect.signature(obj)
+            doc["argspec"] = str(sig)
             if name == "<lambda>":
                 doc["name"] = name + " lambda "
                 doc["argspec"] = doc["argspec"][1:-1]  # remove parentheses
@@ -204,7 +187,7 @@ def getargspecfromtext(text):
     """
     Try to get the formatted argspec of a callable from the first block of its
     docstring
-    
+
     This will return something like
     '(foo, bar, k=1)'
     """

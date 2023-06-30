@@ -13,6 +13,8 @@ The `dockable` module provides a mixin class for widgets that can be docked
 into a QMainWindow.
 """
 
+from __future__ import annotations
+
 from qtpy.QtCore import Qt
 from qtpy.QtWidgets import QDockWidget, QWidget
 
@@ -30,18 +32,29 @@ class DockableWidgetMixin:
 
     def __init__(self):
         self._isvisible = False
-        self.dockwidget = None
+        self.dockwidget: QDockWidget | None = None
         self._allowed_areas = self.ALLOWED_AREAS
         self._location = self.LOCATION
         self._features = self.FEATURES
 
     @property
-    def parent_widget(self):
+    def parent_widget(self) -> QWidget | None:
         """Return associated QWidget parent"""
         return self.parent()
 
-    def setup_dockwidget(self, location=None, features=None, allowed_areas=None):
-        """Setup dockwidget parameters"""
+    def setup_dockwidget(
+        self,
+        location: Qt.DockWidgetArea | None = None,
+        features: QDockWidget.DockWidgetFeatures | None = None,
+        allowed_areas: Qt.DockWidgetAreas | None = None,
+    ) -> None:
+        """Setup dockwidget parameters
+
+        Args:
+            location (Qt.DockWidgetArea, optional): Dockwidget location
+            features (QDockWidget.DockWidgetFeatures, optional): Dockwidget features
+            allowed_areas (Qt.DockWidgetAreas, optional): Dockwidget allowed areas
+        """
         assert (
             self.dockwidget is None
         ), "Dockwidget must be setup before calling 'create_dockwidget'"
@@ -52,12 +65,19 @@ class DockableWidgetMixin:
         if allowed_areas is not None:
             self._allowed_areas = allowed_areas
 
-    def get_focus_widget(self):
+    def get_focus_widget(self) -> QWidget | None:
         """Return widget to focus when dockwidget is visible"""
-        pass
+        return None
 
-    def create_dockwidget(self, title):
-        """Add to parent QMainWindow as a dock widget"""
+    def create_dockwidget(self, title: str) -> tuple[QDockWidget, Qt.DockWidgetArea]:
+        """Add to parent QMainWindow as a dock widget
+
+        Args:
+            title (str): Dockwidget title
+
+        Returns:
+            tuple[QDockWidget, Qt.DockWidgetArea]: Dockwidget and location
+        """
         dock = QDockWidget(title, self.parent_widget)
         dock.setObjectName(self.__class__.__name__ + "_dw")
         dock.setAllowedAreas(self._allowed_areas)
@@ -67,12 +87,16 @@ class DockableWidgetMixin:
         self.dockwidget = dock
         return (dock, self._location)
 
-    def is_visible(self):
+    def is_visible(self) -> bool:
         """Return dockwidget visibility state"""
         return self._isvisible
 
-    def visibility_changed(self, enable):
-        """DockWidget visibility has changed"""
+    def visibility_changed(self, enable: bool) -> None:
+        """DockWidget visibility has changed
+
+        Args:
+            enable (bool): Dockwidget visibility state
+        """
         if enable:
             self.dockwidget.raise_()
             widget = self.get_focus_widget()
@@ -82,8 +106,12 @@ class DockableWidgetMixin:
 
 
 class DockableWidget(QWidget, DockableWidgetMixin):
-    """Dockable widget"""
+    """Dockable widget
 
-    def __init__(self, parent):
+    Args:
+        parent (QWidget): Parent widget
+    """
+
+    def __init__(self, parent: QWidget):
         QWidget.__init__(self, parent)
         DockableWidgetMixin.__init__(self)

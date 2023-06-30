@@ -324,7 +324,6 @@ class InternalShell(PythonShellWidget):
                 _("Remove references:"),
                 _("System commands:"),
                 _("Python help:"),
-                _("GUI-based editor:"),
             ),
         )
 

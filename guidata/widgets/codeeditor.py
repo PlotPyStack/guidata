@@ -359,4 +359,4 @@ if __name__ == "__main__":
     widget = CodeEditor(columns=80, rows=40)
     widget.set_text_from_file(__file__)
     widget.show()
-    exec_application(app)
+    app.exec()

@@ -122,7 +122,7 @@ class NumericTypeItem(DataItem):
     * check [bool]: if False, value is not checked (optional, default=True)
     """
 
-    type: Any = None
+    type: Callable = None
 
     def __init__(
         self,

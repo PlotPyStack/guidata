@@ -149,6 +149,9 @@
                 "/c",
                 "run_pylint.bat",
                 "--disable=fixme",
+                "--disable=C",
+                "--disable=R",
+                "--disable=W",
                 "guidata",
             ],
             "options": {
@@ -234,4 +237,5 @@
                 "Build documentation",
             ]
         },
-    }
+    ]
+}

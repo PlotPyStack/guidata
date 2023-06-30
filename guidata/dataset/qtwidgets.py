@@ -72,7 +72,6 @@ from guidata.qthelpers import win32_fix_title_bar_background
 
 if TYPE_CHECKING:  # pragma: no cover
     from guidata.dataset.datatypes import DataSetGroup
-    from guidata.dataset.qtitemwidgets import AbstractDataSetWidget
 
 
 class DataSetEditDialog(QDialog):
@@ -470,9 +469,6 @@ DataSetEditLayout.register(FloatArrayItem, FloatArrayWidget)
 DataSetEditLayout.register(ButtonItem, ButtonWidget)
 DataSetEditLayout.register(DictItem, ButtonWidget)
 
-
-if TYPE_CHECKING:  # pragma: no cover
-    from guidata.dataset.qtitemwidgets import AbstractDataSetWidget
 
 LABEL_CSS = """
 QLabel { font-weight: bold; color: blue }
