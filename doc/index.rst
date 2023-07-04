@@ -4,7 +4,7 @@ Welcome to :mod:`guidata`'s documentation!
 .. image:: images/guidata-banner.png
     :align: center
 
-Based on the Qt library `guidata` is a Python library generating graphical
+Based on the Qt library :mod:`guidata` is a Python library generating graphical
 user interfaces for easy dataset editing and display. It also provides helpers
 and application development tools for Qt.
 
@@ -17,6 +17,7 @@ External resources:
 .. _PyPI: https://pypi.python.org/pypi/guidata
 .. _GitHub: https://codra-ingenierie-informatique.github.io/guidata/
 
+.. module:: guidata
 
 Table of contents
 -----------------

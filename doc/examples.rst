@@ -36,7 +36,7 @@ Assigning values to data items or using these values is very easy : ::
 Other examples
 --------------
 
-A lot of examples are available in the `guidata` test module ::
+A lot of examples are available in the :mod:`guidata` test module ::
 
     from guidata import tests
     tests.run()
@@ -45,7 +45,7 @@ The two lines above execute the `guidata test launcher` :
 
 .. image:: images/screenshots/__init__.png
 
-All `guidata` items demo
+All :mod:`guidata` items demo
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. literalinclude:: ../guidata/tests/test_all_items.py
@@ -53,7 +53,7 @@ All `guidata` items demo
 
 .. image:: images/screenshots/all_items.png
 
-All (GUI-related) `guidata` features demo
+All (GUI-related) :mod:`guidata` features demo
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. literalinclude:: ../guidata/tests/test_all_features.py

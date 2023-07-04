@@ -3,7 +3,7 @@
 guidata
 =======
 
-Based on the Qt library `guidata` is a Python library generating graphical
+Based on the Qt library :mod:`guidata` is a Python library generating graphical
 user interfaces for easy dataset editing and display. It also provides helpers
 and application development tools for Qt.
 """
