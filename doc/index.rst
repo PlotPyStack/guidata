@@ -31,8 +31,8 @@ Table of contents
 
    overview
    installation
-   development
    examples
+   dev/index
    reference/index
 
 * :ref:`genindex`
