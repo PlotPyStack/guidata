@@ -1,7 +1,12 @@
 # -*- coding: utf-8 -*-
 
-import guidata
-from guidata.utils.genreqs import generate_requirement_tables
+import os
+import sys
+
+sys.path.insert(0, os.path.abspath(".."))
+
+import guidata  # noqa: E402
+from guidata.utils.genreqs import generate_requirement_tables  # noqa: E402
 
 generate_requirement_tables(guidata, ["Python>=3.7", "PyQt>=5.11"])
 
