@@ -13,8 +13,6 @@ call %FUNC% GetModName MODNAME
 call %FUNC% SetPythonPath
 call %FUNC% UsePython
 if exist MANIFEST ( del /q MANIFEST )
-python setup.py sdist bdist_wheel
-del %MODNAME%\*.chm
-python setup.py build sdist
+python -m build
 rmdir /s /q %LIBNAME%.egg-info
 call %FUNC% EndOfScript
