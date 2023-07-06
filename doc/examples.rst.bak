@@ -1,0 +1,124 @@
+.. _examples:
+
+Examples
+========
+
+Basic example
+-------------
+
+Source code :
+
+<<<<<<< HEAD
+.. literalinclude:: basic_example.py
+=======
+ import guidata
+ _app = guidata.qapplication() # not required if a QApplication has already been created
+
+ import guidata.dataset.datatypes as dt
+ import guidata.dataset.dataitems as di
+
+ class Processing(dt.DataSet):
+     """Example"""
+     a = di.FloatItem("Parameter #1", default=2.3)
+     b = di.IntItem("Parameter #2", min=0, max=10, default=5)
+     type = di.ChoiceItem("Processing algorithm",
+                          ("type 1", "type 2", "type 3"))
+
+ param = Processing()
+ param.edit()
+
+Output :
+
+.. image:: images/basic_example.png
+
+Assigning values to data items or using these values is very easy : ::
+
+ param.a = 5.34
+ param.type = "type 3"
+ print "a*b =", param.a*param.b
+>>>>>>> origin/master
+
+
+Other examples
+--------------
+
+A lot of examples are available in the :mod:`guidata` test module ::
+
+    from guidata import tests
+    tests.run()
+
+The two lines above execute the `guidata test launcher` :
+
+.. image:: images/screenshots/__init__.png
+
+All :mod:`guidata` items demo
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+<<<<<<< HEAD
+.. literalinclude:: ../guidata/tests/test_all_items.py
+=======
+.. literalinclude:: ../guidata/tests/all_items.py
+>>>>>>> origin/master
+   :start-after: guitest:
+
+.. image:: images/screenshots/all_items.png
+
+All (GUI-related) :mod:`guidata` features demo
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+<<<<<<< HEAD
+.. literalinclude:: ../guidata/tests/test_all_features.py
+=======
+.. literalinclude:: ../guidata/tests/all_features.py
+>>>>>>> origin/master
+   :start-after: guitest:
+
+.. image:: images/screenshots/all_features.png
+
+Embedding guidata objects in GUI layouts
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+<<<<<<< HEAD
+.. literalinclude:: ../guidata/tests/test_editgroupbox.py
+=======
+.. literalinclude:: ../guidata/tests/editgroupbox.py
+>>>>>>> origin/master
+   :start-after: guitest:
+
+.. image:: images/screenshots/editgroupbox.png
+
+Data item groups and group selection
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+<<<<<<< HEAD
+.. literalinclude:: ../guidata/tests/test_bool_selector.py
+=======
+.. literalinclude:: ../guidata/tests/bool_selector.py
+>>>>>>> origin/master
+   :start-after: guitest:
+
+.. image:: images/screenshots/bool_selector.png
+
+Activable data sets
+^^^^^^^^^^^^^^^^^^^
+
+<<<<<<< HEAD
+.. literalinclude:: ../guidata/tests/test_activable_dataset.py
+=======
+.. literalinclude:: ../guidata/tests/activable_dataset.py
+>>>>>>> origin/master
+   :start-after: guitest:
+
+.. image:: images/screenshots/activable_dataset.png
+
+Data set groups
+^^^^^^^^^^^^^^^
+
+<<<<<<< HEAD
+.. literalinclude:: ../guidata/tests/test_datasetgroup.py
+=======
+.. literalinclude:: ../guidata/tests/datasetgroup.py
+>>>>>>> origin/master
+   :start-after: guitest:
+
+.. image:: images/screenshots/datasetgroup.png
