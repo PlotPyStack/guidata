@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright © 2009 CEA, Pierre Raybaut
-# Licensed under the terms of the CECILL License
-# (see guidata/__init__.py for details)
+# Licensed under the terms of the BSD 3-Clause
+# (see guidata/LICENSE for details)
 
 """
 guidata
@@ -13,9 +12,6 @@ Set of basic GUIs to edit and display objects of many kinds:
     - ndarrays (NumPy's n-dimensional arrays) ;
     - etc.
 
-Copyright © 2009 CEA, Pierre Raybaut
-Licensed under the terms of the CECILL License
-(see guidata/__init__.py for details)
 """
 
 

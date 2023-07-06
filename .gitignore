@@ -9,6 +9,9 @@ doctmp/
 *.stats
 .venv
 test.json
+doc/install_requires.txt
+doc/extras_require-dev.txt
+doc/extras_require-doc.txt
 
 # Created by https://www.gitignore.io/api/python
 

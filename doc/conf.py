@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import guidata
+from guidata.utils.genreqs import generate_requirement_tables
+
+generate_requirement_tables(guidata, ["Python>=3.7", "PyQt>=5.11"])
 
 project = "guidata"
 copyright = "2009 CEA - Commissariat à l'Energie Atomique et aux Energies Alternatives"

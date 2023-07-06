@@ -1,10 +1,9 @@
 Reference
 ---------
 
-guidata API:
-
 .. toctree::
    :maxdepth: 2
+   :caption: Contents:
 
    dataset/index
    utils

@@ -1,10 +1,9 @@
 Data set features
 =================
 
-Public API:
-
 .. toctree::
    :maxdepth: 2
+   :caption: Contents:
 
    datatypes
    dataitems

@@ -4,6 +4,7 @@
 
 New major release:
 
+* New BSD 3-Clause License
 * Black code formatting on all Python files
 * New automated test suite:
   * Added module `guidata.env` to handle execution environment
