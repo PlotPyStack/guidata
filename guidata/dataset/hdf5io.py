@@ -4,7 +4,19 @@
 # (see guidata/LICENSE for details)
 
 """
-Reader and Writer for the serialization of DataSets into HDF5 files
+HDF5 files (.h5)
+^^^^^^^^^^^^^^^^
+
+Reader and writer for the serialization of data sets into .h5 files:
+
+* :py:class:`HDF5Reader`
+* :py:class:`HDF5Writer`
+
+.. autoclass:: HDF5Reader
+    :members:
+
+.. autoclass:: HDF5Writer
+    :members:
 """
 
 from __future__ import annotations

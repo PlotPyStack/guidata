@@ -7,7 +7,19 @@
 # (see codraft/LICENSE for details)
 
 """
-Reader and Writer for the serialization of DataSets into JSON files
+JSON files (.json)
+^^^^^^^^^^^^^^^^^^
+
+Reader and writer for the serialization of data sets into .json files:
+
+* :py:class:`JSONReader`
+* :py:class:`JSONWriter`
+
+.. autoclass:: JSONReader
+    :members:
+
+.. autoclass:: JSONWriter
+    :members:
 """
 
 # pylint: disable=invalid-name  # Allows short reference names like x, y, ...

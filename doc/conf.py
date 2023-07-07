@@ -22,6 +22,7 @@ extensions = [
     "sphinx.ext.mathjax",
     "sphinx_copybutton",
     "sphinx.ext.napoleon",
+    "sphinx_qt_documentation",
 ]
 templates_path = ["_templates"]
 source_suffix = ".rst"
@@ -31,6 +32,12 @@ exclude_trees = []
 pygments_style = "sphinx"
 modindex_common_prefix = ["guidata."]
 autodoc_member_order = "bysource"
+
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3", None),
+    "numpy": ("https://numpy.org/doc/stable/", None),
+    "h5py": ("https://docs.h5py.org/en/stable/", None),
+}
 
 html_theme = "classic"
 html_title = "%s %s Manual" % (project, version)

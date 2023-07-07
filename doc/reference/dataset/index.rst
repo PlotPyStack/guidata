@@ -7,4 +7,5 @@ Data set features
 
    datatypes
    dataitems
+   io
    qtwidgets

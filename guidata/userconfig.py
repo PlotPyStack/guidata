@@ -29,13 +29,26 @@
 
 
 """
-userconfig
-----------
+User configuration management
+-----------------------------
 
 The ``guidata.userconfig`` module provides user configuration file (.ini file)
 management features based on ``ConfigParser`` (standard Python library).
 
 It is the exact copy of the open-source package `userconfig` (MIT license).
+
+This module provides the following functions and classes:
+
+* :py:func:`get_home_dir`: return user home directory
+* :py:func:`get_config_basedir`: return user configuration base directory
+* :py:class:`UserConfig`: user configuration file management class
+
+.. autofunction:: get_home_dir
+
+.. autofunction:: get_config_basedir
+
+.. autoclass:: UserConfig
+    :members:
 """
 
 import configparser as cp

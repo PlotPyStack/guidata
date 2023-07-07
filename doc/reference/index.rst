@@ -8,4 +8,5 @@ Reference
    dataset/index
    utils
    widgets
+   userconfig
    guitest

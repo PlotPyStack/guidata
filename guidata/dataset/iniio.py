@@ -4,11 +4,33 @@
 # (see guidata/LICENSE for details)
 
 """
-Reader and Writer for the serialization of DataSets into .ini files,
-using the open-source `userconfig` Python package
+Base classes for I/O handlers
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-UserConfig reader/writer objects
-(see guidata.hdf5io for another example of reader/writer)
+Base classes for writing custom readers and writers:
+
+* :py:class:`BaseIOHandler`
+* :py:class:`WriterMixin`
+
+.. autoclass:: BaseIOHandler
+    :members:
+
+.. autoclass:: WriterMixin
+    :members:
+
+Configuration files (.ini)
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Reader and writer for the serialization of data sets into .ini files:
+
+* :py:class:`UserConfigReader`
+* :py:class:`UserConfigWriter`
+
+.. autoclass:: UserConfigReader
+    :members:
+
+.. autoclass:: UserConfigWriter
+    :members:
 """
 
 from __future__ import annotations
