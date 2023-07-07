@@ -1,5 +1,12 @@
 # guidata Releases #
 
+## Version 3.0.1 (work in progress) ##
+
+Bug fixes:
+
+* Fixed documentation generation ``.readthedocs.yaml`` file (Qt 5.15 was not
+  installed on ReadTheDocs servers, causing documentation build to fail)
+
 ## Version 3.0.0 ##
 
 New major release:
