@@ -56,31 +56,23 @@ Handling item properties
 # pylint: disable-msg=W0622
 # pylint: disable-msg=W0212
 
-import collections.abc
+from __future__ import annotations
+
 import re
 import sys
 from abc import abstractmethod
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    Callable,
-    Dict,
-    List,
-    Optional,
-    Tuple,
-    Type,
-    Union,
-)
+from collections.abc import Callable
+from typing import TYPE_CHECKING, Any
 
 from guidata.dataset.iniio import UserConfigReader, UserConfigWriter
-from guidata.qthelpers import exec_dialog
 from guidata.userconfig import UserConfig
 from guidata.utils import update_dataset
-from qtpy.QtWidgets import QWidget
 
 DEBUG_DESERIALIZE = False
 
 if TYPE_CHECKING:  # pragma: no cover
+    from qtpy.QtWidgets import QWidget
+
     from guidata.dataset.hdf5io import HDF5Reader, HDF5Writer
     from guidata.dataset.jsonio import JSONReader, JSONWriter
     from guidata.dataset.qtwidgets import DataSetEditDialog
@@ -91,18 +83,29 @@ class NoDefault:
 
 
 class ItemProperty:
+    """Base class for item properties
+
+    Args:
+        callable (Callable): callable to use to evaluate the value of the property
+    """
+
     def __init__(self, callable: Callable) -> None:
         self.callable = callable
 
-    def __call__(self, instance: "DataSet", item: Any, value: Any) -> Any:
+    def __call__(self, instance: DataSet, item: Any, value: Any) -> Any:
         """Evaluate the value of the property given, the instance,
         the item and the value maintained in the instance by the item"""
         return self.callable(instance, item, value)
 
-    def set(self, instance: "DataSet", item: Any, value: Any) -> Any:
+    def set(self, instance: DataSet, item: Any, value: Any) -> Any:
         """Sets the value of the property given an instance, item and value
         Depending on implementation the value will be stored either on the
         instance, item or self
+
+        Args:
+            instance (DataSet): instance of the DataSet
+            item (Any): item to set the value of
+            value (Any): value to set
         """
         raise NotImplementedError
 
@@ -112,9 +115,14 @@ FMT_GROUPS = re.compile(r"(?<!%)%\((\w+)\)")
 
 class FormatProp(ItemProperty):
     """A Property that returns a string to help
-    custom read-only representation of items"""
+    custom read-only representation of items
 
-    def __init__(self, fmt: str, ignore_error: Optional[bool] = True) -> None:
+    Args:
+        fmt (str): format string
+        ignore_error (bool, optional): ignore errors when formatting. Defaults to True.
+    """
+
+    def __init__(self, fmt: str, ignore_error: bool | None = True) -> None:
         """fmt is a format string
         it can contain a single anonymous substition or
         several named substitions.
@@ -123,7 +131,7 @@ class FormatProp(ItemProperty):
         self.ignore_error = ignore_error
         self.attrs = FMT_GROUPS.findall(fmt)
 
-    def __call__(self, instance: "DataSet", item: "DataItem", value: Any) -> Any:
+    def __call__(self, instance: DataSet, item: DataItem, value: Any) -> Any:
         if not self.attrs:
             return self.fmt.format(value)
         dic = {}
@@ -139,57 +147,85 @@ class FormatProp(ItemProperty):
 
 class GetAttrProp(ItemProperty):
     """A property that matches the value of
-    an instance's attribute"""
+    an instance's attribute
+
+    Args:
+        attr (str): attribute to match
+    """
 
     def __init__(self, attr: str) -> None:
         self.attr = attr
 
-    def __call__(self, instance: "DataSet", item: "DataItem", value: Any) -> Any:
+    def __call__(self, instance: DataSet, item: DataItem, value: Any) -> Any:
         val = getattr(instance, self.attr)
         return val
 
-    def set(self, instance: "DataSet", item: "DataItem", value: Any) -> None:
+    def set(self, instance: DataSet, item: DataItem, value: Any) -> None:
         setattr(instance, self.attr, value)
 
 
 class ValueProp(ItemProperty):
-    """A property that retrieves a value stored elsewhere"""
+    """A property that retrieves a value stored elsewhere
+
+    Args:
+        value (Any): value to store
+    """
 
     def __init__(self, value: Any) -> None:
         self.value = value
 
-    def __call__(self, instance: "DataSet", item: "DataItem", value: Any) -> Any:
+    def __call__(self, instance: DataSet, item: DataItem, value: Any) -> Any:
         return self.value
 
-    def set(self, instance: "DataSet", item: "DataItem", value: Any) -> None:
+    def set(self, instance: DataSet, item: DataItem, value: Any) -> None:
+        """Sets the value of the property given an instance, item and value
+
+        Args:
+            instance (DataSet): instance of the DataSet
+            item (Any): item to set the value of
+            value (Any): value to set
+        """
         self.value = value
 
 
 class NotProp(ItemProperty):
-    """Not property"""
+    """Not property
+
+    Args:
+        prop (ItemProperty): property to negate
+    """
 
     def __init__(self, prop: ItemProperty):
         self.property = prop
 
-    def __call__(self, instance: "DataSet", item: "DataItem", value: Any) -> Any:
+    def __call__(self, instance: DataSet, item: DataItem, value: Any) -> Any:
         return not self.property(instance, item, value)
 
-    def set(self, instance: "DataSet", item: "DataItem", value: Any) -> None:
+    def set(self, instance: DataSet, item: DataItem, value: Any) -> None:
+        """Sets the value of the property given an instance, item and value
+
+        Args:
+            instance (DataSet): instance of the DataSet
+            item (Any): item to set the value of
+            value (Any): value to set
+        """
         self.property.set(instance, item, not value)
 
 
 class FuncProp(ItemProperty):
     """An 'operator property'
-    prop: ItemProperty instance
-    func: function
-    invfunc: inverse function (optional)
+
+    Args:
+        prop (ItemProperty): property to apply function to
+        func (function): function to apply
+        invfunc (function, optional): inverse function (default: func)
     """
 
     def __init__(
         self,
         prop: ItemProperty,
         func: Callable,
-        invfunc: Optional[Callable] = None,
+        invfunc: Callable | None = None,
     ) -> None:
         self.property = prop
         self.function = func
@@ -197,20 +233,28 @@ class FuncProp(ItemProperty):
             invfunc = func
         self.inverse_function = invfunc
 
-    def __call__(self, instance: "DataSet", item: "DataItem", value: Any) -> Any:
+    def __call__(self, instance: DataSet, item: DataItem, value: Any) -> Any:
         return self.function(self.property(instance, item, value))
 
-    def set(self, instance: "DataSet", item: "DataItem", value: Any) -> None:
+    def set(self, instance: DataSet, item: DataItem, value: Any) -> None:
+        """Sets the value of the property given an instance, item and value
+
+        Args:
+            instance (DataSet): instance of the DataSet
+            item (Any): item to set the value of
+            value (Any): value to set
+        """
         self.property.set(instance, item, self.inverse_function(value))
 
 
 class DataItem:
-    """
-    DataSet data item
+    """DataSet data item
 
-    `label` : string
-    `default` : any type, optional
-    `help` : string Text displayed on data item's tooltip
+    Args:
+        label (str): item label
+        default (Any, optional): default value
+        help (str, optional): text displayed on data item's tooltip
+        check (bool, optional): check value (default: True)
     """
 
     count = 0
@@ -218,23 +262,32 @@ class DataItem:
     def __init__(
         self,
         label: str,
-        default: Optional[Any] = None,
-        help: Optional[str] = "",
-        check: Optional[bool] = True,
+        default: Any | None = None,
+        help: str | None = "",
+        check: bool | None = True,
     ) -> None:
         self._order = DataItem.count
         DataItem.count += 1
-        self._name: Optional[str] = None
+        self._name: str | None = None
         self._default = default
         self._help = help
-        self._props: Dict[
+        self._props: dict[
             Any, Any
         ] = {}  # a dict realm->dict containing realm-specific properties
         self.set_prop("display", col=0, colspan=None, row=None, label=label)
         self.set_prop("data", check_value=check)
 
     def get_prop(self, realm: str, name: str, default: Any = NoDefault) -> Any:
-        """Get one property of this item"""
+        """Get one property of this item
+
+        Args:
+            realm (str): realm name
+            name (str): property name
+            default (Any, optional): default value (default: NoDefault)
+
+        Returns:
+            Any: property value
+        """
         prop = self._props.get(realm)
         if not prop:
             prop = {}
@@ -243,22 +296,41 @@ class DataItem:
         return prop.get(name, default)
 
     def get_prop_value(
-        self, realm: str, instance: "DataSet", name: str, default: Any = NoDefault
+        self, realm: str, instance: DataSet, name: str, default: Any = NoDefault
     ) -> Any:
+        """Get one property of this item
+
+        Args:
+            realm (str): realm name
+            instance (DataSet): instance of the DataSet
+            name (str): property name
+            default (Any, optional): default value (default: NoDefault)
+
+        Returns:
+            Any: property value
+        """
         value = self.get_prop(realm, name, default)
         if isinstance(value, ItemProperty):
             return value(instance, self, self.get_value(instance))
         else:
             return value
 
-    def set_prop(self, realm: str, **kwargs) -> "DataItem":
-        """Set one or several properties using
-        the syntax set_prop(name1=value1, ..., nameX=valueX)
+    def set_prop(self, realm: str, **kwargs) -> DataItem:
+        """Set one or several properties using the syntax::
 
-        it returns self so that we can assign to the result like this:
+            set_prop(name1=value1, ..., nameX=valueX)
 
-        item = Item().set_prop(x=y)
-        """
+        It returns self so that we can assign to the result like this::
+
+            item = Item().set_prop(x=y)
+
+        Args:
+            realm (str): realm name
+            \*\*kwargs: properties to set
+
+        Returns:
+            DataItem: self
+        """  # noqa
         prop = self._props.get(realm)
         if not prop:
             prop = {}
@@ -267,10 +339,14 @@ class DataItem:
         return self
 
     def set_pos(
-        self, col: int = 0, colspan: Optional[int] = None, row: Optional[int] = None
-    ) -> "DataItem":
-        """
-        Set data item's position on a GUI layout
+        self, col: int = 0, colspan: int | None = None, row: int | None = None
+    ) -> DataItem:
+        """Set data item's position on a GUI layout
+
+        Args:
+            col (int, optional): column number (default: 0)
+            colspan (int, optional): number of columns (default: None)
+            row (int, optional): row number (default: None)
         """
         self.set_prop("display", col=col, colspan=colspan, row=row)
         return self
@@ -278,9 +354,14 @@ class DataItem:
     def __str__(self) -> str:
         return "%s : %s" % (self._name, self.__class__.__name__)
 
-    def get_help(self, instance: "DataSet") -> str:
-        """
-        Return data item's tooltip
+    def get_help(self, instance: DataSet) -> str:
+        """Return data item's tooltip
+
+        Args:
+            instance (DataSet): instance of the DataSet
+
+        Returns:
+            str: tooltip
         """
         auto_help = self.get_auto_help(instance)
         help = self._help
@@ -291,20 +372,40 @@ class DataItem:
                 help = auto_help.capitalize()
         return help
 
-    def get_auto_help(self, instance: "DataSet") -> str:
-        """
-        Return the automatically generated part of data item's tooltip
+    def get_auto_help(self, instance: DataSet) -> str:
+        """Return the automatically generated part of data item's tooltip
+
+        Args:
+            instance (DataSet): instance of the DataSet
+
+        Returns:
+            str: automatically generated part of tooltip
         """
         return ""
 
     def format_string(self, instance: Any, value: Any, fmt: str, func: Callable) -> str:
-        """Apply format to string representation of the item's value"""
+        """Apply format to string representation of the item's value
+
+        Args:
+            instance (Any): instance of the DataSet
+            value (Any): item's value
+            fmt (str): format string
+            func (Callable): function to apply to the value before formatting
+
+        Returns:
+            str: formatted string
+        """
         return fmt % (func(value),)
 
-    def get_string_value(self, instance: "DataSet") -> str:
-        """
-        Return a formatted unicode representation of the item's value
+    def get_string_value(self, instance: DataSet) -> str:
+        """Return a formatted unicode representation of the item's value
         obeying 'display' or 'repr' properties
+
+        Args:
+            instance (DataSet): instance of the DataSet
+
+        Returns:
+            str: formatted string
         """
         value = self.get_value(instance)
         repval = self.get_prop_value("display", instance, "repr", None)
@@ -314,7 +415,7 @@ class DataItem:
             fmt = self.get_prop_value("display", instance, "format", "%s")
             func = self.get_prop_value("display", instance, "func", lambda x: x)
             if (
-                isinstance(fmt, collections.abc.Callable)  # type:ignore
+                isinstance(fmt, Callable)  # type:ignore
                 and value is not None
             ):
                 return fmt(func(value))
@@ -325,33 +426,41 @@ class DataItem:
             return text
 
     def set_name(self, new_name: str) -> None:
-        """
-        Set data item's name
+        """Set data item's name
+
+        Args:
+            new_name (str): new name
         """
         self._name = new_name
 
     def set_help(self, new_help: str) -> None:
-        """
-        Set data item's help text
+        """Set data item's help text
+
+        Args:
+            new_help (str): new help text
         """
         self._help = new_help
 
-    def set_from_string(self, instance: "DataSet", string_value: str) -> None:
-        """
-        Set data item's value from specified string
+    def set_from_string(self, instance: DataSet, string_value: str) -> None:
+        """Set data item's value from specified string
+
+        Args:
+            instance (DataSet): instance of the DataSet
+            string_value (str): string value
         """
         value = self.from_string(string_value)
         self.__set__(instance, value)
 
-    def set_default(self, instance: "DataSet") -> None:
-        """
-        Set data item's value to default
+    def set_default(self, instance: DataSet) -> None:
+        """Set data item's value to default
+
+        Args:
+            instance (DataSet): instance of the DataSet
         """
         self.__set__(instance, self._default)
 
     def accept(self, visitor: object) -> None:
-        """
-        This is the visitor pattern's accept function.
+        """This is the visitor pattern's accept function.
         It calls the corresponding visit_MYCLASS method
         of the visitor object.
 
@@ -359,6 +468,9 @@ class DataItem:
         this method so there's no need to write an accept function
         for each derived class unless you need to override the
         default behavior
+
+        Args:
+            visitor (object)
         """
         funcname = "visit_" + self.__class__.__name__
         func = getattr(visitor, funcname)
@@ -367,74 +479,111 @@ class DataItem:
     def __set__(self, instance: Any, value: Any):
         setattr(instance, "_%s" % (self._name), value)
 
-    def __get__(self, instance: Any, klass: type) -> Optional[Any]:
+    def __get__(self, instance: Any, klass: type) -> Any | None:
         if instance is not None:
             return getattr(instance, "_%s" % (self._name), self._default)
         else:
             return self
 
     def get_value(self, instance: Any) -> Any:
-        """
-        Return data item's value
+        """Return data item's value
+
+        Args:
+            instance (Any): instance of the DataSet
+
+        Returns:
+            Any: data item's value
         """
         return self.__get__(instance, instance.__class__)
 
     def check_item(self, instance: Any) -> Any:
-        """
-        Check data item's current value (calling method check_value)
+        """Check data item's current value (calling method check_value)
+
+        Args:
+            instance (Any): instance of the DataSet
+
+        Returns:
+            Any: data item's value
         """
         value = getattr(instance, "_%s" % (self._name))
         return self.check_value(value)
 
     def check_value(self, value: Any) -> Any:
-        """
-        Check if `value` is valid for this data item
+        """Check if `value` is valid for this data item
+
+        Args:
+            value (Any): value to check
+
+        Returns:
+            Any: value
         """
         raise NotImplementedError()
 
     def from_string(self, string_value: str) -> Any:
-        """
-        Transform string into valid data item's value
+        """Transform string into valid data item's value
+
+        Args:
+            string_value (str): string value
+
+        Returns:
+            Any: data item's value
         """
         raise NotImplementedError()
 
-    def bind(self, instance: "DataSet") -> "DataItemVariable":
-        """
-        Return a DataItemVariable instance bound to the data item
+    def bind(self, instance: DataSet) -> DataItemVariable:
+        """Return a DataItemVariable instance bound to the data item
+
+        Args:
+            instance (DataSet): instance of the DataSet
+
+        Returns:
+            DataItemVariable: DataItemVariable instance
         """
         return DataItemVariable(self, instance)
 
     def serialize(
         self,
-        instance: "DataSet",
-        writer: Union["HDF5Writer", "JSONWriter", "UserConfigWriter"],
+        instance: DataSet,
+        writer: HDF5Writer | JSONWriter | UserConfigWriter,
     ) -> None:
         """Serialize this item using the writer object
 
-        this is a default implementation that should work for
+        This is a default implementation that should work for
         everything but new datatypes
+
+        Args:
+            instance (DataSet): instance of the DataSet
+            writer (HDF5Writer | JSONWriter | UserConfigWriter): writer object
         """
         value = self.get_value(instance)
         writer.write(value)
 
     def get_value_from_reader(
-        self, reader: Union["HDF5Reader", "JSONReader", "UserConfigReader"]
+        self, reader: HDF5Reader | JSONReader | UserConfigReader
     ) -> Any:
         """Reads value from the reader object, inside the try...except
         statement defined in the base item `deserialize` method
 
-        This method is reimplemented in some child classes"""
+        This method is reimplemented in some child classes
+
+        Args:
+            reader (HDF5Reader | JSONReader | UserConfigReader): reader object
+        """
         return reader.read_any()
 
     def deserialize(
         self,
         instance: Any,
-        reader: Union["HDF5Reader", "JSONReader", "UserConfigReader"],
+        reader: HDF5Reader | JSONReader | UserConfigReader,
     ) -> None:
         """Deserialize this item using the reader object
 
         Default base implementation supposes the reader can
         detect expected datatype from the stream
+
+        Args:
+            instance (Any): instance of the DataSet
+            reader (HDF5Reader | JSONReader | UserConfigReader): reader object
         """
         try:
             value = self.get_value_from_reader(reader)
@@ -465,10 +614,14 @@ class ObjectItem(DataItem):
     """Simple helper class implementing default
     for composite objects"""
 
-    klass: Optional[Type] = None
+    klass: type | None = None
 
-    def set_default(self, instance: "DataSet") -> None:
-        """Make a copy of the default value"""
+    def set_default(self, instance: DataSet) -> None:
+        """Make a copy of the default value
+
+        Args:
+            instance (DataSet): instance of the DataSet
+        """
         if self.klass is not None:
             value = self.klass()
             if self._default is not None:
@@ -477,12 +630,16 @@ class ObjectItem(DataItem):
 
     def deserialize(
         self,
-        instance: "DataSet",
-        reader: Union["HDF5Reader", "JSONReader", "UserConfigReader"],
+        instance: DataSet,
+        reader: HDF5Reader | JSONReader | UserConfigReader,
     ) -> None:
         """Deserialize this item using the reader object
 
         We build a new default object and deserialize it
+
+        Args:
+            instance (DataSet): instance of the DataSet
+            reader (HDF5Reader | JSONReader | UserConfigReader): reader object
         """
         if self.klass is not None:
             value = self.klass()
@@ -496,73 +653,172 @@ class DataItemProxy:
 
     This class is needed to construct GroupItem class
     (see module guidata.qtwidgets)
+
+    Args:
+        item (DataItem): data item to proxy
     """
 
-    def __init__(self, item: "DataItem"):
+    def __init__(self, item: DataItem):
         self.item = item
 
     def __str__(self):
         return self.item._name + "_proxy: " + self.__class__.__name__
 
-    def get_help(self, instance: "DataSet") -> str:
-        """DataItem method proxy"""
+    def get_help(self, instance: DataSet) -> str:
+        """DataItem method proxy
+
+        Args:
+            instance (DataSet): instance of the DataSet
+
+        Returns:
+            str: help string
+        """
         return self.item.get_help(instance)
 
-    def get_auto_help(self, instance: "DataSet") -> str:
-        """DataItem method proxy"""
+    def get_auto_help(self, instance: DataSet) -> str:
+        """DataItem method proxy
+
+        Args:
+            instance (DataSet): instance of the DataSet
+
+        Returns:
+            str: help string
+        """
         return self.item.get_auto_help(instance)
 
-    def get_string_value(self, instance: "DataSet") -> str:
-        """DataItem method proxy"""
+    def get_string_value(self, instance: DataSet) -> str:
+        """DataItem method proxy
+
+        Args:
+            instance (DataSet): instance of the DataSet
+
+        Returns:
+            str: string value
+        """
         return self.item.get_string_value(instance)
 
-    def set_from_string(self, instance: "DataSet", string_value: str) -> None:
-        """DataItem method proxy"""
+    def set_from_string(self, instance: DataSet, string_value: str) -> None:
+        """DataItem method proxy
+
+        Args:
+            instance (DataSet): instance of the DataSet
+            string_value (str): string value
+        """
         self.item.set_from_string(instance, string_value)
 
-    def set_default(self, instance: "DataSet") -> None:
-        """DataItem method proxy"""
+    def set_default(self, instance: DataSet) -> None:
+        """DataItem method proxy
+
+        Args:
+            instance (DataSet): instance of the DataSet
+        """
         self.item.set_default(instance)
 
     def __set__(self, instance: Any, value: Any):
         pass
 
-    def accept(self, visitor: "object") -> None:
-        """DataItem method proxy"""
+    def accept(self, visitor: object) -> None:
+        """DataItem method proxy
+
+        Args:
+            visitor (object): visitor object
+        """
         self.item.accept(visitor)
 
-    def get_value(self, instance: "DataItem") -> Any:
-        """DataItem method proxy"""
+    def get_value(self, instance: DataItem) -> Any:
+        """DataItem method proxy
+
+        Args:
+            instance (DataItem): instance of the DataItem
+
+        Returns:
+            Any: value
+        """
         return self.item.get_value(instance)
 
-    def check_item(self, instance: "DataItem") -> Any:
-        """DataItem method proxy"""
+    def check_item(self, instance: DataItem) -> Any:
+        """DataItem method proxy
+
+        Args:
+            instance (DataItem): instance of the DataItem
+
+        Returns:
+            Any: value
+        """
         return self.item.check_item(instance)
 
     def check_value(self, value: Any) -> Any:
-        """DataItem method proxy"""
+        """DataItem method proxy
+
+        Args:
+            value (Any): value
+
+        Returns:
+            Any: value
+        """
         return self.item.check_value(value)
 
     def from_string(self, string_value: str) -> Any:
-        """DataItem method proxy"""
+        """DataItem method proxy
+
+        Args:
+            string_value (str): string value
+
+        Returns:
+            Any: value
+        """
         return self.item.from_string(string_value)
 
     def get_prop(self, realm: str, name: str, default=NoDefault) -> Any:
-        """DataItem method proxy"""
+        """DataItem method proxy
+
+        Args:
+            realm (str): realm
+            name (str): name
+            default (Any, optional): default value
+
+        Returns:
+            Any: value
+        """
         return self.item.get_prop(realm, name, default)
 
     def get_prop_value(
-        self, realm, instance: "DataSet", name: str, default: Any = NoDefault
+        self, realm, instance: DataSet, name: str, default: Any = NoDefault
     ) -> Any:
-        """DataItem method proxy"""
+        """DataItem method proxy
+
+        Args:
+            realm (str): realm
+            instance (DataSet): instance of the DataSet
+            name (str): name
+            default (Any, optional): default value
+
+        Returns:
+            Any: value
+        """
         return self.item.get_prop_value(realm, instance, name, default)
 
-    def set_prop(self, realm: str, **kwargs) -> "DataItem":
-        """DataItem method proxy"""
+    def set_prop(self, realm: str, **kwargs) -> DataItem:
+        """DataItem method proxy
+
+        Args:
+            realm (str): realm
+            \*\*kwargs: keyword arguments
+
+        Returns:
+            DataItem: data item
+        """  # noqa
         return self.item.set_prop(realm, **kwargs)
 
-    def bind(self, instance: "DataSet") -> "DataItemVariable":
-        """DataItem method proxy"""
+    def bind(self, instance: DataSet) -> DataItemVariable:
+        """DataItem method proxy
+
+        Args:
+            instance (DataSet): instance of the DataSet
+
+        Returns:
+            DataItemVariable: data item variable
+        """
         return DataItemVariable(self, instance)
 
 
@@ -575,39 +831,68 @@ class DataItemVariable:
     since DataItem instances are class attributes they need to have a
     DataSet instance to store their value. This class binds the two
     together.
+
+    Args:
+        item (DataItem): data item
+        instance (DataSet): instance of the DataSet
     """
 
     def __init__(
         self,
-        item: "DataItem",
-        instance: "DataSet",
+        item: DataItem,
+        instance: DataSet,
     ):
         self.item = item
         self.instance = instance
 
     def get_prop_value(self, realm: str, name: str, default: object = NoDefault) -> Any:
-        """DataItem method proxy"""
+        """DataItem method proxy
+
+        Args:
+            realm (str): realm
+            name (str): name
+            default (object, optional): default value
+
+        Returns:
+            Any: value
+        """
         return self.item.get_prop_value(realm, self.instance, name, default)
 
-    def get_prop(
-        self, realm: str, name: str, default: Optional[type] = NoDefault
-    ) -> Any:
-        """DataItem method proxy"""
+    def get_prop(self, realm: str, name: str, default: type | None = NoDefault) -> Any:
+        """DataItem method proxy
+
+        Args:
+            realm (str): realm
+            name (str): name
+            default (type | None, optional): default value
+
+        Returns:
+            Any: value
+        """
         return self.item.get_prop(realm, name, default)
 
     def get_help(self) -> str:
-        """Re-implement DataItem method"""
+        """Re-implement DataItem method
+
+        Returns:
+            str: help string
+        """
         return self.item.get_help(self.instance)
 
     def get_auto_help(self) -> str:
-        """Re-implement DataItem method"""
-        # XXX incohérent ?
+        """Re-implement DataItem method
+
+        Returns:
+            str: help string
+        """
         return self.item.get_auto_help(self.instance)
 
     def get_string_value(self) -> str:
-        """
-        Return a unicode representation of the item's value
+        """Return a unicode representation of the item's value
         obeying 'display' or 'repr' properties
+
+        Returns:
+            str: string value
         """
         return self.item.get_string_value(self.instance)
 
@@ -616,31 +901,65 @@ class DataItemVariable:
         return self.item.set_default(self.instance)
 
     def get(self) -> Any:
-        """Re-implement DataItem method"""
+        """Re-implement DataItem method
+
+        Returns:
+            Any: value
+        """
         return self.item.get_value(self.instance)
 
     def set(self, value: Any) -> None:
-        """Re-implement DataItem method"""
+        """Re-implement DataItem method
+
+        Args:
+            value (Any): value
+        """
         return self.item.__set__(self.instance, value)
 
     def set_from_string(self, string_value) -> None:
-        """Re-implement DataItem method"""
+        """Re-implement DataItem method
+
+        Args:
+            string_value (str): string value
+        """
         return self.item.set_from_string(self.instance, string_value)
 
     def check_item(self) -> Any:
-        """Re-implement DataItem method"""
+        """Re-implement DataItem method
+
+        Returns:
+            Any: value
+        """
         return self.item.check_item(self.instance)
 
     def check_value(self, value) -> Any:
-        """Re-implement DataItem method"""
+        """Re-implement DataItem method
+
+        Args:
+            value (Any): value
+
+        Returns:
+            Any: value
+        """
         return self.item.check_value(value)
 
     def from_string(self, string_value: str) -> Any:
-        """Re-implement DataItem method"""
+        """Re-implement DataItem method
+
+        Args:
+            string_value (str): string value
+
+        Returns:
+            Any: value
+        """
         return self.item.from_string(string_value)
 
     def label(self) -> str:
-        """Re-implement DataItem method"""
+        """Re-implement DataItem method
+
+        Returns:
+            str: label
+        """
         return self.item.get_prop("display", "label")
 
 
@@ -652,7 +971,7 @@ class DataSetMeta(type):
     created in the same order as these attributes were written
     """
 
-    def __new__(cls: Type, name: str, bases: Any, dct: Dict[str, Any]) -> Type:
+    def __new__(cls: type, name: str, bases: Any, dct: dict[str, Any]) -> type:
         items = {}
         for base in bases:
             if getattr(base, "__metaclass__", None) is DataSetMeta:
@@ -675,21 +994,21 @@ Meta_Py3Compat = DataSetMeta("Meta_Py3Compat", (object,), {})
 
 
 class DataSet(metaclass=DataSetMeta):
-    """
-    Construct a DataSet object is a set of DataItem objects
-        * title [string]
-        * comment [string]: text shown on the top of the first data item
-        * icon [QIcon or string]: icon show on the button (optional)
-          (string: icon filename as in guidata/guiqwt image search paths)
+    """Construct a DataSet object is a set of DataItem objects
+
+    Args:
+        title (str, optional): title
+        comment (str, optional): comment. Text shown on the top of the first data item
+        icon (str, optional): icon filename as in image search paths
     """
 
-    _items: List["DataItem"]
+    _items: list[DataItem]
     __metaclass__ = DataSetMeta  # keep it even with Python 3 (see DataSetMeta)
 
     def __init__(
         self,
-        title: Optional[str] = None,
-        comment: Optional[str] = None,
+        title: str | None = None,
+        comment: str | None = None,
         icon: str = "",
     ):
         self.__comment = comment
@@ -706,7 +1025,7 @@ class DataSet(metaclass=DataSetMeta):
         self.set_defaults()
 
     @classmethod
-    def create(cls, **kwargs) -> "DataSet":
+    def create(cls, **kwargs) -> DataSet:
         """Create a new instance of the DataSet class
 
         Args:
@@ -714,7 +1033,7 @@ class DataSet(metaclass=DataSetMeta):
 
         Returns:
             DataSet instance
-        """
+        """  # noqa
         instance = cls()
         for item in instance._items:
             name = item._name
@@ -735,7 +1054,7 @@ class DataSet(metaclass=DataSetMeta):
         else:
             return lambda x: x
 
-    def _compute_title_and_comment(self) -> Tuple[str, Optional[str]]:
+    def _compute_title_and_comment(self) -> tuple[str, str | None]:
         """
         Private method to compute title and comment of the data set
         """
@@ -753,20 +1072,26 @@ class DataSet(metaclass=DataSetMeta):
         return comp_title, comp_comment
 
     def get_title(self) -> str:
-        """
-        Return data set title
+        """Return data set title
+
+        Returns:
+            str: title
         """
         return self.__title
 
-    def get_comment(self) -> Optional[str]:
-        """
-        Return data set comment
+    def get_comment(self) -> str | None:
+        """Return data set comment
+
+        Returns:
+            str | None: comment
         """
         return self.__comment
 
-    def get_icon(self) -> Optional[str]:
-        """
-        Return data set icon
+    def get_icon(self) -> str | None:
+        """Return data set icon
+
+        Returns:
+            str | None: icon
         """
         return self.__icon
 
@@ -778,9 +1103,11 @@ class DataSet(metaclass=DataSetMeta):
     def __str__(self):
         return self.to_string(debug=False)
 
-    def check(self) -> List[str]:
-        """
-        Check the dataset item values
+    def check(self) -> list[str]:
+        """Check the dataset item values
+
+        Returns:
+            list[str]: list of errors
         """
         errors = []
         for item in self._items:
@@ -789,53 +1116,75 @@ class DataSet(metaclass=DataSetMeta):
         return errors
 
     def text_edit(self) -> None:
-        """
-        Edit data set with text input only
-        """
+        """Edit data set with text input only"""
         from guidata.dataset import textedit
 
         self.accept(textedit.TextEditVisitor(self))
 
     def edit(
         self,
-        parent: Optional[QWidget] = None,
-        apply: Optional[Callable] = None,
-        size: Optional[Any] = None,
-    ) -> "DataSetEditDialog":
+        parent: QWidget | None = None,
+        apply: Callable | None = None,
+        size: Any | None = None,
+    ) -> DataSetEditDialog:
+        """Open a dialog box to edit data set
+
+        Args:
+            parent (QWidget, optional): parent widget (default is None,
+             meaning no parent)
+            apply (callable, optional): apply callback (default is None)
+            size (QSize | tuple[int, int], optional): dialog size (QSize object
+             or integer tuple (width, height))
         """
-        Open a dialog box to edit data set
-            * parent: parent widget (default is None, meaning no parent)
-            * apply: apply callback (default is None)
-            * size: dialog size (QSize object or integer tuple (width, height))
-        """
+        # Importing those modules here avoids Qt dependency when
+        # guidata is used without Qt
+        # pylint: disable=import-outside-toplevel
         from guidata.dataset.qtwidgets import DataSetEditDialog
+        from guidata.qthelpers import exec_dialog
 
         dial = DataSetEditDialog(
             self, icon=self.__icon, parent=parent, apply=apply, size=size
         )
         return exec_dialog(dial)
 
-    def view(self, parent: Optional[QWidget] = None, size: Optional[Any] = None):
+    def view(self, parent: QWidget | None = None, size: Any | None = None) -> None:
+        """Open a dialog box to view data set
+
+        Args:
+            parent (QWidget, optional): parent widget (default is None,
+             meaning no parent)
+            size (QSize | tuple[int, int], optional): dialog size (QSize object
+             or integer tuple (width, height))
         """
-        Open a dialog box to view data set
-            * parent: parent widget (default is None, meaning no parent)
-            * size: dialog size (QSize object or integer tuple (width, height))
-        """
+        # Importing those modules here avoids Qt dependency when
+        # guidata is used without Qt
+        # pylint: disable=import-outside-toplevel
         from guidata.dataset.qtwidgets import DataSetShowDialog
+        from guidata.qthelpers import exec_dialog
 
         dial = DataSetShowDialog(self, icon=self.__icon, parent=parent, size=size)
         return exec_dialog(dial)
 
     def to_string(
         self,
-        debug: Optional[bool] = False,
-        indent: Optional[str] = None,
-        align: Optional[bool] = False,
-        show_hidden: Optional[bool] = True,
-    ):
-        """
-        Return readable string representation of the data set
+        debug: bool | None = False,
+        indent: str | None = None,
+        align: bool | None = False,
+        show_hidden: bool | None = True,
+    ) -> str:
+        """Return readable string representation of the data set
         If debug is True, add more details on data items
+
+        Args:
+            debug (bool, optional): if True, add more details on data items
+            indent (str, optional): indentation string (default is None,
+                meaning no indentation)
+            align (bool, optional): if True, align data items (default is False)
+            show_hidden (bool, optional): if True, show hidden data items
+                (default is True)
+
+        Returns:
+            str: string representation of the data set
         """
         if indent is None:
             indent = "\n    "
@@ -890,23 +1239,31 @@ class DataSet(metaclass=DataSetMeta):
         return txt
 
     def accept(self, vis: object) -> None:
-        """
-        helper function that passes the visitor to the accept methods of all
+        """Helper function that passes the visitor to the accept methods of all
         the items in this dataset
+
+        Args:
+            vis (object): visitor object
         """
         for item in self._items:
             item.accept(vis)
 
-    def serialize(
-        self, writer: Union["HDF5Writer", "JSONWriter", "UserConfigWriter"]
-    ) -> None:
+    def serialize(self, writer: HDF5Writer | JSONWriter | UserConfigWriter) -> None:
+        """Serialize the dataset
+
+        Args:
+            writer (HDF5Writer | JSONWriter | UserConfigWriter): writer object
+        """
         for item in self._items:
             with writer.group(item._name):
                 item.serialize(self, writer)
 
-    def deserialize(
-        self, reader: Union["HDF5Reader", "JSONReader", "UserConfigReader"]
-    ) -> None:
+    def deserialize(self, reader: HDF5Reader | JSONReader | UserConfigReader) -> None:
+        """Deserialize the dataset
+
+        Args:
+            reader (HDF5Reader | JSONReader | UserConfigReader): reader object
+        """
         for item in self._items:
             with reader.group(item._name):
                 try:
@@ -922,13 +1279,27 @@ class DataSet(metaclass=DataSetMeta):
                         print(error, file=sys.stderr)
                     item.set_default(self)
 
-    def read_config(self, conf: "UserConfig", section: str, option: str) -> None:
+    def read_config(self, conf: UserConfig, section: str, option: str) -> None:
+        """Read configuration from a UserConfig instance
+
+        Args:
+            conf (UserConfig): UserConfig instance
+            section (str): section name
+            option (str): option name
+        """
         from guidata.dataset.iniio import UserConfigReader
 
         reader = UserConfigReader(conf, section, option)
         self.deserialize(reader)
 
-    def write_config(self, conf: "UserConfig", section: str, option: str) -> None:
+    def write_config(self, conf: UserConfig, section: str, option: str) -> None:
+        """Write configuration to a UserConfig instance
+
+        Args:
+            conf (UserConfig): UserConfig instance
+            section (str): section name
+            option (str): option name
+        """
         from guidata.dataset.iniio import UserConfigWriter
 
         writer = UserConfigWriter(conf, section, option)
@@ -936,15 +1307,25 @@ class DataSet(metaclass=DataSetMeta):
 
     @classmethod
     def set_global_prop(klass, realm: str, **kwargs) -> None:
+        """Set global properties for all data items in the dataset
+
+        Args:
+            realm (str): realm name
+            \*\*kwargs (dict): properties to set
+        """  # noqa
         for item in klass._items:
             item.set_prop(realm, **kwargs)
 
 
 class ActivableDataSet(DataSet):
-    """
-    An ActivableDataSet instance must have an "enable" class attribute which
+    """An ActivableDataSet instance must have an "enable" class attribute which
     will set the active state of the dataset instance
     (see example in: tests/activable_dataset.py)
+
+    Args:
+        title (str): dataset title (optional)
+        comment (str): dataset comment (optional)
+        icon (str): dataset icon. Default is "" (no icon)
     """
 
     _ro = True  # default *instance* attribute value
@@ -954,13 +1335,13 @@ class ActivableDataSet(DataSet):
 
     @property
     @abstractmethod
-    def enable(self) -> "DataItem":
+    def enable(self) -> DataItem:
         ...
 
     def __init__(
         self,
-        title: Optional[str] = None,
-        comment: Optional[str] = None,
+        title: str | None = None,
+        comment: str | None = None,
         icon: str = "",
     ):
         DataSet.__init__(self, title, comment, icon)
@@ -979,27 +1360,23 @@ class ActivableDataSet(DataSet):
         )
 
     def set_readonly(self) -> None:
-        """
-        The dataset is now in read-only mode, i.e. all data items are disabled
-        """
+        """The dataset is now in read-only mode, i.e. all data items are disabled"""
         self._ro = True
         self._active = self.enable
 
     def set_writeable(self) -> None:
-        """
-        The dataset is now in read/write mode, i.e. all data items are enabled
-        """
+        """The dataset is now in read/write mode, i.e. all data items are enabled"""
         self._ro = False
         self._active = self.enable
 
 
 class DataSetGroup:
-    """
-    Construct a DataSetGroup object, used to group several datasets together
-        * datasets [list of DataSet objects]
-        * title [string]
-        * icon [QIcon or string]: icon show on the button (optional)
-          (string: icon filename as in guidata/guiqwt image search paths)
+    """Construct a DataSetGroup object, used to group several datasets together
+
+    Args:
+        datasets (list[DataSet]): list of datasets
+        title (str): group title (optional)
+        icon (str): group icon. Default is "" (no icon)
 
     This class tries to mimics the DataSet interface.
 
@@ -1008,7 +1385,7 @@ class DataSetGroup:
     """
 
     def __init__(
-        self, datasets: List["DataSet"], title: Optional[str] = None, icon: str = ""
+        self, datasets: list[DataSet], title: str | None = None, icon: str = ""
     ) -> None:
         self.__icon = icon
         self.datasets = datasets
@@ -1021,42 +1398,56 @@ class DataSetGroup:
         return "\n".join([dataset.__str__() for dataset in self.datasets])
 
     def get_title(self) -> str:
-        """
-        Return data set group title
+        """Return data set group title
+
+        Returns:
+            str: data set group title
         """
         return self.__title
 
     def get_comment(self) -> None:
-        """
-        Return data set group comment --> not implemented (will return None)
+        """Return data set group comment --> not implemented (will return None)
+
+        Returns:
+            None: data set group comment
         """
         return None
 
-    def get_icon(self) -> Union[str, None]:
-        """
-        Return data set icon
+    def get_icon(self) -> str | None:
+        """Return data set icon
+
+        Returns:
+            str | None: data set icon
         """
         return self.__icon
 
-    def check(self) -> List[List[str]]:
-        """
-        Check data set group items
+    def check(self) -> list[list[str]]:
+        """Check data set group items
+
+        Returns:
+            list[list[str]]: list of errors
         """
         return [dataset.check() for dataset in self.datasets]
 
     def text_edit(self) -> None:
-        """
-        Edit data set with text input only
-        """
+        """Edit data set with text input only"""
         raise NotImplementedError()
 
-    def edit(
-        self, parent: Optional[QWidget] = None, apply: Optional[Callable] = None
-    ) -> int:
+    def edit(self, parent: QWidget | None = None, apply: Callable | None = None) -> int:
+        """Open a dialog box to edit data set
+
+        Args:
+            parent (QWidget, optional): parent widget. Defaults to None.
+            apply (Callable, optional): apply callback. Defaults to None.
+
+        Returns:
+            int: dialog box return code
         """
-        Open a dialog box to edit data set
-        """
+        # Importing those modules here avoids Qt dependency when
+        # guidata is used without Qt
+        # pylint: disable=import-outside-toplevel
         from guidata.dataset.qtwidgets import DataSetGroupEditDialog
+        from guidata.qthelpers import exec_dialog
 
         dial = DataSetGroupEditDialog(
             self, icon=self.__icon, parent=parent, apply=apply
@@ -1064,27 +1455,38 @@ class DataSetGroup:
         return exec_dialog(dial)
 
     def accept(self, vis: object) -> None:
-        """
-        helper function that passes the visitor to the accept methods of all
+        """Helper function that passes the visitor to the accept methods of all
         the items in this dataset
+
+        Args:
+            vis (object): visitor
         """
         for dataset in self.datasets:
             dataset.accept(vis)
 
 
 class GroupItem(DataItemProxy):
-    """GroupItem proxy"""
+    """GroupItem proxy
 
-    def __init__(self, item: "DataItem") -> None:
+    Args:
+        item (DataItem): data item
+    """
+
+    def __init__(self, item: DataItem) -> None:
         DataItemProxy.__init__(self, item)
-        self.group: List[Any] = []
+        self.group: list[Any] = []
 
 
 class BeginGroup(DataItem):
-    """
-    Data item which does not represent anything
+    """Data item which does not represent anything
     but a begin flag to define a data set group
+
+    Args:
+        label (str): group label
     """
+
+    def __init__(self, label: str) -> None:
+        super().__init__(label)
 
     def serialize(self, instance, writer) -> None:
         pass
@@ -1097,10 +1499,15 @@ class BeginGroup(DataItem):
 
 
 class EndGroup(DataItem):
-    """
-    Data item which does not represent anything
+    """Data item which does not represent anything
     but an end flag to define a data set group
+
+    Args:
+        label (str): group label
     """
+
+    def __init__(self, label: str) -> None:
+        super().__init__(label)
 
     def serialize(self, instance, writer) -> None:
         pass
@@ -1114,9 +1521,23 @@ class TabGroupItem(GroupItem):
 
 
 class BeginTabGroup(BeginGroup):
+    """Data item which does not represent anything
+    but a begin flag to define a data set tab group
+
+    Args:
+        label (str): group label
+    """
+
     def get_group(self) -> "TabGroupItem":
         return TabGroupItem(self)
 
 
 class EndTabGroup(EndGroup):
+    """Data item which does not represent anything
+    but an end flag to define a data set tab group
+
+    Args:
+        label (str): group label
+    """
+
     pass

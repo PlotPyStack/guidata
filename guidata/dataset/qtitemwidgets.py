@@ -14,6 +14,7 @@ Widget factories used to edit data items
 There is one widget type for each data item type.
 Example: ChoiceWidget <--> ChoiceItem, ImageChoiceItem
 """
+
 import collections.abc
 import datetime
 import os

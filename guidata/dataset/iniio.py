@@ -13,8 +13,8 @@ UserConfig reader/writer objects
 
 from __future__ import annotations
 
-import collections.abc
 import datetime
+from collections.abc import Callable
 from typing import Any
 
 import numpy as np
@@ -251,9 +251,7 @@ class WriterMixin:
             self.write_float(val.timestamp())
         elif isinstance(val, datetime.date):
             self.write_int(val.toordinal())
-        elif hasattr(val, "serialize") and isinstance(
-            val.serialize, collections.abc.Callable
-        ):
+        elif hasattr(val, "serialize") and isinstance(val.serialize, Callable):
             # The object has a DataSet-like `serialize` method
             val.serialize(self)
         else:

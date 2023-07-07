@@ -4,6 +4,11 @@
 
 Bug fixes:
 
+* Modules `guidata.dataset.datatypes` and `guidata.dataset.dataitems` should not
+  critically depend on Qt (only modules specific to GUI should depend on Qt, such
+  as `guidata.dataset.qtwidgets`). This was a regression introduced in version 3.0.0.
+  A new unit test was added to prevent this kind of regression in the future.
+
 * Fixed documentation generation ``.readthedocs.yaml`` file (Qt 5.15 was not
   installed on ReadTheDocs servers, causing documentation build to fail)
 

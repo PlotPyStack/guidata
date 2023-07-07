@@ -86,17 +86,19 @@ Other items
     :members:
 """
 
-import collections.abc
+from __future__ import annotations
+
 import datetime
 import os
 import re
-from typing import TYPE_CHECKING, Any, Callable, List, Optional, Tuple, Type, Union
+from collections.abc import Callable
+from typing import TYPE_CHECKING, Any
+
+from numpy import ndarray
 
 from guidata.config import _
 from guidata.dataset.datatypes import DataItem, DataSet, ItemProperty
 from guidata.dataset.iniio import UserConfigReader, UserConfigWriter
-from guidata.qthelpers import exec_dialog
-from numpy import ndarray
 
 if TYPE_CHECKING:  # pragma: no cover
     from guidata.dataset.hdf5io import HDF5Reader, HDF5Writer
@@ -104,20 +106,21 @@ if TYPE_CHECKING:  # pragma: no cover
 
 
 class NumericTypeItem(DataItem):
-    """
-    Numeric data item
-    * label [string]: name
-    * default [int]: default value (optional)
-    * min [int]: minimum value (optional)
-    * max [int]: maximum value (optional)
-    * nonzero [bool]: if True, zero is not a valid value (optional)
-    * unit [string]: physical unit (optional)
-    * even [bool]: if True, even values are valid, if False,
-        odd values are valid if None (default), ignored (optional)
-    * slider [bool]: if True, shows a slider widget right after the line
-        edit widget (default is False)
-    * help [string]: text shown in tooltip (optional)
-    * check [bool]: if False, value is not checked (optional, default=True)
+    """Numeric data item
+
+    Args:
+        label (str): item name
+        default (int or float): default value (optional)
+        min (int or float): minimum value (optional)
+        max (int or float): maximum value (optional)
+        nonzero (bool): if True, zero is not a valid value (optional)
+        unit (str): physical unit (optional)
+        even (bool): if True, even values are valid, if False,
+          odd values are valid if None (default), ignored (optional)
+        slider (bool): if True, shows a slider widget right after the line
+          edit widget (default is False)
+        help (str): text shown in tooltip (optional)
+        check (bool): if False, value is not checked (optional, default=True)
     """
 
     type: Callable = None
@@ -125,10 +128,10 @@ class NumericTypeItem(DataItem):
     def __init__(
         self,
         label: str,
-        default: Optional[Union[float, int]] = None,
-        min: Optional[Union[float, int]] = None,
-        max: Optional[Union[float, int]] = None,
-        nonzero: Optional[bool] = None,
+        default: float | int | None = None,
+        min: float | int | None = None,
+        max: float | int | None = None,
+        nonzero: bool | None = None,
         unit: str = "",
         help: str = "",
         check: bool = True,
@@ -157,7 +160,7 @@ class NumericTypeItem(DataItem):
         return auto_help
 
     def format_string(
-        self, instance: "DataSet", value: Union[float, int], fmt: str, func: Callable
+        self, instance: DataSet, value: float | int, fmt: str, func: Callable
     ) -> str:
         """Override DataItem method"""
         text = fmt % (func(value),)
@@ -168,7 +171,7 @@ class NumericTypeItem(DataItem):
             text += " " + unit
         return text
 
-    def check_value(self, value: Union[float, int]) -> bool:
+    def check_value(self, value: float | int) -> bool:
         """Override DataItem method"""
         if not self.get_prop("data", "check_value", True):
             return True
@@ -186,31 +189,35 @@ class NumericTypeItem(DataItem):
                 return False
         return True
 
-    def from_string(self, value: str) -> Optional[Any]:
+    def from_string(self, value: str) -> Any | None:
         """Override DataItem method"""
         # String may contains numerical operands:
         if re.match(r"^([\d\(\)\+/\-\*.]|e)+$", value):
+            # pylint: disable=eval-used
+            # pylint: disable=broad-except
             try:
                 return self.type(eval(value))
-            except:
+            except:  # noqa
                 pass
         return None
 
 
 class FloatItem(NumericTypeItem):
-    """
-    Construct a float data item
-        * label [string]: name
-        * default [float]: default value (optional)
-        * min [float]: minimum value (optional)
-        * max [float]: maximum value (optional)
-        * slider [bool]: if True, shows a slider widget right after the line
-          edit widget (default is False)
-        * step [float]: step between tick values with a slider widget (optional)
-        * nonzero [bool]: if True, zero is not a valid value (optional)
-        * unit [string]: physical unit (optional)
-        * help [string]: text shown in tooltip (optional)
-        * check [bool]: if False, value is not checked (optional, default=True)
+    """Construct a float data item
+
+    Args:
+        label (str): item name
+        default (float): default value (optional)
+        min (float): minimum value (optional)
+        max (float): maximum value (optional)
+        nonzero (bool): if True, zero is not a valid value (optional)
+        unit (str): physical unit (optional)
+        even (bool): if True, even values are valid, if False,
+         odd values are valid if None (default), ignored (optional)
+        slider (bool): if True, shows a slider widget right after the line
+         edit widget (default is False)
+        help (str): text shown in tooltip (optional)
+        check (bool): if False, value is not checked (optional, default=True)
     """
 
     type = float
@@ -218,10 +225,10 @@ class FloatItem(NumericTypeItem):
     def __init__(
         self,
         label: str,
-        default: Optional[float] = None,
-        min: Optional[float] = None,
-        max: Optional[float] = None,
-        nonzero: Optional[bool] = None,
+        default: float | None = None,
+        min: float | None = None,
+        max: float | None = None,
+        nonzero: bool | None = None,
         unit: str = "",
         step: float = 0.1,
         slider: bool = False,
@@ -242,7 +249,7 @@ class FloatItem(NumericTypeItem):
         self.set_prop("data", step=step)
 
     def get_value_from_reader(
-        self, reader: Union["HDF5Reader", "JSONReader", "UserConfigReader"]
+        self, reader: HDF5Reader | JSONReader | UserConfigReader
     ) -> float:
         """Reads value from the reader object, inside the try...except
         statement defined in the base item `deserialize` method"""
@@ -250,20 +257,21 @@ class FloatItem(NumericTypeItem):
 
 
 class IntItem(NumericTypeItem):
-    """
-    Construct an integer data item
-        * label [string]: name
-        * default [int]: default value (optional)
-        * min [int]: minimum value (optional)
-        * max [int]: maximum value (optional)
-        * nonzero [bool]: if True, zero is not a valid value (optional)
-        * unit [string]: physical unit (optional)
-        * even [bool]: if True, even values are valid, if False,
-          odd values are valid if None (default), ignored (optional)
-        * slider [bool]: if True, shows a slider widget right after the line
-          edit widget (default is False)
-        * help [string]: text shown in tooltip (optional)
-        * check [bool]: if False, value is not checked (optional, default=True)
+    """Construct an integer data item
+
+    Args:
+        label (str): item name
+        default (int): default value (optional)
+        min (int): minimum value (optional)
+        max (int): maximum value (optional)
+        nonzero (bool): if True, zero is not a valid value (optional)
+        unit (str): physical unit (optional)
+        even (bool): if True, even values are valid, if False,
+         odd values are valid if None (default), ignored (optional)
+        slider (bool): if True, shows a slider widget right after the line
+         edit widget (default is False)
+        help (str): text shown in tooltip (optional)
+        check (bool): if False, value is not checked (optional, default=True)
     """
 
     type = int
@@ -271,12 +279,12 @@ class IntItem(NumericTypeItem):
     def __init__(
         self,
         label: str,
-        default: Optional[int] = None,
-        min: Optional[int] = None,
-        max: Optional[int] = None,
-        nonzero: Optional[bool] = None,
+        default: int | None = None,
+        min: int | None = None,
+        max: int | None = None,
+        nonzero: bool | None = None,
         unit: str = "",
-        even: Optional[bool] = None,
+        even: bool | None = None,
         slider: bool = False,
         help: str = "",
         check: bool = True,
@@ -294,7 +302,7 @@ class IntItem(NumericTypeItem):
         self.set_prop("data", even=even)
         self.set_prop("display", slider=slider)
 
-    def get_auto_help(self, instance: "DataSet") -> str:
+    def get_auto_help(self, instance: DataSet) -> str:
         """Override DataItem method"""
         auto_help = super().get_auto_help(instance)
         even = self.get_prop_value("data", instance, "even")
@@ -320,7 +328,7 @@ class IntItem(NumericTypeItem):
         return True
 
     def get_value_from_reader(
-        self, reader: Union["HDF5Reader", "JSONReader", "UserConfigReader"]
+        self, reader: HDF5Reader | JSONReader | UserConfigReader
     ) -> Any:
         """Reads value from the reader object, inside the try...except
         statement defined in the base item `deserialize` method"""
@@ -328,13 +336,14 @@ class IntItem(NumericTypeItem):
 
 
 class StringItem(DataItem):
-    """
-    Construct a string data item
-        * label [string]: name
-        * default [string]: default value (optional)
-        * help [string]: text shown in tooltip (optional)
-        * notempty [bool]: if True, empty string is not a valid value (opt.)
-        * wordwrap [bool]: toggle word wrapping (optional)
+    """Construct a string data item
+
+    Args:
+        label (str): item name
+        default (str): default value (optional)
+        notempty (bool): if True, empty string is not a valid value (optional)
+        wordwrap (bool): toggle word wrapping (optional)
+        help (str): text shown in tooltip (optional)
     """
 
     type: Any = str
@@ -342,8 +351,8 @@ class StringItem(DataItem):
     def __init__(
         self,
         label: str,
-        default: Optional[str] = None,
-        notempty: Optional[bool] = None,
+        default: str | None = None,
+        notempty: bool | None = None,
         wordwrap: bool = False,
         help: str = "",
     ) -> None:
@@ -363,7 +372,7 @@ class StringItem(DataItem):
         return value
 
     def get_value_from_reader(
-        self, reader: Union["HDF5Reader", "JSONReader", "UserConfigReader"]
+        self, reader: HDF5Reader | JSONReader | UserConfigReader
     ) -> Any:
         """Reads value from the reader object, inside the try...except
         statement defined in the base item `deserialize` method"""
@@ -371,20 +380,21 @@ class StringItem(DataItem):
 
 
 class TextItem(StringItem):
-    """
-    Construct a text data item (multiline string)
-        * label [string]: name
-        * default [string]: default value (optional)
-        * help [string]: text shown in tooltip (optional)
-        * notempty [bool]: if True, empty string is not a valid value (opt.)
-        * wordwrap [bool]: toggle word wrapping (optional)
+    """Construct a text data item (multiline string)
+
+    Args:
+        label (str): item name
+        default (str): default value (optional)
+        notempty (bool): if True, empty string is not a valid value (optional)
+        wordwrap (bool): toggle word wrapping (optional)
+        help (str): text shown in tooltip (optional)
     """
 
     def __init__(
         self,
         label: str,
-        default: Optional[str] = None,
-        notempty: Optional[bool] = None,
+        default: str | None = None,
+        notempty: bool | None = None,
         wordwrap: bool = True,
         help: str = "",
     ) -> None:
@@ -399,13 +409,14 @@ class TextItem(StringItem):
 
 
 class BoolItem(DataItem):
-    """
-    Construct a boolean data item
-        * text [string]: form's field name (optional)
-        * label [string]: name
-        * default [string]: default value (optional)
-        * help [string]: text shown in tooltip (optional)
-        * check [bool]: if False, value is not checked (optional, default=True)
+    """Construct a boolean data item
+
+    Args:
+        text (str): form's field name (optional)
+        label (str): item name
+        default (bool): default value (optional)
+        help (str): text shown in tooltip (optional)
+        check (bool): if False, value is not checked (optional, default=True)
     """
 
     type = bool
@@ -414,7 +425,7 @@ class BoolItem(DataItem):
         self,
         text: str = "",
         label: str = "",
-        default: Optional[bool] = None,
+        default: bool | None = None,
         help: str = "",
         check: bool = True,
     ) -> None:
@@ -422,7 +433,7 @@ class BoolItem(DataItem):
         self.set_prop("display", text=text)
 
     def get_value_from_reader(
-        self, reader: Union["HDF5Reader", "JSONReader", "UserConfigReader"]
+        self, reader: HDF5Reader | JSONReader | UserConfigReader
     ) -> bool:
         """Reads value from the reader object, inside the try...except
         statement defined in the base item `deserialize` method"""
@@ -430,38 +441,40 @@ class BoolItem(DataItem):
 
 
 class DateItem(DataItem):
-    """
-    Construct a date data item.
-        * text [string]: form's field name (optional)
-        * label [string]: name
-        * default [datetime.date]: default value (optional)
-        * help [string]: text shown in tooltip (optional)
+    """DataSet data item
+
+    Args:
+        label (str): item label
+        default (datetime.date, optional): default value (optional)
+        help (str, optional): text displayed on data item's tooltip
+        check (bool, optional): check value (default: True)
     """
 
     type = datetime.date
 
 
 class DateTimeItem(DateItem):
-    """
-    Construct a date time data item.
-        * text [string]: form's field name (optional)
-        * label [string]: name
-        * default [datetime.date]: default value (optional)
-        * help [string]: text shown in tooltip (optional)
+    """DataSet data item
+
+    Args:
+        label (str): item label
+        default (datetime.datetime, optional): default value (optional)
+        help (str, optional): text displayed on data item's tooltip
+        check (bool, optional): check value (default: True)
     """
 
     pass
 
 
 class ColorItem(StringItem):
-    """
-    Construct a color data item
-        * label [string]: name
-        * default [string]: default value (optional)
-        * help [string]: text shown in tooltip (optional)
-        * check [bool]: if False, value is not checked (optional, default=True)
+    """Construct a color data item
 
-    Color values are encoded as hexadecimal strings or Qt color names
+    Args:
+        label (str): item name
+        default (str): default value (optional). Color can be specified as
+         a string (e.g. "#FF0000" or "red") or as a Qt name (e.g. "red")
+        help (str): text shown in tooltip (optional)
+        check (bool): if False, value is not checked (optional, default=True)
     """
 
     def check_value(self, value: str) -> bool:
@@ -475,7 +488,7 @@ class ColorItem(StringItem):
         return text_to_qcolor(value).isValid()
 
     def get_value_from_reader(
-        self, reader: Union["HDF5Reader", "JSONReader", "UserConfigReader"]
+        self, reader: HDF5Reader | JSONReader | UserConfigReader
     ) -> str:
         """Reads value from the reader object, inside the try...except
         statement defined in the base item `deserialize` method"""
@@ -486,22 +499,23 @@ class ColorItem(StringItem):
 
 
 class FileSaveItem(StringItem):
-    """
-    Construct a path data item for a file to be saved
-        * label [string]: name
-        * formats [string (or string list)]: wildcard filter
-        * default [string]: default value (optional)
-        * basedir [string]: default base directory (optional)
-        * help [string]: text shown in tooltip (optional)
-        * check [bool]: if False, value is not checked (optional, default=True)
+    """Construct a path data item for a file to be saved
+
+    Args:
+        label (str): item name
+        formats (str or list of str): wildcard filter
+        default (str): default value (optional)
+        basedir (str): default base directory (optional)
+        help (str): text shown in tooltip (optional)
+        check (bool): if False, value is not checked (optional, default=True)
     """
 
     def __init__(
         self,
         label: str,
-        formats: Union[Tuple[str, ...], str] = "*",
-        default: Optional[Union[List[str], str]] = None,
-        basedir: Optional[str] = None,
+        formats: tuple[str, ...] | str = "*",
+        default: list[str] | str | None = None,
+        basedir: str | None = None,
         all_files_first: bool = False,
         help: str = "",
         check: bool = True,
@@ -513,7 +527,7 @@ class FileSaveItem(StringItem):
         self.set_prop("data", basedir=basedir)
         self.set_prop("data", all_files_first=all_files_first)
 
-    def get_auto_help(self, instance: "DataSet") -> str:
+    def get_auto_help(self, instance: DataSet) -> str:
         """Override DataItem method"""
         formats = self.get_prop("data", "formats")
         return (
@@ -546,14 +560,15 @@ class FileSaveItem(StringItem):
 
 
 class FileOpenItem(FileSaveItem):
-    """
-    Construct a path data item for a file to be opened
-        * label [string]: name
-        * formats [string (or string list)]: wildcard filter
-        * default [string]: default value (optional)
-        * basedir [string]: default base directory (optional)
-        * help [string]: text shown in tooltip (optional)
-        * check [bool]: if False, value is not checked (optional, default=True)
+    """Construct a path data item for a file to be opened
+
+    Args:
+        label (str): item name
+        formats (str or list of str): wildcard filter
+        default (str): default value (optional)
+        basedir (str): default base directory (optional)
+        help (str): text shown in tooltip (optional)
+        check (bool): if False, value is not checked (optional, default=True)
     """
 
     def check_value(self, value: str) -> bool:
@@ -566,14 +581,15 @@ class FileOpenItem(FileSaveItem):
 
 
 class FilesOpenItem(FileSaveItem):
-    """
-    Construct a path data item for multiple files to be opened.
-        * label [string]: name
-        * formats [string (or string list)]: wildcard filter
-        * default [string]: default value (optional)
-        * basedir [string]: default base directory (optional)
-        * help [string]: text shown in tooltip (optional)
-        * check [bool]: if False, value is not checked (optional, default=True)
+    """Construct a path data item for multiple files to be opened.
+
+    Args:
+        label (str): item name
+        formats (str or list of str): wildcard filter
+        default (str): default value (optional)
+        basedir (str): default base directory (optional)
+        help (str): text shown in tooltip (optional)
+        check (bool): if False, value is not checked (optional, default=True)
     """
 
     type = list
@@ -582,8 +598,8 @@ class FilesOpenItem(FileSaveItem):
         self,
         label: str,
         formats: str = "*",
-        default: Optional[Union[List[str], str]] = None,
-        basedir: Optional[str] = None,
+        default: list[str] | str | None = None,
+        basedir: str | None = None,
         all_files_first: bool = False,
         help: str = "",
         check: bool = True,
@@ -612,7 +628,7 @@ class FilesOpenItem(FileSaveItem):
             allexist = allexist and os.path.exists(path) and os.path.isfile(path)
         return allexist
 
-    def from_string(self, value: Any) -> List[str]:  # type:ignore
+    def from_string(self, value: Any) -> list[str]:  # type:ignore
         """Override DataItem method"""
         if value.endswith("']") or value.endswith('"]'):
             value = eval(value)
@@ -622,28 +638,29 @@ class FilesOpenItem(FileSaveItem):
 
     def serialize(
         self,
-        instance: "DataSet",
-        writer: Union["HDF5Writer", "JSONWriter", "UserConfigWriter"],
+        instance: DataSet,
+        writer: HDF5Writer | JSONWriter | UserConfigWriter,
     ) -> None:
         """Serialize this item"""
         value = self.get_value(instance)
         writer.write_sequence([fname.encode("utf-8") for fname in value])
 
     def get_value_from_reader(
-        self, reader: Union["HDF5Reader", "JSONReader", "UserConfigReader"]
-    ) -> List[str]:
+        self, reader: HDF5Reader | JSONReader | UserConfigReader
+    ) -> list[str]:
         """Reads value from the reader object, inside the try...except
         statement defined in the base item `deserialize` method"""
         return [fname for fname in reader.read_sequence()]
 
 
 class DirectoryItem(StringItem):
-    """
-    Construct a path data item for a directory.
-        * label [string]: name
-        * default [string]: default value (optional)
-        * help [string]: text shown in tooltip (optional)
-        * check [bool]: if False, value is not checked (optional, default=True)
+    """Construct a path data item for a directory.
+
+    Args:
+        label (str): item name
+        default (str): default value (optional)
+        help (str): text shown in tooltip (optional)
+        check (bool): if False, value is not checked (optional, default=True)
     """
 
     def check_value(self, value: str) -> bool:
@@ -665,39 +682,38 @@ class FirstChoice:
 
 
 class ChoiceItem(DataItem):
-    """
-    Construct a data item for a list of choices.
-        * label [string]: name
-        * choices [list, tuple or function]: string list or (key, label) list
-          function of two arguments (item, value) returning a list of tuples
-          (key, label, image) where image is an icon path, a QIcon instance
-          or a function of one argument (key) returning a QIcon instance
-        * default [-]: default label or default key (optional)
-        * help [string]: text shown in tooltip (optional)
-        * check [bool]: if False, value is not checked (optional, default=True)
-        * radio [bool]: if True, shows radio buttons instead of a combo box
-          (default is False)
+    """Construct a data item for a list of choices.
+
+    Args:
+        label (str): item name
+        choices (list, tuple or function): string list or (key, label) list
+         function of two arguments (item, value) returning a list of tuples
+         (key, label, image) where image is an icon path, a QIcon instance
+         or a function of one argument (key) returning a QIcon instance
+        default (str): default value (optional)
+        help (str): text shown in tooltip (optional)
+        check (bool): if False, value is not checked (optional, default=True)
+        radio (bool): if True, shows radio buttons instead of a combo box
+         (default is False)
     """
 
     def __init__(
         self,
         label: str,
         choices: Any,
-        default: Optional[Union[Tuple[()], Type[FirstChoice], int]] = FirstChoice,
+        default: tuple[()] | type[FirstChoice] | int | None = FirstChoice,
         help: str = "",
         check: bool = True,
         radio: bool = False,
     ) -> None:
         _choices_data: Any
-        if isinstance(choices, collections.abc.Callable):  # type:ignore
+        if isinstance(choices, Callable):
             _choices_data = ItemProperty(choices)
         else:
             _choices_data = []
             for idx, choice in enumerate(choices):
                 _choices_data.append(self._normalize_choice(idx, choice))
-        if default is FirstChoice and not isinstance(
-            choices, collections.abc.Callable  # type:ignore
-        ):
+        if default is FirstChoice and not isinstance(choices, Callable):
             default = _choices_data[0][0]
         elif default is FirstChoice:
             default = None
@@ -706,8 +722,8 @@ class ChoiceItem(DataItem):
         self.set_prop("display", radio=radio)
 
     def _normalize_choice(
-        self, idx: int, choice_tuple: Tuple[Any, ...]
-    ) -> Union[Tuple[int, str, None], Tuple[str, str, None]]:
+        self, idx: int, choice_tuple: tuple[Any, ...]
+    ) -> tuple[int, str, None] | tuple[str, str, None]:
         if isinstance(choice_tuple, tuple):
             key, value = choice_tuple
         else:
@@ -715,7 +731,7 @@ class ChoiceItem(DataItem):
             value = choice_tuple
         return (key, value, None)
 
-    def get_string_value(self, instance: "DataSet") -> str:
+    def get_string_value(self, instance: DataSet) -> str:
         """Override DataItem method"""
         value = self.get_value(instance)
         choices = self.get_prop_value("data", instance, "choices")
@@ -728,20 +744,21 @@ class ChoiceItem(DataItem):
 
 
 class MultipleChoiceItem(ChoiceItem):
-    """
-    Construct a data item for a list of choices -- multiple choices can be selected
-        * label [string]: name
-        * choices [list or tuple]: string list or (key, label) list
-        * default [-]: default label or default key (optional)
-        * help [string]: text shown in tooltip (optional)
-        * check [bool]: if False, value is not checked (optional, default=True)
+    """Construct a data item for a list of choices -- multiple choices can be selected
+
+    Args:
+        label (str): item name
+        choices (list or tuple): string list or (key, label) list
+        default (str): default value (optional)
+        help (str): text shown in tooltip (optional)
+        check (bool): if False, value is not checked (optional, default=True)
     """
 
     def __init__(
         self,
         label: str,
-        choices: List[str],
-        default: Tuple[()] = (),
+        choices: list[str],
+        default: tuple[()] = (),
         help: str = "",
         check: bool = True,
     ) -> None:
@@ -770,8 +787,8 @@ class MultipleChoiceItem(ChoiceItem):
 
     def serialize(
         self,
-        instance: "DataSet",
-        writer: Union["HDF5Writer", "JSONWriter", "UserConfigWriter"],
+        instance: DataSet,
+        writer: HDF5Writer | JSONWriter | UserConfigWriter,
     ) -> None:
         """Serialize this item"""
         value = self.get_value(instance)
@@ -783,8 +800,8 @@ class MultipleChoiceItem(ChoiceItem):
 
     def deserialize(
         self,
-        instance: "DataSet",
-        reader: Union["HDF5Reader", "JSONReader", "UserConfigReader"],
+        instance: DataSet,
+        reader: HDF5Reader | JSONReader | UserConfigReader,
     ) -> None:
         """Deserialize this item"""
         try:
@@ -803,22 +820,22 @@ class MultipleChoiceItem(ChoiceItem):
 
 
 class ImageChoiceItem(ChoiceItem):
-    """
-    Construct a data item for a list of choices with images
-        * label [string]: name
-        * choices [list, tuple or function]: (label, image) list or
-          (key, label, image) list function of two arguments (item, value)
-          returning a list of tuples (key, label, image) where image is an
-          icon path, a QIcon instance or a function of one argument (key)
-          returning a QIcon instance
-        * default [-]: default label or default key (optional)
-        * help [string]: text shown in tooltip (optional)
-        * check [bool]: if False, value is not checked (optional, default=True)
+    """Construct a data item for a list of choices with images
+
+    Args:
+        label (str): item name
+        choices (list or tuple): (label, image) list, or (key, label, image) list,
+         or function of two arguments (item, value) returning a list of tuples
+         (key, label, image) where image is an icon path, a QIcon instance or
+         a function of one argument (key) returning a QIcon instance
+        default (str): default value (optional)
+        help (str): text shown in tooltip (optional)
+        check (bool): if False, value is not checked (optional, default=True)
     """
 
     def _normalize_choice(
-        self, idx: int, choice_tuple: Tuple[Any, ...]
-    ) -> Tuple[Any, Any, Any]:
+        self, idx: int, choice_tuple: tuple[Any, ...]
+    ) -> tuple[Any, Any, Any]:
         assert isinstance(choice_tuple, tuple)
         if len(choice_tuple) == 3:
             key, value, img = choice_tuple
@@ -829,22 +846,23 @@ class ImageChoiceItem(ChoiceItem):
 
 
 class FloatArrayItem(DataItem):
-    """
-    Construct a float array data item
-        * label [string]: name
-        * default [numpy.ndarray]: default value (optional)
-        * help [string]: text shown in tooltip (optional)
-        * format [string]: formatting string (example: '%.3f') (optional)
-        * transpose [bool]: transpose matrix (display only)
-        * large [bool]: view all float of the array
-        * minmax [string]: "all" (default), "columns", "rows"
-        * check [bool]: if False, value is not checked (optional, default=True)
+    """Construct a float array data item
+
+    Args:
+        label (str): item name
+        default (numpy.ndarray): default value (optional)
+        help (str): text shown in tooltip (optional)
+        format (str): formatting string (example: '%.3f') (optional)
+        transpose (bool): transpose matrix (display only)
+        large (bool): view all float of the array
+        minmax (str): "all" (default), "columns", "rows"
+        check (bool): if False, value is not checked (optional, default=True)
     """
 
     def __init__(
         self,
         label: str,
-        default: Optional[ndarray] = None,
+        default: ndarray | None = None,
         help: str = "",
         format: str = "%.3f",
         transpose: bool = False,
@@ -855,7 +873,7 @@ class FloatArrayItem(DataItem):
         self.set_prop("display", format=format, transpose=transpose, minmax=minmax)
 
     def format_string(
-        self, instance: "DataSet", value: Any, fmt: str, func: Callable
+        self, instance: DataSet, value: Any, fmt: str, func: Callable
     ) -> str:
         """Override DataItem method"""
         larg = self.get_prop_value("display", instance, "large", False)
@@ -877,15 +895,15 @@ class FloatArrayItem(DataItem):
 
     def serialize(
         self,
-        instance: "DataSet",
-        writer: Union["HDF5Writer", "JSONWriter", "UserConfigWriter"],
+        instance: DataSet,
+        writer: HDF5Writer | JSONWriter | UserConfigWriter,
     ) -> None:
         """Serialize this item"""
         value = self.get_value(instance)
         writer.write_array(value)
 
     def get_value_from_reader(
-        self, reader: Union["HDF5Reader", "JSONReader", "UserConfigReader"]
+        self, reader: HDF5Reader | JSONReader | UserConfigReader
     ) -> Any:
         """Reads value from the reader object, inside the try...except
         statement defined in the base item `deserialize` method"""
@@ -893,20 +911,20 @@ class FloatArrayItem(DataItem):
 
 
 class ButtonItem(DataItem):
-    """
-    Construct a simple button that calls a method when hit
-        * label [string]: text shown on the button
-        * callback [function]: function with four parameters (dataset, item, value, parent)
-            - dataset [DataSet]: instance of the parent dataset
-            - item [DataItem]: instance of ButtonItem (i.e. self)
-            - value [unspecified]: value of ButtonItem (default ButtonItem
-              value or last value returned by the callback)
-            - parent [QObject]: button's parent widget
-        * icon [QIcon or string]: icon show on the button (optional)
-          (string: icon filename as in guidata/guiqwt image search paths)
-        * default [unspecified]: default value passed to the callback (optional)
-        * help [string]: text shown in button's tooltip (optional)
-        * check [bool]: if False, value is not checked (optional, default=True)
+    """Construct a simple button that calls a method when hit
+
+    Args:
+        label (str): item name
+        callback (callable): function with four parameters (dataset, item, value,
+         parent) where dataset (DataSet) is an instance of the parent dataset,
+         item (DataItem) is an instance of ButtonItem (i.e. self), value (unspecified)
+         is the value of ButtonItem (default ButtonItem value or last value returned
+         by the callback) and parent (QObject) is button's parent widget
+        icon (QIcon or str): icon show on the button (optional)
+         (str: icon filename as in guidata/guiqwt image search paths)
+        default (unspecified): default value passed to the callback (optional)
+        help (str): text shown in button's tooltip (optional)
+        check (bool): if False, value is not checked (optional, default=True)
 
     The value of this item is unspecified but is passed to the callback along
     with the whole dataset. The value is assigned the callback`s return value.
@@ -916,8 +934,8 @@ class ButtonItem(DataItem):
         self,
         label: str,
         callback: Callable,
-        icon: Optional[str] = None,
-        default: Optional[Any] = None,
+        icon: str | None = None,
+        default: Any | None = None,
         help: str = "",
         check: bool = True,
     ) -> None:
@@ -927,52 +945,66 @@ class ButtonItem(DataItem):
 
     def serialize(
         self,
-        instance: "DataSet",
-        writer: Union["HDF5Writer", "JSONWriter", "UserConfigWriter"],
+        instance: DataSet,
+        writer: HDF5Writer | JSONWriter | UserConfigWriter,
     ) -> Any:
         pass
 
     def deserialize(
         self,
-        instance: "DataSet",
-        reader: Union["HDF5Reader", "JSONReader", "UserConfigReader"],
+        instance: DataSet,
+        reader: HDF5Reader | JSONReader | UserConfigReader,
     ) -> Any:
         pass
 
 
-class DictItem(ButtonItem):
+def dictedit(
+    instance: DataSet, item: DataItem, value: Any, parent: object
+) -> Any:  # pylint: disable=unused-argument
+    """Edit a dictionary value using a dialog box
+
+    Args:
+        instance (DataSet): dataset instance
+        item (DataItem): item instance
+        value (Any): item value
+        parent (object): parent widget
     """
-    Construct a dictionary data item
-        * label [string]: name
-        * default [dict]: default value (optional)
-        * help [string]: text shown in tooltip (optional)
-        * check [bool]: if False, value is not checked (optional, default=True)
+    # Importing those modules here avoids Qt dependency when
+    # guidata is used without Qt
+    # pylint: disable=import-outside-toplevel
+    from guidata.qthelpers import exec_dialog
+    from guidata.widgets.collectionseditor import CollectionsEditor
+
+    editor = CollectionsEditor(parent)
+    value_was_none = value is None
+    if value_was_none:
+        value = {}
+    editor.setup(value)
+    if exec_dialog(editor):
+        return editor.get_value()
+    else:
+        if value_was_none:
+            return
+        return value
+
+
+class DictItem(ButtonItem):
+    """Construct a dictionary data item
+
+    Args:
+        label (str): item name
+        default (dict): default value (optional)
+        help (str): text shown in tooltip (optional)
+        check (bool): if False, value is not checked (optional, default=True)
     """
 
     def __init__(
         self,
         label: str,
-        default: Optional[dict] = None,
+        default: dict | None = None,
         help: str = "",
         check: bool = True,
     ) -> None:
-        def dictedit(
-            instance: "DataSet", item: "DataItem", value: Any, parent: object
-        ) -> Any:
-            from guidata.widgets.collectionseditor import CollectionsEditor
-
-            editor = CollectionsEditor(parent)
-            value_was_none = value is None
-            if value_was_none:
-                value = {}
-            editor.setup(value)
-            if exec_dialog(editor):
-                return editor.get_value()
-            else:
-                if value_was_none:
-                    return
-                return value
-
         ButtonItem.__init__(
             self,
             label,
@@ -985,11 +1017,13 @@ class DictItem(ButtonItem):
 
 
 class FontFamilyItem(StringItem):
-    """
-    Construct a font family name item
-        * label [string]: name
-        * default [string]: default value (optional)
-        * help [string]: text shown in tooltip (optional)
+    """Construct a font family name item
+
+    Args:
+        label (str): item name
+        default (str): default value (optional)
+        help (str): text shown in tooltip (optional)
+        check (bool): if False, value is not checked (optional, default=True)
     """
 
     pass
