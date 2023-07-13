@@ -12,9 +12,16 @@ Tests for collectionseditor.py
 
 import datetime
 
+import pytest
+
 from guidata.env import execenv
 from guidata.qthelpers import qt_app_context
-from guidata.widgets.collectionseditor import CollectionsEditor
+
+try:
+    from guidata.widgets.collectionseditor import CollectionsEditor
+except ImportError:
+    # PIL is not installed
+    CollectionsEditor = None
 
 
 def get_test_data():
@@ -107,6 +114,7 @@ def get_test_data():
     }
 
 
+@pytest.mark.skipif(CollectionsEditor is None, reason="PIL is not installed")
 def test_collectionseditor():
     """Test Collections editor."""
     with qt_app_context(exec_loop=True):

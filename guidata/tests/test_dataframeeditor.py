@@ -11,15 +11,21 @@ Tests for dataframeeditor.py
 # guitest: show
 
 import numpy as np
-from numpy import nan
-from pandas import DataFrame, Series
-from pandas.testing import assert_frame_equal, assert_series_equal
+import pytest
+
+try:
+    import pandas as pd
+    import pandas.testing as pdt
+except ImportError:
+    # pandas is not installed
+    pd = pdt = None
 
 from guidata.env import execenv
 from guidata.qthelpers import exec_dialog, qt_app_context
 from guidata.widgets.dataframeeditor import DataFrameEditor
 
 
+@pytest.mark.skipif(pd is None, reason="pandas is not installed")
 def test_dataframeeditor():
     """DataFrame editor test"""
 
@@ -36,7 +42,7 @@ def test_dataframeeditor():
             sys.exit(1)
 
     with qt_app_context():
-        df1 = DataFrame(
+        df1 = pd.DataFrame(
             [
                 [True, "bool"],
                 [1 + 1j, "complex"],
@@ -47,23 +53,23 @@ def test_dataframeeditor():
                 ["Large value", 100],
                 ["áéí", "unicode"],
             ],
-            index=["a", "b", nan, nan, nan, "c", "Test global max", "d"],
-            columns=[nan, "Type"],
+            index=["a", "b", np.nan, np.nan, np.nan, "c", "Test global max", "d"],
+            columns=[np.nan, "Type"],
         )
         out = test_edit(df1)
-        assert_frame_equal(df1, out)
+        pdt.assert_frame_equal(df1, out)
 
-        result = Series([True, "bool"], index=[nan, "Type"], name="a")
+        result = pd.Series([True, "bool"], index=[np.nan, "Type"], name="a")
         out = test_edit(df1.iloc[0])
-        assert_series_equal(result, out)
+        pdt.assert_series_equal(result, out)
 
-        df1 = DataFrame(np.random.rand(100100, 10))
+        df1 = pd.DataFrame(np.random.rand(100100, 10))
         out = test_edit(df1)
-        assert_frame_equal(out, df1)
+        pdt.assert_frame_equal(out, df1)
 
-        series = Series(np.arange(10), name=0)
+        series = pd.Series(np.arange(10), name=0)
         out = test_edit(series)
-        assert_series_equal(series, out)
+        pdt.assert_series_equal(series, out)
 
         execenv.print("OK")
 
