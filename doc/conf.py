@@ -20,11 +20,14 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.intersphinx",
     "sphinx.ext.doctest",
-    "sphinx.ext.mathjax",
     "sphinx_copybutton",
     "sphinx.ext.napoleon",
     "sphinx_qt_documentation",
 ]
+if "htmlhelp" in sys.argv:
+    extensions += ["sphinx.ext.imgmath"]
+else:
+    extensions += ["sphinx.ext.mathjax"]
 templates_path = ["_templates"]
 source_suffix = ".rst"
 master_doc = "index"
@@ -40,7 +43,10 @@ intersphinx_mapping = {
     "h5py": ("https://docs.h5py.org/en/stable/", None),
 }
 
-html_theme = "python_docs_theme"
+if "htmlhelp" in sys.argv:
+    html_theme = "classic"
+else:
+    html_theme = "python_docs_theme"
 html_title = "%s %s Manual" % (project, version)
 html_short_title = "%s Manual" % project
 html_logo = "images/guidata-vertical.png"
