@@ -283,3 +283,61 @@ def remove_backslashes(path):
         path = path.replace("\\", "/")
         path = path.replace("/'", "\\'")
     return path
+
+
+def convert_date_format(format_string: str) -> str:
+    """
+    Converts a date format string in Python strftime format to QDateTime style format.
+
+    Args:
+        format_string: The date format string in Python strftime format.
+
+    Returns:
+        The converted date format string in QDateTime style.
+
+    Examples:
+        >>> format_string = '%d.%m.%Y'
+        >>> qt_format = convert_date_format(format_string)
+        >>> print(qt_format)
+        dd.MM.yyyy
+    """
+    format_mapping = {
+        "%d": "dd",
+        "%-d": "d",
+        "%dd": "dd",
+        "%-dd": "d",
+        "%ddd": "ddd",
+        "%dddd": "dddd",
+        "%b": "MMM",
+        "%B": "MMMM",
+        "%m": "MM",
+        "%-m": "M",
+        "%mm": "MM",
+        "%-mm": "M",
+        "%y": "yy",
+        "%Y": "yyyy",
+        "%I": "h",
+        "%H": "HH",
+        "%-H": "H",
+        "%M": "mm",
+        "%-M": "m",
+        "%S": "ss",
+        "%-S": "s",
+        "%z": "z",
+        "%Z": "zzz",
+    }
+
+    qt_format = ""
+    i = 0
+    while i < len(format_string):
+        if format_string[i : i + 2] in format_mapping:
+            qt_format += format_mapping[format_string[i : i + 2]]
+            i += 2
+        elif format_string[i] in format_mapping:
+            qt_format += format_mapping[format_string[i]]
+            i += 1
+        else:
+            qt_format += format_string[i]
+            i += 1
+
+    return qt_format

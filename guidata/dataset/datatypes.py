@@ -413,6 +413,7 @@ class DataItem:
             return repval
         else:
             fmt = self.get_prop_value("display", instance, "format", "%s")
+            fmt = "%s" if fmt is None else fmt
             func = self.get_prop_value("display", instance, "func", lambda x: x)
             if (
                 isinstance(fmt, Callable)  # type:ignore

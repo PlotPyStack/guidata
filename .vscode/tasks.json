@@ -10,13 +10,13 @@
             "args": [
                 "/c",
                 "gettext.bat",
-                "rescan",
+                "rescan"
             ],
             "options": {
                 "cwd": "scripts",
                 "env": {
                     "UNATTENDED": "1",
-                    "PYTHON": "${env:GUIDATA_PYTHONEXE}",
+                    "PYTHON": "${env:GUIDATA_PYTHONEXE}"
                 }
             },
             "group": {
@@ -39,13 +39,13 @@
             "args": [
                 "/c",
                 "gettext.bat",
-                "compile",
+                "compile"
             ],
             "options": {
                 "cwd": "scripts",
                 "env": {
                     "UNATTENDED": "1",
-                    "PYTHON": "${env:GUIDATA_PYTHONEXE}",
+                    "PYTHON": "${env:GUIDATA_PYTHONEXE}"
                 }
             },
             "group": {
@@ -67,13 +67,13 @@
             "command": "cmd",
             "args": [
                 "/c",
-                "run_coverage.bat",
+                "run_coverage.bat"
             ],
             "options": {
                 "cwd": "scripts",
                 "env": {
                     "UNATTENDED": "1",
-                    "PYTHON": "${env:GUIDATA_PYTHONEXE}",
+                    "PYTHON": "${env:GUIDATA_PYTHONEXE}"
                 }
             },
             "group": {
@@ -98,7 +98,7 @@
                 "clean_up.bat"
             ],
             "options": {
-                "cwd": "scripts",
+                "cwd": "scripts"
             },
             "group": {
                 "kind": "build",
@@ -125,7 +125,7 @@
                 "cwd": "scripts",
                 "env": {
                     "UNATTENDED": "1",
-                    "PYTHON": "${env:GUIDATA_PYTHONEXE}",
+                    "PYTHON": "${env:GUIDATA_PYTHONEXE}"
                 }
             },
             "group": {
@@ -152,13 +152,13 @@
                 "--disable=C",
                 "--disable=R",
                 "--disable=W",
-                "guidata",
+                "guidata"
             ],
             "options": {
                 "cwd": "scripts",
                 "env": {
                     "UNATTENDED": "1",
-                    "PYTHON": "${env:GUIDATA_PYTHONEXE}",
+                    "PYTHON": "${env:GUIDATA_PYTHONEXE}"
                 }
             },
             "group": {
@@ -182,7 +182,7 @@
                 "cwd": "scripts",
                 "env": {
                     "PYTHON": "${env:GUIDATA_PYTHONEXE}",
-                    "UNATTENDED": "1",
+                    "UNATTENDED": "1"
                 }
             },
             "args": [
@@ -211,7 +211,7 @@
                 "cwd": "scripts",
                 "env": {
                     "PYTHON": "${env:GUIDATA_PYTHONEXE}",
-                    "UNATTENDED": "1",
+                    "UNATTENDED": "1"
                 }
             },
             "args": [
@@ -234,7 +234,7 @@
             "dependsOrder": "sequence",
             "dependsOn": [
                 "Clean Up",
-                "Build documentation",
+                "Build documentation"
             ]
         },
     ]

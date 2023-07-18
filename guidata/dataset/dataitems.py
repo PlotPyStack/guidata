@@ -446,8 +446,7 @@ class DateItem(DataItem):
     Args:
         label (str): item label
         default (datetime.date): default value (optional)
-        format (str, optional): date format (as in
-         :py:func:`QDateTimeEdit.setDisplayFormat`)
+        format (str, optional): date format (as in :py:func:`date.strftime`)
         help (str, optional): text displayed on data item's tooltip
         check (bool, optional): check value (default: True)
     """
@@ -472,6 +471,7 @@ class DateTimeItem(DateItem):
     Args:
         label (str): item label
         default (datetime.datetime): default value (optional)
+        format (str, optional): date format (as in :py:func:`date.strftime`)
         help (str, optional): text displayed on data item's tooltip
         check (bool, optional): check value (default: True)
     """
