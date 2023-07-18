@@ -18,13 +18,17 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import PIL.Image
+try:
+    from PIL import Image as PILImage
+except ImportError:
+    PILImage = None
+from numpy.core.multiarray import ndarray
+
 from guidata.qthelpers import exec_dialog
 from guidata.widgets.arrayeditor import ArrayEditor
 from guidata.widgets.collectionseditor import CollectionsEditor
 from guidata.widgets.nsview import DataFrame, FakeObject, Series, is_known_type
 from guidata.widgets.texteditor import TextEditor
-from numpy.core.multiarray import ndarray
 
 try:
     from guidata.widgets.dataframeeditor import DataFrameEditor
@@ -47,20 +51,27 @@ def create_dialog(obj, title, parent=None):
     oedit to show eMZed related data)
     """
 
-    conv_func = lambda data: data
+    def conv_func(data):
+        """Conversion function"""
+        return data
+
     readonly = not is_known_type(obj)
     if isinstance(obj, ndarray):
         dialog = ArrayEditor(parent)
         if not dialog.setup_and_check(obj, title=title, readonly=readonly):
             return
-    elif isinstance(obj, PIL.Image.Image):
+    elif PILImage is not None and isinstance(obj, PILImage.Image):
         dialog = ArrayEditor(parent)
         import numpy as np
 
         data = np.array(obj)
         if not dialog.setup_and_check(data, title=title, readonly=readonly):
             return
-        conv_func = lambda data: PIL.Image.fromarray(data, mode=obj.mode)
+
+        def conv_func(data):
+            """Conversion function"""
+            return PILImage.fromarray(data, mode=obj.mode)
+
     elif isinstance(obj, (DataFrame, Series)) and DataFrame is not FakeObject:
         dialog = DataFrameEditor(parent)
         if not dialog.setup_and_check(obj):

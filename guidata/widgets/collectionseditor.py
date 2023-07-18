@@ -10,7 +10,8 @@
 guidata.widgets.collectionseditor
 =================================
 
-This package provides a Collections (i.e. dictionary, list and tuple) editor widget and dialog.
+This package provides a Collections (i.e. dictionary, list and tuple) editor widget
+and dialog.
 
 .. autoclass:: CollectionsEditor
 
@@ -31,30 +32,65 @@ import re
 import sys
 import warnings
 
-import PIL.Image
+try:
+    from PIL import Image as PILImage
+except ImportError:
+    PILImage = None
+from qtpy.compat import getsavefilename
+from qtpy.QtCore import QAbstractTableModel, QDateTime, QModelIndex, Qt, Signal, Slot
+from qtpy.QtGui import QColor, QKeySequence
+from qtpy.QtWidgets import (
+    QAbstractItemDelegate,
+    QApplication,
+    QDateEdit,
+    QDateTimeEdit,
+    QDialog,
+    QHBoxLayout,
+    QInputDialog,
+    QItemDelegate,
+    QLineEdit,
+    QMenu,
+    QMessageBox,
+    QPushButton,
+    QTableView,
+    QVBoxLayout,
+    QWidget,
+)
+
 from guidata.config import CONF, _
 from guidata.configtools import get_font, get_icon
-from guidata.qthelpers import (add_actions, create_action, mimedata2url,
-                               win32_fix_title_bar_background)
+from guidata.qthelpers import (
+    add_actions,
+    create_action,
+    mimedata2url,
+    win32_fix_title_bar_background,
+)
 from guidata.utils.misc import getcwd_or_home
 from guidata.widgets.importwizard import ImportWizard
-from guidata.widgets.nsview import (DataFrame, DatetimeIndex, FakeObject,
-                                    Image, MaskedArray, Series, array,
-                                    display_to_value, get_color_name,
-                                    get_human_readable_type, get_object_attrs,
-                                    get_size, get_type_string,
-                                    is_editable_type, is_known_type, ndarray,
-                                    np_savetxt, sort_against, try_to_eval,
-                                    unsorted_unique, value_to_display)
+from guidata.widgets.nsview import (
+    DataFrame,
+    DatetimeIndex,
+    FakeObject,
+    Image,
+    MaskedArray,
+    Series,
+    array,
+    display_to_value,
+    get_color_name,
+    get_human_readable_type,
+    get_object_attrs,
+    get_size,
+    get_type_string,
+    is_editable_type,
+    is_known_type,
+    ndarray,
+    np_savetxt,
+    sort_against,
+    try_to_eval,
+    unsorted_unique,
+    value_to_display,
+)
 from guidata.widgets.texteditor import TextEditor
-from qtpy.compat import getsavefilename
-from qtpy.QtCore import (QAbstractTableModel, QDateTime, QModelIndex, Qt,
-                         Signal, Slot)
-from qtpy.QtGui import QColor, QKeySequence
-from qtpy.QtWidgets import (QAbstractItemDelegate, QApplication, QDateEdit,
-                            QDateTimeEdit, QDialog, QHBoxLayout, QInputDialog,
-                            QItemDelegate, QLineEdit, QMenu, QMessageBox,
-                            QPushButton, QTableView, QVBoxLayout, QWidget)
 
 if ndarray is not FakeObject:
     from guidata.widgets.arrayeditor import ArrayEditor
@@ -78,7 +114,11 @@ def fix_reference_name(name, blacklist=None):
     if not name:
         name = "data"
     if blacklist is not None and name in blacklist:
-        get_new_name = lambda index: name + ("%03d" % index)
+
+        def get_new_name(index):
+            """Generate new name"""
+            return name + ("%03d" % index)
+
         index = 0
         while get_new_name(index) in blacklist:
             index += 1
@@ -247,21 +287,21 @@ class ReadOnlyCollectionsModel(QAbstractTableModel):
             self.types = sort_against(self.types, self.keys, reverse)
             try:
                 self.keys.sort(reverse=reverse)
-            except:
+            except Exception:  # pylint: disable=broad-except
                 pass
         elif column == 1:
             self.keys[: self.rows_loaded] = sort_against(self.keys, self.types, reverse)
             self.sizes = sort_against(self.sizes, self.types, reverse)
             try:
                 self.types.sort(reverse=reverse)
-            except:
+            except Exception:  # pylint: disable=broad-except
                 pass
         elif column == 2:
             self.keys[: self.rows_loaded] = sort_against(self.keys, self.sizes, reverse)
             self.types = sort_against(self.types, self.sizes, reverse)
             try:
                 self.sizes.sort(reverse=reverse)
-            except:
+            except Exception:  # pylint: disable=broad-except
                 pass
         elif column == 3:
             values = [self._data[key] for key in self.keys]
@@ -435,7 +475,6 @@ class CollectionsModel(ReadOnlyCollectionsModel):
 class CollectionsDelegate(QItemDelegate):
     """CollectionsEditor Item Delegate"""
 
-
     def __init__(self, parent=None):
         QItemDelegate.__init__(self, parent)
         self._editors = {}  # keep references on opened editors
@@ -473,7 +512,7 @@ class CollectionsDelegate(QItemDelegate):
         try:
             val_size = index.model().sizes[index.row()]
             val_type = index.model().types[index.row()]
-        except:
+        except Exception:  # pylint: disable=broad-except
             return False
         if val_type in ["list", "tuple", "dict"] and int(val_size) > 1e5:
             return True
@@ -548,7 +587,11 @@ class CollectionsDelegate(QItemDelegate):
             editor = ArrayEditor(parent=parent)
             if not editor.setup_and_check(arr, title=key, readonly=readonly):
                 return
-            conv_func = lambda arr: PIL.Image.fromarray(arr, mode=value.mode)
+
+            def conv_func(arr):
+                """Conversion function"""
+                return PILImage.fromarray(arr, mode=value.mode)
+
             self.create_dialog(
                 editor,
                 dict(
@@ -690,7 +733,7 @@ class CollectionsDelegate(QItemDelegate):
             if isinstance(value, bytes):
                 try:
                     value = str(value, "utf8")
-                except:
+                except Exception:  # pylint: disable=broad-except
                     pass
             if not isinstance(value, str):
                 value = repr(value)
@@ -1173,14 +1216,14 @@ class BaseTableView(QTableView):
             import guiqwt.pyplot  # analysis:ignore
 
             return True
-        except:
+        except Exception:  # pylint: disable=broad-except
             try:
                 if "matplotlib" not in sys.modules:
                     import matplotlib
 
                     matplotlib.use("Qt5Agg")
                 return True
-            except:
+            except Exception:  # pylint: disable=broad-except
                 QMessageBox.warning(
                     self,
                     _("Import error"),
@@ -1262,7 +1305,7 @@ class BaseTableView(QTableView):
                 output = io.BytesIO()
                 try:
                     np_savetxt(output, obj, delimiter="\t")
-                except:
+                except Exception:  # pylint: disable=broad-except
                     QMessageBox.warning(
                         self,
                         _("Warning"),
@@ -1275,7 +1318,7 @@ class BaseTableView(QTableView):
                 output = io.StringIO()
                 try:
                     obj.to_csv(output, sep="\t", index=True, header=True)
-                except Exception:
+                except Exception:  # pylint: disable=broad-except
                     QMessageBox.warning(
                         self,
                         _("Warning"),

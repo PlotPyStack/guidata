@@ -12,24 +12,21 @@ Tests for collectionseditor.py
 
 import datetime
 
-import pytest
+import numpy as np
 
 from guidata.env import execenv
 from guidata.qthelpers import qt_app_context
+from guidata.widgets.collectionseditor import CollectionsEditor
 
 try:
-    from guidata.widgets.collectionseditor import CollectionsEditor
+    from PIL import Image as PILImage
 except ImportError:
     # PIL is not installed
-    CollectionsEditor = None
+    PILImage = None
 
 
 def get_test_data():
     """Create test data."""
-    import numpy as np
-    from PIL import Image
-
-    image = Image.fromarray(np.random.randint(256, size=(100, 100)), mode="P")
     testdict = {"d": 1, "a": np.random.rand(10, 10), "b": [1, 2]}
     testdate = datetime.date(1945, 5, 8)
     test_timedelta = datetime.timedelta(days=-1, minutes=42, seconds=13)
@@ -65,7 +62,7 @@ def get_test_data():
             self.testdate = testdate
 
     foobar = Foobar()
-    return {
+    test_data = {
         "object": foobar,
         "module": np,
         "str": "kjkj kj k j j kj k jkj",
@@ -83,7 +80,6 @@ def get_test_data():
         "1D-array": np.linspace(-10, 10).astype(np.float16),
         "3D-array": np.random.randint(2, size=(5, 5, 5)).astype(np.bool_),
         "empty_array": np.array([]),
-        "image": image,
         "date": testdate,
         "datetime": datetime.datetime(1945, 5, 8, 23, 1, 0, int(1.5e5)),
         "timedelta": test_timedelta,
@@ -112,9 +108,12 @@ def get_test_data():
             1000, dtype=[("ID", "f8"), ("param1", "f8", 5000)]
         ),
     }
+    if PILImage is not None:
+        image = PILImage.fromarray(np.random.randint(256, size=(100, 100)), mode="P")
+        test_data["image"] = image
+    return test_data
 
 
-@pytest.mark.skipif(CollectionsEditor is None, reason="PIL is not installed")
 def test_collectionseditor():
     """Test Collections editor."""
     with qt_app_context(exec_loop=True):

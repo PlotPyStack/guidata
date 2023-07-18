@@ -16,13 +16,14 @@ import pytest
 try:
     import pandas as pd
     import pandas.testing as pdt
+
+    from guidata.widgets.dataframeeditor import DataFrameEditor
 except ImportError:
     # pandas is not installed
-    pd = pdt = None
+    pd = pdt = DataFrameEditor = None
 
 from guidata.env import execenv
 from guidata.qthelpers import exec_dialog, qt_app_context
-from guidata.widgets.dataframeeditor import DataFrameEditor
 
 
 @pytest.mark.skipif(pd is None, reason="pandas is not installed")
