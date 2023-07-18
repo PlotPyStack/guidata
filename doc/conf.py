@@ -10,8 +10,9 @@ from guidata.utils.genreqs import generate_requirement_tables  # noqa: E402
 
 generate_requirement_tables(guidata, ["Python>=3.7", "PyQt>=5.11"])
 
+creator = "Pierre Raybaut"
 project = "guidata"
-copyright = "2009 CEA - Commissariat à l'Energie Atomique et aux Energies Alternatives"
+copyright = "2009 CEA, " + creator
 version = ".".join(guidata.__version__.split(".")[:2])
 release = guidata.__version__
 
@@ -39,7 +40,7 @@ intersphinx_mapping = {
     "h5py": ("https://docs.h5py.org/en/stable/", None),
 }
 
-html_theme = "classic"
+html_theme = "python_docs_theme"
 html_title = "%s %s Manual" % (project, version)
 html_short_title = "%s Manual" % project
 html_logo = "images/guidata-vertical.png"
@@ -48,5 +49,5 @@ html_static_path = ["_static"]
 html_use_modindex = True
 htmlhelp_basename = "guidata"
 latex_documents = [
-    ("index", "guidata.tex", "guidata Manual", "Pierre Raybaut", "manual"),
+    ("index", "guidata.tex", "guidata Manual", creator, "manual"),
 ]
