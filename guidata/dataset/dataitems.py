@@ -445,12 +445,25 @@ class DateItem(DataItem):
 
     Args:
         label (str): item label
-        default (datetime.date, optional): default value (optional)
+        default (datetime.date): default value (optional)
+        format (str, optional): date format (as in
+         :py:func:`QDateTimeEdit.setDisplayFormat`)
         help (str, optional): text displayed on data item's tooltip
         check (bool, optional): check value (default: True)
     """
 
     type = datetime.date
+
+    def __init__(
+        self,
+        label: str,
+        default: datetime.date | None = None,
+        format: str | None = None,
+        help: str | None = "",
+        check: bool | None = True,
+    ) -> None:
+        DataItem.__init__(self, label, default=default, help=help, check=check)
+        self.set_prop("display", format=format)
 
 
 class DateTimeItem(DateItem):
@@ -458,7 +471,7 @@ class DateTimeItem(DateItem):
 
     Args:
         label (str): item label
-        default (datetime.datetime, optional): default value (optional)
+        default (datetime.datetime): default value (optional)
         help (str, optional): text displayed on data item's tooltip
         check (bool, optional): check value (default: True)
     """

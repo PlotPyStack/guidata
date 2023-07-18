@@ -12,6 +12,10 @@ Bug fixes:
 * Fixed documentation generation ``.readthedocs.yaml`` file (Qt 5.15 was not
   installed on ReadTheDocs servers, causing documentation build to fail)
 
+Minor changes:
+
+* [Pull Request #55](https://github.com/Codra-Ingenierie-Informatique/guidata/pull/55) - DateItem and DateTimeItem: added 'format' parameter for formatting, by [@robochat](https://github.com/robochat)
+
 ## Version 3.0.0 ##
 
 New major release:

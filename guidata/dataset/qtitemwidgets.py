@@ -466,6 +466,9 @@ class DateWidget(AbstractDataSetWidget):
         self.dateedit = self.group = QDateEdit()
         self.dateedit.setToolTip(item.get_help())
         self.dateedit.dateTimeChanged.connect(self.date_changed)
+        fmt = self.item.get_prop("display", "format", None)
+        if fmt:
+            self.dateedit.setDisplayFormat(fmt)
 
     def date_changed(self, value):
         """Date changed"""
@@ -516,6 +519,9 @@ class DateTimeWidget(AbstractDataSetWidget):
         self.dateedit.dateTimeChanged.connect(  # type:ignore
             lambda value: self.notify_value_change()
         )
+        fmt = self.item.get_prop("display", "format", None)
+        if fmt:
+            self.dateedit.setDisplayFormat(fmt)
 
     def date_changed(self, value):
         """Date changed"""

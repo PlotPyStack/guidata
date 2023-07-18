@@ -62,7 +62,7 @@ class ExampleMultiGroupDataSet(gdt.DataSet):
     _b_group = gdt.EndGroup("B group")
     c_group = gdt.BeginGroup("C group")
     param5 = gdi.FloatItem("Foobar 4", default=250)
-    param6 = gdi.DateItem("Date")
+    param6 = gdi.DateItem("Date").set_prop("display", format="dd.MM.yyyy")
     param7 = gdi.ColorItem("Color")
     _c_group = gdt.EndGroup("C group")
     _t_group = gdt.EndTabGroup("T group")
