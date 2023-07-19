@@ -98,11 +98,10 @@ from numpy import ndarray
 
 from guidata.config import _
 from guidata.dataset.datatypes import DataItem, DataSet, ItemProperty
-from guidata.dataset.iniio import UserConfigReader, UserConfigWriter
+from guidata.dataset.io import INIReader, INIWriter
 
 if TYPE_CHECKING:  # pragma: no cover
-    from guidata.dataset.hdf5io import HDF5Reader, HDF5Writer
-    from guidata.dataset.jsonio import JSONReader, JSONWriter
+    from guidata.dataset.io import HDF5Reader, HDF5Writer, JSONReader, JSONWriter
 
 
 class NumericTypeItem(DataItem):
@@ -249,7 +248,7 @@ class FloatItem(NumericTypeItem):
         self.set_prop("data", step=step)
 
     def get_value_from_reader(
-        self, reader: HDF5Reader | JSONReader | UserConfigReader
+        self, reader: HDF5Reader | JSONReader | INIReader
     ) -> float:
         """Reads value from the reader object, inside the try...except
         statement defined in the base item `deserialize` method"""
@@ -327,9 +326,7 @@ class IntItem(NumericTypeItem):
                 return False
         return True
 
-    def get_value_from_reader(
-        self, reader: HDF5Reader | JSONReader | UserConfigReader
-    ) -> Any:
+    def get_value_from_reader(self, reader: HDF5Reader | JSONReader | INIReader) -> Any:
         """Reads value from the reader object, inside the try...except
         statement defined in the base item `deserialize` method"""
         return reader.read_int()
@@ -371,9 +368,7 @@ class StringItem(DataItem):
         """Override DataItem method"""
         return value
 
-    def get_value_from_reader(
-        self, reader: HDF5Reader | JSONReader | UserConfigReader
-    ) -> Any:
+    def get_value_from_reader(self, reader: HDF5Reader | JSONReader | INIReader) -> Any:
         """Reads value from the reader object, inside the try...except
         statement defined in the base item `deserialize` method"""
         return reader.read_unicode()
@@ -433,7 +428,7 @@ class BoolItem(DataItem):
         self.set_prop("display", text=text)
 
     def get_value_from_reader(
-        self, reader: HDF5Reader | JSONReader | UserConfigReader
+        self, reader: HDF5Reader | JSONReader | INIReader
     ) -> bool:
         """Reads value from the reader object, inside the try...except
         statement defined in the base item `deserialize` method"""
@@ -500,9 +495,7 @@ class ColorItem(StringItem):
 
         return text_to_qcolor(value).isValid()
 
-    def get_value_from_reader(
-        self, reader: HDF5Reader | JSONReader | UserConfigReader
-    ) -> str:
+    def get_value_from_reader(self, reader: HDF5Reader | JSONReader | INIReader) -> str:
         """Reads value from the reader object, inside the try...except
         statement defined in the base item `deserialize` method"""
         # Using read_str converts `numpy.string_` to `str` -- otherwise,
@@ -652,14 +645,14 @@ class FilesOpenItem(FileSaveItem):
     def serialize(
         self,
         instance: DataSet,
-        writer: HDF5Writer | JSONWriter | UserConfigWriter,
+        writer: HDF5Writer | JSONWriter | INIWriter,
     ) -> None:
         """Serialize this item"""
         value = self.get_value(instance)
         writer.write_sequence([fname.encode("utf-8") for fname in value])
 
     def get_value_from_reader(
-        self, reader: HDF5Reader | JSONReader | UserConfigReader
+        self, reader: HDF5Reader | JSONReader | INIReader
     ) -> list[str]:
         """Reads value from the reader object, inside the try...except
         statement defined in the base item `deserialize` method"""
@@ -801,7 +794,7 @@ class MultipleChoiceItem(ChoiceItem):
     def serialize(
         self,
         instance: DataSet,
-        writer: HDF5Writer | JSONWriter | UserConfigWriter,
+        writer: HDF5Writer | JSONWriter | INIWriter,
     ) -> None:
         """Serialize this item"""
         value = self.get_value(instance)
@@ -814,7 +807,7 @@ class MultipleChoiceItem(ChoiceItem):
     def deserialize(
         self,
         instance: DataSet,
-        reader: HDF5Reader | JSONReader | UserConfigReader,
+        reader: HDF5Reader | JSONReader | INIReader,
     ) -> None:
         """Deserialize this item"""
         try:
@@ -909,15 +902,13 @@ class FloatArrayItem(DataItem):
     def serialize(
         self,
         instance: DataSet,
-        writer: HDF5Writer | JSONWriter | UserConfigWriter,
+        writer: HDF5Writer | JSONWriter | INIWriter,
     ) -> None:
         """Serialize this item"""
         value = self.get_value(instance)
         writer.write_array(value)
 
-    def get_value_from_reader(
-        self, reader: HDF5Reader | JSONReader | UserConfigReader
-    ) -> Any:
+    def get_value_from_reader(self, reader: HDF5Reader | JSONReader | INIReader) -> Any:
         """Reads value from the reader object, inside the try...except
         statement defined in the base item `deserialize` method"""
         return reader.read_array()
@@ -959,14 +950,14 @@ class ButtonItem(DataItem):
     def serialize(
         self,
         instance: DataSet,
-        writer: HDF5Writer | JSONWriter | UserConfigWriter,
+        writer: HDF5Writer | JSONWriter | INIWriter,
     ) -> Any:
         pass
 
     def deserialize(
         self,
         instance: DataSet,
-        reader: HDF5Reader | JSONReader | UserConfigReader,
+        reader: HDF5Reader | JSONReader | INIReader,
     ) -> Any:
         pass
 

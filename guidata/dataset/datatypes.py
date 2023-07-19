@@ -64,7 +64,7 @@ from abc import abstractmethod
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Any
 
-from guidata.dataset.iniio import UserConfigReader, UserConfigWriter
+from guidata.dataset.io import INIReader, INIWriter
 from guidata.userconfig import UserConfig
 from guidata.utils import update_dataset
 
@@ -73,8 +73,7 @@ DEBUG_DESERIALIZE = False
 if TYPE_CHECKING:  # pragma: no cover
     from qtpy.QtWidgets import QWidget
 
-    from guidata.dataset.hdf5io import HDF5Reader, HDF5Writer
-    from guidata.dataset.jsonio import JSONReader, JSONWriter
+    from guidata.dataset.io import HDF5Reader, HDF5Writer, JSONReader, JSONWriter
     from guidata.dataset.qtwidgets import DataSetEditDialog
 
 
@@ -545,7 +544,7 @@ class DataItem:
     def serialize(
         self,
         instance: DataSet,
-        writer: HDF5Writer | JSONWriter | UserConfigWriter,
+        writer: HDF5Writer | JSONWriter | INIWriter,
     ) -> None:
         """Serialize this item using the writer object
 
@@ -554,28 +553,26 @@ class DataItem:
 
         Args:
             instance (DataSet): instance of the DataSet
-            writer (HDF5Writer | JSONWriter | UserConfigWriter): writer object
+            writer (HDF5Writer | JSONWriter | INIWriter): writer object
         """
         value = self.get_value(instance)
         writer.write(value)
 
-    def get_value_from_reader(
-        self, reader: HDF5Reader | JSONReader | UserConfigReader
-    ) -> Any:
+    def get_value_from_reader(self, reader: HDF5Reader | JSONReader | INIReader) -> Any:
         """Reads value from the reader object, inside the try...except
         statement defined in the base item `deserialize` method
 
         This method is reimplemented in some child classes
 
         Args:
-            reader (HDF5Reader | JSONReader | UserConfigReader): reader object
+            reader (HDF5Reader | JSONReader | INIReader): reader object
         """
         return reader.read_any()
 
     def deserialize(
         self,
         instance: Any,
-        reader: HDF5Reader | JSONReader | UserConfigReader,
+        reader: HDF5Reader | JSONReader | INIReader,
     ) -> None:
         """Deserialize this item using the reader object
 
@@ -584,7 +581,7 @@ class DataItem:
 
         Args:
             instance (Any): instance of the DataSet
-            reader (HDF5Reader | JSONReader | UserConfigReader): reader object
+            reader (HDF5Reader | JSONReader | INIReader): reader object
         """
         try:
             value = self.get_value_from_reader(reader)
@@ -632,7 +629,7 @@ class ObjectItem(DataItem):
     def deserialize(
         self,
         instance: DataSet,
-        reader: HDF5Reader | JSONReader | UserConfigReader,
+        reader: HDF5Reader | JSONReader | INIReader,
     ) -> None:
         """Deserialize this item using the reader object
 
@@ -640,7 +637,7 @@ class ObjectItem(DataItem):
 
         Args:
             instance (DataSet): instance of the DataSet
-            reader (HDF5Reader | JSONReader | UserConfigReader): reader object
+            reader (HDF5Reader | JSONReader | INIReader): reader object
         """
         if self.klass is not None:
             value = self.klass()
@@ -1249,21 +1246,21 @@ class DataSet(metaclass=DataSetMeta):
         for item in self._items:
             item.accept(vis)
 
-    def serialize(self, writer: HDF5Writer | JSONWriter | UserConfigWriter) -> None:
+    def serialize(self, writer: HDF5Writer | JSONWriter | INIWriter) -> None:
         """Serialize the dataset
 
         Args:
-            writer (HDF5Writer | JSONWriter | UserConfigWriter): writer object
+            writer (HDF5Writer | JSONWriter | INIWriter): writer object
         """
         for item in self._items:
             with writer.group(item._name):
                 item.serialize(self, writer)
 
-    def deserialize(self, reader: HDF5Reader | JSONReader | UserConfigReader) -> None:
+    def deserialize(self, reader: HDF5Reader | JSONReader | INIReader) -> None:
         """Deserialize the dataset
 
         Args:
-            reader (HDF5Reader | JSONReader | UserConfigReader): reader object
+            reader (HDF5Reader | JSONReader | INIReader): reader object
         """
         for item in self._items:
             with reader.group(item._name):
@@ -1288,9 +1285,9 @@ class DataSet(metaclass=DataSetMeta):
             section (str): section name
             option (str): option name
         """
-        from guidata.dataset.iniio import UserConfigReader
+        from guidata.dataset.io import INIReader
 
-        reader = UserConfigReader(conf, section, option)
+        reader = INIReader(conf, section, option)
         self.deserialize(reader)
 
     def write_config(self, conf: UserConfig, section: str, option: str) -> None:
@@ -1301,9 +1298,9 @@ class DataSet(metaclass=DataSetMeta):
             section (str): section name
             option (str): option name
         """
-        from guidata.dataset.iniio import UserConfigWriter
+        from guidata.dataset.io import INIWriter
 
-        writer = UserConfigWriter(conf, section, option)
+        writer = INIWriter(conf, section, option)
         self.serialize(writer)
 
     @classmethod

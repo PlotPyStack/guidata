@@ -8,18 +8,6 @@
 
 """
 JSON files (.json)
-^^^^^^^^^^^^^^^^^^
-
-Reader and writer for the serialization of data sets into .json files:
-
-* :py:class:`JSONReader`
-* :py:class:`JSONWriter`
-
-.. autoclass:: JSONReader
-    :members:
-
-.. autoclass:: JSONWriter
-    :members:
 """
 
 # pylint: disable=invalid-name  # Allows short reference names like x, y, ...
@@ -30,7 +18,7 @@ from uuid import uuid1
 
 import numpy as np
 
-from guidata.dataset.iniio import BaseIOHandler, WriterMixin
+from guidata.dataset.io.base import BaseIOHandler, WriterMixin
 
 
 class CustomJSONEncoder(json.JSONEncoder):
@@ -88,7 +76,11 @@ class CustomJSONDecoder(json.JSONDecoder):
 
 
 class JSONHandler(BaseIOHandler):
-    """Class handling JSON r/w"""
+    """Class handling JSON r/w
+
+    Args:
+        filename: JSON filename (if None, use `jsontext` attribute)
+    """
 
     def __init__(self, filename=None):
         super().__init__()
@@ -173,11 +165,14 @@ class JSONWriter(JSONHandler, WriterMixin):
 
 
 class JSONReader(JSONHandler):
-    """Class handling JSON deserialization"""
+    """Class handling JSON deserialization
+
+    Args:
+        fname_or_jsontext: JSON filename or JSON text
+    """
 
     def __init__(self, fname_or_jsontext):
-        """JSONReader constructor:
-        * fname_or_jsontext: JSON filename or JSON text"""
+        """JSONReader constructor"""
         JSONHandler.__init__(self, fname_or_jsontext)
         if fname_or_jsontext is not None and not os.path.isfile(fname_or_jsontext):
             self.filename = None

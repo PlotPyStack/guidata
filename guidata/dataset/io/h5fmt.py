@@ -5,18 +5,6 @@
 
 """
 HDF5 files (.h5)
-^^^^^^^^^^^^^^^^
-
-Reader and writer for the serialization of data sets into .h5 files:
-
-* :py:class:`HDF5Reader`
-* :py:class:`HDF5Writer`
-
-.. autoclass:: HDF5Reader
-    :members:
-
-.. autoclass:: HDF5Writer
-    :members:
 """
 
 from __future__ import annotations
@@ -29,7 +17,7 @@ from uuid import uuid1
 import h5py
 import numpy as np
 
-from guidata.dataset.iniio import BaseIOHandler, WriterMixin
+from guidata.dataset.io.base import BaseIOHandler, WriterMixin
 
 
 class TypeConverter:

@@ -2,6 +2,17 @@
 
 ## Version 3.0.1 (work in progress) ##
 
+API changes (fixes inconsistencies in API):
+
+* Moved `guidata.dataset.iniio.WriterMixin` to `guidata.dataset.io.WriterMixin`
+* Moved `guidata.dataset.iniio.BaseIOHandler` to `guidata.dataset.io.BaseIOHandler`
+* Moved `guidata.dataset.iniio` to `guidata.dataset.io.inifmt` and renamed:
+  * `UserConfigIOHandler` to `INIHandler`
+  * `UserConfigWriter` to `INIWriter`
+  * `UserConfigReader` to `INIReader`
+* Moved `guidata.dataset.jsonio` to `guidata.dataset.io.jsonfmt`
+* Moved `guidata.dataset.hdf5io` to `guidata.dataset.io.h5fmt`
+
 Bug fixes:
 
 * Modules `guidata.dataset.datatypes` and `guidata.dataset.dataitems` should not
