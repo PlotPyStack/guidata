@@ -162,10 +162,10 @@ def run_program(
 
     Args:
         name (str): The program name.
-        args (str, optional): The program arguments. Defaults to "".""
-        cwd (str, optional): The current working directory. Defaults to None.
-        shell (bool, optional): If True, run program in a shell. Defaults to True.
-        wait (bool, optional): If True, wait for program to finish. Defaults to False.
+        args (str): The program arguments. Defaults to "".""
+        cwd (str): The current working directory. Defaults to None.
+        shell (bool): If True, run program in a shell. Defaults to True.
+        wait (bool): If True, wait for program to finish. Defaults to False.
 
     Raises:
         RuntimeError: If program is not installed.

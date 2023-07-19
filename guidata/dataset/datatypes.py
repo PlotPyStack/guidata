@@ -37,6 +37,8 @@ Grouping items
 Handling item properties
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
+.. autoclass:: ItemProperty
+
 .. autoclass:: FormatProp
     :members:
 
@@ -118,7 +120,7 @@ class FormatProp(ItemProperty):
 
     Args:
         fmt (str): format string
-        ignore_error (bool, optional): ignore errors when formatting. Defaults to True.
+        ignore_error (bool): ignore errors when formatting. Defaults to True.
     """
 
     def __init__(self, fmt: str, ignore_error: bool | None = True) -> None:
@@ -217,7 +219,7 @@ class FuncProp(ItemProperty):
     Args:
         prop (ItemProperty): property to apply function to
         func (function): function to apply
-        invfunc (function, optional): inverse function (default: func)
+        invfunc (function): inverse function (default: func)
     """
 
     def __init__(
@@ -251,9 +253,9 @@ class DataItem:
 
     Args:
         label (str): item label
-        default (Any, optional): default value
-        help (str, optional): text displayed on data item's tooltip
-        check (bool, optional): check value (default: True)
+        default (Any): default value
+        help (str): text displayed on data item's tooltip
+        check (bool): check value (default: True)
     """
 
     count = 0
@@ -282,7 +284,7 @@ class DataItem:
         Args:
             realm (str): realm name
             name (str): property name
-            default (Any, optional): default value (default: NoDefault)
+            default (Any): default value (default: NoDefault)
 
         Returns:
             Any: property value
@@ -303,7 +305,7 @@ class DataItem:
             realm (str): realm name
             instance (DataSet): instance of the DataSet
             name (str): property name
-            default (Any, optional): default value (default: NoDefault)
+            default (Any): default value (default: NoDefault)
 
         Returns:
             Any: property value
@@ -343,9 +345,9 @@ class DataItem:
         """Set data item's position on a GUI layout
 
         Args:
-            col (int, optional): column number (default: 0)
-            colspan (int, optional): number of columns (default: None)
-            row (int, optional): row number (default: None)
+            col (int): column number (default: 0)
+            colspan (int): number of columns (default: None)
+            row (int): row number (default: None)
         """
         self.set_prop("display", col=col, colspan=colspan, row=row)
         return self
@@ -773,7 +775,7 @@ class DataItemProxy:
         Args:
             realm (str): realm
             name (str): name
-            default (Any, optional): default value
+            default (Any): default value
 
         Returns:
             Any: value
@@ -789,7 +791,7 @@ class DataItemProxy:
             realm (str): realm
             instance (DataSet): instance of the DataSet
             name (str): name
-            default (Any, optional): default value
+            default (Any): default value
 
         Returns:
             Any: value
@@ -849,7 +851,7 @@ class DataItemVariable:
         Args:
             realm (str): realm
             name (str): name
-            default (object, optional): default value
+            default (object): default value
 
         Returns:
             Any: value
@@ -862,7 +864,7 @@ class DataItemVariable:
         Args:
             realm (str): realm
             name (str): name
-            default (type | None, optional): default value
+            default (type | None): default value
 
         Returns:
             Any: value
@@ -995,9 +997,9 @@ class DataSet(metaclass=DataSetMeta):
     """Construct a DataSet object is a set of DataItem objects
 
     Args:
-        title (str, optional): title
-        comment (str, optional): comment. Text shown on the top of the first data item
-        icon (str, optional): icon filename as in image search paths
+        title (str): title
+        comment (str): comment. Text shown on the top of the first data item
+        icon (str): icon filename as in image search paths
     """
 
     _items: list[DataItem]
@@ -1128,10 +1130,10 @@ class DataSet(metaclass=DataSetMeta):
         """Open a dialog box to edit data set
 
         Args:
-            parent (QWidget, optional): parent widget (default is None,
+            parent (QWidget): parent widget (default is None,
              meaning no parent)
-            apply (callable, optional): apply callback (default is None)
-            size (QSize | tuple[int, int], optional): dialog size (QSize object
+            apply (Callable): apply callback (default is None)
+            size (QSize | tuple[int, int]): dialog size (QSize object
              or integer tuple (width, height))
         """
         # Importing those modules here avoids Qt dependency when
@@ -1149,9 +1151,9 @@ class DataSet(metaclass=DataSetMeta):
         """Open a dialog box to view data set
 
         Args:
-            parent (QWidget, optional): parent widget (default is None,
+            parent (QWidget): parent widget (default is None,
              meaning no parent)
-            size (QSize | tuple[int, int], optional): dialog size (QSize object
+            size (QSize | tuple[int, int]): dialog size (QSize object
              or integer tuple (width, height))
         """
         # Importing those modules here avoids Qt dependency when
@@ -1174,11 +1176,11 @@ class DataSet(metaclass=DataSetMeta):
         If debug is True, add more details on data items
 
         Args:
-            debug (bool, optional): if True, add more details on data items
-            indent (str, optional): indentation string (default is None,
+            debug (bool): if True, add more details on data items
+            indent (str): indentation string (default is None,
                 meaning no indentation)
-            align (bool, optional): if True, align data items (default is False)
-            show_hidden (bool, optional): if True, show hidden data items
+            align (bool): if True, align data items (default is False)
+            show_hidden (bool): if True, show hidden data items
                 (default is True)
 
         Returns:
@@ -1435,8 +1437,8 @@ class DataSetGroup:
         """Open a dialog box to edit data set
 
         Args:
-            parent (QWidget, optional): parent widget. Defaults to None.
-            apply (Callable, optional): apply callback. Defaults to None.
+            parent (QWidget): parent widget. Defaults to None.
+            apply (Callable): apply callback. Defaults to None.
 
         Returns:
             int: dialog box return code

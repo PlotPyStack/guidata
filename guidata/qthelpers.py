@@ -173,8 +173,8 @@ def create_action(
     Args:
         parent (QWidget or None): Parent widget
         title (str): Action title
-        triggered (callable or None): Triggered callback
-        toggled (callable or None): Toggled callback
+        triggered (Callable or None): Triggered callback
+        toggled (Callable or None): Toggled callback
         shortcut (QKeySequence or None): Shortcut
         icon (QIcon or None): Icon
         tip (str or None): Tooltip
@@ -230,9 +230,9 @@ def create_toolbutton(
         parent (QWidget): Parent widget
         icon (QIcon or str or None): Icon
         text (str or None): Text
-        triggered (callable or None): Triggered callback
+        triggered (Callable or None): Triggered callback
         tip (str or None): Tooltip
-        toggled (callable or None): Toggled callback
+        toggled (Callable or None): Toggled callback
         shortcut (QKeySequence or None): Shortcut
         autoraise (bool): Auto raise
         enabled (bool or None): Enabled
@@ -280,7 +280,7 @@ def create_groupbox(
     Args:
         parent (QWidget): Parent widget
         title (str or None): Title
-        toggled (callable or None): Toggled callback
+        toggled (Callable or None): Toggled callback
         checked (bool or None): Checked
         flat (bool): Flat
         layout (QLayout or None): Layout

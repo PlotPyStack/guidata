@@ -61,7 +61,7 @@ def get_module_data_path(modname: str, relpath: str | None = None) -> str:
 
     Args:
         modname (str): module name
-        relpath (str, optional): relative path to module data directory
+        relpath (str): relative path to module data directory
 
     Returns:
         str: module data path
@@ -84,7 +84,7 @@ def get_translation(modname: str, dirname: str | None = None) -> Callable[[str],
 
     Args:
         modname (str): module name
-        dirname (str, optional): module directory
+        dirname (str): module directory
 
     Returns:
         Callable[[str], str]: translation callback
@@ -146,7 +146,7 @@ def add_image_path(path: str, subfolders: bool = True) -> None:
 
     Args:
         path (str): image path
-        subfolders (bool, optional): include subfolders
+        subfolders (bool): include subfolders
     """
     if not isinstance(path, str):
         path = decode_fs_string(path)
@@ -171,7 +171,7 @@ def add_image_module_path(modname: str, relpath: str, subfolders: bool = True) -
     Args:
         modname (str): module name
         relpath (str): relative path to module data directory
-        subfolders (bool, optional): include subfolders
+        subfolders (bool): include subfolders
     """
     add_image_path(get_module_data_path(modname, relpath=relpath), subfolders)
 
@@ -183,7 +183,7 @@ def get_image_file_path(name: str, default: str = "not_found.png") -> str:
 
     Args:
         name (str): name of the image
-        default (str, optional): default image name. Defaults to "not_found.png".
+        default (str): default image name. Defaults to "not_found.png".
 
     Raises:
         RuntimeError: if image file not found
@@ -214,7 +214,7 @@ def get_icon(name: str, default: str = "not_found.png") -> QG.QIcon:
 
     Args:
         name (str): name of the icon
-        default (str, optional): default icon name. Defaults to "not_found.png".
+        default (str): default icon name. Defaults to "not_found.png".
 
     Returns:
         QG.QIcon: icon
@@ -237,7 +237,7 @@ def get_image_label(name, default="not_found.png") -> QW.QLabel:
 
     Args:
         name (str): name of the icon
-        default (str, optional): default icon name. Defaults to "not_found.png".
+        default (str): default icon name. Defaults to "not_found.png".
 
     Returns:
         QW.QLabel: label
@@ -261,9 +261,9 @@ def get_image_layout(
 
     Args:
         imagename (str): name of the icon
-        text (str, optional): text to display. Defaults to "".
-        tooltip (str, optional): tooltip to display. Defaults to "".
-        alignment (QC.Qt.Alignment, optional): alignment of the text. Defaults to None.
+        text (str): text to display. Defaults to "".
+        tooltip (str): tooltip to display. Defaults to "".
+        alignment (QC.Qt.Alignment): alignment of the text. Defaults to None.
 
     Returns:
         tuple[QW.QHBoxLayout, QW.QLabel]: layout, label
@@ -347,7 +347,7 @@ def get_font(conf: UserConfig, section: str, option: str = "") -> QG.QFont:
     Args:
         conf (UserConfig): UserConfig instance
         section (str): configuration entry
-        option (str, optional): configuration entry. Defaults to "".
+        option (str): configuration entry. Defaults to "".
 
     Returns:
         QG.QFont: font
@@ -402,10 +402,10 @@ def get_pen(
     Args:
         conf (UserConfig): UserConfig instance
         section (str): configuration entry
-        option (str, optional): configuration entry. Defaults to "".
-        color (str, optional): default color. Defaults to "black".
-        width (int, optional): default width. Defaults to 1.
-        style (str, optional): default style. Defaults to "SolidLine".
+        option (str): configuration entry. Defaults to "".
+        color (str): default color. Defaults to "black".
+        width (int): default width. Defaults to 1.
+        style (str): default style. Defaults to "SolidLine".
 
     Returns:
         QG.QPen: pen
@@ -441,9 +441,9 @@ def get_brush(
     Args:
         conf (UserConfig): UserConfig instance
         section (str): configuration entry
-        option (str, optional): configuration entry. Defaults to "".
-        color (str, optional): default color. Defaults to "black".
-        alpha (float, optional): default alpha-channel. Defaults to 1.0.
+        option (str): configuration entry. Defaults to "".
+        color (str): default color. Defaults to "black".
+        alpha (float): default alpha-channel. Defaults to 1.0.
 
     Returns:
         QG.QBrush: brush

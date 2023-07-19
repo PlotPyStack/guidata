@@ -7,6 +7,11 @@
 Data items
 ----------
 
+Base class
+^^^^^^^^^^
+
+.. autoclass:: DataItem
+
 Numeric items
 ^^^^^^^^^^^^^
 
@@ -441,9 +446,9 @@ class DateItem(DataItem):
     Args:
         label (str): item label
         default (datetime.date): default value (optional)
-        format (str, optional): date format (as in :py:func:`date.strftime`)
-        help (str, optional): text displayed on data item's tooltip
-        check (bool, optional): check value (default: True)
+        format (str): date format (as in :py:func:`datetime.date.strftime`)
+        help (str): text displayed on data item's tooltip
+        check (bool): check value (default: True)
     """
 
     type = datetime.date
@@ -466,9 +471,9 @@ class DateTimeItem(DateItem):
     Args:
         label (str): item label
         default (datetime.datetime): default value (optional)
-        format (str, optional): date format (as in :py:func:`date.strftime`)
-        help (str, optional): text displayed on data item's tooltip
-        check (bool, optional): check value (default: True)
+        format (str): date format (as in :py:func:`datetime.date.strftime`)
+        help (str): text displayed on data item's tooltip
+        check (bool): check value (default: True)
     """
 
     pass
@@ -692,7 +697,7 @@ class ChoiceItem(DataItem):
 
     Args:
         label (str): item name
-        choices (list, tuple or function): string list or (key, label) list
+        choices (list, tuple or Callable): string list or (key, label) list
          function of two arguments (item, value) returning a list of tuples
          (key, label, image) where image is an icon path, a QIcon instance
          or a function of one argument (key) returning a QIcon instance
@@ -919,14 +924,14 @@ class ButtonItem(DataItem):
 
     Args:
         label (str): item name
-        callback (callable): function with four parameters (dataset, item, value,
+        callback (Callable): function with four parameters (dataset, item, value,
          parent) where dataset (DataSet) is an instance of the parent dataset,
          item (DataItem) is an instance of ButtonItem (i.e. self), value (unspecified)
          is the value of ButtonItem (default ButtonItem value or last value returned
          by the callback) and parent (QObject) is button's parent widget
         icon (QIcon or str): icon show on the button (optional)
          (str: icon filename as in guidata/guiqwt image search paths)
-        default (unspecified): default value passed to the callback (optional)
+        default (Any): default value passed to the callback (optional)
         help (str): text shown in button's tooltip (optional)
         check (bool): if False, value is not checked (optional, default=True)
 

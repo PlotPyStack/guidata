@@ -49,9 +49,9 @@ class DockableWidgetMixin:
         """Setup dockwidget parameters
 
         Args:
-            location (Qt.DockWidgetArea, optional): Dockwidget location
-            features (QDockWidget.DockWidgetFeatures, optional): Dockwidget features
-            allowed_areas (Qt.DockWidgetAreas, optional): Dockwidget allowed areas
+            location (Qt.DockWidgetArea): Dockwidget location
+            features (QDockWidget.DockWidgetFeatures): Dockwidget features
+            allowed_areas (Qt.DockWidgetAreas): Dockwidget allowed areas
         """
         assert (
             self.dockwidget is None

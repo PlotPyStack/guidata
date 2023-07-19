@@ -103,8 +103,8 @@ def oedit(
 
     Args:
         obj (dict | list | tuple | str | np.ndarray): object to edit
-        title (str, optional): dialog title
-        parent (QW.QWidget, optional): parent widget
+        title (str): dialog title
+        parent (QW.QWidget): parent widget
 
     Returns:
         dict | list | tuple | str | np.ndarray: edited object

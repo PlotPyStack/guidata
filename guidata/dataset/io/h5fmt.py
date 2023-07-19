@@ -196,12 +196,12 @@ class Dset(Attr):
 
     Args:
         hdf_name (str): The name of the HDF5 attribute.
-        struct_name (str, optional): The name of the structure. Defaults to None.
-        type (type, optional): The expected data type of the attribute.
+        struct_name (str): The name of the structure. Defaults to None.
+        type (type): The expected data type of the attribute.
             Defaults to None.
-        scalar (callable, optional): Function to convert the scalar value, if any.
+        scalar (Callable): Function to convert the scalar value, if any.
             Defaults to None.
-        optional (bool, optional): Whether the attribute is optional. Defaults to False.
+        optional (bool): Whether the attribute is optional. Defaults to False.
     """
 
     def __init__(
@@ -221,7 +221,7 @@ class Dset(Attr):
 
         Args:
             group (h5py.Group): The group in the HDF5 file to save the attribute to.
-            struct (any): The structure containing the attribute.
+            struct (Any): The structure containing the attribute.
 
         Returns:
             None
@@ -250,7 +250,7 @@ class Dset(Attr):
 
         Args:
             group (h5py.Group): The group in the HDF5 file to load the attribute from.
-            struct (any): The structure to load the attribute into.
+            struct (Any): The structure to load the attribute into.
 
         Raises:
             KeyError: If the attribute cannot be found in the HDF5 group.
@@ -280,12 +280,12 @@ class Dlist(Dset):
 
     Args:
         hdf_name (str): The name of the HDF5 attribute.
-        struct_name (str, optional): The name of the structure. Defaults to None.
-        type (type, optional): The expected data type of the attribute.
+        struct_name (str): The name of the structure. Defaults to None.
+        type (type): The expected data type of the attribute.
             Defaults to None.
-        scalar (callable, optional): Function to convert the scalar value, if any.
+        scalar (Callable): Function to convert the scalar value, if any.
             Defaults to None.
-        optional (bool, optional): Whether the attribute is optional. Defaults to False.
+        optional (bool): Whether the attribute is optional. Defaults to False.
     """
 
     def get_value(self, struct: Any) -> np.ndarray:
@@ -293,7 +293,7 @@ class Dlist(Dset):
         Returns the value of the attribute in the given structure as a numpy array.
 
         Args:
-            struct (any): The structure containing the attribute.
+            struct (Any): The structure containing the attribute.
 
         Returns:
             np.ndarray: The value of the attribute in the given structure as a
@@ -307,7 +307,7 @@ class Dlist(Dset):
         the values of the given numpy array.
 
         Args:
-            struct (any): The structure in which to set the attribute.
+            struct (Any): The structure in which to set the attribute.
             value (np.ndarray): A numpy array containing the values to set the
                 attribute to.
 
@@ -338,7 +338,7 @@ class H5Store:
         Opens an HDF5 file in the given mode.
 
         Args:
-            mode (str, optional): The mode in which to open the file. Defaults to "a".
+            mode (str): The mode in which to open the file. Defaults to "a".
 
         Returns:
             h5py._hl.files.File: The opened HDF5 file.
@@ -395,8 +395,8 @@ class H5Store:
         Saves the data from source into the file using 'structure' as a descriptor.
 
         Args:
-            parent (any): The parent HDF5 group.
-            source (any): The source of the data to save.
+            parent (Any): The parent HDF5 group.
+            source (Any): The source of the data to save.
             structure (List[Attr]): A list of attribute descriptors (Attr, Dset,
                 Dlist, etc.) that describe the conversion of data and the names
                 of the attributes in the source and in the file.
@@ -412,8 +412,8 @@ class H5Store:
         Loads the data from the file into 'dest' using 'structure' as a descriptor.
 
         Args:
-            parent (any): The parent HDF5 group.
-            dest (any): The destination to load the data into.
+            parent (Any): The parent HDF5 group.
+            dest (Any): The destination to load the data into.
             structure (List[Attr]): A list of attribute descriptors (Attr, Dset,
                 Dlist, etc.) that describe the conversion of data and the names
                 of the attributes in the file and in the destination.
@@ -479,7 +479,7 @@ class HDF5Writer(HDF5Handler, WriterMixin):
         Write the value to the HDF5 file as an attribute.
 
         Args:
-            val (any): The value to write.
+            val (Any): The value to write.
 
         Returns:
             None
@@ -549,7 +549,7 @@ class HDF5Writer(HDF5Handler, WriterMixin):
         Objects must implement the DataSet-like `serialize` method.
 
         Args:
-            seq (Sequence[Any], optional): The object sequence to write.
+            seq (Sequence[Any]): The object sequence to write.
                 Defaults to None.
             group_name (str): The name of the group in which to write the objects.
 
@@ -594,11 +594,11 @@ class HDF5Reader(HDF5Handler):
         Read a value from the current group or specified group_name.
 
         Args:
-            group_name (str, optional): The name of the group to read from.
+            group_name (str): The name of the group to read from.
                 Defaults to None.
-            func (Callable[[], Any], optional): The function to use for reading
+            func (Callable[[], Any]): The function to use for reading
                 the value. Defaults to None.
-            instance (Any, optional): An object that implements the DataSet-like
+            instance (Any): An object that implements the DataSet-like
                 `deserialize` method. Defaults to None.
 
         Returns:

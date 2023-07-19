@@ -18,6 +18,8 @@ Base classes for writing custom readers and writers:
 * :py:class:`BaseIOHandler`
 * :py:class:`WriterMixin`
 
+.. autoclass:: GroupContext
+
 .. autoclass:: BaseIOHandler
     :members:
 
@@ -68,7 +70,7 @@ Reader and writer for the serialization of data sets into .h5 files:
 """
 
 # pylint: disable=unused-import
-from .base import BaseIOHandler, WriterMixin  # noqa
+from .base import BaseIOHandler, GroupContext, WriterMixin  # noqa
 from .h5fmt import HDF5Handler, HDF5Reader, HDF5Writer  # noqa
 from .inifmt import INIHandler, INIReader, INIWriter  # noqa
 from .jsonfmt import JSONHandler, JSONReader, JSONWriter  # noqa

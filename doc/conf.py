@@ -42,6 +42,7 @@ intersphinx_mapping = {
     "numpy": ("https://numpy.org/doc/stable/", None),
     "h5py": ("https://docs.h5py.org/en/stable/", None),
 }
+# nitpicky = True  # Uncomment to warn about all broken links
 
 if "htmlhelp" in sys.argv:
     html_theme = "classic"

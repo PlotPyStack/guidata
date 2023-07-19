@@ -33,7 +33,7 @@ def update_dataset(
         dest (DataSet): The destination dataset object to update.
         source (Union[Any, Dict[str, Any]]): The source object or dictionary containing
            matching attribute names.
-        visible_only (bool, optional): If True, update only visible items. Defaults
+        visible_only (bool): If True, update only visible items. Defaults
            to False.
 
     For each DataSet item, the function will try to get the attribute

@@ -167,8 +167,8 @@ class TestModule:
         """Run test script
 
         Args:
-            args (str, optional): arguments to pass to the script
-            timeout (int, optional): timeout in seconds
+            args (str): arguments to pass to the script
+            timeout (int): timeout in seconds
         """
         # Keep the same sys.path environment in child process:
         # (useful when the program is executed from Spyder, for example)
@@ -186,7 +186,7 @@ class TestPropertiesWidget(QW.QWidget):
     """Test module properties panel
 
     Args:
-        parent (QWidget, optional): parent widget
+        parent (QWidget): parent widget
     """
 
     def __init__(self, parent: QW.QWidget = None) -> None:
@@ -234,7 +234,7 @@ class TestMainView(QW.QSplitter):
 
     Args:
         package (module): test package
-        parent (QWidget, optional): parent widget
+        parent (QWidget): parent widget
     """
 
     def __init__(self, package, parent=None):
@@ -317,7 +317,7 @@ class TestLauncherWindow(QW.QMainWindow):
 
     Args:
         package (module): test package
-        parent (QWidget, optional): parent widget
+        parent (QWidget): parent widget
     """
 
     def __init__(self, package, parent: QW.QWidget = None) -> None:
