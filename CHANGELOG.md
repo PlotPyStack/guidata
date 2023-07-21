@@ -1,6 +1,6 @@
 # guidata Releases #
 
-## Version 3.0.1 (work in progress) ##
+## Version 3.0.1 ##
 
 API changes (fixes inconsistencies in API):
 
@@ -23,9 +23,12 @@ Bug fixes:
 * Fixed documentation generation ``.readthedocs.yaml`` file (Qt 5.15 was not
   installed on ReadTheDocs servers, causing documentation build to fail)
 
-Minor changes:
+Other changes:
 
 * [Pull Request #55](https://github.com/Codra-Ingenierie-Informatique/guidata/pull/55) - DateItem and DateTimeItem: added 'format' parameter for formatting, by [@robochat](https://github.com/robochat)
+
+* Packaging: still using `setuptools`, switched from `setup.cfg` to `pyproject.toml`
+  for configuration (see [PEP 517](https://www.python.org/dev/peps/pep-0517/))
 
 ## Version 3.0.0 ##
 

@@ -46,3 +46,18 @@ If you want to contribute to the project, you can submit a patch. The
 recommended way to do this is to fork the project on GitHub, create a branch
 for your modifications and then send a pull request. The pull request will be
 reviewed and merged if it is accepted.
+
+Setting up development environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If you want to contribute to the project, you will probably want to set up a
+development environment. The easiest way to do this is to use `virtualenv
+<http://pypi.python.org/pypi/virtualenv>`_ and `pip
+<http://pypi.python.org/pypi/pip>`_.
+
+Some environment variables are required to be set before using the project from
+within Visual Studio Code (used in `launch.json` and `tasks.json`). These are:
+
+* ``GUIDATA_PYTHONEXE``: The path to the Python interpreter to use. This is
+  used to launch the application from within Visual Studio Code. If not set,
+  the default Python interpreter will be used.
