@@ -38,6 +38,7 @@ def test_loadsave_hdf5():
             e.deserialize(reader)
             reader.close()
             e.edit()
+            os.unlink("test.h5")
         execenv.print("OK")
 
 
