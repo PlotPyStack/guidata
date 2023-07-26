@@ -69,6 +69,9 @@ test = [
     "pytest-xvfb",
 ]
 
+[tool.setuptools.packages.find]
+include = ["guidata*"]
+
 [tool.setuptools.package-data]
 "*" = ["*.png", "*.svg", "*.mo", "*.chm", "*.cfg", "*.toml"]
 

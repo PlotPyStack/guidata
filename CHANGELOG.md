@@ -6,6 +6,8 @@ Bug fixes:
 
 * [Issue #59](https://github.com/Codra-Ingenierie-Informatique/guidata/issues/59) - [3.0.1] the doc is missing
 
+* [Issue #60](https://github.com/Codra-Ingenierie-Informatique/guidata/issues/60) - [3.0.1] pyproject.toml/setuptools: automatic package discovery does not work on debian
+
 ## Version 3.0.1 ##
 
 API changes (fixes inconsistencies in API):
