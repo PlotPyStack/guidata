@@ -4,6 +4,8 @@
 
 Bug fixes:
 
+* [Pull Request #61](https://github.com/Codra-Ingenierie-Informatique/guidata/pull/61) - Make the build reproducible, by [@lamby](https://github.com/lamby)
+
 * [Issue #59](https://github.com/Codra-Ingenierie-Informatique/guidata/issues/59) - [3.0.1] the doc is missing
 
 * [Issue #60](https://github.com/Codra-Ingenierie-Informatique/guidata/issues/60) - [3.0.1] pyproject.toml/setuptools: automatic package discovery does not work on debian
