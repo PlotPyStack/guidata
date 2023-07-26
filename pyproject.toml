@@ -10,7 +10,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "guidata"
 authors = [{ name = "Codra", email = "p.raybaut@codra.fr" }]
-description = "Signal and image processing software"
+description = "Automatic GUI generation for easy dataset editing and display"
 readme = "README.md"
 license = { file = "LICENSE" }
 classifiers = [
