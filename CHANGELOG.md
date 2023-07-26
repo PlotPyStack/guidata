@@ -1,5 +1,11 @@
 # guidata Releases #
 
+## Version 3.0.2 ##
+
+Bug fixes:
+
+* [Issue #59](https://github.com/Codra-Ingenierie-Informatique/guidata/issues/59) - [3.0.1] the doc is missing
+
 ## Version 3.0.1 ##
 
 API changes (fixes inconsistencies in API):
