@@ -36,6 +36,7 @@ def test_loadsave_json():
             reader = JSONReader("test.json")
             e.deserialize(reader)
             e.edit()
+            os.unlink("test.json")
         execenv.print("OK")
 
 
