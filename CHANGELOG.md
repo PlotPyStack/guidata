@@ -1,5 +1,15 @@
 # guidata Releases #
 
+## Version 3.0.3 ##
+
+Fixed project description:
+
+* This could be seen as a detail, but as this description text is used by PyPI,
+  it is important to have a correct description.
+
+* Of course, nobody reads the description text, so it was not noticed since the
+  first release of guidata v3.0.
+
 ## Version 3.0.2 ##
 
 Bug fixes:
