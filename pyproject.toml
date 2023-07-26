@@ -1,7 +1,7 @@
 # guidata setup configuration file
 
 # Important note:
-# Requirements (see [options]) are parsed by utils\genreqs.py to generate documentation
+# Requirements are parsed by utils\genreqs.py to generate documentation
 
 [build-system]
 requires = ["setuptools"]
@@ -9,10 +9,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "guidata"
-authors = [{name = "Codra", email = "p.raybaut@codra.fr"}]
+authors = [{ name = "Codra", email = "p.raybaut@codra.fr" }]
 description = "Signal and image processing software"
 readme = "README.md"
-license = {file = "LICENSE"}
+license = { file = "LICENSE" }
 classifiers = [
     "Topic :: Scientific/Engineering",
     "Topic :: Software Development :: Libraries :: Python Modules",
@@ -28,16 +28,10 @@ classifiers = [
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11"
+    "Programming Language :: Python :: 3.11",
 ]
 requires-python = ">=3.8, <4"
-dependencies = [
-    "h5py>=3.0",
-    "NumPy>=1.21",
-    "QtPy>=1.9",
-    "requests",
-    "tomli"
-]
+dependencies = ["h5py>=3.0", "NumPy>=1.21", "QtPy>=1.9", "requests", "tomli"]
 dynamic = ["version"]
 
 [project.urls]
@@ -47,12 +41,7 @@ Documentation = "https://guidata.readthedocs.io/en/latest/"
 [project.scripts]
 
 [project.optional-dependencies]
-dev = [
-    "black",
-    "isort",
-    "pylint",
-    "Coverage"
-]
+dev = ["black", "isort", "pylint", "Coverage"]
 doc = [
     "PyQt5",
     "pillow",
@@ -60,14 +49,9 @@ doc = [
     "sphinx",
     "sphinx-copybutton",
     "sphinx_qt_documentation",
-    "python-docs-theme"
+    "python-docs-theme",
 ]
-test = [
-    "pytest",
-    "pytest-cov",
-    "pytest-qt",
-    "pytest-xvfb",
-]
+test = ["pytest", "pytest-cov", "pytest-qt", "pytest-xvfb"]
 
 [tool.setuptools.packages.find]
 include = ["guidata*"]
@@ -76,4 +60,4 @@ include = ["guidata*"]
 "*" = ["*.png", "*.svg", "*.mo", "*.chm", "*.cfg", "*.toml"]
 
 [tool.setuptools.dynamic]
-version = {attr = "guidata.__version__"}
+version = { attr = "guidata.__version__" }

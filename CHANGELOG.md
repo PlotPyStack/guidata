@@ -23,6 +23,10 @@ API changes (fixes inconsistencies in API):
 
 Bug fixes:
 
+* [Issue #57](https://github.com/Codra-Ingenierie-Informatique/guidata/issues/57) - [Errno 2] No such file or directory: 'doc/dev/v2_to_v3.csv'
+
+* [Issue #58](https://github.com/Codra-Ingenierie-Informatique/guidata/issues/58) - Test suite: missing dependencies (pandas, Pillow)
+
 * Modules `guidata.dataset.datatypes` and `guidata.dataset.dataitems` should not
   critically depend on Qt (only modules specific to GUI should depend on Qt, such
   as `guidata.dataset.qtwidgets`). This was a regression introduced in version 3.0.0.
