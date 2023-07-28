@@ -38,7 +38,8 @@ dynamic = ["version"]
 Homepage = "https://github.com/CODRA-Ingenierie-Informatique/guidata/"
 Documentation = "https://guidata.readthedocs.io/en/latest/"
 
-[project.scripts]
+[project.gui-scripts]
+guidata-tests = "guidata.tests:run"
 
 [project.optional-dependencies]
 dev = ["black", "isort", "pylint", "Coverage"]
