@@ -4,11 +4,13 @@
 
 Bug fixes:
 
-* [Issue #64](https://github.com/Codra-Ingenierie-Informatique/guidata/issues/64) - Add guidata-tests.desktop file to repository
-
 * [Issue #63](https://github.com/Codra-Ingenierie-Informatique/guidata/issues/63) - [3.0.2] there is no more guidata-test script
 
 * [Issue #62](https://github.com/Codra-Ingenierie-Informatique/guidata/issues/62) - [3.0.2] sphinx doc hang when building on the Debian infra
+
+Other changes:
+
+* [Issue #64](https://github.com/Codra-Ingenierie-Informatique/guidata/issues/64) - Add guidata-tests.desktop file to repository
 
 ## Version 3.0.3 ##
 
