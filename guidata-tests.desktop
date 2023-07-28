@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=guidata-tests
+GenericName=guidata Test launcher
+Comment=The guidata Python library provides GUIs for easy dataset editing and display
+TryExec=guidata-tests
+Exec=guidata-tests
+Icon=guidata.svg
+Categories=Education;Science;Physics;
