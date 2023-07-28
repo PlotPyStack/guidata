@@ -1,5 +1,11 @@
 # guidata Releases #
 
+## Version 3.0.4 ##
+
+Bug fixes:
+
+* [Issue #62](https://github.com/Codra-Ingenierie-Informatique/guidata/issues/62) - [3.0.2] sphinx doc hang when building on the Debian infra
+
 ## Version 3.0.3 ##
 
 Fixed project description:
