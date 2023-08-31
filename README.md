@@ -5,6 +5,8 @@
 [![PyPI pyversions](https://img.shields.io/pypi/pyversions/guidata.svg)](https://pypi.python.org/pypi/guidata/)
 [![download count](https://img.shields.io/conda/dn/conda-forge/guidata.svg)](https://www.anaconda.com/download/)
 
+## Overview
+
 Simple example of ``guidata`` datasets embedded in an application window:
 
 <img src="https://raw.githubusercontent.com/CODRA-Ingenierie-Informatique/guidata/master/doc/images/screenshots/editgroupbox.png">
@@ -17,7 +19,7 @@ Copyrights and licensing:
 * Copyright © 2023 [CEA](https://www.cea.fr), [Codra](https://codra.net/), [Pierre Raybaut](https://github.com/PierreRaybaut).
 * Licensed under the terms of the BSD 3-Clause (see [LICENSE](LICENSE)).
 
-## Overview
+## Features
 
 Based on the Qt library, ``guidata`` is a Python library generating graphical user
 interfaces for easy dataset editing and display. It also provides helpers and
