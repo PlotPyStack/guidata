@@ -207,15 +207,3 @@ def gen_module_req_rst(
     """
     path = osp.abspath(osp.join(osp.dirname(module.__file__), os.pardir))
     gen_path_req_rst(path, module.__name__, additional_reqs, destpath)
-
-
-def test():
-    """Test function"""
-    path = osp.abspath(osp.join(osp.dirname(__file__), os.pardir, os.pardir))
-    print(extract_requirements_from_toml(path))
-    print(extract_requirements_from_cfg(path))
-    gen_path_req_rst(path, "guidata", ["Python>=3.7", "PyQt>=5.11"])
-
-
-if __name__ == "__main__":
-    test()
