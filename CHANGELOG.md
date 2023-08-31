@@ -1,5 +1,12 @@
 # guidata Releases #
 
+## Version 3.0.5 ##
+
+Other changes:
+
+* ``tests.test_callbacks``: added an example of a callback function for dynamically
+  changing the list of choices of a ``ChoiceItem`` object
+
 ## Version 3.0.4 ##
 
 Bug fixes:

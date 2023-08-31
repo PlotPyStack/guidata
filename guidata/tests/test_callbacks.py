@@ -4,7 +4,8 @@
 # (see guidata/LICENSE for details)
 
 """
-Demonstrates how items may trigger callbacks when activated
+Demonstrates how items may trigger callbacks when activated, or how
+the list of choices may be dynamically changed.
 """
 
 # guitest: show
@@ -45,10 +46,26 @@ class Parameters(DataSet):
     x2 = FloatItem("x2").set_prop("display", callback=update_x1plusx2)
     x1plusx2 = FloatItem("x1+x2").set_prop("display", active=False)
     color = ColorItem("Color", default="red").set_prop("display", callback=cb_example)
+
+    def choices_callback(self, item, value):
+        """Choices callback: this demonstrates how to dynamically change
+        the list of choices... even if it is not very useful in this case
+
+        Note that `None` is systematically added as the third element of
+        the returned tuples: that is to ensure the compatibility between
+        `ChoiceItem` and `ImageChoiceItem` (see `guidata.dataset.dataitems`)
+        """
+        execenv.print(f"[choices_callback]: item={item}, value={value}")
+        return [
+            (16, "first choice", None),
+            (32, "second choice", None),
+            (64, "third choice", None),
+        ]
+
     choice = (
         ChoiceItem(
             "Single choice",
-            [(16, "first choice"), (32, "second choice"), (64, "third choice")],
+            choices_callback,
             default=64,
         )
         .set_pos(col=1, colspan=2)
