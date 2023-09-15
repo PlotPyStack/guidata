@@ -8,3 +8,4 @@ Development
    contribute
    howto
    v2_to_v3
+   platform
