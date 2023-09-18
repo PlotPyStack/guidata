@@ -20,7 +20,7 @@ External resources:
 * Bug reports and feature requests: `GitHub`_
 
 .. _PyPI: https://pypi.python.org/pypi/guidata
-.. _GitHub: https://github.com/CODRA-Ingenierie-Informatique/guidata/
+.. _GitHub: https://github.com/PlotPyStack/guidata/
 
 .. module:: guidata
 

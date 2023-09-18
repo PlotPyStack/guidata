@@ -39,7 +39,7 @@ dependencies = [
 dynamic = ["version"]
 
 [project.urls]
-Homepage = "https://github.com/CODRA-Ingenierie-Informatique/guidata/"
+Homepage = "https://github.com/PlotPyStack/guidata/"
 Documentation = "https://guidata.readthedocs.io/en/latest/"
 
 [project.scripts]

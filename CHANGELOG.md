@@ -11,13 +11,13 @@ Other changes:
 
 Bug fixes:
 
-* [Issue #63](https://github.com/Codra-Ingenierie-Informatique/guidata/issues/63) - [3.0.2] there is no more guidata-test script
+* [Issue #63](https://github.com/PlotPyStack/guidata/issues/63) - [3.0.2] there is no more guidata-test script
 
-* [Issue #62](https://github.com/Codra-Ingenierie-Informatique/guidata/issues/62) - [3.0.2] sphinx doc hang when building on the Debian infra
+* [Issue #62](https://github.com/PlotPyStack/guidata/issues/62) - [3.0.2] sphinx doc hang when building on the Debian infra
 
 Other changes:
 
-* [Issue #64](https://github.com/Codra-Ingenierie-Informatique/guidata/issues/64) - Add guidata-tests.desktop file to repository
+* [Issue #64](https://github.com/PlotPyStack/guidata/issues/64) - Add guidata-tests.desktop file to repository
 
 ## Version 3.0.3 ##
 
@@ -33,11 +33,11 @@ Fixed project description:
 
 Bug fixes:
 
-* [Pull Request #61](https://github.com/Codra-Ingenierie-Informatique/guidata/pull/61) - Make the build reproducible, by [@lamby](https://github.com/lamby)
+* [Pull Request #61](https://github.com/PlotPyStack/guidata/pull/61) - Make the build reproducible, by [@lamby](https://github.com/lamby)
 
-* [Issue #59](https://github.com/Codra-Ingenierie-Informatique/guidata/issues/59) - [3.0.1] the doc is missing
+* [Issue #59](https://github.com/PlotPyStack/guidata/issues/59) - [3.0.1] the doc is missing
 
-* [Issue #60](https://github.com/Codra-Ingenierie-Informatique/guidata/issues/60) - [3.0.1] pyproject.toml/setuptools: automatic package discovery does not work on debian
+* [Issue #60](https://github.com/PlotPyStack/guidata/issues/60) - [3.0.1] pyproject.toml/setuptools: automatic package discovery does not work on debian
 
 ## Version 3.0.1 ##
 
@@ -54,9 +54,9 @@ API changes (fixes inconsistencies in API):
 
 Bug fixes:
 
-* [Issue #57](https://github.com/Codra-Ingenierie-Informatique/guidata/issues/57) - [Errno 2] No such file or directory: 'doc/dev/v2_to_v3.csv'
+* [Issue #57](https://github.com/PlotPyStack/guidata/issues/57) - [Errno 2] No such file or directory: 'doc/dev/v2_to_v3.csv'
 
-* [Issue #58](https://github.com/Codra-Ingenierie-Informatique/guidata/issues/58) - Test suite: missing dependencies (pandas, Pillow)
+* [Issue #58](https://github.com/PlotPyStack/guidata/issues/58) - Test suite: missing dependencies (pandas, Pillow)
 
 * Modules `guidata.dataset.datatypes` and `guidata.dataset.dataitems` should not
   critically depend on Qt (only modules specific to GUI should depend on Qt, such
@@ -68,7 +68,7 @@ Bug fixes:
 
 Other changes:
 
-* [Pull Request #55](https://github.com/Codra-Ingenierie-Informatique/guidata/pull/55) - DateItem and DateTimeItem: added 'format' parameter for formatting, by [@robochat](https://github.com/robochat)
+* [Pull Request #55](https://github.com/PlotPyStack/guidata/pull/55) - DateItem and DateTimeItem: added 'format' parameter for formatting, by [@robochat](https://github.com/robochat)
 
 * Packaging: still using `setuptools`, switched from `setup.cfg` to `pyproject.toml`
   for configuration (see [PEP 517](https://www.python.org/dev/peps/pep-0517/))
