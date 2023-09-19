@@ -5,6 +5,8 @@
 [![PyPI pyversions](https://img.shields.io/pypi/pyversions/guidata.svg)](https://pypi.python.org/pypi/guidata/)
 [![download count](https://img.shields.io/conda/dn/conda-forge/guidata.svg)](https://www.anaconda.com/download/)
 
+ℹ️ Created in 2009 by Pierre Raybaut and maintained by the [PlotPyStack](https://github.com/PlotPyStack) organization.
+
 ## Overview
 
 Simple example of ``guidata`` datasets embedded in an application window:
