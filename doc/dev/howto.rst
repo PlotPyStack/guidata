@@ -1,5 +1,5 @@
-How to build, test and deploy plotpy
-------------------------------------
+How to build, test and deploy
+-----------------------------
 
 Build instructions
 ^^^^^^^^^^^^^^^^^^
