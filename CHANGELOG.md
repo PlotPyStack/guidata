@@ -2,6 +2,10 @@
 
 ## Version 3.0.5 ##
 
+Bug fixes:
+
+* [Issue #65](https://github.com/PlotPyStack/guidata/issues/65) - QVariant import erroneously used in typing annotations
+
 Other changes:
 
 * ``tests.test_callbacks``: added an example of a callback function for dynamically

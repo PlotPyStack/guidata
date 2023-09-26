@@ -25,7 +25,7 @@ from typing import TYPE_CHECKING, Any, Callable, List, Optional, Protocol
 
 import numpy
 from qtpy.compat import getexistingdirectory
-from qtpy.QtCore import Qt, QVariant
+from qtpy.QtCore import Qt
 from qtpy.QtGui import QColor, QIcon, QPixmap
 from qtpy.QtWidgets import (
     QAbstractButton,
@@ -318,7 +318,7 @@ class LineEditWidget(AbstractDataSetWidget):
         else:
             self.line_edit_changed(value)
 
-    def line_edit_changed(self, qvalue: Optional[QVariant]) -> None:
+    def line_edit_changed(self, qvalue: str | None) -> None:
         """QLineEdit validator"""
         if qvalue is not None:
             value = self.item.from_string(str(qvalue))
