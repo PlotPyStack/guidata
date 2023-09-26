@@ -9,6 +9,10 @@
 
 ## Overview
 
+The ``guidata`` package is a Python library generating Qt graphical user interfaces.
+It is part of the [PlotPyStack](https://github.com/PlotPyStack) project, aiming at
+providing a unified framework for creating scientific GUIs with Python and Qt.
+
 Simple example of ``guidata`` datasets embedded in an application window:
 
 <img src="https://raw.githubusercontent.com/PlotPyStack/guidata/master/doc/images/screenshots/editgroupbox.png">
