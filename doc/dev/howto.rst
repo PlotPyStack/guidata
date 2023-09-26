@@ -4,11 +4,12 @@ How to build, test and deploy
 Build instructions
 ^^^^^^^^^^^^^^^^^^
 
-To build the wheel, you need to run the following command::
+To build the package, you need to run the following command::
 
-    python setup.py bdist_wheel
+    python -m build
 
-It should generate a ``.whl`` file in the `dist` directory.
+It should generate a source package (``.tar.gz`` file) and a Wheel package
+(``.whl`` file) in the `dist` directory.
 
 
 Running unittests
