@@ -6,9 +6,6 @@ build:
   os: ubuntu-22.04
   tools:
     python: "3.11"
-  jobs:
-    post_create_environment:
-      - pip install PyQt5 sphinx>6
 sphinx:
    configuration: doc/conf.py
 formats:

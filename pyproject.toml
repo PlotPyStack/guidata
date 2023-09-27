@@ -47,7 +47,7 @@ doc = [
     "PyQt5",
     "pillow",
     "pandas",
-    "sphinx",
+    "sphinx>6",
     "sphinx-copybutton",
     "sphinx_qt_documentation",
     "python-docs-theme",
