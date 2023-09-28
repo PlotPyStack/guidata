@@ -13,6 +13,8 @@ Version 2,Version 3
 ``.gettext_helpers``,``.utils.gettext_helpers``
 ``.disthelpers``,``.utils.disthelpers``
 ``.encoding``,``.utils.encoding``
+``.encoding.transcode``,*removed*
+``.encoding.getfilesystemencoding``,*removed*
 ``.utils.to_string``,``.utils.misc.to_string.misc``
 ``.utils.decode_fs_string``,``.utils.misc.decode_fs_string.misc``
 ``.utils.assert_interfaces_valid``,``.utils.misc.assert_interfaces_valid.misc``

@@ -12,46 +12,9 @@ source code (Utilities/__init___.py) Copyright © 2003-2009 Detlev Offenbach
 """
 
 
-import locale
 import os
 import re
-import sys
 from codecs import BOM_UTF8, BOM_UTF16, BOM_UTF32
-
-PREFERRED_ENCODING = locale.getpreferredencoding()
-
-
-def transcode(text, input=PREFERRED_ENCODING, output=PREFERRED_ENCODING):
-    """Transcode a text string"""
-    try:
-        return text.decode("cp437").encode("cp1252")
-    except UnicodeError:
-        try:
-            return text.decode("cp437").encode(output)
-        except UnicodeError:
-            return text
-
-
-# ------------------------------------------------------------------------------
-#  Functions for encoding and decoding bytes that come from
-#  the *file system*.
-# ------------------------------------------------------------------------------
-
-# The default encoding for file paths and environment variables should be set
-# to match the default encoding that the OS is using.
-def getfilesystemencoding():
-    """
-    Query the filesystem for the encoding used to encode filenames
-    and environment variables.
-    """
-    encoding = sys.getfilesystemencoding()
-    if encoding is None:
-        # Must be Linux or Unix and nl_langinfo(CODESET) failed.
-        encoding = PREFERRED_ENCODING
-    return encoding
-
-
-FS_ENCODING = getfilesystemencoding()
 
 # ------------------------------------------------------------------------------
 #  Functions for encoding and decoding *text data* itself, usually originating

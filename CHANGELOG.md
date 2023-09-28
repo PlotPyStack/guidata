@@ -1,5 +1,13 @@
 # guidata Releases #
 
+## Version 3.0.6 ##
+
+Other changes:
+
+* Removed unused functions from ``guidata.utils.encoding`` module:
+  * ``transcode``
+  * ``getfilesystemencoding``
+
 ## Version 3.0.5 ##
 
 Bug fixes:
