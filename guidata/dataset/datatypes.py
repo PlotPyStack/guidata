@@ -623,7 +623,7 @@ class ObjectItem(DataItem):
             instance (DataSet): instance of the DataSet
         """
         if self.klass is not None:
-            value = self.klass()
+            value = self.klass()  # pylint: disable=not-callable
             if self._default is not None:
                 update_dataset(value, self._default)
             self.__set__(instance, value)
@@ -642,7 +642,7 @@ class ObjectItem(DataItem):
             reader (HDF5Reader | JSONReader | INIReader): reader object
         """
         if self.klass is not None:
-            value = self.klass()
+            value = self.klass()  # pylint: disable=not-callable
             value.deserialize(reader)
             self.__set__(instance, value)
 

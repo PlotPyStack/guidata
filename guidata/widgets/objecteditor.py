@@ -68,7 +68,7 @@ def create_dialog(obj, title, parent=None):
         if not dialog.setup_and_check(data, title=title, readonly=readonly):
             return
 
-        def conv_func(data):
+        def conv_func(data):  # pylint: disable=function-redefined
             """Conversion function"""
             return PILImage.fromarray(data, mode=obj.mode)
 

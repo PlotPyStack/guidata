@@ -200,6 +200,7 @@ class NumericTypeItem(DataItem):
             # pylint: disable=eval-used
             # pylint: disable=broad-except
             try:
+                # pylint: disable=not-callable
                 return self.type(eval(value))
             except:  # noqa
                 pass

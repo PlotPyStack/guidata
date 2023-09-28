@@ -904,6 +904,7 @@ class PythonShellWidget(TracebackLinksMixin, ShellBaseWidget, GetHelpMixin):
             return
 
         if text.startswith("import "):
+            # pylint: disable=assignment-from-no-return
             obj_list = self.get_module_completion(text)
             words = text.split(" ")
             if "," in words[-1]:
@@ -914,6 +915,7 @@ class PythonShellWidget(TracebackLinksMixin, ShellBaseWidget, GetHelpMixin):
             return
 
         elif text.startswith("from "):
+            # pylint: disable=assignment-from-no-return
             obj_list = self.get_module_completion(text)
             if obj_list is None:
                 return

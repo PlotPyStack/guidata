@@ -97,7 +97,7 @@ class DockableWidgetMixin:
         """
         if enable:
             self.dockwidget.raise_()
-            widget = self.get_focus_widget()
+            widget = self.get_focus_widget()  # pylint: disable=assignment-from-none
             if widget is not None:
                 widget.setFocus()
         self._isvisible = enable and self.dockwidget.isVisible()
