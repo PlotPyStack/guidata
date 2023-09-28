@@ -271,7 +271,7 @@ has the same effect as typing a particular string at the help> prompt.
 
         :return:
         """
-        if self.isAlive():
+        if self.is_alive():
             ctypes.pythonapi.PyThreadState_SetAsyncExc(
                 self.get_thread_id(), ctypes.py_object(KeyboardInterrupt)
             )
