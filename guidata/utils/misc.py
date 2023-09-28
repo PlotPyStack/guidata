@@ -34,7 +34,7 @@ import os
 import os.path as osp
 import subprocess
 import sys
-from typing import Any
+from typing import Any, Type
 
 # Local imports
 from guidata.userconfig import get_home_dir
@@ -84,8 +84,16 @@ def decode_fs_string(string: str) -> str:
 # ==============================================================================
 
 
-def assert_interface_supported(klass, iface):
-    """Makes sure a class supports an interface"""
+def assert_interface_supported(klass: Type, iface: Type) -> None:
+    """Makes sure a class supports an interface
+
+    Args:
+        klass (Type): The class.
+        iface (Type): The interface.
+
+    Raises:
+        AssertionError: If the class does not support the interface.
+    """
     for name, func in list(iface.__dict__.items()):
         if name == "__inherits__":
             continue
@@ -107,9 +115,15 @@ def assert_interface_supported(klass, iface):
             pass  # should check class attributes for consistency
 
 
-def assert_interfaces_valid(klass):
-    """Makes sure a class supports the interfaces
-    it declares"""
+def assert_interfaces_valid(klass: Type) -> None:
+    """Makes sure a class supports the interfaces it declares
+
+    Args:
+        klass (Type): The class.
+
+    Raises:
+        AssertionError: If the class does not support the interfaces it declares.
+    """
     assert hasattr(klass, "__implements__"), "Class doesn't implements anything"
     for iface in klass.__implements__:
         assert_interface_supported(klass, iface)

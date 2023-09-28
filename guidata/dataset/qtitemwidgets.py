@@ -160,11 +160,7 @@ class AbstractDataSetWidget:
         self.item.set_from_string(self.value())
 
     def get(self) -> None:
-        """Update widget contents from data item value
-
-        Returns:
-            Widget value
-        """
+        """Update widget contents from data item value"""
         pass
 
     def value(self) -> Any:
@@ -218,11 +214,7 @@ class GroupWidget(AbstractDataSetWidget):
         self.group.setLayout(self.layout)
 
     def get(self) -> None:
-        """Update widget contents from data item value
-
-        Returns:
-            Widget value
-        """
+        """Update widget contents from data item value"""
         self.edit.update_widgets()
 
     def set(self) -> None:
@@ -298,11 +290,7 @@ class TabGroupWidget(AbstractDataSetWidget):
             self.widgets.append(widget)
 
     def get(self) -> None:
-        """Update widget contents from data item value
-
-        Returns:
-            Widget value
-        """
+        """Update widget contents from data item value"""
         for widget in self.widgets:
             widget.get()
 
@@ -367,11 +355,7 @@ class LineEditWidget(AbstractDataSetWidget):
         self.edit.textChanged.connect(self.line_edit_changed)  # type:ignore
 
     def get(self) -> None:
-        """Update widget contents from data item value
-
-        Returns:
-            Widget value
-        """
+        """Update widget contents from data item value"""
         value = self.item.get()
         old_value = str(self.value())
         if value is not None:
@@ -438,11 +422,7 @@ class TextEditWidget(AbstractDataSetWidget):
         return str(self.edit.toPlainText()).replace("\u2029", os.linesep)
 
     def get(self) -> None:
-        """Update widget contents from data item value
-
-        Returns:
-            Widget value
-        """
+        """Update widget contents from data item value"""
         value = self.item.get()
         if value is not None:
             self.edit.setPlainText(value)
@@ -496,11 +476,7 @@ class CheckBoxWidget(AbstractDataSetWidget):
         self.checkbox.stateChanged.connect(self.state_changed)  # type:ignore
 
     def get(self) -> None:
-        """Update widget contents from data item value
-
-        Returns:
-            Widget value
-        """
+        """Update widget contents from data item value"""
         value = self.item.get()
         if value is not None:
             self.checkbox.setChecked(value)
@@ -576,11 +552,7 @@ class DateWidget(AbstractDataSetWidget):
         self.notify_value_change()
 
     def get(self) -> None:
-        """Update widget contents from data item value
-
-        Returns:
-            Widget value
-        """
+        """Update widget contents from data item value"""
         value = self.item.get()
         if value:
             if not isinstance(value, datetime.date):
@@ -629,11 +601,7 @@ class DateTimeWidget(AbstractDataSetWidget):
         self.notify_value_change()
 
     def get(self) -> None:
-        """Update widget contents from data item value
-
-        Returns:
-            Widget value
-        """
+        """Update widget contents from data item value"""
         value = self.item.get()
         if value:
             if not isinstance(value, datetime.datetime):
@@ -1004,11 +972,7 @@ class ChoiceWidget(AbstractDataSetWidget):
             return self.combobox.currentIndex()
 
     def get(self) -> None:
-        """Update widget contents from data item value
-
-        Returns:
-            Widget value
-        """
+        """Update widget contents from data item value"""
         self.initialize_widget()
         value = self.item.get()
         if value is not None:
@@ -1074,11 +1038,7 @@ class MultipleChoiceWidget(AbstractDataSetWidget):
         self.groupbox.setLayout(layout)
 
     def get(self) -> None:
-        """Update widget contents from data item value
-
-        Returns:
-            Widget value
-        """
+        """Update widget contents from data item value"""
         value = self.item.get()
         _choices = self.item.get_prop_value("data", "choices")
         for (i, _choice, _img), checkbox in zip(_choices, self.boxes):
@@ -1172,11 +1132,7 @@ class FloatArrayWidget(AbstractDataSetWidget):
                 self.update(self.arr)
 
     def get(self) -> None:
-        """Update widget contents from data item value
-
-        Returns:
-            Widget value
-        """
+        """Update widget contents from data item value"""
         self.arr = numpy.array(self.item.get(), copy=False)
         if self.item.get_prop_value("display", "transpose"):
             self.arr = self.arr.T
@@ -1276,11 +1232,7 @@ class ButtonWidget(AbstractDataSetWidget):
         self.cb_value = None
 
     def get(self) -> None:
-        """Update widget contents from data item value
-
-        Returns:
-            Widget value
-        """
+        """Update widget contents from data item value"""
         self.cb_value = self.item.get()
 
     def set(self) -> None:
@@ -1355,11 +1307,7 @@ class DataSetWidget(AbstractDataSetWidget):
         )
 
     def get(self) -> None:
-        """Update widget contents from data item value
-
-        Returns:
-            Widget value
-        """
+        """Update widget contents from data item value"""
         self.get_dataset()
         for widget in self.edit.widgets:
             widget.get()

@@ -11,6 +11,7 @@ Functions 'get_coding', 'decode', 'encode'  come from Eric4
 source code (Utilities/__init___.py) Copyright © 2003-2009 Detlev Offenbach
 """
 
+from __future__ import annotations
 
 import os
 import re
@@ -47,7 +48,7 @@ CODECS = [
 ]
 
 
-def get_coding(text):
+def get_coding(text: str) -> str | None:
     """
     Function to get the coding of a text.
     @param text text to inspect (string)
@@ -70,7 +71,7 @@ def get_coding(text):
                     return codec
 
 
-def decode(text):
+def decode(text: bytes) -> tuple[str, str] | tuple[str, str] | tuple[str, str]:
     """
     Function to decode a text.
     @param text text to decode (bytes)
@@ -100,7 +101,7 @@ def decode(text):
     return str(text, "latin-1"), "latin-1-guessed"
 
 
-def encode(text, orig_coding):
+def encode(text: str, orig_coding: str) -> tuple[bytes, str] | tuple[bytes, str]:
     """
     Function to encode a text.
     @param text text to encode (string)
@@ -146,7 +147,7 @@ def encode(text, orig_coding):
     return text.encode("utf-8"), "utf-8"
 
 
-def write(text, filename, encoding="utf-8", mode="wb"):
+def write(text: str, filename: str, encoding: str = "utf-8", mode: str = "wb") -> str:
     """
     Write 'text' to file ('filename') assuming 'encoding'
     Return (eventually new) encoding
@@ -157,7 +158,9 @@ def write(text, filename, encoding="utf-8", mode="wb"):
     return encoding
 
 
-def writelines(lines, filename, encoding="utf-8", mode="wb"):
+def writelines(
+    lines: list[str], filename: str, encoding: str = "utf-8", mode: str = "wb"
+) -> str:
     """
     Write 'lines' to file ('filename') assuming 'encoding'
     Return (eventually new) encoding
@@ -165,7 +168,7 @@ def writelines(lines, filename, encoding="utf-8", mode="wb"):
     return write(os.linesep.join(lines), filename, encoding, mode)
 
 
-def read(filename, encoding="utf-8"):
+def read(filename: str, encoding: str = "utf-8") -> tuple[str, str]:
     """
     Read text from file ('filename')
     Return text and encoding
@@ -174,7 +177,7 @@ def read(filename, encoding="utf-8"):
     return text, encoding
 
 
-def readlines(filename, encoding="utf-8"):
+def readlines(filename: str, encoding: str = "utf-8") -> tuple[list[str], str]:
     """
     Read lines from file ('filename')
     Return lines and encoding
