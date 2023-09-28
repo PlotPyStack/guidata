@@ -8,6 +8,12 @@ Other changes:
   * ``transcode``
   * ``getfilesystemencoding``
 
+* Added missing docstrings and typing annotations in modules:
+  * ``guidata.dataset.qtitemwidgets``
+  * ``guidata.dataset.qtwidgets``
+  * ``guidata.utils.encoding``
+  * ``guidata.utils.misc``
+
 ## Version 3.0.5 ##
 
 Bug fixes:
