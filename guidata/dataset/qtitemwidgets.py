@@ -15,13 +15,15 @@ There is one widget type for each data item type.
 Example: ChoiceWidget <--> ChoiceItem, ImageChoiceItem
 """
 
-import collections.abc
+from __future__ import annotations
+
 import datetime
 import os
 import os.path as osp
 import sys
 from abc import abstractmethod
-from typing import TYPE_CHECKING, Any, Callable, List, Optional, Protocol
+from collections.abc import Callable
+from typing import TYPE_CHECKING, Any, Optional, Protocol
 
 import numpy
 from qtpy.compat import getexistingdirectory
@@ -71,8 +73,7 @@ if TYPE_CHECKING:  # pragma: no cover
 
 
 class AbstractDataSetWidget:
-    """
-    Base class for 'widgets' handled by `DataSetEditLayout` and it's derived
+    """Base class for 'widgets' handled by `DataSetEditLayout` and it's derived
     classes.
 
     This is a generic representation of an input (or display) widget that
@@ -80,25 +81,32 @@ class AbstractDataSetWidget:
 
     `DataSetEditLayout` uses a registry of *Item* to *Widget* mapping in order
     to automatically create a GUI for a `DataSet` structure
+
+    Args:
+        item: instance of `DataItemVariable` (not `DataItem`)
+        parent_layout: parent `DataSetEditLayout` instance
     """
 
     READ_ONLY = False
 
     def __init__(
-        self, item: "DataItemVariable", parent_layout: "DataSetEditLayout"
+        self, item: DataItemVariable, parent_layout: DataSetEditLayout
     ) -> None:
-        """Derived constructors should create the necessary widgets
-        The base class keeps a reference to item and parent
-        """
+        # Derived constructors should create the necessary widgets.
+        # The base class keeps a reference to item and parent
         self.item = item
         self.parent_layout = parent_layout
-        self.group: Any = None  # Layout/Widget grouping items
+        self.group: QWidget | None = None  # Layout/Widget grouping items
         self.label: Optional[QLabel] = None
         self.build_mode = False
 
     def place_label(self, layout: QGridLayout, row: int, column: int) -> None:
-        """
-        Place item label on layout at specified position (row, column)
+        """Place item label on layout at specified position (row, column)
+
+        Args:
+            layout: parent layout
+            row: row index
+            column: column index
         """
         label_text = self.item.get_prop_value("display", "label")
         unit = self.item.get_prop_value("display", "unit", "")
@@ -117,47 +125,58 @@ class AbstractDataSetWidget:
         row_span: int = 1,
         column_span: int = 1,
     ) -> None:
-        """
-        Place widget on layout at specified position
+        """Place widget on layout at specified position
+
+        Args:
+            layout: parent layout
+            row: row index
+            label_column: column index for label
+            widget_column: column index for widget
+            row_span: number of rows to span
+            column_span: number of columns to span
         """
         self.place_label(layout, row, label_column)
         layout.addWidget(self.group, row, widget_column, row_span, column_span)
 
     def is_active(self) -> bool:
-        """
-        Return True if associated item is active
+        """Is associated item active?
+
+        Returns:
+            True if associated item is active
         """
         return self.item.get_prop_value("display", "active", True)
 
     def check(self) -> bool:
-        """
-        Item validator
+        """Item validator
+
+        Returns:
+            True if item value is valid
         """
         return True
 
     def set(self) -> None:
-        """
-        Update data item value from widget contents
-        """
+        """Update data item value from widget contents"""
         # XXX: consider using item.set instead of item.set_from_string...
         self.item.set_from_string(self.value())
 
-    def get(self) -> Any:
-        """
-        Update widget contents from data item value
+    def get(self) -> None:
+        """Update widget contents from data item value
+
+        Returns:
+            Widget value
         """
         pass
 
     def value(self) -> Any:
-        """
-        Returns the widget's current value
+        """Returns the widget's current value
+
+        Returns:
+            Widget value
         """
         return None
 
     def set_state(self) -> None:
-        """
-        Update the visual status of the widget
-        """
+        """Update the visual status of the widget"""
         active = self.is_active()
         if self.group:
             self.group.setEnabled(active)
@@ -165,20 +184,21 @@ class AbstractDataSetWidget:
             self.label.setEnabled(active)
 
     def notify_value_change(self) -> None:
-        """
-        Notify parent layout that widget value has changed
-        """
+        """Notify parent layout that widget value has changed"""
         if not self.build_mode:
             self.parent_layout.widget_value_changed()
 
 
 class GroupWidget(AbstractDataSetWidget):
-    """
-    GroupItem widget
+    """GroupItem widget
+
+    Args:
+        item: instance of `DataItemVariable` (not `DataItem`)
+        parent_layout: parent `DataSetEditLayout` instance
     """
 
     def __init__(
-        self, item: "DataItemVariable", parent_layout: "DataSetEditLayout"
+        self, item: DataItemVariable, parent_layout: DataSetEditLayout
     ) -> None:
         super().__init__(item, parent_layout)
         embedded = item.get_prop_value("display", "embedded", False)
@@ -198,15 +218,23 @@ class GroupWidget(AbstractDataSetWidget):
         self.group.setLayout(self.layout)
 
     def get(self) -> None:
-        """Override AbstractDataSetWidget method"""
+        """Update widget contents from data item value
+
+        Returns:
+            Widget value
+        """
         self.edit.update_widgets()
 
     def set(self) -> None:
-        """Override AbstractDataSetWidget method"""
+        """Update data item value from widget contents"""
         self.edit.accept_changes()
 
     def check(self) -> bool:
-        """Override AbstractDataSetWidget method"""
+        """Item validator
+
+        Returns:
+            True if item value is valid
+        """
         return self.edit.check_all_values()
 
     def place_on_grid(
@@ -218,13 +246,29 @@ class GroupWidget(AbstractDataSetWidget):
         row_span: int = 1,
         column_span: int = 1,
     ) -> None:
-        """Override AbstractDataSetWidget method"""
+        """Place widget on layout at specified position
+
+        Args:
+            layout: parent layout
+            row: row index
+            label_column: column index for label
+            widget_column: column index for widget
+            row_span: number of rows to span
+            column_span: number of columns to span
+        """
         layout.addWidget(self.group, row, label_column, row_span, column_span + 1)
 
 
 class TabGroupWidget(AbstractDataSetWidget):
+    """TabGroupItem widget
+
+    Args:
+        item: instance of `DataItemVariable` (not `DataItem`)
+        parent_layout: parent `DataSetEditLayout` instance
+    """
+
     def __init__(
-        self, item_var: "DataItemVariable", parent_layout: "DataSetEditLayout"
+        self, item_var: DataItemVariable, parent_layout: DataSetEditLayout
     ) -> None:
         super().__init__(item_var, parent_layout)
         self.tabs = QTabWidget()
@@ -253,18 +297,26 @@ class TabGroupWidget(AbstractDataSetWidget):
                 raise
             self.widgets.append(widget)
 
-    def get(self) -> Any:
-        """Override AbstractDataSetWidget method"""
+    def get(self) -> None:
+        """Update widget contents from data item value
+
+        Returns:
+            Widget value
+        """
         for widget in self.widgets:
             widget.get()
 
-    def set(self) -> Any:
-        """Override AbstractDataSetWidget method"""
+    def set(self) -> None:
+        """Update data item value from widget contents"""
         for widget in self.widgets:
             widget.set()
 
     def check(self) -> bool:
-        """Override AbstractDataSetWidget method"""
+        """Item validator
+
+        Returns:
+            True if item value is valid
+        """
         return True
 
     def place_on_grid(
@@ -276,7 +328,16 @@ class TabGroupWidget(AbstractDataSetWidget):
         row_span: int = 1,
         column_span: int = 1,
     ) -> None:
-        """Override AbstractDataSetWidget method"""
+        """Place widget on layout at specified position
+
+        Args:
+            layout: parent layout
+            row: row index
+            label_column: column index for label
+            widget_column: column index for widget
+            row_span: number of rows to span
+            column_span: number of columns to span
+        """
         layout.addWidget(self.tabs, row, label_column, row_span, column_span + 1)
 
 
@@ -306,7 +367,11 @@ class LineEditWidget(AbstractDataSetWidget):
         self.edit.textChanged.connect(self.line_edit_changed)  # type:ignore
 
     def get(self) -> None:
-        """Override AbstractDataSetWidget method"""
+        """Update widget contents from data item value
+
+        Returns:
+            Widget value
+        """
         value = self.item.get()
         old_value = str(self.value())
         if value is not None:
@@ -333,16 +398,24 @@ class LineEditWidget(AbstractDataSetWidget):
         self.notify_value_change()
 
     def update(self, value: Any) -> None:
-        """Override AbstractDataSetWidget method"""
         cb = self.item.get_prop_value("display", "value_callback", None)
         if cb is not None:
             cb(value)
 
     def value(self) -> str:
+        """Returns the widget's current value
+
+        Returns:
+            Widget value
+        """
         return str(self.edit.text())
 
-    def check(self) -> Any:
-        """Override AbstractDataSetWidget method"""
+    def check(self) -> bool:
+        """Item validator
+
+        Returns:
+            True if item value is valid
+        """
         value = self.item.from_string(str(self.edit.text()))
         return self.item.check_value(value)
 
@@ -365,7 +438,11 @@ class TextEditWidget(AbstractDataSetWidget):
         return str(self.edit.toPlainText()).replace("\u2029", os.linesep)
 
     def get(self) -> None:
-        """Override AbstractDataSetWidget method"""
+        """Update widget contents from data item value
+
+        Returns:
+            Widget value
+        """
         value = self.item.get()
         if value is not None:
             self.edit.setPlainText(value)
@@ -382,19 +459,22 @@ class TextEditWidget(AbstractDataSetWidget):
         self.notify_value_change()
 
     def update(self, value: Any) -> Any:
-        """Override AbstractDataSetWidget method"""
         pass
 
     def value(self) -> str:
-        """
-        Returns the widget's current value
+        """Returns the widget's current value
 
-        :rtype str:
+        Returns:
+            Widget value
         """
         return self.edit.toPlainText()
 
-    def check(self) -> Any:
-        """Override AbstractDataSetWidget method"""
+    def check(self) -> bool:
+        """Item validator
+
+        Returns:
+            True if item value is valid
+        """
         value = self.item.from_string(self.__get_text())
         return self.item.check_value(value)
 
@@ -416,16 +496,25 @@ class CheckBoxWidget(AbstractDataSetWidget):
         self.checkbox.stateChanged.connect(self.state_changed)  # type:ignore
 
     def get(self) -> None:
-        """Override AbstractDataSetWidget method"""
+        """Update widget contents from data item value
+
+        Returns:
+            Widget value
+        """
         value = self.item.get()
         if value is not None:
             self.checkbox.setChecked(value)
 
     def set(self) -> None:
-        """Override AbstractDataSetWidget method"""
+        """Update data item value from widget contents"""
         self.item.set(self.value())
 
     def value(self) -> bool:
+        """Returns the widget's current value
+
+        Returns:
+            Widget value
+        """
         return self.checkbox.isChecked()
 
     def place_on_grid(
@@ -437,7 +526,16 @@ class CheckBoxWidget(AbstractDataSetWidget):
         row_span: int = 1,
         column_span: int = 1,
     ) -> None:
-        """Override AbstractDataSetWidget method"""
+        """Place widget on layout at specified position
+
+        Args:
+            layout: parent layout
+            row: row index
+            label_column: column index for label
+            widget_column: column index for widget
+            row_span: number of rows to span
+            column_span: number of columns to span
+        """
         if not self.item.get_prop_value("display", "label"):
             widget_column = label_column
             column_span += 1
@@ -478,7 +576,11 @@ class DateWidget(AbstractDataSetWidget):
         self.notify_value_change()
 
     def get(self) -> None:
-        """Override AbstractDataSetWidget method"""
+        """Update widget contents from data item value
+
+        Returns:
+            Widget value
+        """
         value = self.item.get()
         if value:
             if not isinstance(value, datetime.date):
@@ -486,19 +588,14 @@ class DateWidget(AbstractDataSetWidget):
             self.dateedit.setDate(value)
 
     def set(self) -> None:
-        """Override AbstractDataSetWidget method"""
+        """Update data item value from widget contents"""
         self.item.set(self.value())
 
     def value(self) -> datetime:  # type:ignore
-        """
-        Returns the widget's current value
+        """Returns the widget's current value
 
-        :rtype date:
-        """
-        """
-        Returns the widget's current value
-
-        :rtype date:
+        Returns:
+            Widget value
         """
         try:
             return self.dateedit.date().toPyDate()
@@ -531,8 +628,12 @@ class DateTimeWidget(AbstractDataSetWidget):
         _display_callback(self, value)
         self.notify_value_change()
 
-    def get(self):
-        """Override AbstractDataSetWidget method"""
+    def get(self) -> None:
+        """Update widget contents from data item value
+
+        Returns:
+            Widget value
+        """
         value = self.item.get()
         if value:
             if not isinstance(value, datetime.datetime):
@@ -540,10 +641,15 @@ class DateTimeWidget(AbstractDataSetWidget):
             self.dateedit.setDateTime(value)
 
     def set(self) -> None:
-        """Override AbstractDataSetWidget method"""
+        """Update data item value from widget contents"""
         self.item.set(self.value())
 
     def value(self) -> datetime:  # type:ignore
+        """Returns the widget's current value
+
+        Returns:
+            Widget value
+        """
         try:
             return self.dateedit.dateTime().toPyDateTime()
         except AttributeError:
@@ -553,9 +659,9 @@ class DateTimeWidget(AbstractDataSetWidget):
 class GroupLayout(QHBoxLayout):
     def __init__(self) -> None:
         QHBoxLayout.__init__(self)
-        self.widgets: List["QWidget"] = []
+        self.widgets: list[QWidget] = []
 
-    def addWidget(self, widget: "QWidget") -> None:  # type:ignore
+    def addWidget(self, widget: QWidget) -> None:  # type:ignore
         QHBoxLayout.addWidget(self, widget)
         self.widgets.append(widget)
 
@@ -570,6 +676,13 @@ class HasGroupProtocol(Protocol):
         pass
 
     def place_label(self, layout: QGridLayout, row: int, column: int) -> None:
+        """Place item label on layout at specified position (row, column)
+
+        Args:
+            layout: parent layout
+            row: row index
+            column: column index
+        """
         pass
 
 
@@ -593,7 +706,16 @@ class HLayoutMixin:
         row_span: int = 1,
         column_span: int = 1,
     ):
-        """Override AbstractDataSetWidget method"""
+        """Place widget on layout at specified position
+
+        Args:
+            layout: parent layout
+            row: row index
+            label_column: column index for label
+            widget_column: column index for widget
+            row_span: number of rows to span
+            column_span: number of columns to span
+        """
         self.place_label(layout, row, label_column)
         layout.addLayout(self.group, row, widget_column, row_span, column_span)
 
@@ -812,7 +934,7 @@ class ChoiceWidget(AbstractDataSetWidget):
             self.group.setToolTip(item.get_help())
             self.vbox = QVBoxLayout()
             self.group.setLayout(self.vbox)
-            self._buttons: List["QAbstractButton"] = []
+            self._buttons: list[QAbstractButton] = []
         else:
             self.combobox = self.group = QComboBox()
             self.combobox.setToolTip(item.get_help())
@@ -845,7 +967,7 @@ class ChoiceWidget(AbstractDataSetWidget):
                     if not osp.isfile(img):
                         img = get_image_file_path(img)
                     img = QIcon(img)
-                elif isinstance(img, collections.abc.Callable):  # type:ignore
+                elif isinstance(img, Callable):  # type:ignore
                     img = img(key)
                 if self.is_radio:
                     button.setIcon(img)
@@ -882,7 +1004,11 @@ class ChoiceWidget(AbstractDataSetWidget):
             return self.combobox.currentIndex()
 
     def get(self) -> None:
-        """Override AbstractDataSetWidget method"""
+        """Update widget contents from data item value
+
+        Returns:
+            Widget value
+        """
         self.initialize_widget()
         value = self.item.get()
         if value is not None:
@@ -898,7 +1024,7 @@ class ChoiceWidget(AbstractDataSetWidget):
                 self._first_call = False
 
     def set(self) -> None:
-        """Override AbstractDataSetWidget method"""
+        """Update data item value from widget contents"""
         try:
             value = self.value()
         except IndexError:
@@ -906,6 +1032,11 @@ class ChoiceWidget(AbstractDataSetWidget):
         self.item.set(value)
 
     def value(self) -> Any:
+        """Returns the widget's current value
+
+        Returns:
+            Widget value
+        """
         index = self.get_widget_value()
         choices = self.item.get_prop_value("data", "choices")
         return choices[index][0]
@@ -943,7 +1074,11 @@ class MultipleChoiceWidget(AbstractDataSetWidget):
         self.groupbox.setLayout(layout)
 
     def get(self) -> None:
-        """Override AbstractDataSetWidget method"""
+        """Update widget contents from data item value
+
+        Returns:
+            Widget value
+        """
         value = self.item.get()
         _choices = self.item.get_prop_value("data", "choices")
         for (i, _choice, _img), checkbox in zip(_choices, self.boxes):
@@ -951,12 +1086,17 @@ class MultipleChoiceWidget(AbstractDataSetWidget):
                 checkbox.setChecked(True)
 
     def set(self) -> None:
-        """Override AbstractDataSetWidget method"""
+        """Update data item value from widget contents"""
         _choices = self.item.get_prop_value("data", "choices")
         choices = [_choices[i][0] for i in self.value()]
         self.item.set(choices)
 
-    def value(self) -> List[int]:
+    def value(self) -> list[int]:
+        """Returns the widget's current value
+
+        Returns:
+            Widget value
+        """
         return [i for i, w in enumerate(self.boxes) if w.isChecked()]
 
     def place_on_grid(
@@ -968,7 +1108,16 @@ class MultipleChoiceWidget(AbstractDataSetWidget):
         row_span: int = 1,
         column_span: int = 1,
     ) -> None:
-        """Override AbstractDataSetWidget method"""
+        """Place widget on layout at specified position
+
+        Args:
+            layout: parent layout
+            row: row index
+            label_column: column index for label
+            widget_column: column index for widget
+            row_span: number of rows to span
+            column_span: number of columns to span
+        """
         layout.addWidget(self.group, row, label_column, row_span, column_span + 1)
 
 
@@ -1023,14 +1172,17 @@ class FloatArrayWidget(AbstractDataSetWidget):
                 self.update(self.arr)
 
     def get(self) -> None:
-        """Override AbstractDataSetWidget method"""
+        """Update widget contents from data item value
+
+        Returns:
+            Widget value
+        """
         self.arr = numpy.array(self.item.get(), copy=False)
         if self.item.get_prop_value("display", "transpose"):
             self.arr = self.arr.T
         self.update(self.arr)
 
     def update(self, arr: numpy.ndarray) -> None:
-        """Override AbstractDataSetWidget method"""
         shape = arr.shape
         if len(shape) == 1:
             shape = (1,) + shape
@@ -1066,7 +1218,7 @@ class FloatArrayWidget(AbstractDataSetWidget):
         self.dtype_label.setText("-" if typestr == "object" else typestr)
 
     def set(self) -> None:
-        """Override AbstractDataSetWidget method"""
+        """Update data item value from widget contents"""
         if self.item.get_prop_value("display", "transpose"):
             value = self.value().T
         else:
@@ -1074,6 +1226,11 @@ class FloatArrayWidget(AbstractDataSetWidget):
         self.item.set(value)
 
     def value(self) -> numpy.ndarray:
+        """Returns the widget's current value
+
+        Returns:
+            Widget value
+        """
         return self.arr
 
     def place_on_grid(
@@ -1085,7 +1242,16 @@ class FloatArrayWidget(AbstractDataSetWidget):
         row_span: int = 1,
         column_span: int = 1,
     ) -> None:
-        """Override AbstractDataSetWidget method"""
+        """Place widget on layout at specified position
+
+        Args:
+            layout: parent layout
+            row: row index
+            label_column: column index for label
+            widget_column: column index for widget
+            row_span: number of rows to span
+            column_span: number of columns to span
+        """
         layout.addWidget(self.group, row, label_column, row_span, column_span + 1)
 
 
@@ -1110,14 +1276,23 @@ class ButtonWidget(AbstractDataSetWidget):
         self.cb_value = None
 
     def get(self) -> None:
-        """Override AbstractDataSetWidget method"""
+        """Update widget contents from data item value
+
+        Returns:
+            Widget value
+        """
         self.cb_value = self.item.get()
 
     def set(self) -> None:
-        """Override AbstractDataSetWidget method"""
+        """Update data item value from widget contents"""
         self.item.set(self.value())
 
     def value(self) -> Optional[Any]:
+        """Returns the widget's current value
+
+        Returns:
+            Widget value
+        """
         return self.cb_value
 
     def place_on_grid(
@@ -1129,7 +1304,16 @@ class ButtonWidget(AbstractDataSetWidget):
         row_span: int = 1,
         column_span: int = 1,
     ):
-        """Override AbstractDataSetWidget method"""
+        """Place widget on layout at specified position
+
+        Args:
+            layout: parent layout
+            row: row index
+            label_column: column index for label
+            widget_column: column index for widget
+            row_span: number of rows to span
+            column_span: number of columns to span
+        """
         layout.addWidget(self.group, row, label_column, row_span, column_span + 1)
 
     def clicked(self, *args) -> None:
@@ -1171,13 +1355,17 @@ class DataSetWidget(AbstractDataSetWidget):
         )
 
     def get(self) -> None:
-        """Override AbstractDataSetWidget method"""
+        """Update widget contents from data item value
+
+        Returns:
+            Widget value
+        """
         self.get_dataset()
         for widget in self.edit.widgets:
             widget.get()
 
     def set(self) -> None:
-        """Override AbstractDataSetWidget method"""
+        """Update data item value from widget contents"""
         for widget in self.edit.widgets:
             widget.set()
         self.set_dataset()
@@ -1211,5 +1399,14 @@ class DataSetWidget(AbstractDataSetWidget):
         row_span: int = 1,
         column_span: int = 1,
     ) -> None:
-        """Override AbstractDataSetWidget method"""
+        """Place widget on layout at specified position
+
+        Args:
+            layout: parent layout
+            row: row index
+            label_column: column index for label
+            widget_column: column index for widget
+            row_span: number of rows to span
+            column_span: number of columns to span
+        """
         layout.addWidget(self.group, row, label_column, row_span, column_span + 1)
