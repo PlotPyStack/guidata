@@ -19,7 +19,17 @@ Moreover, the following guidelines should be followed:
   should follow the `Google style <http://google-styleguide.googlecode.com/svn/trunk/pyguide.html?showone=Comments#Comments>`_.
 
 * Add typing annotations for all functions and methods. The annotations should
-  use the future syntax (``from __future__ import annotations``)
+  use the future syntax (``from __future__ import annotations``) and the
+  ``if TYPE_CHECKING`` pattern to avoid circular imports (see
+  `PEP 484 <https://www.python.org/dev/peps/pep-0484/>`_).
+
+.. note::
+
+    To ensure that types are properly referenced by ``sphinx`` in the
+    documentation, you may need to import the individual types for Qt
+    (e.g. ``from qtpy.QtCore import QRectF``) instead of importing the whole
+    module (e.g. ``from qtpy import QtCore as QC``): this is a limitation of
+    ``sphinx-qt-documentation`` extension.
 
 * Try to keep the code as simple as possible. If you have to write a complex
   piece of code, try to split it into several functions or classes.
@@ -41,6 +51,31 @@ Moreover, the following guidelines should be followed:
 
 Submitting patches
 ^^^^^^^^^^^^^^^^^^
+
+Check-list
+~~~~~~~~~~
+
+Before submitting a patch, please check the following points:
+
+* The code follows the coding guidelines described above.
+
+* Build the documentation and check that it is correctly generated. *No warning
+  should be displayed.*
+
+* Run pylint on the code and check that there is no error:
+
+    .. code-block:: bash
+
+        pylint --disable=fixme,C,R,W plotpy
+
+* Run the tests and check that they all pass:
+
+    .. code-block:: bash
+
+        pytest --unattended plotpy
+
+Pull request
+~~~~~~~~~~~~
 
 If you want to contribute to the project, you can submit a patch. The
 recommended way to do this is to fork the project on GitHub, create a branch
