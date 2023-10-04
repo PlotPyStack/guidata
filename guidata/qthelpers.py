@@ -78,7 +78,7 @@ from guidata.env import execenv
 from guidata.external import darkdetect
 from guidata.utils.misc import to_string
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from collections.abc import Callable
 
 
