@@ -2,7 +2,17 @@
 
 ## Version 3.0.6 ##
 
+Bug fixes:
+
+* ``widgets.console.interpreter``: replaced threading.Thread.isAlive (deprecated since Python 3.8)
+
 Other changes:
+
+* ``DataSet.edit``, ``DataSet.view`` and ``DataSetGroup.edit``: added missing arguments ``size`` and ``wordwrap``
+
+* Documentation: added check-list before submitting a patch (see ``contribute.rst`` file)
+
+* Fixed some typing annotations and docstrings, as well as Pylint false positives
 
 * Removed unused functions from ``guidata.utils.encoding`` module:
   * ``transcode``
