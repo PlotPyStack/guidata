@@ -148,11 +148,8 @@
             "args": [
                 "/c",
                 "run_pylint.bat",
-                "--disable=fixme",
-                "--disable=C",
-                "--disable=R",
-                "--disable=W",
-                "guidata"
+                // "--disable=R0801,C0103,C0114,C0115,C0116,W0612,W0613",
+                "--disable=fixme,C,R,W",
             ],
             "options": {
                 "cwd": "scripts",

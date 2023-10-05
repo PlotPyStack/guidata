@@ -12,6 +12,6 @@ call %~dp0utils GetScriptPath SCRIPTPATH
 call %FUNC% GetModName MODNAME
 call %FUNC% SetPythonPath
 set PYLINT_ARG=%*
-if "%PYLINT_ARG%"=="" set PYLINT_ARG=%MODNAME% --disable=fixme
-%PYTHON% -m pylint --rcfile=%SCRIPTPATH%\..\.pylintrc %PYLINT_ARG%
+if "%PYLINT_ARG%"=="" set PYLINT_ARG=--disable=fixme
+%PYTHON% -m pylint --rcfile=%SCRIPTPATH%\..\.pylintrc %PYLINT_ARG% %MODNAME%
 call %FUNC% EndOfScript

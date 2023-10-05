@@ -9,10 +9,11 @@ REM (see PythonQwt LICENSE file for more details)
 REM ======================================================
 setlocal
 call %~dp0utils GetScriptPath SCRIPTPATH
+call %FUNC% GetModName MODNAME
 call %FUNC% SetPythonPath
 call %FUNC% UsePython
 
 set COVERAGE_PROCESS_START=%SCRIPTPATH%\..\.coveragerc
-pytest -v --cov --cov-report=html --unattended guidata
+pytest -v --cov --cov-report=html --unattended %MODNAME%
 start .\htmlcov\index.html
 call %FUNC% EndOfScript
