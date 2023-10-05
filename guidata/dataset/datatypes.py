@@ -73,6 +73,7 @@ from guidata.utils import update_dataset
 DEBUG_DESERIALIZE = False
 
 if TYPE_CHECKING:  # pragma: no cover
+    from qtpy.QtCore import QSize
     from qtpy.QtWidgets import QWidget
 
     from guidata.dataset.io import HDF5Reader, HDF5Writer, JSONReader, JSONWriter
@@ -1125,16 +1126,16 @@ class DataSet(metaclass=DataSetMeta):
         self,
         parent: QWidget | None = None,
         apply: Callable | None = None,
-        size: Any | None = None,
+        wordwrap: bool = True,
+        size: QSize | tuple[int, int] | None = None,
     ) -> DataSetEditDialog:
         """Open a dialog box to edit data set
 
         Args:
-            parent (QWidget): parent widget (default is None,
-             meaning no parent)
-            apply (Callable): apply callback (default is None)
-            size (QSize | tuple[int, int]): dialog size (QSize object
-             or integer tuple (width, height))
+            parent: parent widget (default is None, meaning no parent)
+            apply: apply callback (default is None)
+            wordwrap: if True, comment text is wordwrapped
+            size: dialog size (QSize object or integer tuple (width, height))
         """
         # Importing those modules here avoids Qt dependency when
         # guidata is used without Qt
@@ -1142,19 +1143,28 @@ class DataSet(metaclass=DataSetMeta):
         from guidata.dataset.qtwidgets import DataSetEditDialog
         from guidata.qthelpers import exec_dialog
 
-        dial = DataSetEditDialog(
-            self, icon=self.__icon, parent=parent, apply=apply, size=size
+        dlg = DataSetEditDialog(
+            self,
+            icon=self.__icon,
+            parent=parent,
+            apply=apply,
+            wordwrap=wordwrap,
+            size=size,
         )
-        return exec_dialog(dial)
+        return exec_dialog(dlg)
 
-    def view(self, parent: QWidget | None = None, size: Any | None = None) -> None:
+    def view(
+        self,
+        parent: QWidget | None = None,
+        wordwrap: bool = True,
+        size: QSize | tuple[int, int] | None = None,
+    ) -> None:
         """Open a dialog box to view data set
 
         Args:
-            parent (QWidget): parent widget (default is None,
-             meaning no parent)
-            size (QSize | tuple[int, int]): dialog size (QSize object
-             or integer tuple (width, height))
+            parent: parent widget (default is None, meaning no parent)
+            wordwrap: if True, comment text is wordwrapped
+            size: dialog size (QSize object or integer tuple (width, height))
         """
         # Importing those modules here avoids Qt dependency when
         # guidata is used without Qt
@@ -1162,7 +1172,9 @@ class DataSet(metaclass=DataSetMeta):
         from guidata.dataset.qtwidgets import DataSetShowDialog
         from guidata.qthelpers import exec_dialog
 
-        dial = DataSetShowDialog(self, icon=self.__icon, parent=parent, size=size)
+        dial = DataSetShowDialog(
+            self, icon=self.__icon, parent=parent, wordwrap=wordwrap, size=size
+        )
         return exec_dialog(dial)
 
     def to_string(
@@ -1433,12 +1445,20 @@ class DataSetGroup:
         """Edit data set with text input only"""
         raise NotImplementedError()
 
-    def edit(self, parent: QWidget | None = None, apply: Callable | None = None) -> int:
+    def edit(
+        self,
+        parent: QWidget | None = None,
+        apply: Callable | None = None,
+        wordwrap: bool = True,
+        size: QSize | tuple[int, int] | None = None,
+    ) -> int:
         """Open a dialog box to edit data set
 
         Args:
-            parent (QWidget): parent widget. Defaults to None.
-            apply (Callable): apply callback. Defaults to None.
+            parent: parent widget. Defaults to None.
+            apply: apply callback. Defaults to None.
+            wordwrap: if True, comment text is wordwrapped
+            size: dialog size (default: None)
 
         Returns:
             int: dialog box return code
@@ -1450,7 +1470,12 @@ class DataSetGroup:
         from guidata.qthelpers import exec_dialog
 
         dial = DataSetGroupEditDialog(
-            self, icon=self.__icon, parent=parent, apply=apply
+            self,
+            icon=self.__icon,
+            parent=parent,
+            apply=apply,
+            wordwrap=wordwrap,
+            size=size,
         )
         return exec_dialog(dial)
 
