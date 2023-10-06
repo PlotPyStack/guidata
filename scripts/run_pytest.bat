@@ -1,7 +1,7 @@
 @echo off
 REM This script was derived from PythonQwt project
 REM ======================================================
-REM Run coverage tests
+REM Run pytest script
 REM ======================================================
 REM Licensed under the terms of the MIT License
 REM Copyright (c) 2020 Pierre Raybaut
@@ -12,8 +12,5 @@ call %~dp0utils GetScriptPath SCRIPTPATH
 call %FUNC% GetModName MODNAME
 call %FUNC% SetPythonPath
 call %FUNC% UsePython
-
-set COVERAGE_PROCESS_START=%SCRIPTPATH%\..\.coveragerc
-pytest -v --cov --cov-report=html --unattended %MODNAME%
-start .\htmlcov\index.html
+pytest --unattended %MODNAME%
 call %FUNC% EndOfScript

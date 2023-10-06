@@ -90,6 +90,34 @@
             }
         },
         {
+            "label": "Run pytest",
+            "type": "shell",
+            "command": "cmd",
+            "args": [
+                "/c",
+                "run_pytest.bat"
+            ],
+            "options": {
+                "cwd": "scripts",
+                "env": {
+                    "UNATTENDED": "1",
+                    "PYTHON": "${env:GUIDATA_PYTHONEXE}"
+                }
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "dedicated",
+                "showReuseMessage": true,
+                "clear": true
+            }
+        },
+        {
             "label": "Clean Up",
             "type": "shell",
             "command": "cmd",
