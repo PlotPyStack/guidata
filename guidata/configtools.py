@@ -100,12 +100,7 @@ def get_translation(modname: str, dirname: str | None = None) -> Callable[[str],
             os.environ["LANG"] = lang
     try:
         modlocpath = get_module_locale_path(dirname)
-        try:
-            # pylint: disable=unexpected-keyword-arg
-            _trans = gettext.translation(modname, modlocpath, codeset="utf-8")
-        except TypeError:
-            # Python >= 3.11 (codeset argument has been removed)
-            _trans = gettext.translation(modname, modlocpath)
+        _trans = gettext.translation(modname, modlocpath)
         lgettext = _trans.gettext
 
         def translate_gettext(x):
