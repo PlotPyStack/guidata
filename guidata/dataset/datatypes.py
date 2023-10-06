@@ -328,7 +328,7 @@ class DataItem:
 
         Args:
             realm (str): realm name
-            \*\*kwargs: properties to set
+            kwargs: properties to set
 
         Returns:
             DataItem: self
@@ -804,7 +804,7 @@ class DataItemProxy:
 
         Args:
             realm (str): realm
-            \*\*kwargs: keyword arguments
+            kwargs: keyword arguments
 
         Returns:
             DataItem: data item
@@ -1030,7 +1030,7 @@ class DataSet(metaclass=DataSetMeta):
         """Create a new instance of the DataSet class
 
         Args:
-            \*\*kwargs: keyword arguments to set the DataItem values
+            kwargs: keyword arguments to set the DataItem values
 
         Returns:
             DataSet instance
@@ -1323,7 +1323,7 @@ class DataSet(metaclass=DataSetMeta):
 
         Args:
             realm (str): realm name
-            \*\*kwargs (dict): properties to set
+            kwargs (dict): properties to set
         """  # noqa
         for item in klass._items:
             item.set_prop(realm, **kwargs)
