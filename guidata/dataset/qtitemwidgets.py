@@ -23,7 +23,7 @@ import os.path as osp
 import sys
 from abc import abstractmethod
 from collections.abc import Callable
-from typing import TYPE_CHECKING, Any, Optional, Protocol
+from typing import TYPE_CHECKING, Any, Protocol
 
 import numpy
 from qtpy.compat import getexistingdirectory
@@ -97,7 +97,7 @@ class AbstractDataSetWidget:
         self.item = item
         self.parent_layout = parent_layout
         self.group: QWidget | None = None  # Layout/Widget grouping items
-        self.label: Optional[QLabel] = None
+        self.label: QLabel | None = None
         self.build_mode = False
 
     def place_label(self, layout: QGridLayout, row: int, column: int) -> None:
@@ -962,7 +962,7 @@ class ChoiceWidget(AbstractDataSetWidget):
             self.combobox.setCurrentIndex(idx)
             self.combobox.blockSignals(False)
 
-    def get_widget_value(self) -> Optional[int]:
+    def get_widget_value(self) -> int| None:
         if self.is_radio:
             for index, widget in enumerate(self._buttons):
                 if widget.isChecked():
@@ -1239,7 +1239,7 @@ class ButtonWidget(AbstractDataSetWidget):
         """Update data item value from widget contents"""
         self.item.set(self.value())
 
-    def value(self) -> Optional[Any]:
+    def value(self) -> Any| None:
         """Returns the widget's current value
 
         Returns:
