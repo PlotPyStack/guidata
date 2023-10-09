@@ -7,10 +7,19 @@ REM Licensed under the terms of the MIT License
 REM Copyright (c) 2020 Pierre Raybaut
 REM (see PythonQwt LICENSE file for more details)
 REM ======================================================
-setlocal
+setlocal enabledelayedexpansion
 call %~dp0utils GetScriptPath SCRIPTPATH
 call %FUNC% GetModName MODNAME
 call %FUNC% SetPythonPath
-call %FUNC% UsePython
-pytest --unattended %MODNAME%
+
+:: Iterate over all directories in the grandparent directory
+:: (WinPython base directories)
+call %FUNC% GetPythonExeGrandParentDir DIR0
+for /D %%d in ("%DIR0%*") do (
+    set WINPYDIRBASE=%%d
+    call !WINPYDIRBASE!\scripts\env.bat
+    echo Running pytest from "%%d":
+    pytest --ff -q --unattended %MODNAME%
+    echo ----
+)
 call %FUNC% EndOfScript

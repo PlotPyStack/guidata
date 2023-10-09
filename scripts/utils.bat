@@ -59,6 +59,14 @@ REM ======================================================
     set PYTHONPATH=%PYTHONPATH%;%ORIGINAL_PYTHONPATH%
     goto:eof
 
+:GetPythonExeGrandParentDir
+    for %%i in (%PYTHON%) do set DIR2=%%~dpi
+    set DIR2=%DIR2:~0,-1%
+    for %%j in (%DIR2%) do set DIR1=%%~dpj
+    set DIR1=%DIR1:~0,-1%
+    for %%k in (%DIR1%) do set %1=%%~dpk
+    goto:eof
+
 :UsePython
     if defined WINPYVER (goto:eof)
     if not defined PYTHON (goto :nopython)
