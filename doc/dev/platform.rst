@@ -53,7 +53,7 @@ project settings and tasks, you will need to set the following environment varia
 
 .. code-block:: bash
 
-    set GUIDATA_PYTHONEXE=C:\WPy64-31110\python-3.11.1.amd64\python.exe
+    set PPSTACK_PYTHONEXE=C:\WPy64-31110\python-3.11.1.amd64\python.exe
 
 CentOS Stream 8.8
 ^^^^^^^^^^^^^^^^^

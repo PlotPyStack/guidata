@@ -93,6 +93,6 @@ development environment. The easiest way to do this is to use `virtualenv
 Some environment variables are required to be set before using the project from
 within Visual Studio Code (used in `launch.json` and `tasks.json`). These are:
 
-* ``GUIDATA_PYTHONEXE``: The path to the Python interpreter to use. This is
+* ``PPSTACK_PYTHONEXE``: The path to the Python interpreter to use. This is
   used to launch the application from within Visual Studio Code. If not set,
   the default Python interpreter will be used.

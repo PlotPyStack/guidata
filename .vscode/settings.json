@@ -16,7 +16,7 @@
     },
     "files.trimFinalNewlines": true,
     "files.trimTrailingWhitespace": true,
-    "python.defaultInterpreterPath": "${env:GUIDATA_PYTHONEXE}",
+    "python.defaultInterpreterPath": "${env:PPSTACK_PYTHONEXE}",
     "editor.formatOnSave": true,
     "isort.args": [
         "--profile",
