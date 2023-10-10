@@ -26,9 +26,8 @@ from guidata.qthelpers import (
     qt_app_context,
     win32_fix_title_bar_background,
 )
-
-# Local test import:
 from guidata.tests.test_activable_dataset import Parameters
+from guidata.widgets import about
 
 
 class AnotherDataSet(gdt.DataSet):
@@ -89,7 +88,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
         win32_fix_title_bar_background(self)
-        self.setWindowIcon(get_icon("python.png"))
+        self.setWindowIcon(get_icon("guidata.svg"))
         self.setWindowTitle("Application example")
 
         # Instantiate dataset-related widgets:
@@ -142,6 +141,16 @@ class MainWindow(QMainWindow):
         add_actions(
             edit_menu, (editparam1_action, editparam2_action, editparam4_action)
         )
+
+        # ? menu
+        help_menu = self.menuBar().addMenu("?")
+        about_action = create_action(
+            self,
+            "About",
+            icon=get_std_icon("MessageBoxInformation"),
+            triggered=lambda parent=self: about.show_about_dialog(parent),
+        )
+        add_actions(help_menu, (about_action,))
 
     def update_window(self):
         """Update window"""

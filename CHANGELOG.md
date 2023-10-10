@@ -1,5 +1,13 @@
 # guidata Releases #
 
+## Version 3.1.0 ##
+
+New PlotPyStack internal features:
+
+* ``widgets.about``: handle about dialog box informations (Python, Qt, Qt bindings, ...)
+
+* Renamed development environment variable ``GUIDATA_PYTHONEXE`` to ``PPSTACK_PYTHONEXE``
+
 ## Version 3.0.6 ##
 
 Bug fixes:
