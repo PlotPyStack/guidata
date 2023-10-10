@@ -18,14 +18,14 @@ import guidata
 from guidata.config import _
 
 
-def get_general_infos(addinfos: str = "") -> str:
-    """Get general information (copyright, Qt versions, etc.)
+def get_python_libs_infos(addinfos: str = "") -> str:
+    """Get Python and libraries information
 
     Args:
         addinfos: additional information to be displayed
 
     Returns:
-        str: Qt information
+        str: Python and libraries information
     """
     python_version = "{} {}".format(
         platform.python_version(), "64 bits" if sys.maxsize > 2**32 else "32 bits"
@@ -39,10 +39,22 @@ def get_general_infos(addinfos: str = "") -> str:
     if addinfos:
         addinfos = ", " + addinfos
     return (
-        f"Copyright © 2023 CEA\n\nPython {python_version}, "
+        f"Python {python_version}, "
         f"Qt {qtpy.QT_VERSION}, {qtb_name} {qtb_version}"
         f"{addinfos} on {platform.system()}"
     )
+
+
+def get_general_infos(addinfos: str = "") -> str:
+    """Get general information (copyright, Qt versions, etc.)
+
+    Args:
+        addinfos: additional information to be displayed
+
+    Returns:
+        str: Qt information
+    """
+    return "Copyright © 2023 CEA\n\n" + get_python_libs_infos(addinfos=addinfos)
 
 
 def about(html: bool = True, copyright_only: bool = False) -> str:
