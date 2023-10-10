@@ -88,7 +88,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
         win32_fix_title_bar_background(self)
-        self.setWindowIcon(get_icon("guidata.svg"))
+        self.setWindowIcon(get_icon("python.png"))
         self.setWindowTitle("Application example")
 
         # Instantiate dataset-related widgets:
@@ -146,9 +146,9 @@ class MainWindow(QMainWindow):
         help_menu = self.menuBar().addMenu("?")
         about_action = create_action(
             self,
-            "About",
+            "About guidata",
             icon=get_std_icon("MessageBoxInformation"),
-            triggered=lambda parent=self: about.show_about_dialog(parent),
+            triggered=about.show_about_dialog,
         )
         add_actions(help_menu, (about_action,))
 

@@ -12,10 +12,12 @@ import platform
 import sys
 
 import qtpy
-from qtpy.QtWidgets import QMessageBox, QWidget
+from qtpy.QtCore import Qt
+from qtpy.QtWidgets import QMainWindow, QMessageBox
 
 import guidata
 from guidata.config import _
+from guidata.configtools import get_icon
 
 
 def get_python_libs_infos(addinfos: str = "") -> str:
@@ -80,10 +82,11 @@ def about(html: bool = True, copyright_only: bool = False) -> str:
     return desc
 
 
-def show_about_dialog(parent: QWidget) -> None:
-    """Show ``plotpy`` about dialog
-
-    Args:
-        parent (QWidget): parent widget
-    """
-    QMessageBox.about(parent, _("About") + " guidata", about(html=True))
+def show_about_dialog() -> None:
+    """Show ``guidata`` about dialog"""
+    win = QMainWindow(None)
+    win.setAttribute(Qt.WA_DeleteOnClose)
+    win.hide()
+    win.setWindowIcon(get_icon("guidata.svg"))
+    QMessageBox.about(win, _("About") + " guidata", about(html=True))
+    win.close()
