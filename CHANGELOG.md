@@ -8,6 +8,10 @@ New PlotPyStack internal features:
 
 * Renamed development environment variable ``GUIDATA_PYTHONEXE`` to ``PPSTACK_PYTHONEXE``
 
+Bug fixes:
+
+* Fixed Qt6 compatibility issue with ``QFontDatabase``
+
 ## Version 3.0.6 ##
 
 Bug fixes:

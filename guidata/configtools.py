@@ -43,6 +43,8 @@ import sys
 from collections.abc import Callable
 from typing import TYPE_CHECKING
 
+from qtpy import PYQT5
+
 from guidata.utils.misc import decode_fs_string, get_module_path
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -293,7 +295,12 @@ def font_is_installed(font: str) -> list[str]:
     # Importing Qt here because this module should be independent from it
     from qtpy import QtGui as QG  # pylint: disable=import-outside-toplevel
 
-    return [fam for fam in QG.QFontDatabase().families() if str(fam) == font]
+    if PYQT5:
+        fontfamilies = QG.QFontDatabase().families()
+    else:
+        # Qt6
+        fontfamilies = QG.QFontDatabase.families()
+    return [fam for fam in fontfamilies if str(fam) == font]
 
 
 MONOSPACE = [
