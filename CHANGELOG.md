@@ -4,37 +4,32 @@
 
 New PlotPyStack internal features:
 
-* ``widgets.about``: handle about dialog box informations (Python, Qt, Qt bindings, ...)
-
-* Renamed development environment variable ``GUIDATA_PYTHONEXE`` to ``PPSTACK_PYTHONEXE``
+* `widgets.about`: handle about dialog box informations (Python, Qt, Qt bindings, ...)
+* Renamed development environment variable `GUIDATA_PYTHONEXE` to `PPSTACK_PYTHONEXE`
 
 Bug fixes:
 
-* Fixed Qt6 compatibility issue with ``QFontDatabase``
+* Fixed Qt6 compatibility issue with `QFontDatabase`
 
 ## Version 3.0.6 ##
 
 Bug fixes:
 
-* ``widgets.console.interpreter``: replaced threading.Thread.isAlive (deprecated since Python 3.8)
+* `widgets.console.interpreter`: replaced threading.Thread.isAlive (deprecated since Python 3.8)
 
 Other changes:
 
-* ``DataSet.edit``, ``DataSet.view`` and ``DataSetGroup.edit``: added missing arguments ``size`` and ``wordwrap``
-
-* Documentation: added check-list before submitting a patch (see ``contribute.rst`` file)
-
+* `DataSet.edit`, `DataSet.view` and `DataSetGroup.edit`: added missing arguments `size` and `wordwrap`
+* Documentation: added check-list before submitting a patch (see [`contribute.rst`](https://github.com/PlotPyStack/guidata/blob/master/doc/dev/contribute.rst) file)
 * Fixed some typing annotations and docstrings, as well as Pylint false positives
-
-* Removed unused functions from ``guidata.utils.encoding`` module:
-  * ``transcode``
-  * ``getfilesystemencoding``
-
+* Removed unused functions from `guidata.utils.encoding` module:
+  * `transcode`
+  * `getfilesystemencoding`
 * Added missing docstrings and typing annotations in modules:
-  * ``guidata.dataset.qtitemwidgets``
-  * ``guidata.dataset.qtwidgets``
-  * ``guidata.utils.encoding``
-  * ``guidata.utils.misc``
+  * `guidata.dataset.qtitemwidgets`
+  * `guidata.dataset.qtwidgets`
+  * `guidata.utils.encoding`
+  * `guidata.utils.misc`
 
 ## Version 3.0.5 ##
 
@@ -44,8 +39,8 @@ Bug fixes:
 
 Other changes:
 
-* ``tests.test_callbacks``: added an example of a callback function for dynamically
-  changing the list of choices of a ``ChoiceItem`` object
+* `tests.test_callbacks`: added an example of a callback function for dynamically
+  changing the list of choices of a `ChoiceItem` object
 
 ## Version 3.0.4 ##
 
@@ -103,7 +98,7 @@ Bug fixes:
   as `guidata.dataset.qtwidgets`). This was a regression introduced in version 3.0.0.
   A new unit test was added to prevent this kind of regression in the future.
 
-* Fixed documentation generation ``.readthedocs.yaml`` file (Qt 5.15 was not
+* Fixed documentation generation `.readthedocs.yaml` file (Qt 5.15 was not
   installed on ReadTheDocs servers, causing documentation build to fail)
 
 Other changes:
@@ -142,8 +137,8 @@ New major release:
 * Other changes:
   * `guidata.guitest`:
     * Added support for subpackages
-    * New comment directive (``# guitest: show``) to add test module to test suite or
-      to show test module in test launcher (this replaces the old ``SHOW = True`` line)
+    * New comment directive (`# guitest: show`) to add test module to test suite or
+      to show test module in test launcher (this replaces the old `SHOW = True` line)
   * `guidata.dataset.datatypes.DataSet`: new `create` class method for concise
     dataset creation, allowing to create a dataset with a single line of code by
     passing default item values as keyword arguments
