@@ -90,6 +90,7 @@ class Parameters(DataSet):
         },
     )
     string = StringItem("String")
+    password = StringItem("Password", password=True)
     text = TextItem("Text")
     _bg = BeginGroup("A sub group")
     float_slider = FloatItem(
@@ -139,7 +140,7 @@ class Parameters(DataSet):
     )
     eg0 = EndTabGroup("group")
     integer_slider = IntItem(
-        "Integer (with slider)", default=5, min=-50, max=-50, slider=True
+        "Integer (with slider)", default=5, min=-50, max=50, slider=True
     )
     integer = IntItem("Integer", default=5, min=3, max=6).set_pos(col=1)
 

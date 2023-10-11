@@ -346,6 +346,7 @@ class StringItem(DataItem):
         default (str): default value (optional)
         notempty (bool): if True, empty string is not a valid value (optional)
         wordwrap (bool): toggle word wrapping (optional)
+        password (bool): if True, text is hidden (optional)
         help (str): text shown in tooltip (optional)
     """
 
@@ -357,11 +358,12 @@ class StringItem(DataItem):
         default: str | None = None,
         notempty: bool | None = None,
         wordwrap: bool = False,
+        password: bool = False,
         help: str = "",
     ) -> None:
         DataItem.__init__(self, label, default=default, help=help)
         self.set_prop("data", notempty=notempty)
-        self.set_prop("display", wordwrap=wordwrap)
+        self.set_prop("display", wordwrap=wordwrap, password=password)
 
     def check_value(self, value: Any) -> bool:
         """Override DataItem method"""
@@ -373,6 +375,13 @@ class StringItem(DataItem):
     def from_string(self, value: str) -> str:
         """Override DataItem method"""
         return value
+
+    def get_string_value(self, instance: DataSet) -> str:
+        """Override DataItem method"""
+        strval = super().get_string_value(instance)
+        if self.get_prop("display", "password"):
+            return "*" * len(strval)
+        return strval
 
     def get_value_from_reader(self, reader: HDF5Reader | JSONReader | INIReader) -> Any:
         """Reads value from the reader object, inside the try...except

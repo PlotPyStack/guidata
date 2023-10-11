@@ -2,6 +2,10 @@
 
 ## Version 3.1.0 ##
 
+New features:
+
+* `dataset.dataitems.StringItem`: added argument `password` to hide text (useful for passwords)
+
 New PlotPyStack internal features:
 
 * `widgets.about`: handle about dialog box informations (Python, Qt, Qt bindings, ...)

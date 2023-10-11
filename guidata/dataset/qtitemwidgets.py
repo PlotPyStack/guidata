@@ -352,6 +352,9 @@ class LineEditWidget(AbstractDataSetWidget):
         super().__init__(item, parent_layout)
         self.edit = self.group = QLineEdit()
         self.edit.setToolTip(item.get_help())
+        password = self.item.get_prop_value("display", "password", False)
+        if password:
+            self.edit.setEchoMode(QLineEdit.Password)
         self.edit.textChanged.connect(self.line_edit_changed)  # type:ignore
 
     def get(self) -> None:
@@ -962,7 +965,7 @@ class ChoiceWidget(AbstractDataSetWidget):
             self.combobox.setCurrentIndex(idx)
             self.combobox.blockSignals(False)
 
-    def get_widget_value(self) -> int| None:
+    def get_widget_value(self) -> int | None:
         if self.is_radio:
             for index, widget in enumerate(self._buttons):
                 if widget.isChecked():
@@ -1239,7 +1242,7 @@ class ButtonWidget(AbstractDataSetWidget):
         """Update data item value from widget contents"""
         self.item.set(self.value())
 
-    def value(self) -> Any| None:
+    def value(self) -> Any | None:
         """Returns the widget's current value
 
         Returns:
