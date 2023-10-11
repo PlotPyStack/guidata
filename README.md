@@ -49,5 +49,5 @@ Application development tools:
 
 ## Dependencies and installation
 
-See [Installation](https://guidata.readthedocs.io/en/latest/intro/installation.html)
+See [Installation](https://guidata.readthedocs.io/en/latest/installation.html)
 section in the documentation for more details.
