@@ -127,7 +127,7 @@ class ShellBaseWidget(ConsoleBaseWidget, SaveHistoryMixin, BrowseHistoryMixin):
         cursor = self.textCursor()
         cursor.select(QTextCursor.Document)
         charformat = QTextCharFormat()
-        charformat.setFontFamily(font.family())
+        charformat.setFontFamilies([font.family()])
         charformat.setFontPointSize(font.pointSize())
         cursor.mergeCharFormat(charformat)
 
