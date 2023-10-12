@@ -115,7 +115,7 @@ class UserConfig(cp.ConfigParser):
     """
     UserConfig class, based on ConfigParser
     name: name of the config
-    options: dictionnary containing options *or* list of tuples
+    options: dictionary containing options *or* list of tuples
     (section_name, options)
 
     Note that "get" and "set" arguments number and type

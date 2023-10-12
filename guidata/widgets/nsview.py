@@ -34,28 +34,25 @@ class FakeObject(object):
 # ==============================================================================
 try:
     from numpy import (
-        ndarray,
         array,
-        matrix,
-        recarray,
-        int64,
-        int32,
-        int16,
-        int8,
-        uint64,
-        uint32,
-        uint16,
-        uint8,
-        float64,
-        float32,
-        float16,
+        bool_,
         complex64,
         complex128,
-        bool_,
+        float16,
+        float32,
+        float64,
+        get_printoptions,
+        int8,
+        int16,
+        int32,
+        int64,
+        matrix,
+        ndarray,
+        recarray,
     )
-    from numpy.ma import MaskedArray
     from numpy import savetxt as np_savetxt
-    from numpy import get_printoptions, set_printoptions
+    from numpy import set_printoptions, uint8, uint16, uint32, uint64
+    from numpy.ma import MaskedArray
 except:
     ndarray = (
         array
@@ -434,7 +431,7 @@ def value_to_display(value, minmax=False, level=0):
             # Fixes Issue 2448
             display = str(value)
             if level > 0:
-                display = u"'" + display + u"'"
+                display = "'" + display + "'"
         elif isinstance(value, DatetimeIndex):
             if level == 0:
                 try:
@@ -450,7 +447,7 @@ def value_to_display(value, minmax=False, level=0):
                 try:
                     display = str(value, "utf8")
                     if level > 0:
-                        display = u"'" + display + u"'"
+                        display = "'" + display + "'"
                 except:
                     display = value
                     if level > 0:
@@ -463,7 +460,7 @@ def value_to_display(value, minmax=False, level=0):
             if type(value) is str:
                 display = value
                 if level > 0:
-                    display = u"'" + display + u"'"
+                    display = "'" + display + "'"
             else:
                 display = default_display(value)
         elif isinstance(value, datetime.date) or isinstance(value, datetime.timedelta):
@@ -488,7 +485,7 @@ def value_to_display(value, minmax=False, level=0):
         if isinstance(display, bytes):
             ellipses = b" ..."
         else:
-            ellipses = u" ..."
+            ellipses = " ..."
         display = display[:70].rstrip() + ellipses
 
     # Restore Numpy threshold
@@ -663,7 +660,7 @@ REMOTE_SETTINGS = (
 
 def get_supported_types():
     """
-    Return a dictionnary containing types lists supported by the
+    Return a dictionary containing types lists supported by the
     namespace browser.
 
     """
@@ -671,13 +668,13 @@ def get_supported_types():
 
     editable_types = [int, float, complex, list, dict, tuple, date, timedelta, str]
     try:
-        from numpy import ndarray, matrix, generic
+        from numpy import generic, matrix, ndarray
 
         editable_types += [ndarray, matrix, generic]
     except:
         pass
     try:
-        from pandas import DataFrame, Series, DatetimeIndex
+        from pandas import DataFrame, DatetimeIndex, Series
 
         editable_types += [DataFrame, Series, DatetimeIndex]
     except:

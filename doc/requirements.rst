@@ -70,7 +70,7 @@ Optional modules for building the documentation:
       - 
       - Powerful data structures for data analysis, time series, and statistics
     * - sphinx
-      - 
+      - >6
       - Python documentation generator
     * - sphinx-copybutton
       - 

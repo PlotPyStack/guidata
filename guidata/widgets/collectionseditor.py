@@ -1534,7 +1534,7 @@ class CollectionsEditor(QDialog):
     def setup(self, data, title="", readonly=False, width=650, icon=None, parent=None):
         """Setup editor."""
         if isinstance(data, dict):
-            # dictionnary
+            # dictionary
             self.data_copy = data.copy()
             datalen = len(data)
         elif isinstance(data, (tuple, list)):
