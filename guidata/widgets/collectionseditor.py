@@ -1213,7 +1213,7 @@ class BaseTableView(QTableView):
 
     def __prepare_plot(self):
         try:
-            import guiqwt.pyplot  # analysis:ignore
+            import plotpy.pyplot  # analysis:ignore
 
             return True
         except Exception:  # pylint: disable=broad-except
@@ -1227,7 +1227,7 @@ class BaseTableView(QTableView):
                 QMessageBox.warning(
                     self,
                     _("Import error"),
-                    _("Please install <b>matplotlib</b>" " or <b>guiqwt</b>."),
+                    _("Please install <b>matplotlib</b>" " or <b>plotpy</b>."),
                 )
 
     def plot_item(self, funcname):
@@ -1451,7 +1451,7 @@ class CollectionsEditorTableView(BaseTableView):
     def plot(self, key, funcname):
         """Plot item"""
         data = self.model.get_data()
-        import guiqwt.pyplot as plt
+        import plotpy.pyplot as plt
 
         plt.figure()
         getattr(plt, funcname)(data[key])
@@ -1460,7 +1460,7 @@ class CollectionsEditorTableView(BaseTableView):
     def imshow(self, key):
         """Show item's image"""
         data = self.model.get_data()
-        import guiqwt.pyplot as plt
+        import plotpy.pyplot as plt
 
         plt.figure()
         plt.imshow(data[key])
