@@ -113,18 +113,18 @@ class NumericTypeItem(DataItem):
     """Numeric data item
 
     Args:
-        label (str): item name
-        default (int or float): default value (optional)
-        min (int or float): minimum value (optional)
-        max (int or float): maximum value (optional)
-        nonzero (bool): if True, zero is not a valid value (optional)
-        unit (str): physical unit (optional)
-        even (bool): if True, even values are valid, if False,
+        label: item name
+        default: default value (optional)
+        min: minimum value (optional)
+        max: maximum value (optional)
+        nonzero: if True, zero is not a valid value (optional)
+        unit: physical unit (optional)
+        even: if True, even values are valid, if False,
           odd values are valid if None (default), ignored (optional)
-        slider (bool): if True, shows a slider widget right after the line
+        slider: if True, shows a slider widget right after the line
           edit widget (default is False)
-        help (str): text shown in tooltip (optional)
-        check (bool): if False, value is not checked (optional, default=True)
+        help: text shown in tooltip (optional)
+        check: if False, value is not checked (optional, default=True)
     """
 
     type: Callable = None
@@ -140,7 +140,7 @@ class NumericTypeItem(DataItem):
         help: str = "",
         check: bool = True,
     ) -> None:
-        DataItem.__init__(self, label, default=default, help=help)
+        super().__init__(label, default=default, help=help, check=check)
         self.set_prop("data", min=min, max=max, nonzero=nonzero, check_value=check)
         self.set_prop("display", unit=unit)
 
@@ -211,18 +211,18 @@ class FloatItem(NumericTypeItem):
     """Construct a float data item
 
     Args:
-        label (str): item name
-        default (float): default value (optional)
-        min (float): minimum value (optional)
-        max (float): maximum value (optional)
-        nonzero (bool): if True, zero is not a valid value (optional)
-        unit (str): physical unit (optional)
-        even (bool): if True, even values are valid, if False,
+        label: item name
+        default: default value (optional)
+        min: minimum value (optional)
+        max: maximum value (optional)
+        nonzero: if True, zero is not a valid value (optional)
+        unit: physical unit (optional)
+        even: if True, even values are valid, if False,
          odd values are valid if None (default), ignored (optional)
-        slider (bool): if True, shows a slider widget right after the line
+        slider: if True, shows a slider widget right after the line
          edit widget (default is False)
-        help (str): text shown in tooltip (optional)
-        check (bool): if False, value is not checked (optional, default=True)
+        help: text shown in tooltip (optional)
+        check: if False, value is not checked (optional, default=True)
     """
 
     type = float
@@ -265,18 +265,18 @@ class IntItem(NumericTypeItem):
     """Construct an integer data item
 
     Args:
-        label (str): item name
-        default (int): default value (optional)
-        min (int): minimum value (optional)
-        max (int): maximum value (optional)
-        nonzero (bool): if True, zero is not a valid value (optional)
-        unit (str): physical unit (optional)
-        even (bool): if True, even values are valid, if False,
+        label: item name
+        default: default value (optional)
+        min: minimum value (optional)
+        max: maximum value (optional)
+        nonzero: if True, zero is not a valid value (optional)
+        unit: physical unit (optional)
+        even: if True, even values are valid, if False,
          odd values are valid if None (default), ignored (optional)
-        slider (bool): if True, shows a slider widget right after the line
+        slider: if True, shows a slider widget right after the line
          edit widget (default is False)
-        help (str): text shown in tooltip (optional)
-        check (bool): if False, value is not checked (optional, default=True)
+        help: text shown in tooltip (optional)
+        check: if False, value is not checked (optional, default=True)
     """
 
     type = int
@@ -342,12 +342,13 @@ class StringItem(DataItem):
     """Construct a string data item
 
     Args:
-        label (str): item name
-        default (str): default value (optional)
-        notempty (bool): if True, empty string is not a valid value (optional)
-        wordwrap (bool): toggle word wrapping (optional)
-        password (bool): if True, text is hidden (optional)
-        help (str): text shown in tooltip (optional)
+        label: item name
+        default: default value (optional)
+        notempty: if True, empty string is not a valid value (optional)
+        wordwrap: toggle word wrapping (optional)
+        password: if True, text is hidden (optional)
+        help: text shown in tooltip (optional)
+        check: if False, value is not checked (ineffective for strings)
     """
 
     type: Any = str
@@ -360,8 +361,9 @@ class StringItem(DataItem):
         wordwrap: bool = False,
         password: bool = False,
         help: str = "",
+        check: bool = True,
     ) -> None:
-        DataItem.__init__(self, label, default=default, help=help)
+        super().__init__(label, default=default, help=help, check=check)
         self.set_prop("data", notempty=notempty)
         self.set_prop("display", wordwrap=wordwrap, password=password)
 
@@ -393,11 +395,11 @@ class TextItem(StringItem):
     """Construct a text data item (multiline string)
 
     Args:
-        label (str): item name
-        default (str): default value (optional)
-        notempty (bool): if True, empty string is not a valid value (optional)
-        wordwrap (bool): toggle word wrapping (optional)
-        help (str): text shown in tooltip (optional)
+        label: item name
+        default: default value (optional)
+        notempty: if True, empty string is not a valid value (optional)
+        wordwrap: toggle word wrapping (optional)
+        help: text shown in tooltip (optional)
     """
 
     def __init__(
@@ -408,8 +410,7 @@ class TextItem(StringItem):
         wordwrap: bool = True,
         help: str = "",
     ) -> None:
-        StringItem.__init__(
-            self,
+        super().__init__(
             label,
             default=default,
             notempty=notempty,
@@ -422,11 +423,11 @@ class BoolItem(DataItem):
     """Construct a boolean data item
 
     Args:
-        text (str): form's field name (optional)
-        label (str): item name
-        default (bool): default value (optional)
-        help (str): text shown in tooltip (optional)
-        check (bool): if False, value is not checked (optional, default=True)
+        text: form's field name (optional)
+        label: item name
+        default: default value (optional)
+        help: text shown in tooltip (optional)
+        check: if False, value is not checked (optional, default=True)
     """
 
     type = bool
@@ -439,7 +440,7 @@ class BoolItem(DataItem):
         help: str = "",
         check: bool = True,
     ) -> None:
-        DataItem.__init__(self, label, default=default, help=help, check=check)
+        super().__init__(label, default=default, help=help, check=check)
         self.set_prop("display", text=text)
 
     def get_value_from_reader(
@@ -454,11 +455,11 @@ class DateItem(DataItem):
     """DataSet data item
 
     Args:
-        label (str): item label
-        default (datetime.date): default value (optional)
-        format (str): date format (as in :py:func:`datetime.date.strftime`)
-        help (str): text displayed on data item's tooltip
-        check (bool): check value (default: True)
+        label: item label
+        default: default value (optional)
+        format: date format (as in :py:func:`datetime.date.strftime`)
+        help: text displayed on data item's tooltip
+        check: check value (default: True)
     """
 
     type = datetime.date
@@ -471,7 +472,7 @@ class DateItem(DataItem):
         help: str | None = "",
         check: bool | None = True,
     ) -> None:
-        DataItem.__init__(self, label, default=default, help=help, check=check)
+        super().__init__(label, default=default, help=help, check=check)
         self.set_prop("display", format=format)
 
 
@@ -479,11 +480,11 @@ class DateTimeItem(DateItem):
     """DataSet data item
 
     Args:
-        label (str): item label
-        default (datetime.datetime): default value (optional)
-        format (str): date format (as in :py:func:`datetime.date.strftime`)
-        help (str): text displayed on data item's tooltip
-        check (bool): check value (default: True)
+        label: item label
+        default: default value (optional)
+        format: date format (as in :py:func:`datetime.date.strftime`)
+        help: text displayed on data item's tooltip
+        check: check value (default: True)
     """
 
     pass
@@ -493,11 +494,11 @@ class ColorItem(StringItem):
     """Construct a color data item
 
     Args:
-        label (str): item name
-        default (str): default value (optional). Color can be specified as
+        label: item name
+        default: default value (optional). Color can be specified as
          a string (e.g. "#FF0000" or "red") or as a Qt name (e.g. "red")
-        help (str): text shown in tooltip (optional)
-        check (bool): if False, value is not checked (optional, default=True)
+        help: text shown in tooltip (optional)
+        check: if False, value is not checked (optional, default=True)
     """
 
     def check_value(self, value: str) -> bool:
@@ -523,12 +524,12 @@ class FileSaveItem(StringItem):
     """Construct a path data item for a file to be saved
 
     Args:
-        label (str): item name
-        formats (str or list of str): wildcard filter
-        default (str): default value (optional)
-        basedir (str): default base directory (optional)
-        help (str): text shown in tooltip (optional)
-        check (bool): if False, value is not checked (optional, default=True)
+        label: item name
+        formats: wildcard filter
+        default: default value (optional)
+        basedir: default base directory (optional)
+        help: text shown in tooltip (optional)
+        check: if False, value is not checked (optional, default=True)
     """
 
     def __init__(
@@ -541,7 +542,7 @@ class FileSaveItem(StringItem):
         help: str = "",
         check: bool = True,
     ) -> None:
-        DataItem.__init__(self, label, default=default, help=help, check=check)
+        super().__init__(label, default=default, help=help, check=check)
         if isinstance(formats, str):
             formats = [formats]  # type:ignore
         self.set_prop("data", formats=formats)
@@ -584,12 +585,12 @@ class FileOpenItem(FileSaveItem):
     """Construct a path data item for a file to be opened
 
     Args:
-        label (str): item name
-        formats (str or list of str): wildcard filter
-        default (str): default value (optional)
-        basedir (str): default base directory (optional)
-        help (str): text shown in tooltip (optional)
-        check (bool): if False, value is not checked (optional, default=True)
+        label: item name
+        formats: wildcard filter
+        default: default value (optional)
+        basedir: default base directory (optional)
+        help: text shown in tooltip (optional)
+        check: if False, value is not checked (optional, default=True)
     """
 
     def check_value(self, value: str) -> bool:
@@ -605,12 +606,12 @@ class FilesOpenItem(FileSaveItem):
     """Construct a path data item for multiple files to be opened.
 
     Args:
-        label (str): item name
-        formats (str or list of str): wildcard filter
-        default (str): default value (optional)
-        basedir (str): default base directory (optional)
-        help (str): text shown in tooltip (optional)
-        check (bool): if False, value is not checked (optional, default=True)
+        label: item name
+        formats: wildcard filter
+        default: default value (optional)
+        basedir: default base directory (optional)
+        help: text shown in tooltip (optional)
+        check: if False, value is not checked (optional, default=True)
     """
 
     type = list
@@ -627,8 +628,7 @@ class FilesOpenItem(FileSaveItem):
     ) -> None:
         if isinstance(default, str):
             default = [default]
-        FileSaveItem.__init__(
-            self,
+        super().__init__(
             label,
             formats=formats,
             default=default,
@@ -678,10 +678,10 @@ class DirectoryItem(StringItem):
     """Construct a path data item for a directory.
 
     Args:
-        label (str): item name
-        default (str): default value (optional)
-        help (str): text shown in tooltip (optional)
-        check (bool): if False, value is not checked (optional, default=True)
+        label: item name
+        default: default value (optional)
+        help: text shown in tooltip (optional)
+        check: if False, value is not checked (optional, default=True)
     """
 
     def check_value(self, value: str) -> bool:
@@ -706,15 +706,15 @@ class ChoiceItem(DataItem):
     """Construct a data item for a list of choices.
 
     Args:
-        label (str): item name
-        choices (list, tuple or Callable): string list or (key, label) list
+        label: item name
+        choices: string list or (key, label) list
          function of two arguments (item, value) returning a list of tuples
          (key, label, image) where image is an icon path, a QIcon instance
          or a function of one argument (key) returning a QIcon instance
-        default (str): default value (optional)
-        help (str): text shown in tooltip (optional)
-        check (bool): if False, value is not checked (optional, default=True)
-        radio (bool): if True, shows radio buttons instead of a combo box
+        default: default value (optional)
+        help: text shown in tooltip (optional)
+        check: if False, value is not checked (optional, default=True)
+        radio: if True, shows radio buttons instead of a combo box
          (default is False)
     """
 
@@ -738,7 +738,7 @@ class ChoiceItem(DataItem):
             default = _choices_data[0][0]
         elif default is FirstChoice:
             default = None
-        DataItem.__init__(self, label, default=default, help=help, check=check)
+        super().__init__(label, default=default, help=help, check=check)
         self.set_prop("data", choices=_choices_data)
         self.set_prop("display", radio=radio)
 
@@ -768,11 +768,11 @@ class MultipleChoiceItem(ChoiceItem):
     """Construct a data item for a list of choices -- multiple choices can be selected
 
     Args:
-        label (str): item name
-        choices (list or tuple): string list or (key, label) list
-        default (str): default value (optional)
-        help (str): text shown in tooltip (optional)
-        check (bool): if False, value is not checked (optional, default=True)
+        label: item name
+        choices: string list or (key, label) list
+        default: default value (optional)
+        help: text shown in tooltip (optional)
+        check: if False, value is not checked (optional, default=True)
     """
 
     def __init__(
@@ -783,7 +783,7 @@ class MultipleChoiceItem(ChoiceItem):
         help: str = "",
         check: bool = True,
     ) -> None:
-        ChoiceItem.__init__(self, label, choices, default, help, check=check)
+        super().__init__(label, choices, default, help, check=check)
         self.set_prop("display", shape=(1, -1))
 
     def horizontal(self, row_nb: int = 1) -> "MultipleChoiceItem":
@@ -844,14 +844,14 @@ class ImageChoiceItem(ChoiceItem):
     """Construct a data item for a list of choices with images
 
     Args:
-        label (str): item name
-        choices (list or tuple): (label, image) list, or (key, label, image) list,
+        label: item name
+        choices: (label, image) list, or (key, label, image) list,
          or function of two arguments (item, value) returning a list of tuples
          (key, label, image) where image is an icon path, a QIcon instance or
          a function of one argument (key) returning a QIcon instance
-        default (str): default value (optional)
-        help (str): text shown in tooltip (optional)
-        check (bool): if False, value is not checked (optional, default=True)
+        default: default value (optional)
+        help: text shown in tooltip (optional)
+        check: if False, value is not checked (optional, default=True)
     """
 
     def _normalize_choice(
@@ -870,14 +870,14 @@ class FloatArrayItem(DataItem):
     """Construct a float array data item
 
     Args:
-        label (str): item name
-        default (numpy.ndarray): default value (optional)
-        help (str): text shown in tooltip (optional)
-        format (str): formatting string (example: '%.3f') (optional)
-        transpose (bool): transpose matrix (display only)
-        large (bool): view all float of the array
-        minmax (str): "all" (default), "columns", "rows"
-        check (bool): if False, value is not checked (optional, default=True)
+        label: item name
+        default: default value (optional)
+        help: text shown in tooltip (optional)
+        format: formatting string (example: '%.3f') (optional)
+        transpose: transpose matrix (display only)
+        large: view all float of the array
+        minmax: "all" (default), "columns", "rows"
+        check: if False, value is not checked (optional, default=True)
     """
 
     def __init__(
@@ -890,7 +890,7 @@ class FloatArrayItem(DataItem):
         minmax: str = "all",
         check: bool = True,
     ) -> None:
-        DataItem.__init__(self, label, default=default, help=help, check=check)
+        super().__init__(label, default=default, help=help, check=check)
         self.set_prop("display", format=format, transpose=transpose, minmax=minmax)
 
     def format_string(
@@ -933,17 +933,17 @@ class ButtonItem(DataItem):
     """Construct a simple button that calls a method when hit
 
     Args:
-        label (str): item name
-        callback (Callable): function with four parameters (dataset, item, value,
+        label: item name
+        callback: function with four parameters (dataset, item, value,
          parent) where dataset (DataSet) is an instance of the parent dataset,
          item (DataItem) is an instance of ButtonItem (i.e. self), value (unspecified)
          is the value of ButtonItem (default ButtonItem value or last value returned
          by the callback) and parent (QObject) is button's parent widget
-        icon (QIcon or str): icon show on the button (optional)
+        icon: icon show on the button (optional)
          (str: icon filename as in guidata/guiqwt image search paths)
-        default (Any): default value passed to the callback (optional)
-        help (str): text shown in button's tooltip (optional)
-        check (bool): if False, value is not checked (optional, default=True)
+        default: default value passed to the callback (optional)
+        help: text shown in button's tooltip (optional)
+        check: if False, value is not checked (optional, default=True)
 
     The value of this item is unspecified but is passed to the callback along
     with the whole dataset. The value is assigned the callback`s return value.
@@ -958,7 +958,7 @@ class ButtonItem(DataItem):
         help: str = "",
         check: bool = True,
     ) -> None:
-        DataItem.__init__(self, label, default=default, help=help, check=check)
+        super().__init__(label, default=default, help=help, check=check)
         self.set_prop("display", callback=callback)
         self.set_prop("display", icon=icon)
 
@@ -1039,10 +1039,10 @@ class FontFamilyItem(StringItem):
     """Construct a font family name item
 
     Args:
-        label (str): item name
-        default (str): default value (optional)
-        help (str): text shown in tooltip (optional)
-        check (bool): if False, value is not checked (optional, default=True)
+        label: item name
+        default: default value (optional)
+        help: text shown in tooltip (optional)
+        check: if False, value is not checked (optional, default=True)
     """
 
     pass
