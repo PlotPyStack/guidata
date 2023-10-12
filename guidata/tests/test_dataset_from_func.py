@@ -12,6 +12,8 @@ type annotations. See the example below.
 
 # guitest: show
 
+from __future__ import annotations
+
 import numpy as np
 
 from guidata.env import execenv
