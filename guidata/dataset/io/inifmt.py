@@ -110,7 +110,7 @@ class INIWriter(INIHandler, WriterMixin):
     # and write_str alias to write_any
     write_bool = (
         write_int
-    ) = write_float = write_array = write_sequence = write_str = write_any
+    ) = write_float = write_array = write_sequence = write_dict = write_str = write_any
 
     def write_unicode(self, val: str) -> None:
         """
@@ -162,7 +162,9 @@ class INIReader(INIHandler):
     # and read_str alias to read_any
     read_bool = (
         read_int
-    ) = read_float = read_array = read_sequence = read_none = read_str = read_any
+    ) = (
+        read_float
+    ) = read_array = read_sequence = read_dict = read_none = read_str = read_any
 
     def read_unicode(self) -> str | None:
         """
