@@ -57,16 +57,19 @@ def __get_dataitem_from_type(data_type: Any) -> gdi.DataItem:
     Returns:
         The DataItem.
     """
-    if isinstance(data_type, types.GenericAlias):
-        data_type = data_type.__origin__
-    ditem_klass = {
-        int: gdi.IntItem,
-        float: gdi.FloatItem,
-        bool: gdi.BoolItem,
-        str: gdi.StringItem,
-        dict: gdi.DictItem,
-        np.ndarray: gdi.FloatArrayItem,
-    }.get(data_type)
+    if not isinstance(data_type, str):
+        # In case we are not using "from __future__ import annotations"
+        data_type = data_type.__name__
+    data_type = data_type.split("[")[0].split(".")[-1]
+    typemap = {
+        "int": gdi.IntItem,
+        "float": gdi.FloatItem,
+        "bool": gdi.BoolItem,
+        "str": gdi.StringItem,
+        "dict": gdi.DictItem,
+        "ndarray": gdi.FloatArrayItem,
+    }
+    ditem_klass = typemap.get(data_type)
     if ditem_klass is None:
         raise ValueError(f"Unsupported data type: {data_type}")
     return ditem_klass
