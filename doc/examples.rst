@@ -80,6 +80,12 @@ Update/restore a dataset from/to a dictionary
 .. literalinclude:: ../guidata/tests/test_updaterestoredataset.py
    :start-after: guitest:
 
+Create a dataset class from a function signature
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. literalinclude:: ../guidata/tests/test_dataset_from_func.py
+   :start-after: guitest:
+
 Data set HDF5 serialization/deserialization
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

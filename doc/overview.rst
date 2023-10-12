@@ -33,6 +33,10 @@ Most of the time, the programmer will need the following features:
 
 * update and restore a data set to/from a dictionary
 
+* generate a data set from a function signature (i.e. a function prototype)
+  and use it to automatically generate a graphical user interface for
+  calling the function
+
 This library aims to provide these features thanks to automatic graphical user
 interface generation for data set editing and display. Widgets inside GUIs are
 automatically generated depending on each data item type.

@@ -4,6 +4,8 @@
 
 New features:
 
+* New `utils.conv.create_dataset_from_func`: create a dataset from a function signature,
+  using type annotations and default values to create the dataset items
 * `dataset.dataitems.StringItem`:
   * Added argument `password` to hide text (useful for passwords)
   * Added argument `regexp` to validate text using a regular expression
