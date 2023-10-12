@@ -31,15 +31,19 @@ Based on the Qt library, `guidata` is a Python library generating graphical user
 interfaces for easy dataset editing and display. It also provides helpers and
 application development tools for Qt (PyQt5, PySide2, PyQt6, PySide6).
 
-Generate GUIs to edit and display all kind of objects:
+Generate GUIs to edit and display all kind of objects regrouped in datasets:
 
 * Integers, floats, strings
 * Lists (single/multiple choices)
+* Dictionaries
 * `ndarrays` (NumPy's N-dimensional arrays)
 * Etc.
 
+Save and load datasets to/from HDF5, JSON or INI files.
+
 Application development tools:
 
+* Data model (internal data structure, serialization, etc.)
 * Configuration management
 * Internationalization (`gettext`)
 * Deployment tools

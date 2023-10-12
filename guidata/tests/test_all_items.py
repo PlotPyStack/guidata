@@ -88,6 +88,18 @@ class Parameters(gdt.DataSet):
         .vertical(1)
         .set_pos(col=1)
     )
+    dictionary = gdi.DictItem(
+        "Dictionary",
+        default={
+            "lkl": 2,
+            "tototo": 3,
+            "zzzz": "lklk",
+            "bool": True,
+            "float": 1.234,
+            "list": [1, 2.5, 3, "str", False, 5, {"lkl": 2, "l": [1, 2, 3]}],
+        },
+        help="This is a dictionary",
+    )
 
 
 def test_all_items():

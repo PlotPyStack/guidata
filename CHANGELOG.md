@@ -5,6 +5,8 @@
 New features:
 
 * `dataset.dataitems.StringItem`: added argument `password` to hide text (useful for passwords)
+* `dataset.dataitems.DictItem`: added support for HDF5 and JSON serialization
+* `dataset.io.h5fmt` and `dataset.io.jsonfmt`: added support for lists and dictionnaries serialization
 
 New PlotPyStack internal features:
 
@@ -251,7 +253,7 @@ Changes:
 
 Changes:
 
-* Added generic widgets: array, dictionnary, text and code editors.
+* Added generic widgets: array, dictionary, text and code editors.
 * Removed `spyderlib`/`spyder` dependency.
 * Added setter method on DataItem object for "help" text (fixed part of the tooltip).
 

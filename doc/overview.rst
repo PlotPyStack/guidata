@@ -20,11 +20,16 @@ Most of the time, the programmer will need the following features:
   value, should we store the option string, the list index or an
   associated key?)
 
+* showing the stored values in a dialog box or within a graphical user
+  interface layout, again with widgets adapted to data types
+
 * using the stored values easily (e.g. for data processing) by regrouping
   parameters in data structures
 
-* showing the stored values in a dialog box or within a graphical user
-  interface layout, again with widgets adapted to data types
+* using those data structures to easily construct application data models
+  (e.g. for storing application settings or data processing parameters)
+  and to serialize and deserialize them (i.e. save and load them to/from
+  HDF5, JSON or INI files)
 
 This library aims to provide these features thanks to automatic graphical user
 interface generation for data set editing and display. Widgets inside GUIs are

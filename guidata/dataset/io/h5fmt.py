@@ -9,6 +9,7 @@ HDF5 files (.h5)
 
 from __future__ import annotations
 
+import datetime
 import sys
 from collections.abc import Callable, Sequence
 from typing import Any
@@ -16,7 +17,6 @@ from uuid import uuid1
 
 import h5py
 import numpy as np
-
 from guidata.dataset.io.base import BaseIOHandler, WriterMixin
 
 
@@ -222,9 +222,6 @@ class Dset(Attr):
         Args:
             group (h5py.Group): The group in the HDF5 file to save the attribute to.
             struct (Any): The structure containing the attribute.
-
-        Returns:
-            None
         """
         value = self.get_value(struct)
         if isinstance(value, float):
@@ -254,9 +251,6 @@ class Dset(Attr):
 
         Raises:
             KeyError: If the attribute cannot be found in the HDF5 group.
-
-        Returns:
-            None
         """
         if self.optional:
             if self.hdf_name not in group:
@@ -310,9 +304,6 @@ class Dlist(Dset):
             struct (Any): The structure in which to set the attribute.
             value (np.ndarray): A numpy array containing the values to set the
                 attribute to.
-
-        Returns:
-            None
         """
         setattr(struct, self.struct_name, list(value))
 
@@ -364,9 +355,6 @@ class H5Store:
     def close(self) -> None:
         """
         Closes the HDF5 file if it is open.
-
-        Returns:
-            None
         """
         if self.h5:
             self.h5.close()
@@ -384,9 +372,6 @@ class H5Store:
     def __exit__(self, *args) -> None:
         """
         Support for 'with' statement. Closes the HDF5 file on exiting the 'with' block.
-
-        Returns:
-            None
         """
         self.close()
 
@@ -400,9 +385,6 @@ class H5Store:
             structure (List[Attr]): A list of attribute descriptors (Attr, Dset,
                 Dlist, etc.) that describe the conversion of data and the names
                 of the attributes in the source and in the file.
-
-        Returns:
-            None
         """
         for instr in structure:
             instr.save(parent, source)
@@ -417,9 +399,6 @@ class H5Store:
             structure (List[Attr]): A list of attribute descriptors (Attr, Dset,
                 Dlist, etc.) that describe the conversion of data and the names
                 of the attributes in the file and in the destination.
-
-        Returns:
-            None
 
         Raises:
             Exception: If there is an error while trying to load an item.
@@ -462,6 +441,10 @@ class HDF5Handler(H5Store, BaseIOHandler):
         return parent
 
 
+SEQUENCE_NAME = "__seq"
+DICT_NAME = "__dict"
+
+
 class HDF5Writer(HDF5Handler, WriterMixin):
     """
     Writer for HDF5 files. Inherits from HDF5Handler and WriterMixin.
@@ -474,15 +457,48 @@ class HDF5Writer(HDF5Handler, WriterMixin):
         super().__init__(filename)
         self.open("w")
 
+    def write(self, val: Any, group_name: str | None = None) -> None:
+        """
+        Write a value depending on its type, optionally within a named group.
+        Args:
+            val (Any): The value to be written.
+            group_name (Optional[str]): The name of the group. If provided, the group
+            context will be used for writing the value.
+        """
+        if group_name:
+            self.begin(group_name)
+
+        if val is None:
+            self.write_none()
+        elif isinstance(val, (list, tuple)):
+            self.write_sequence(val)
+        elif isinstance(val, dict):
+            self.write_dict(val)
+        elif isinstance(val, datetime.datetime):
+            self.write_float(val.timestamp())
+        elif isinstance(val, datetime.date):
+            self.write_int(val.toordinal())
+        elif hasattr(val, "serialize") and isinstance(val.serialize, Callable):
+            # The object has a DataSet-like `serialize` method
+            val.serialize(self)
+        else:
+            group = self.get_parent_group()
+            try:
+                group.attrs[self.option[-1]] = val
+            except TypeError:
+                raise NotImplementedError(
+                    "cannot serialize %r of type %r" % (val, type(val))
+                )
+
+        if group_name:
+            self.end(group_name)
+
     def write_any(self, val: Any) -> None:
         """
         Write the value to the HDF5 file as an attribute.
 
         Args:
             val (Any): The value to write.
-
-        Returns:
-            None
         """
         group = self.get_parent_group()
         group.attrs[self.option[-1]] = val
@@ -495,9 +511,6 @@ class HDF5Writer(HDF5Handler, WriterMixin):
 
         Args:
             val (bool): The boolean value to write.
-
-        Returns:
-            None
         """
         self.write_int(int(val))
 
@@ -509,9 +522,6 @@ class HDF5Writer(HDF5Handler, WriterMixin):
 
         Args:
             val (str): The Unicode string value to write.
-
-        Returns:
-            None
         """
         group = self.get_parent_group()
         group.attrs[self.option[-1]] = val.encode("utf-8")
@@ -524,24 +534,47 @@ class HDF5Writer(HDF5Handler, WriterMixin):
 
         Args:
             val (np.ndarray): The numpy array value to write.
-
-        Returns:
-            None
         """
         group = self.get_parent_group()
         group[self.option[-1]] = val
 
-    write_sequence = write_any
-
     def write_none(self) -> None:
         """
         Write a None value to the HDF5 file as an attribute.
-
-        Returns:
-            None
         """
         group = self.get_parent_group()
         group.attrs[self.option[-1]] = ""
+
+    def write_sequence(self, val: list | tuple) -> None:
+        """
+        Write the list or tuple value to the HDF5 file as an attribute.
+
+        Args:
+            The value to write.
+        """
+        # Check if all elements are of the same type, raise an error if not
+        for index, obj in enumerate(val):
+            if val is None:
+                raise ValueError("cannot serialize None value in sequence")
+            with self.group(f"{SEQUENCE_NAME}{index}"):
+                self.write(obj)
+        self.write(len(val), SEQUENCE_NAME)
+
+    def write_dict(self, val: dict[str, Any]) -> None:
+        """Write dictionary to h5 file
+
+        Args:
+            val (dict[str, Any]): dictionary to write
+        """
+        # Check if keys are all strings, raise an error if not
+        if not all(isinstance(key, str) for key in val.keys()):
+            raise ValueError("cannot serialize dict with non-string keys")
+        for key, value in val.items():
+            with self.group(key):
+                if value is None:
+                    raise ValueError("cannot serialize None value in dict")
+                self.write(value)
+        self.write(len(val), DICT_NAME)
 
     def write_object_list(self, seq: Sequence[Any] | None, group_name: str) -> None:
         """
@@ -552,9 +585,6 @@ class HDF5Writer(HDF5Handler, WriterMixin):
             seq (Sequence[Any]): The object sequence to write.
                 Defaults to None.
             group_name (str): The name of the group in which to write the objects.
-
-        Returns:
-            None
         """
         with self.group(group_name):
             if seq is None:
@@ -687,7 +717,69 @@ class HDF5Reader(HDF5Handler):
         Read a sequence from the current group.
 
         Returns:
-            List[Any]: The read sequence.
+            The read sequence.
+        """
+        length = self.read(SEQUENCE_NAME, func=self.read_int)
+        seq = []
+        for index in range(length):
+            name = f"{SEQUENCE_NAME}{index}"
+            with self.group(name):
+                dspath = "/".join(self.option)
+                errormsg = f"cannot deserialize sequence at '{dspath}' (name '{name}')"
+                try:
+                    group = self.get_parent_group()
+                    if name in group.attrs:
+                        obj = self.read_any()
+                    else:
+                        try:
+                            obj = self.read_array()
+                        except TypeError:
+                            obj_group = group[name]
+                            if DICT_NAME in obj_group.attrs:
+                                obj = self.read_dict()
+                            elif SEQUENCE_NAME in obj_group.attrs:
+                                obj = self.read_sequence()
+                            else:
+                                dspath = "/".join(self.option)
+                                raise ValueError(errormsg)
+                except ValueError as err:
+                    raise ValueError(errormsg) from err
+            seq.append(obj)
+        return seq
+
+    def read_dict(self) -> dict[str, Any]:
+        """Read dictionary from h5 file
+
+        Returns:
+            dict[str, Any]: dictionary read from h5 file
+        """
+        group = self.get_parent_group()
+        dict_group = group[self.option[-1]]
+        dict_val = {}
+        for key, value in dict_group.attrs.items():
+            if key == DICT_NAME:
+                continue
+            dict_val[key] = value
+        for key in dict_group:
+            with self.group(key):
+                key_group = dict_group[self.option[-1]]
+                if DICT_NAME in key_group.attrs:
+                    dict_val[key] = self.read_dict()
+                elif SEQUENCE_NAME in key_group.attrs:
+                    dict_val[key] = self.read_sequence()
+                else:
+                    dspath = "/".join(self.option)
+                    raise ValueError(
+                        f"cannot deserialize dict at '{dspath}' (key '{key}'))"
+                    )
+        return dict_val
+
+    def read_list(self) -> list[Any]:
+        """
+        Read a list from the current group.
+
+        Returns:
+            The read list.
         """
         group = self.get_parent_group()
         return list(group.attrs[self.option[-1]])
@@ -711,7 +803,7 @@ class HDF5Reader(HDF5Handler):
         """
         with self.group(group_name):
             try:
-                ids = self.read("IDs", func=self.read_sequence)
+                ids = self.read("IDs", func=self.read_list)
             except ValueError:
                 # None was saved instead of list of objects
                 self.end("IDs")

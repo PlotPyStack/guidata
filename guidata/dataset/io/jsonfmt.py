@@ -17,7 +17,6 @@ import os
 from uuid import uuid1
 
 import numpy as np
-
 from guidata.dataset.io.base import BaseIOHandler, WriterMixin
 
 
@@ -143,6 +142,8 @@ class JSONWriter(JSONHandler, WriterMixin):
 
     write_str = (
         write_sequence
+    ) = (
+        write_dict
     ) = write_unicode = write_bool = write_int = write_float = write_array = write_any
 
     def write_object_list(self, seq, group_name):
@@ -245,4 +246,4 @@ class JSONReader(JSONHandler):
 
     read_unicode = (
         read_sequence
-    ) = read_float = read_int = read_str = read_bool = read_array = read_any
+    ) = read_dict = read_float = read_int = read_str = read_bool = read_array = read_any

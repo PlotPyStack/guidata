@@ -73,11 +73,10 @@ from guidata.utils import update_dataset
 DEBUG_DESERIALIZE = False
 
 if TYPE_CHECKING:  # pragma: no cover
-    from qtpy.QtCore import QSize
-    from qtpy.QtWidgets import QWidget
-
     from guidata.dataset.io import HDF5Reader, HDF5Writer, JSONReader, JSONWriter
     from guidata.dataset.qtwidgets import DataSetEditDialog
+    from qtpy.QtCore import QSize
+    from qtpy.QtWidgets import QWidget
 
 
 class NoDefault:

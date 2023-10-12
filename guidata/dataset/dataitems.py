@@ -929,6 +929,52 @@ class FloatArrayItem(DataItem):
         return reader.read_array()
 
 
+class DictItem(DataItem):
+    """Construct a data item representing a dictionary
+
+    Args:
+        label: item name
+        default: default value (optional)
+        help: text shown in tooltip (optional)
+        check: if False, value is not checked (optional, default=True)
+    """
+
+    # pylint: disable=redefined-builtin,abstract-method
+    def __init__(self, label, default=None, help="", check=True):
+        super().__init__(label, default=default, help=help, check=check)
+        self.set_prop("display", callback=self.__dictedit)
+        self.set_prop("display", icon="dictedit.png")
+
+    @staticmethod
+    # pylint: disable=unused-argument
+    def __dictedit(instance, item, value, parent):
+        """Open a dictionary editor"""
+        # pylint: disable=import-outside-toplevel
+        from guidata.qthelpers import exec_dialog
+        from guidata.widgets.collectionseditor import CollectionsEditor
+
+        editor = CollectionsEditor(parent)
+        value_was_none = value is None
+        if value_was_none:
+            value = {}
+        editor.setup(value)
+        if exec_dialog(editor):
+            return editor.get_value()
+        if value_was_none:
+            return None
+        return value
+
+    def serialize(self, instance, writer):
+        """Serialize this item"""
+        value = self.get_value(instance)
+        writer.write_dict(value)
+
+    def get_value_from_reader(self, reader):
+        """Reads value from the reader object, inside the try...except
+        statement defined in the base item `deserialize` method"""
+        return reader.read_dict()
+
+
 class ButtonItem(DataItem):
     """Construct a simple button that calls a method when hit
 
@@ -975,64 +1021,6 @@ class ButtonItem(DataItem):
         reader: HDF5Reader | JSONReader | INIReader,
     ) -> Any:
         pass
-
-
-def dictedit(
-    instance: DataSet, item: DataItem, value: Any, parent: object
-) -> Any:  # pylint: disable=unused-argument
-    """Edit a dictionary value using a dialog box
-
-    Args:
-        instance (DataSet): dataset instance
-        item (DataItem): item instance
-        value (Any): item value
-        parent (object): parent widget
-    """
-    # Importing those modules here avoids Qt dependency when
-    # guidata is used without Qt
-    # pylint: disable=import-outside-toplevel
-    from guidata.qthelpers import exec_dialog
-    from guidata.widgets.collectionseditor import CollectionsEditor
-
-    editor = CollectionsEditor(parent)
-    value_was_none = value is None
-    if value_was_none:
-        value = {}
-    editor.setup(value)
-    if exec_dialog(editor):
-        return editor.get_value()
-    else:
-        if value_was_none:
-            return
-        return value
-
-
-class DictItem(ButtonItem):
-    """Construct a dictionary data item
-
-    Args:
-        label (str): item name
-        default (dict): default value (optional)
-        help (str): text shown in tooltip (optional)
-        check (bool): if False, value is not checked (optional, default=True)
-    """
-
-    def __init__(
-        self,
-        label: str,
-        default: dict | None = None,
-        help: str = "",
-        check: bool = True,
-    ) -> None:
-        ButtonItem.__init__(
-            self,
-            label,
-            dictedit,
-            icon="dictedit.png",
-            default=default,
-            help=help,
-            check=check,
-        )
 
 
 class FontFamilyItem(StringItem):

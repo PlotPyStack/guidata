@@ -70,3 +70,15 @@ Data set groups
    :start-after: guitest:
 
 .. image:: images/screenshots/datasetgroup.png
+
+Data set HDF5 serialization/deserialization
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. literalinclude:: ../guidata/tests/test_loadsave_hdf5.py
+   :start-after: guitest:
+
+Data set JSON serialization/deserialization
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. literalinclude:: ../guidata/tests/test_loadsave_json.py
+   :start-after: guitest:
