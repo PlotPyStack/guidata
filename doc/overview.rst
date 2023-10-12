@@ -31,6 +31,8 @@ Most of the time, the programmer will need the following features:
   and to serialize and deserialize them (i.e. save and load them to/from
   HDF5, JSON or INI files)
 
+* update and restore a data set to/from a dictionary
+
 This library aims to provide these features thanks to automatic graphical user
 interface generation for data set editing and display. Widgets inside GUIs are
 automatically generated depending on each data item type.

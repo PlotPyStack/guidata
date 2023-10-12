@@ -71,6 +71,15 @@ Data set groups
 
 .. image:: images/screenshots/datasetgroup.png
 
+Utilities
+^^^^^^^^^
+
+Update/restore a dataset from/to a dictionary
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. literalinclude:: ../guidata/tests/test_updaterestoredataset.py
+   :start-after: guitest:
+
 Data set HDF5 serialization/deserialization
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
