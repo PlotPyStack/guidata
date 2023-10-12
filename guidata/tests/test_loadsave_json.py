@@ -22,21 +22,22 @@ from guidata.tests.test_all_items import Parameters
 
 def test_loadsave_json():
     """Test JSON I/O"""
+    fname = "test.json"
     with qt_app_context():
-        if os.path.exists("test.json"):
-            os.unlink("test.json")
+        if os.path.exists(fname):
+            os.unlink(fname)
 
         e = Parameters()
         if execenv.unattended or e.edit():
-            writer = JSONWriter("test.json")
+            writer = JSONWriter(fname)
             e.serialize(writer)
             writer.save()
 
             e = Parameters()
-            reader = JSONReader("test.json")
+            reader = JSONReader(fname)
             e.deserialize(reader)
             e.edit()
-            os.unlink("test.json")
+            os.unlink(fname)
         execenv.print("OK")
 
 
