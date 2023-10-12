@@ -90,6 +90,7 @@ class Parameters(DataSet):
         },
     )
     string = StringItem("String")
+    string_regexp = StringItem("String", regexp=r"^[a-z]+[0-9]$", default="abcd9")
     password = StringItem("Password", password=True)
     text = TextItem("Text")
     _bg = BeginGroup("A sub group")

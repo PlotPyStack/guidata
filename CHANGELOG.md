@@ -4,7 +4,12 @@
 
 New features:
 
-* `dataset.dataitems.StringItem`: added argument `password` to hide text (useful for passwords)
+* `dataset.dataitems.StringItem`:
+  * Added argument `password` to hide text (useful for passwords)
+  * Added argument `regexp` to validate text using a regular expression
+* `dataset.dataitems.FileSaveItem`, `dataset.dataitems.FileOpenItem`,
+  `dataset.dataitems.FilesOpenItem` and `dataset.dataitems.DirectoryItem`:
+  added argument `regexp` to validate file/dir name using a regular expression
 * `dataset.dataitems.DictItem`: added support for HDF5 and JSON serialization
 * `dataset.io.h5fmt` and `dataset.io.jsonfmt`: added support for lists and dictionnaries serialization
 

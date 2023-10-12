@@ -347,6 +347,7 @@ class StringItem(DataItem):
         notempty: if True, empty string is not a valid value (optional)
         wordwrap: toggle word wrapping (optional)
         password: if True, text is hidden (optional)
+        regexp: regular expression for checking value (optional)
         help: text shown in tooltip (optional)
         check: if False, value is not checked (ineffective for strings)
     """
@@ -360,18 +361,33 @@ class StringItem(DataItem):
         notempty: bool | None = None,
         wordwrap: bool = False,
         password: bool = False,
+        regexp: str | None = None,
         help: str = "",
         check: bool = True,
     ) -> None:
         super().__init__(label, default=default, help=help, check=check)
-        self.set_prop("data", notempty=notempty)
+        self.set_prop("data", notempty=notempty, regexp=regexp)
         self.set_prop("display", wordwrap=wordwrap, password=password)
+
+    def get_auto_help(self, instance: DataSet) -> str:
+        """Override DataItem method"""
+        auto_help = _("string")
+        notempty = self.get_prop_value("data", instance, "notempty")
+        if notempty:
+            auto_help += ", " + _("not empty")
+        regexp = self.get_prop_value("data", instance, "regexp")
+        if regexp:
+            auto_help += ", " + _("regexp:") + " " + regexp
+        return auto_help
 
     def check_value(self, value: Any) -> bool:
         """Override DataItem method"""
         notempty = self.get_prop("data", "notempty")
         if notempty and not value:
             return False
+        regexp = self.get_prop("data", "regexp")
+        if regexp is not None:
+            return re.match(regexp, "" if value is None else value)
         return True
 
     def from_string(self, value: str) -> str:
@@ -528,6 +544,7 @@ class FileSaveItem(StringItem):
         formats: wildcard filter
         default: default value (optional)
         basedir: default base directory (optional)
+        regexp: regular expression for checking value (optional)
         help: text shown in tooltip (optional)
         check: if False, value is not checked (optional, default=True)
     """
@@ -539,10 +556,11 @@ class FileSaveItem(StringItem):
         default: list[str] | str | None = None,
         basedir: str | None = None,
         all_files_first: bool = False,
+        regexp: str | None = None,
         help: str = "",
         check: bool = True,
     ) -> None:
-        super().__init__(label, default=default, help=help, check=check)
+        super().__init__(label, default=default, regexp=regexp, help=help, check=check)
         if isinstance(formats, str):
             formats = [formats]  # type:ignore
         self.set_prop("data", formats=formats)
@@ -610,6 +628,7 @@ class FilesOpenItem(FileSaveItem):
         formats: wildcard filter
         default: default value (optional)
         basedir: default base directory (optional)
+        regexp: regular expression for checking value (optional)
         help: text shown in tooltip (optional)
         check: if False, value is not checked (optional, default=True)
     """
@@ -623,6 +642,7 @@ class FilesOpenItem(FileSaveItem):
         default: list[str] | str | None = None,
         basedir: str | None = None,
         all_files_first: bool = False,
+        regexp: str | None = None,
         help: str = "",
         check: bool = True,
     ) -> None:
@@ -634,6 +654,7 @@ class FilesOpenItem(FileSaveItem):
             default=default,
             basedir=basedir,
             all_files_first=all_files_first,
+            regexp=regexp,
             help=help,
             check=check,
         )
