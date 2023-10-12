@@ -727,6 +727,8 @@ class HDF5Reader(HDF5Handler):
             The read sequence.
         """
         length = self.read(SEQUENCE_NAME, func=self.read_int)
+        if length is None:
+            return []
         seq = []
         for index in range(length):
             name = f"{SEQUENCE_NAME}{index}"
