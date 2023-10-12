@@ -17,6 +17,7 @@ from uuid import uuid1
 
 import h5py
 import numpy as np
+
 from guidata.dataset.io.base import BaseIOHandler, WriterMixin
 
 
@@ -478,6 +479,8 @@ class HDF5Writer(HDF5Handler, WriterMixin):
             self.write_float(val.timestamp())
         elif isinstance(val, datetime.date):
             self.write_int(val.toordinal())
+        elif isinstance(val, np.ndarray):
+            self.write_array(val)
         elif hasattr(val, "serialize") and isinstance(val.serialize, Callable):
             # The object has a DataSet-like `serialize` method
             val.serialize(self)
@@ -503,7 +506,7 @@ class HDF5Writer(HDF5Handler, WriterMixin):
         group = self.get_parent_group()
         group.attrs[self.option[-1]] = val
 
-    write_int = write_float = write_any
+    write_list = write_int = write_float = write_any
 
     def write_bool(self, val: bool) -> None:
         """
@@ -599,7 +602,8 @@ class HDF5Writer(HDF5Handler, WriterMixin):
                             self.write_none()
                         else:
                             obj.serialize(self)
-                self.write(ids, "IDs")
+                with self.group("IDs"):
+                    self.write_list(ids)
 
 
 class HDF5Reader(HDF5Handler):
@@ -661,7 +665,10 @@ class HDF5Reader(HDF5Handler):
             Union[str, bytes]: The read value.
         """
         group = self.get_parent_group()
-        value = group.attrs[self.option[-1]]
+        try:
+            value = group.attrs[self.option[-1]]
+        except KeyError:
+            value = self.read_sequence()
         if isinstance(value, bytes):
             return value.decode("utf-8")
         else:
@@ -762,16 +769,19 @@ class HDF5Reader(HDF5Handler):
             dict_val[key] = value
         for key in dict_group:
             with self.group(key):
-                key_group = dict_group[self.option[-1]]
-                if DICT_NAME in key_group.attrs:
-                    dict_val[key] = self.read_dict()
-                elif SEQUENCE_NAME in key_group.attrs:
-                    dict_val[key] = self.read_sequence()
-                else:
-                    dspath = "/".join(self.option)
-                    raise ValueError(
-                        f"cannot deserialize dict at '{dspath}' (key '{key}'))"
-                    )
+                try:
+                    dict_val[key] = self.read_array()
+                except TypeError:
+                    key_group = dict_group[self.option[-1]]
+                    if DICT_NAME in key_group.attrs:
+                        dict_val[key] = self.read_dict()
+                    elif SEQUENCE_NAME in key_group.attrs:
+                        dict_val[key] = self.read_sequence()
+                    else:
+                        dspath = "/".join(self.option)
+                        raise ValueError(
+                            f"cannot deserialize dict at '{dspath}' (key '{key}'))"
+                        )
         return dict_val
 
     def read_list(self) -> list[Any]:
