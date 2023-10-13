@@ -12,28 +12,27 @@ for example when deriving a dataset from another.
 
 # guitest: show
 
-import guidata.dataset.dataitems as gdi
-import guidata.dataset.datatypes as gdt
+import guidata.dataset as gds
 from guidata.env import execenv
 from guidata.qthelpers import qt_app_context
 
 
-class OriginalDataset(gdt.DataSet):
+class OriginalDataset(gds.DataSet):
     """Original dataset
     This is the original dataset"""
 
-    param1 = gdi.BoolItem("P1 | Boolean")
-    param2 = gdi.StringItem("P2 | String")
-    param3 = gdi.TextItem("P3 | Text")
-    param4 = gdi.FloatItem("P4 | Float", default=0)
+    param1 = gds.BoolItem("P1 | Boolean")
+    param2 = gds.StringItem("P2 | String")
+    param3 = gds.TextItem("P3 | Text")
+    param4 = gds.FloatItem("P4 | Float", default=0)
 
 
 class DerivedDataset(OriginalDataset):
     """Derived dataset
     This is the derived dataset, with modified item order"""
 
-    param5 = gdi.IntItem("P5 | Int", default=0).set_pos(row=2)
-    param6 = gdi.DateItem("P6 | Date", default=0).set_pos(row=4)
+    param5 = gds.IntItem("P5 | Int", default=0).set_pos(row=2)
+    param6 = gds.DateItem("P6 | Date", default=0).set_pos(row=4)
 
 
 def test_item_order():

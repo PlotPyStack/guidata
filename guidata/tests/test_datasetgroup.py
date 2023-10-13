@@ -12,7 +12,7 @@ in a single dialog box (with one tab per DataSet object).
 
 # guitest: show
 
-from guidata.dataset.datatypes import DataSetGroup
+from guidata.dataset import DataSetGroup
 from guidata.env import execenv
 from guidata.qthelpers import qt_app_context
 from guidata.tests.test_all_features import Parameters

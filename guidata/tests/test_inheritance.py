@@ -12,30 +12,29 @@ application is to extend a parameter set with additionnal parameters.
 
 # guitest: show
 
-import guidata.dataset.dataitems as gdi
-import guidata.dataset.datatypes as gdt
+import guidata.dataset as gds
 from guidata.env import execenv
 from guidata.qthelpers import qt_app_context
 
 
-class OriginalDataset(gdt.DataSet):
+class OriginalDataset(gds.DataSet):
     """Original dataset
     This is the original dataset"""
 
-    bool = gdi.BoolItem("Boolean")
-    string = gdi.StringItem("String")
-    text = gdi.TextItem("Text")
-    float = gdi.FloatItem("Float", default=0.5, min=0, max=1, step=0.01, slider=True)
+    bool = gds.BoolItem("Boolean")
+    string = gds.StringItem("String")
+    text = gds.TextItem("Text")
+    float = gds.FloatItem("Float", default=0.5, min=0, max=1, step=0.01, slider=True)
 
 
 class DerivedDataset(OriginalDataset):
     """Derived dataset
     This is the derived dataset"""
 
-    bool = gdi.BoolItem("Boolean (modified in derived dataset)")
-    a = gdi.FloatItem("Level 1 (added in derived dataset)", default=0)
-    b = gdi.FloatItem("Level 2 (added in derived dataset)", default=0)
-    c = gdi.FloatItem("Level 3 (added in derived dataset)", default=0)
+    bool = gds.BoolItem("Boolean (modified in derived dataset)")
+    a = gds.FloatItem("Level 1 (added in derived dataset)", default=0)
+    b = gds.FloatItem("Level 2 (added in derived dataset)", default=0)
+    c = gds.FloatItem("Level 3 (added in derived dataset)", default=0)
 
 
 def test_inheritance():

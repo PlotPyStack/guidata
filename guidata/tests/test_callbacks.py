@@ -10,19 +10,12 @@ the list of choices may be dynamically changed.
 
 # guitest: show
 
-from guidata.dataset.dataitems import (
-    ChoiceItem,
-    ColorItem,
-    FloatItem,
-    StringItem,
-    TextItem,
-)
-from guidata.dataset.datatypes import DataSet
+import guidata.dataset as gds
 from guidata.env import execenv
 from guidata.qthelpers import qt_app_context
 
 
-class Parameters(DataSet):
+class Parameters(gds.DataSet):
     """Example dataset"""
 
     def cb_example(self, item, value):
@@ -39,13 +32,15 @@ class Parameters(DataSet):
         else:
             self.x1plusx2 = None
 
-    string = StringItem("String", default="foobar").set_prop(
+    string = gds.StringItem("String", default="foobar").set_prop(
         "display", callback=cb_example
     )
-    x1 = FloatItem("x1").set_prop("display", callback=update_x1plusx2)
-    x2 = FloatItem("x2").set_prop("display", callback=update_x1plusx2)
-    x1plusx2 = FloatItem("x1+x2").set_prop("display", active=False)
-    color = ColorItem("Color", default="red").set_prop("display", callback=cb_example)
+    x1 = gds.FloatItem("x1").set_prop("display", callback=update_x1plusx2)
+    x2 = gds.FloatItem("x2").set_prop("display", callback=update_x1plusx2)
+    x1plusx2 = gds.FloatItem("x1+x2").set_prop("display", active=False)
+    color = gds.ColorItem("Color", default="red").set_prop(
+        "display", callback=cb_example
+    )
 
     def choices_callback(self, item, value):
         """Choices callback: this demonstrates how to dynamically change
@@ -63,7 +58,7 @@ class Parameters(DataSet):
         ]
 
     choice = (
-        ChoiceItem(
+        gds.ChoiceItem(
             "Single choice",
             choices_callback,
             default=64,
@@ -71,17 +66,17 @@ class Parameters(DataSet):
         .set_pos(col=1, colspan=2)
         .set_prop("display", callback=cb_example)
     )
-    results = TextItem("Results")
+    results = gds.TextItem("Results")
 
 
 def test_callbacks():
     """Test callbacks"""
     with qt_app_context():
-        e = Parameters()
-        execenv.print(e)
-        if e.edit():
-            execenv.print(e)
-        e.view()
+        prm = Parameters()
+        execenv.print(prm)
+        if prm.edit():
+            execenv.print(prm)
+        prm.view()
         execenv.print("OK")
 
 

@@ -10,84 +10,84 @@ Data items
 Base class
 ^^^^^^^^^^
 
-.. autoclass:: DataItem
+.. autoclass:: guidata.dataset.DataItem
 
 Numeric items
 ^^^^^^^^^^^^^
 
-.. autoclass:: FloatItem
+.. autoclass:: guidata.dataset.FloatItem
     :members:
 
-.. autoclass:: IntItem
+.. autoclass:: guidata.dataset.IntItem
     :members:
 
-.. autoclass:: FloatArrayItem
+.. autoclass:: guidata.dataset.FloatArrayItem
     :members:
 
 Text items
 ^^^^^^^^^^
 
-.. autoclass:: StringItem
+.. autoclass:: guidata.dataset.StringItem
     :members:
 
-.. autoclass:: TextItem
+.. autoclass:: guidata.dataset.TextItem
     :members:
 
 Date and time items
 ^^^^^^^^^^^^^^^^^^^
 
-.. autoclass:: DateItem
+.. autoclass:: guidata.dataset.DateItem
     :members:
 
-.. autoclass:: DateTimeItem
+.. autoclass:: guidata.dataset.DateTimeItem
     :members:
 
 Color items
 ^^^^^^^^^^^
 
-.. autoclass:: ColorItem
+.. autoclass:: guidata.dataset.ColorItem
     :members:
 
 File items
 ^^^^^^^^^^
 
-.. autoclass:: FileSaveItem
+.. autoclass:: guidata.dataset.FileSaveItem
     :members:
 
-.. autoclass:: FileOpenItem
+.. autoclass:: guidata.dataset.FileOpenItem
     :members:
 
-.. autoclass:: FilesOpenItem
+.. autoclass:: guidata.dataset.FilesOpenItem
     :members:
 
-.. autoclass:: DirectoryItem
+.. autoclass:: guidata.dataset.DirectoryItem
     :members:
 
 Choice items
 ^^^^^^^^^^^^
 
-.. autoclass:: BoolItem
+.. autoclass:: guidata.dataset.BoolItem
     :members:
 
-.. autoclass:: ChoiceItem
+.. autoclass:: guidata.dataset.ChoiceItem
     :members:
 
-.. autoclass:: MultipleChoiceItem
+.. autoclass:: guidata.dataset.MultipleChoiceItem
     :members:
 
-.. autoclass:: ImageChoiceItem
+.. autoclass:: guidata.dataset.ImageChoiceItem
     :members:
 
 Other items
 ^^^^^^^^^^^
 
-.. autoclass:: ButtonItem
+.. autoclass:: guidata.dataset.ButtonItem
     :members:
 
-.. autoclass:: DictItem
+.. autoclass:: guidata.dataset.DictItem
     :members:
 
-.. autoclass:: FontFamilyItem
+.. autoclass:: guidata.dataset.FontFamilyItem
     :members:
 """
 

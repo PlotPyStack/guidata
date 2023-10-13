@@ -53,9 +53,9 @@ from qtpy.QtWidgets import (
 
 from guidata.config import _
 from guidata.configtools import get_icon, get_image_file_path, get_image_layout
+from guidata.dataset.conv import restore_dataset, update_dataset
 from guidata.dataset.datatypes import DataItemVariable
 from guidata.qthelpers import get_std_icon, text_to_qcolor
-from guidata.utils import restore_dataset, update_dataset
 from guidata.utils.misc import convert_date_format
 from guidata.widgets.arrayeditor import ArrayEditor
 

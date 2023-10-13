@@ -11,8 +11,8 @@ Generate a dataset class from a dictionary
 
 import numpy as np
 
+from guidata.dataset import create_dataset_from_dict
 from guidata.env import execenv
-from guidata.utils.conv import create_dataset_from_dict
 
 TEST_DICT1 = {
     "a": 1,

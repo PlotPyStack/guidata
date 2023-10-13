@@ -14,16 +14,15 @@ version = 1.0.0
 b/f = 1.0
 """
 
+import guidata.dataset as gds
 from guidata import userconfig
-from guidata.dataset import dataitems as gdi
-from guidata.dataset import datatypes as gdt
 from guidata.env import execenv
 
 
-class DS(gdt.DataSet):
+class DS(gds.DataSet):
     """Example dataset"""
 
-    f = gdi.FloatItem("F", 1.0)
+    f = gds.FloatItem("F", 1.0)
 
 
 def test_userconfig_app():

@@ -2,11 +2,34 @@
 
 ## Version 3.1.0 ##
 
-New features:
+⚠ Exceptionnally, this release contains the following API breaking changes:
 
-* New `utils.conv.create_dataset_from_dict`: create a dataset from a dictionary,
+* Moved `utils.update_dataset` to `dataset.conv.update_dataset`
+* Moved `utils.restore_dataset` to `dataset.conv.restore_dataset`
+
+✔ API simplification (backward compatible):
+
+* Dataset items may now be imported from `guidata.dataset` instead of `guidata.dataset.dataitems`
+* Dataset types may now be imported from `guidata.dataset` instead of `guidata.dataset.datatypes`
+* Examples:
+  * `from guidata.dataset.dataitems import FloatItem` becomes `from guidata.dataset import FloatItem`
+  * `from guidata.dataset.datatypes import DataSet` becomes `from guidata.dataset import DataSet`
+  * Or you may now write:
+
+    ```python
+    import guidata.dataset as gds
+
+    class MyParameters(gds.DataSet):
+        """My parameters"""
+        freq = gds.FloatItem("Frequency", default=1.0, min=0.0, nonzero=True)
+        amp = gds.FloatItem("Amplitude", default=1.0, min=0.0)
+    ```
+
+💥 New features:
+
+* New `dataset.create_dataset_from_dict`: create a dataset from a dictionary,
   using keys and values to create the dataset items
-* New `utils.conv.create_dataset_from_func`: create a dataset from a function signature,
+* New `dataset.create_dataset_from_func`: create a dataset from a function signature,
   using type annotations and default values to create the dataset items
 * `dataset.dataitems.StringItem`:
   * Added argument `password` to hide text (useful for passwords)
@@ -17,12 +40,12 @@ New features:
 * `dataset.dataitems.DictItem`: added support for HDF5 and JSON serialization
 * `dataset.io.h5fmt` and `dataset.io.jsonfmt`: added support for lists and dictionnaries serialization
 
-New PlotPyStack internal features:
+♻ New PlotPyStack internal features:
 
 * `widgets.about`: handle about dialog box informations (Python, Qt, Qt bindings, ...)
 * Renamed development environment variable `GUIDATA_PYTHONEXE` to `PPSTACK_PYTHONEXE`
 
-Bug fixes:
+🧹 Bug fixes:
 
 * Fixed Qt6 compatibility issue with `QFontDatabase`
 

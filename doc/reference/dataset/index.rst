@@ -7,5 +7,6 @@ Data set features
 
    datatypes
    dataitems
+   conv
    io
    qtwidgets

@@ -16,8 +16,8 @@ from __future__ import annotations
 
 import numpy as np
 
+from guidata.dataset import create_dataset_from_func
 from guidata.env import execenv
-from guidata.utils.conv import create_dataset_from_func, get_arg_info
 
 
 def func_ok(
@@ -41,7 +41,6 @@ def test_dataset_from_func():
     """Test generate dataset class from function"""
     for func in (func_ok, func_no_default):
         execenv.print(func.__name__)
-        execenv.print(get_arg_info(func))
         dataset = create_dataset_from_func(func)
         execenv.print(dataset)
         execenv.print(dataset.create(a=1, b=2.0))

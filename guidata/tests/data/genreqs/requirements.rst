@@ -9,6 +9,7 @@ The :mod:`guidata` package requires the following Python modules:
       - Summary
     * - Python
       - >=3.8, <4
+      - 
     * - h5py
       - >=3.0
       - Read and write HDF5 files from Python
@@ -20,6 +21,7 @@ The :mod:`guidata` package requires the following Python modules:
       - Provides an abstraction layer on top of the various Qt bindings (PyQt5/6 and PySide2/6).
     * - PyQt
       - >=5.11
+      - 
 
 Optional modules for development:
 

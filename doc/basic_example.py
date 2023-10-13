@@ -1,19 +1,18 @@
 # -*- coding: utf-8 -*-
 
 import guidata
-import guidata.dataset.dataitems as di
-import guidata.dataset.datatypes as dt
+import guidata.dataset as gds
 
 # Note: the following line is not required if a QApplication has already been created
 _app = guidata.qapplication()
 
 
-class Processing(dt.DataSet):
+class Processing(gds.DataSet):
     """Example"""
 
-    a = di.FloatItem("Parameter #1", default=2.3)
-    b = di.IntItem("Parameter #2", min=0, max=10, default=5)
-    type = di.ChoiceItem("Processing algorithm", ("type 1", "type 2", "type 3"))
+    a = gds.FloatItem("Parameter #1", default=2.3)
+    b = gds.IntItem("Parameter #2", min=0, max=10, default=5)
+    type = gds.ChoiceItem("Processing algorithm", ("type 1", "type 2", "type 3"))
 
 
 param = Processing()

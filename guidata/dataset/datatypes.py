@@ -10,48 +10,48 @@ Data sets
 Defining data sets
 ^^^^^^^^^^^^^^^^^^
 
-.. autoclass:: DataSet
+.. autoclass:: guidata.dataset.DataSet
     :members:
 
-.. autoclass:: DataSetGroup
+.. autoclass:: guidata.dataset.DataSetGroup
     :members:
 
-.. autoclass:: ActivableDataSet
+.. autoclass:: guidata.dataset.ActivableDataSet
     :members:
 
 Grouping items
 ^^^^^^^^^^^^^^
 
-.. autoclass:: BeginGroup
+.. autoclass:: guidata.dataset.BeginGroup
     :members:
 
-.. autoclass:: EndGroup
+.. autoclass:: guidata.dataset.EndGroup
     :members:
 
-.. autoclass:: BeginTabGroup
+.. autoclass:: guidata.dataset.BeginTabGroup
     :members:
 
-.. autoclass:: EndTabGroup
+.. autoclass:: guidata.dataset.EndTabGroup
     :members:
 
 Handling item properties
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. autoclass:: ItemProperty
+.. autoclass:: guidata.dataset.ItemProperty
 
-.. autoclass:: FormatProp
+.. autoclass:: guidata.dataset.FormatProp
     :members:
 
-.. autoclass:: GetAttrProp
+.. autoclass:: guidata.dataset.GetAttrProp
     :members:
 
-.. autoclass:: ValueProp
+.. autoclass:: guidata.dataset.ValueProp
     :members:
 
-.. autoclass:: NotProp
+.. autoclass:: guidata.dataset.NotProp
     :members:
 
-.. autoclass:: FuncProp
+.. autoclass:: guidata.dataset.FuncProp
     :members:
 """
 
@@ -68,15 +68,15 @@ from typing import TYPE_CHECKING, Any
 
 from guidata.dataset.io import INIReader, INIWriter
 from guidata.userconfig import UserConfig
-from guidata.utils import update_dataset
 
 DEBUG_DESERIALIZE = False
 
 if TYPE_CHECKING:  # pragma: no cover
-    from guidata.dataset.io import HDF5Reader, HDF5Writer, JSONReader, JSONWriter
-    from guidata.dataset.qtwidgets import DataSetEditDialog
     from qtpy.QtCore import QSize
     from qtpy.QtWidgets import QWidget
+
+    from guidata.dataset.io import HDF5Reader, HDF5Writer, JSONReader, JSONWriter
+    from guidata.dataset.qtwidgets import DataSetEditDialog
 
 
 class NoDefault:
@@ -622,6 +622,10 @@ class ObjectItem(DataItem):
         Args:
             instance (DataSet): instance of the DataSet
         """
+        # Avoid circular import
+        # pylint: disable=import-outside-toplevel
+        from guidata.dataset.conv import update_dataset
+
         if self.klass is not None:
             value = self.klass()  # pylint: disable=not-callable
             if self._default is not None:

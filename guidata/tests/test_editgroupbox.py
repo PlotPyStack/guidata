@@ -14,9 +14,8 @@ layout, showing read-only parameter sets or allowing to edit parameter values.
 
 from qtpy.QtWidgets import QMainWindow, QSplitter
 
+import guidata.dataset as gds
 from guidata.configtools import get_icon
-from guidata.dataset import dataitems as gdi
-from guidata.dataset import datatypes as gdt
 from guidata.dataset.qtwidgets import DataSetEditGroupBox, DataSetShowGroupBox
 from guidata.env import execenv
 from guidata.qthelpers import (
@@ -30,48 +29,48 @@ from guidata.tests.test_activable_dataset import Parameters
 from guidata.widgets import about
 
 
-class AnotherDataSet(gdt.DataSet):
+class AnotherDataSet(gds.DataSet):
     """
     Example 2
     <b>Simple dataset example</b>
     """
 
-    param0 = gdi.ChoiceItem("Choice", ["deazdazk", "aeazee", "87575757"])
-    param1 = gdi.FloatItem("Foobar 1", default=0, min=0)
-    a_group = gdt.BeginGroup("A group")
-    param2 = gdi.FloatItem("Foobar 2", default=0.93)
-    param3 = gdi.FloatItem("Foobar 3", default=123)
-    _a_group = gdt.EndGroup("A group")
+    param0 = gds.ChoiceItem("Choice", ["deazdazk", "aeazee", "87575757"])
+    param1 = gds.FloatItem("Foobar 1", default=0, min=0)
+    a_group = gds.BeginGroup("A group")
+    param2 = gds.FloatItem("Foobar 2", default=0.93)
+    param3 = gds.FloatItem("Foobar 3", default=123)
+    _a_group = gds.EndGroup("A group")
 
 
-class ExampleMultiGroupDataSet(gdt.DataSet):
+class ExampleMultiGroupDataSet(gds.DataSet):
     """Example DS with multiple groups"""
 
-    param0 = gdi.ChoiceItem("Choice", ["deazdazk", "aeazee", "87575757"])
-    param1 = gdi.FloatItem("Foobar 1", default=0, min=0)
-    t_group = gdt.BeginTabGroup("T group")
-    a_group = gdt.BeginGroup("A group")
-    param2 = gdi.FloatItem("Foobar 2", default=0.93)
-    dir1 = gdi.DirectoryItem("Directory 1")
-    file1 = gdi.FileOpenItem("File 1")
-    _a_group = gdt.EndGroup("A group")
-    b_group = gdt.BeginGroup("B group")
-    param3 = gdi.FloatItem("Foobar 3", default=123)
-    param4 = gdi.BoolItem("Boolean")
-    _b_group = gdt.EndGroup("B group")
-    c_group = gdt.BeginGroup("C group")
-    param5 = gdi.FloatItem("Foobar 4", default=250)
-    param6 = gdi.DateItem("Date").set_prop("display", format="dd.MM.yyyy")
-    param7 = gdi.ColorItem("Color")
-    _c_group = gdt.EndGroup("C group")
-    _t_group = gdt.EndTabGroup("T group")
+    param0 = gds.ChoiceItem("Choice", ["deazdazk", "aeazee", "87575757"])
+    param1 = gds.FloatItem("Foobar 1", default=0, min=0)
+    t_group = gds.BeginTabGroup("T group")
+    a_group = gds.BeginGroup("A group")
+    param2 = gds.FloatItem("Foobar 2", default=0.93)
+    dir1 = gds.DirectoryItem("Directory 1")
+    file1 = gds.FileOpenItem("File 1")
+    _a_group = gds.EndGroup("A group")
+    b_group = gds.BeginGroup("B group")
+    param3 = gds.FloatItem("Foobar 3", default=123)
+    param4 = gds.BoolItem("Boolean")
+    _b_group = gds.EndGroup("B group")
+    c_group = gds.BeginGroup("C group")
+    param5 = gds.FloatItem("Foobar 4", default=250)
+    param6 = gds.DateItem("Date").set_prop("display", format="dd.MM.yyyy")
+    param7 = gds.ColorItem("Color")
+    _c_group = gds.EndGroup("C group")
+    _t_group = gds.EndTabGroup("T group")
 
 
-class OtherDataSet(gdt.DataSet):
+class OtherDataSet(gds.DataSet):
     """Another example dataset"""
 
-    title = gdi.StringItem("Title", default="Title")
-    icon = gdi.ChoiceItem(
+    title = gds.StringItem("Title", default="Title")
+    icon = gds.ChoiceItem(
         "Icon",
         (
             ("python.png", "Python"),
@@ -79,7 +78,7 @@ class OtherDataSet(gdt.DataSet):
             ("settings.png", "Settings"),
         ),
     )
-    opacity = gdi.FloatItem("Opacity", default=1.0, min=0.1, max=1)
+    opacity = gds.FloatItem("Opacity", default=1.0, min=0.1, max=1)
 
 
 class MainWindow(QMainWindow):

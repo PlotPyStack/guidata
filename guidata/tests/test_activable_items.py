@@ -10,8 +10,7 @@ on another item's value.
 
 # guitest: show
 
-from guidata.dataset.dataitems import ChoiceItem, FloatItem
-from guidata.dataset.datatypes import DataSet, FuncProp, GetAttrProp
+from guidata.dataset import ChoiceItem, DataSet, FloatItem, FuncProp, GetAttrProp
 from guidata.env import execenv
 from guidata.qthelpers import qt_app_context
 

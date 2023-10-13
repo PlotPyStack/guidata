@@ -8,25 +8,24 @@
 
 import pytest
 
-from guidata.dataset.dataitems import FloatItem, IntItem
-from guidata.dataset.datatypes import DataSet
+import guidata.dataset as gds
 from guidata.env import execenv
 
 
-class Parameters(DataSet):
+class Parameters(gds.DataSet):
     """Example dataset"""
 
-    height = FloatItem("Height", min=1, max=250, help="height in cm")
-    width = FloatItem("Width", min=1, max=250, help="width in cm")
-    number = IntItem("Number", min=3, max=20)
+    height = gds.FloatItem("Height", min=1, max=250, help="height in cm")
+    width = gds.FloatItem("Width", min=1, max=250, help="width in cm")
+    number = gds.IntItem("Number", min=3, max=20)
 
 
 @pytest.mark.skip(reason="interactive text mode: not suitable for automated testing")
 def test_text():
     """Test text mode"""
-    p = Parameters()
-    p.text_edit()
-    execenv.print(p)
+    prm = Parameters()
+    prm.text_edit()
+    execenv.print(prm)
     execenv.print("OK")
 
 

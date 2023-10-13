@@ -8,18 +8,17 @@
 
 import unittest
 
-from guidata.dataset.dataitems import FloatItem, IntItem
-from guidata.dataset.datatypes import DataSet
+import guidata.dataset as gds
+from guidata.dataset.conv import update_dataset
 from guidata.env import execenv
-from guidata.utils import update_dataset
 
 
-class Parameters(DataSet):
+class Parameters(gds.DataSet):
     """Example dataset"""
 
-    float1 = FloatItem("float #1", min=1, max=250, help="height in cm")
-    float2 = FloatItem("float #2", min=1, max=250, help="width in cm")
-    number = IntItem("number", min=3, max=20)
+    float1 = gds.FloatItem("float #1", min=1, max=250, help="height in cm")
+    float2 = gds.FloatItem("float #2", min=1, max=250, help="width in cm")
+    number = gds.IntItem("number", min=3, max=20)
 
 
 class TestCheck(unittest.TestCase):

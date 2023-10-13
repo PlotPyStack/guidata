@@ -11,8 +11,8 @@ Update/Restore dataset from/to another dataset or dictionary
 
 import numpy as np
 
+from guidata.dataset.conv import restore_dataset, update_dataset
 from guidata.tests.test_all_items import Parameters
-from guidata.utils import restore_dataset, update_dataset
 
 
 def test_update_restore_dataset():
