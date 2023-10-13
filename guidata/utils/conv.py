@@ -13,16 +13,13 @@ Conversion utilities
 from __future__ import annotations
 
 import inspect
-import types
 from typing import Any
-
-import numpy as np
 
 import guidata.dataset.dataitems as gdi
 import guidata.dataset.datatypes as gdt
 
 # ==============================================================================
-# Generating a dataset from a function signature
+# Generating a dataset class from a function signature
 # ==============================================================================
 
 
@@ -76,13 +73,13 @@ def __get_dataitem_from_type(data_type: Any) -> gdi.DataItem:
 
 
 def create_dataset_from_func(func) -> gdt.DataSet:
-    """Creates a DataSet from a function signature.
+    """Creates a DataSet class from a function signature.
 
     Args:
         func: The function to create the DataSet from.
 
     Returns:
-        The DataSet.
+        The DataSet class.
 
     Note: Supported data types are: int, float, bool, str, dict, np.ndarray.
     """
@@ -94,4 +91,31 @@ def create_dataset_from_func(func) -> gdt.DataSet:
             raise ValueError(f"Argument '{name}' has no data type annotation.")
         ditem = __get_dataitem_from_type(data_type)
         klassattrs[name] = ditem(name, default=default_value)
+    return type(klassname, (gdt.DataSet,), klassattrs)
+
+
+# ==============================================================================
+# Generating a dataset class from a dictionary
+# ==============================================================================
+
+
+def create_dataset_from_dict(
+    dictionary: dict[str, Any], klassname: str | None = None
+) -> gdt.DataSet:
+    """Creates a DataSet class from a dictionary.
+
+    Args:
+        dictionary: The dictionary to create the DataSet class from.
+        klassname: The name of the DataSet class. If None, the name is 'DictDataSet'.
+
+    Returns:
+        The DataSet class.
+
+    Note: Supported data types are: int, float, bool, str, dict, np.ndarray.
+    """
+    klassname = "DictDataSet" if klassname is None else klassname
+    klassattrs = {}
+    for name, value in dictionary.items():
+        ditem = __get_dataitem_from_type(type(value))
+        klassattrs[name] = ditem(name, default=value)
     return type(klassname, (gdt.DataSet,), klassattrs)

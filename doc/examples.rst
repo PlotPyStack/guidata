@@ -86,6 +86,12 @@ Create a dataset class from a function signature
 .. literalinclude:: ../guidata/tests/test_dataset_from_func.py
    :start-after: guitest:
 
+Create a dataset class from a function dictionary
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. literalinclude:: ../guidata/tests/test_dataset_from_dict.py
+   :start-after: guitest:
+
 Data set HDF5 serialization/deserialization
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

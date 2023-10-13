@@ -4,7 +4,7 @@
 # (see guidata/LICENSE for details)
 
 """
-Generate a dataset from a function signature
+Generate a dataset class from a function signature
 
 This function is used to generate a dataset from a function signature which has
 type annotations. See the example below.
@@ -38,7 +38,7 @@ def func_no_default(a: int, b: float, c: str, data: np.ndarray) -> None:
 
 
 def test_dataset_from_func():
-    """Test generate dataset from function"""
+    """Test generate dataset class from function"""
     for func in (func_ok, func_no_default):
         execenv.print(func.__name__)
         execenv.print(get_arg_info(func))
