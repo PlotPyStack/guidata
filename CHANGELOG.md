@@ -7,6 +7,7 @@
 * 'Apply' button state is now correctly updated when modifying one of the following items:
   * `dataset.MultipleChoiceItem`
   * `dataset.dataitems.DictItem`
+  * `dataset.dataitems.FloatArrayItem`
 
 ## Version 3.1.0 ##
 

@@ -12,6 +12,7 @@ layout, showing read-only parameter sets or allowing to edit parameter values.
 
 # guitest: show
 
+import numpy as np
 from qtpy.QtWidgets import QMainWindow, QSplitter
 
 import guidata.dataset as gds
@@ -81,6 +82,7 @@ class OtherDataSet(gds.DataSet):
         ),
     )
     opacity = gds.FloatItem("Opacity", default=1.0, min=0.1, max=1)
+    transform = gds.FloatArrayItem("Transform", default=np.array([1, 2, 3, 4, 5, 6]))
 
 
 class MainWindow(QMainWindow):

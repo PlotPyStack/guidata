@@ -1134,6 +1134,7 @@ class FloatArrayWidget(AbstractDataSetWidget):
         if editor.setup_and_check(self.arr, title=label):
             if editor.exec():
                 self.update(self.arr)
+                self.notify_value_change()
 
     def get(self) -> None:
         """Update widget contents from data item value"""
