@@ -4,7 +4,9 @@
 
 🛠️ Bug fixes:
 
-* Fixed 'Apply' button behavior: state is now correctly updated when a MultipleChoiceItem is modified
+* 'Apply' button state is now correctly updated when modifying one of the following items:
+  * `dataset.MultipleChoiceItem`
+  * `dataset.dataitems.DictItem`
 
 ## Version 3.1.0 ##
 

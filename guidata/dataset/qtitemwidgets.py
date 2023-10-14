@@ -1280,6 +1280,7 @@ class ButtonWidget(AbstractDataSetWidget):
         )
         self.set()
         self.parent_layout.update_widgets()
+        self.notify_value_change()
 
 
 class DataSetWidget(AbstractDataSetWidget):
