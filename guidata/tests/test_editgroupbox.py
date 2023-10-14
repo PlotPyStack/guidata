@@ -46,6 +46,7 @@ class AnotherDataSet(gds.DataSet):
 class ExampleMultiGroupDataSet(gds.DataSet):
     """Example DS with multiple groups"""
 
+    choices = gds.MultipleChoiceItem("Choices", ["a", "b", "c", "d", "e"])
     param0 = gds.ChoiceItem("Choice", ["deazdazk", "aeazee", "87575757"])
     param1 = gds.FloatItem("Foobar 1", default=0, min=0)
     t_group = gds.BeginTabGroup("T group")

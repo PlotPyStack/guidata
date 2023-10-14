@@ -1,5 +1,11 @@
 # guidata Releases #
 
+## Version 3.1.1 ##
+
+🛠️ Bug fixes:
+
+* Fixed 'Apply' button behavior: state is now correctly updated when a MultipleChoiceItem is modified
+
 ## Version 3.1.0 ##
 
 ⚠ Exceptionnally, this release contains the following API breaking changes:
