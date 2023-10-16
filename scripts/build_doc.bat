@@ -15,9 +15,6 @@ call %FUNC% SetPythonPath
 call %FUNC% UsePython
 cd %SCRIPTPATH%\..
 %PYTHON% doc\update_requirements.py
-set PATH=C:\Program Files\HTML Help Workshop;C:\Program Files (x86)\HTML Help Workshop;%PATH%
-sphinx-build -b htmlhelp doc build\doc
-hhc build\doc\%LIBNAME%.hhp
-copy build\doc\*.chm %MODNAME%
 sphinx-build -b html doc build\doc
+start build\doc\index.html
 call %FUNC% EndOfScript
