@@ -1026,6 +1026,7 @@ class MultipleChoiceWidget(AbstractDataSetWidget):
         _choices = item.get_prop_value("data", "choices")
         for _, choice, _img in _choices:
             checkbox = QCheckBox(choice)
+            checkbox.stateChanged.connect(lambda: self.notify_value_change())
             layout.addWidget(checkbox, cx, cy)
             if nx < 0:
                 cy += 1
@@ -1133,6 +1134,7 @@ class FloatArrayWidget(AbstractDataSetWidget):
         if editor.setup_and_check(self.arr, title=label):
             if editor.exec():
                 self.update(self.arr)
+                self.notify_value_change()
 
     def get(self) -> None:
         """Update widget contents from data item value"""
@@ -1279,6 +1281,7 @@ class ButtonWidget(AbstractDataSetWidget):
         )
         self.set()
         self.parent_layout.update_widgets()
+        self.notify_value_change()
 
 
 class DataSetWidget(AbstractDataSetWidget):

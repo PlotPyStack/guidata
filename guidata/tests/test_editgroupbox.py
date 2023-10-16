@@ -12,6 +12,7 @@ layout, showing read-only parameter sets or allowing to edit parameter values.
 
 # guitest: show
 
+import numpy as np
 from qtpy.QtWidgets import QMainWindow, QSplitter
 
 import guidata.dataset as gds
@@ -46,6 +47,8 @@ class AnotherDataSet(gds.DataSet):
 class ExampleMultiGroupDataSet(gds.DataSet):
     """Example DS with multiple groups"""
 
+    choices = gds.MultipleChoiceItem("Choices", ["a", "b", "c", "d", "e"])
+    dictionary = gds.DictItem("Dictionary", {"a": 1, "b": 2, "c": 3})
     param0 = gds.ChoiceItem("Choice", ["deazdazk", "aeazee", "87575757"])
     param1 = gds.FloatItem("Foobar 1", default=0, min=0)
     t_group = gds.BeginTabGroup("T group")
@@ -79,6 +82,7 @@ class OtherDataSet(gds.DataSet):
         ),
     )
     opacity = gds.FloatItem("Opacity", default=1.0, min=0.1, max=1)
+    transform = gds.FloatArrayItem("Transform", default=np.array([1, 2, 3, 4, 5, 6]))
 
 
 class MainWindow(QMainWindow):

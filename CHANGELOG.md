@@ -1,8 +1,15 @@
 # guidata Releases #
 
-## Version 3.1.1 (work in progress) ##
+## Version 3.1.1 (🚧 work in progress 🚧) ##
 
-Changes:
+🛠️ Bug fixes:
+
+* 'Apply' button state is now correctly updated when modifying one of the following items:
+  * `dataset.MultipleChoiceItem`
+  * `dataset.dataitems.DictItem`
+  * `dataset.dataitems.FloatArrayItem`
+
+💥 Changes:
 
 * Removed `--unattended` command line option for `pytest`:
   * Before: `pytest --unattended guidata` (to run tests without Qt event loop)
