@@ -23,11 +23,11 @@ To run the unittests, you need:
 
 Then run the following command::
 
-    pytest -v --unattended guidata
+    pytest guidata
 
 To run test with coverage support, use the following command::
 
-    pytest -v --cov --cov-report=html --unattended guidata
+    pytest -v --cov --cov-report=html guidata
 
 
 Code formatting

@@ -14,6 +14,6 @@ call %FUNC% SetPythonPath
 call %FUNC% UsePython
 
 set COVERAGE_PROCESS_START=%SCRIPTPATH%\..\.coveragerc
-pytest -v --cov --cov-report=html --unattended %MODNAME%
+pytest -v --cov --cov-report=html %MODNAME%
 start .\htmlcov\index.html
 call %FUNC% EndOfScript

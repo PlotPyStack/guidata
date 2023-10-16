@@ -1,5 +1,14 @@
 # guidata Releases #
 
+## Version 3.1.1 (work in progress) ##
+
+Changes:
+
+* Removed `--unattended` command line option for `pytest`:
+  * Before: `pytest --unattended guidata` (to run tests without Qt event loop)
+  * Now: `pytest guidata` (there is no use case for running tests with Qt event loop,
+    so the `--unattended` option was removed and the *unattended* mode is now the default)
+
 ## Version 3.1.0 ##
 
 ⚠ Exceptionnally, this release contains the following API breaking changes:

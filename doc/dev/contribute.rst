@@ -66,13 +66,13 @@ Before submitting a patch, please check the following points:
 
     .. code-block:: bash
 
-        pylint --disable=fixme,C,R,W plotpy
+        pylint --disable=fixme,C,R,W guidata
 
 * Run the tests and check that they all pass:
 
     .. code-block:: bash
 
-        pytest --unattended plotpy
+        pytest guidata
 
 Pull request
 ~~~~~~~~~~~~
