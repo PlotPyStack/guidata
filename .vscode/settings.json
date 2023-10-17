@@ -42,7 +42,6 @@
         "-v",
         "--cov",
         "--cov-report=html",
-        "--unattended",
         "guidata"
     ],
     "python.analysis.autoFormatStrings": true,
