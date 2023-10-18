@@ -16,6 +16,7 @@
                 "cwd": "scripts",
                 "env": {
                     "UNATTENDED": "1",
+                    "PYTHONUTF8": "1",
                     "PYTHON": "${env:PPSTACK_PYTHONEXE}"
                 }
             },
