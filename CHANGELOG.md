@@ -15,6 +15,11 @@
   * Before: `pytest --unattended guidata` (to run tests without Qt event loop)
   * Now: `pytest guidata` (there is no use case for running tests with Qt event loop,
     so the `--unattended` option was removed and the *unattended* mode is now the default)
+* Removed CHM documentation (obsolete format)
+
+🧹 Bug fixes:
+
+* Fixed minor deprecation and other issues related to locale
 
 ## Version 3.1.0 ##
 
