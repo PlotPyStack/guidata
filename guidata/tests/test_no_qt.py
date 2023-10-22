@@ -10,11 +10,10 @@ Test if some guidata features work without Qt
 
 import os
 
-os.environ["QT_API"] = "invalid_value"  # Invalid Qt API
-
 
 def test_imports_without_qt():
     """Test if some guidata features work without Qt"""
+    os.environ["QT_API"] = "invalid_value"  # Invalid Qt API
     try:
         # pylint: disable=unused-import
         # pylint: disable=import-outside-toplevel

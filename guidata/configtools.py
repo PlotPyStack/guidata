@@ -43,8 +43,6 @@ import sys
 from collections.abc import Callable
 from typing import TYPE_CHECKING
 
-from qtpy import PYQT5
-
 from guidata.utils.misc import decode_fs_string, get_module_path
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -293,6 +291,7 @@ def font_is_installed(font: str) -> list[str]:
         list[str]: list of installed fonts
     """
     # Importing Qt here because this module should be independent from it
+    from qtpy import PYQT5
     from qtpy import QtGui as QG  # pylint: disable=import-outside-toplevel
 
     if PYQT5:
