@@ -82,7 +82,11 @@ def get_tests(package, category: str) -> list[TestModule]:
     for root, _dirs, files in os.walk(test_path):
         for fname in files:
             path = osp.join(root, fname)
-            if fname.endswith((".py", ".pyw")) and not fname.startswith("_"):
+            if (
+                fname.endswith((".py", ".pyw"))
+                and not fname.startswith("_")
+                and fname != "conftest.py"
+            ):
                 test = TestModule(test_package, path)
                 if (
                     category == "all"
