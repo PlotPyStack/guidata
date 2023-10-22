@@ -97,7 +97,7 @@ def get_translation(modname: str, dirname: str | None = None) -> Callable[[str],
     if "LANG" not in os.environ:
         import locale  # Warning: 2to3 false alarm ('import' fixer)
 
-        lang = locale.getdefaultlocale()[0]
+        lang = locale.getlocale()[0]
         if lang is not None:
             os.environ["LANG"] = lang
     try:

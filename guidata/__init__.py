@@ -50,6 +50,7 @@ def install_translator(qapp):
         for prefix in ("qt", "qtbase"):
             if qt_translator.load(prefix + "_" + locale, paths):
                 QT_TRANSLATOR = qt_translator  # Keep reference alive
+                break
     if QT_TRANSLATOR is not None:
         qapp.installTranslator(QT_TRANSLATOR)
 
