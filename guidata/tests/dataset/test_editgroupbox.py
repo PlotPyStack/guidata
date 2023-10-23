@@ -26,7 +26,7 @@ from guidata.qthelpers import (
     qt_app_context,
     win32_fix_title_bar_background,
 )
-from guidata.tests.test_activable_dataset import Parameters
+from guidata.tests.dataset.test_activable_dataset import Parameters
 from guidata.widgets import about
 
 

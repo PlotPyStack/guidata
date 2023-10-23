@@ -10,20 +10,22 @@ Tests for codeeditor.py
 
 # guitest: show
 
+from guidata.configtools import get_icon
 from guidata.env import execenv
 from guidata.qthelpers import qt_app_context
-from guidata.widgets import codeeditor
+from guidata.widgets.console import Console
 
 
-def test_codeeditor():
-    """Test Code editor."""
+def test_console():
+    """Test Console widget."""
     with qt_app_context(exec_loop=True):
-        widget = codeeditor.CodeEditor(language="python")
-        widget.set_text_from_file(codeeditor.__file__)
+        widget = Console(debug=False, multithreaded=True)
         widget.resize(800, 600)
+        widget.setWindowTitle("Console")
+        widget.setWindowIcon(get_icon("guidata.svg"))
         widget.show()
         execenv.print("OK")
 
 
 if __name__ == "__main__":
-    test_codeeditor()
+    test_console()
