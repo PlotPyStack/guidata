@@ -5,11 +5,10 @@
 
 """Generate install requirements RST table."""
 
-import os.path as osp
-
+from guidata.tests import get_path
 from guidata.utils import genreqs
 
-GR_PATH = osp.join(osp.dirname(__file__), "data", "genreqs")
+GR_PATH = get_path("genreqs")
 
 
 def test_compare_cfg_toml():
