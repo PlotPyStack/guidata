@@ -41,8 +41,10 @@ This library aims to provide these features thanks to automatic graphical user
 interface generation for data set editing and display. Widgets inside GUIs are
 automatically generated depending on each data item type.
 
-The :mod:`guidata` library also provides the following features:
+The :mod:`guidata` library provides the following modules:
 
+* :py:mod:`guidata.dataset`: data set definition and manipulation
+* :py:mod:`guidata.widgets`: ready-to-use Qt widgets (console, code editor, array editor, etc.)
 * :py:mod:`guidata.qthelpers`: Qt helpers
 * :py:mod:`guidata.configtools`: library/application data management
 * :py:mod:`guidata.guitest`: automatic GUI-based test launcher

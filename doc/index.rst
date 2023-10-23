@@ -5,8 +5,9 @@ Welcome to :mod:`guidata`'s documentation!
     :align: center
 
 Based on the Qt library :mod:`guidata` is a Python library generating graphical
-user interfaces for easy dataset editing and display. It also provides helpers
-and application development tools for Qt.
+user interfaces for easy dataset editing and display. It also provides :ref:`widgets`
+(Python console, code editor, array editor, etc. - see ), helpers and application
+development tools for Qt.
 
 .. figure:: images/layout_example.png
     :class: invert-in-dark-mode
@@ -33,6 +34,7 @@ Table of contents
    overview
    installation
    examples
+   widgets
    dev/index
    reference/index
 
