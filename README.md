@@ -5,7 +5,7 @@
 [![PyPI pyversions](https://img.shields.io/pypi/pyversions/guidata.svg)](https://pypi.python.org/pypi/guidata/)
 [![download count](https://img.shields.io/conda/dn/conda-forge/guidata.svg)](https://www.anaconda.com/download/)
 
-ℹ️ Created in 2009 by Pierre Raybaut and maintained by the [PlotPyStack](https://github.com/PlotPyStack) organization.
+ℹ️ Created in 2009 by [Pierre Raybaut](https://github.com/PierreRaybaut) and maintained by the [PlotPyStack](https://github.com/PlotPyStack) organization.
 
 ## Overview
 
