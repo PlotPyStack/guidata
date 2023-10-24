@@ -15,7 +15,7 @@ providing a unified framework for creating scientific GUIs with Python and Qt.
 
 Simple example of `guidata` datasets embedded in an application window:
 
-<img src="https://raw.githubusercontent.com/PlotPyStack/guidata/master/doc/images/screenshots/editgroupbox.png">
+![Example](https://raw.githubusercontent.com/PlotPyStack/guidata/master/doc/images/screenshots/editgroupbox.png)
 
 See [documentation](https://guidata.readthedocs.io/en/latest/) for more details on
 the library and [changelog](CHANGELOG.md) for recent history of changes.
