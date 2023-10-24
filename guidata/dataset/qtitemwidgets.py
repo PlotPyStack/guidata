@@ -708,7 +708,7 @@ class ColorWidget(HLayoutMixin, LineEditWidget):
     def update(self, value: str) -> None:
         """Reimplement LineEditWidget method"""
         LineEditWidget.update(self, value)
-        color = QColor(value)
+        color = QColor("" if value is None else value)
         if color.isValid():
             bitmap = QPixmap(16, 16)
             bitmap.fill(color)
