@@ -42,8 +42,6 @@ Application
 Other
 ^^^^^
 
-.. autofunction:: text_to_qcolor
-
 .. autofunction:: grab_save_window
 
 .. autofunction:: click_on_widget
@@ -60,6 +58,7 @@ from __future__ import annotations
 import faulthandler
 import os
 import os.path as osp
+import re
 import shutil
 import sys
 import time
@@ -133,27 +132,6 @@ def win32_fix_title_bar_background(widget: QW.QWidget) -> None:
     set_win_cpa.argtypes = (wintypes.HWND, WINDOWCOMPOSITIONATTRIBDATA)
     set_win_cpa.restype = ctypes.c_int
     set_win_cpa(int(widget.winId()), data)
-
-
-def text_to_qcolor(text: str | None) -> QG.QColor:
-    """Create a QColor from specified string
-
-    Args:
-        text (str): Color name or hex value
-
-    Returns:
-        QG.QColor: Color
-    """
-    color = QG.QColor()
-    if text is not None and text.startswith("#") and len(text) == 7:
-        correct = "#0123456789abcdef"
-        for char in text:
-            if char.lower() not in correct:
-                return color
-    elif text not in list(QG.QColor.colorNames()):
-        return color
-    color.setNamedColor(text)
-    return color
 
 
 def create_action(

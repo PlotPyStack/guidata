@@ -15,6 +15,7 @@ Version 2,Version 3
 ``.encoding``,``.utils.encoding``
 ``.encoding.transcode``,*removed*
 ``.encoding.getfilesystemencoding``,*removed*
+``.qthelpers.text_to_qcolor``,*removed*
 ``.utils.update_dataset``,``.dataset.update_dataset``
 ``.utils.restore_dataset``,``.dataset.restore_dataset``
 ``.utils.to_string``,``.utils.misc.to_string.misc``

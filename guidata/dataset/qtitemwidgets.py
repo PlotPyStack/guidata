@@ -55,7 +55,7 @@ from guidata.config import _
 from guidata.configtools import get_icon, get_image_file_path, get_image_layout
 from guidata.dataset.conv import restore_dataset, update_dataset
 from guidata.dataset.datatypes import DataItemVariable
-from guidata.qthelpers import get_std_icon, text_to_qcolor
+from guidata.qthelpers import get_std_icon
 from guidata.utils.misc import convert_date_format
 from guidata.widgets.arrayeditor import ArrayEditor
 
@@ -708,7 +708,7 @@ class ColorWidget(HLayoutMixin, LineEditWidget):
     def update(self, value: str) -> None:
         """Reimplement LineEditWidget method"""
         LineEditWidget.update(self, value)
-        color = text_to_qcolor(value)
+        color = QColor(value)
         if color.isValid():
             bitmap = QPixmap(16, 16)
             bitmap.fill(color)
@@ -719,7 +719,7 @@ class ColorWidget(HLayoutMixin, LineEditWidget):
 
     def select_color(self) -> None:
         """Open a color selection dialog box"""
-        color = text_to_qcolor(self.edit.text())
+        color = QColor(self.edit.text())
         if not color.isValid():
             color = Qt.gray  # type:ignore
         color = QColorDialog.getColor(color, self.parent_layout.parent)

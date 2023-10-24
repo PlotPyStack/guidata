@@ -523,9 +523,9 @@ class ColorItem(StringItem):
             return True
         if not isinstance(value, self.type):
             return False
-        from guidata.qthelpers import text_to_qcolor
+        from qtpy import QtGui as QG
 
-        return text_to_qcolor(value).isValid()
+        return QG.QColor(value).isValid()
 
     def get_value_from_reader(self, reader: HDF5Reader | JSONReader | INIReader) -> str:
         """Reads value from the reader object, inside the try...except
