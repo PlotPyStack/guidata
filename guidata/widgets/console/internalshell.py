@@ -25,8 +25,10 @@ from qtpy.QtCore import QEventLoop, QObject, Signal, Slot
 from qtpy.QtWidgets import QMessageBox
 
 from guidata.config import CONF, _
-from guidata.qthelpers import create_action, get_std_icon, is_dark_mode
+from guidata.configtools import get_icon
+from guidata.qthelpers import add_actions, create_action, get_std_icon, is_dark_mode
 from guidata.utils.misc import getcwd_or_home, run_program
+from guidata.widgets import about
 from guidata.widgets.console.dochelpers import getargtxt, getdoc, getobjdir, getsource
 from guidata.widgets.console.interpreter import Interpreter
 from guidata.widgets.console.shell import PythonShellWidget
@@ -294,18 +296,24 @@ class InternalShell(PythonShellWidget):
     def setup_context_menu(self):
         """Reimplement PythonShellWidget method"""
         PythonShellWidget.setup_context_menu(self)
-        self.help_action = create_action(
+        help_action = create_action(
             self,
             _("Help..."),
             icon=get_std_icon("DialogHelpButton"),
             triggered=self.help,
         )
-        self.menu.addAction(self.help_action)
+        about_action = create_action(
+            self,
+            _("About..."),
+            icon=get_icon("guidata.svg"),
+            triggered=about.show_about_dialog,
+        )
+        add_actions(self.menu, (None, help_action, about_action))
 
     @Slot()
     def help(self):
         """Help on Spyder console"""
-        QMessageBox.about(
+        QMessageBox.information(
             self,
             _("Help"),
             """<b>%s</b>

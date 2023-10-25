@@ -23,14 +23,6 @@ This package provides a NumPy Array Editor Dialog based on Qt.
 import io
 
 import numpy as np
-from guidata.config import CONF, _
-from guidata.configtools import get_font, get_icon
-from guidata.qthelpers import (
-    add_actions,
-    create_action,
-    keybinding,
-    win32_fix_title_bar_background,
-)
 from qtpy.QtCore import (
     QAbstractTableModel,
     QItemSelection,
@@ -63,6 +55,16 @@ from qtpy.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
+
+from guidata.config import CONF, _
+from guidata.configtools import get_font, get_icon
+from guidata.qthelpers import (
+    add_actions,
+    create_action,
+    keybinding,
+    win32_fix_title_bar_background,
+)
+from guidata.widgets import about
 
 # Note: string and unicode data types will be formatted with '%s' (see below)
 SUPPORTED_FORMATS = {
@@ -539,8 +541,14 @@ class ArrayView(QTableView):
             triggered=self.copy,
             context=Qt.WidgetShortcut,
         )
+        about_action = create_action(
+            self,
+            _("About..."),
+            icon=get_icon("guidata.svg"),
+            triggered=about.show_about_dialog,
+        )
         menu = QMenu(self)
-        add_actions(menu, [self.copy_action])
+        add_actions(menu, (self.copy_action, None, about_action))
         return menu
 
     def contextMenuEvent(self, event):

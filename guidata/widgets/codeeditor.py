@@ -20,14 +20,21 @@ This package provides an Editor widget based on QtGui.QPlainTextEdit.
 # pylint: disable=R0911
 # pylint: disable=R0201
 
-import guidata.widgets.syntaxhighlighters as sh
-from guidata.config import CONF, _
-from guidata.configtools import get_font
-from guidata.qthelpers import is_dark_mode, win32_fix_title_bar_background
-from guidata.utils import encoding
 from qtpy.QtCore import QRect, QSize, Qt
 from qtpy.QtGui import QColor, QPainter
 from qtpy.QtWidgets import QPlainTextEdit, QWidget
+
+import guidata.widgets.syntaxhighlighters as sh
+from guidata.config import CONF, _
+from guidata.configtools import get_font, get_icon
+from guidata.qthelpers import (
+    add_actions,
+    create_action,
+    is_dark_mode,
+    win32_fix_title_bar_background,
+)
+from guidata.utils import encoding
+from guidata.widgets import about
 
 
 class LineNumberArea(QWidget):
@@ -108,6 +115,18 @@ class CodeEditor(QPlainTextEdit):
 
         self.setFocusPolicy(Qt.StrongFocus)
         self.setup(language=language, font=font, columns=columns, rows=rows)
+
+    def contextMenuEvent(self, event):
+        """Override Qt method"""
+        menu = self.createStandardContextMenu()
+        about_action = create_action(
+            self,
+            _("About..."),
+            icon=get_icon("guidata.svg"),
+            triggered=about.show_about_dialog,
+        )
+        add_actions(menu, (None, about_action))
+        menu.exec(event.globalPos())
 
     def setup(self, language=None, font=None, columns=None, rows=None):
         """Setup widget"""
