@@ -8,6 +8,7 @@
   * `dataset.MultipleChoiceItem`
   * `dataset.dataitems.DictItem`
   * `dataset.dataitems.FloatArrayItem`
+* Fixed minor deprecation and other issues related to locale
 
 💥 Changes:
 
@@ -17,9 +18,6 @@
     so the `--unattended` option was removed and the *unattended* mode is now the default)
 * Removed CHM documentation (obsolete format)
 
-🧹 Bug fixes:
-
-* Fixed minor deprecation and other issues related to locale
 
 ## Version 3.1.0 ##
 

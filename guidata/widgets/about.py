@@ -11,13 +11,12 @@ from __future__ import annotations
 import platform
 import sys
 
-import qtpy
-from qtpy.QtCore import Qt
-from qtpy.QtWidgets import QMainWindow, QMessageBox
-
 import guidata
+import qtpy
 from guidata.config import _
 from guidata.configtools import get_icon
+from qtpy.QtCore import Qt
+from qtpy.QtWidgets import QMainWindow, QMessageBox
 
 
 def get_python_libs_infos(addinfos: str = "") -> str:
@@ -56,7 +55,66 @@ def get_general_infos(addinfos: str = "") -> str:
     Returns:
         str: Qt information
     """
-    return "Copyright © 2023 CEA\n\n" + get_python_libs_infos(addinfos=addinfos)
+    return "Copyright © 2023 CEA-Codra\n\n" + get_python_libs_infos(addinfos=addinfos)
+
+
+class AboutInfo:
+    """Object to generate information about the package
+
+    Args:
+        name: package name
+        version: package version
+        description: package description
+        author: package author
+        year: package year
+        organization: package organization
+    """
+
+    def __init__(
+        self,
+        name: str,
+        version: str,
+        description: str,
+        author: str,
+        year: int,
+        organization: str,
+    ) -> None:
+        self.name = name
+        self.version = version
+        self.description = description
+        self.author = author
+        self.year = year
+        self.organization = organization
+
+    def __str__(self) -> str:
+        return self.about()
+
+    def about(
+        self, html: bool = True, copyright_only: bool = False, addinfos: str = ""
+    ) -> str:
+        """Return text about this package
+
+        Args:
+            html: return html text. Defaults to True.
+            copyright_only: if True, return only copyright
+            addinfos: additional information to be displayed
+
+        Returns:
+            Text about this package
+        """
+        auth, year, org = self.author, self.year, self.organization
+        if html:
+            author = f"<a href='https://github.com/{auth.replace(' ','')}'>{auth}</a>"
+            organization = f"<a href='https://github.com/{org}'>{org}</a>"
+        shdesc = f"{self.name} {self.version}\n{self.description}\n\n"
+        shdesc += _("Created by %s in %d.") % (author, year) + "\n"
+        shdesc += _("Maintained by the %s organization.") % organization
+        desc = get_general_infos(addinfos)
+        if not copyright_only:
+            desc = f"{shdesc}\n\n{desc}"
+        if html:
+            desc = desc.replace("\n", "<br />")
+        return desc
 
 
 def about(html: bool = True, copyright_only: bool = False) -> str:
@@ -67,19 +125,17 @@ def about(html: bool = True, copyright_only: bool = False) -> str:
         copyright_only: if True, return only copyright
 
     Returns:
-        str: text about this package
+        Text about this package
     """
-    shortdesc = (
-        f"guidata {guidata.__version__}\n\n"
-        f"Automatic GUI generation for easy dataset editing and display\n"
-        f"Created by Pierre Raybaut."
+    info = AboutInfo(
+        "guidata",
+        guidata.__version__,
+        _("Automatic GUI generation for easy dataset editing and display"),
+        "Pierre Raybaut",
+        2009,
+        "PlotPyStack",
     )
-    desc = get_general_infos()
-    if not copyright_only:
-        desc = f"{shortdesc}\n\n{desc}"
-    if html:
-        desc = desc.replace("\n", "<br />")
-    return desc
+    return info.about(html=html, copyright_only=copyright_only)
 
 
 def show_about_dialog() -> None:
