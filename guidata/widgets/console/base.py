@@ -67,6 +67,7 @@ class CompletionWidget(QListWidget):
 
     def __init__(self, parent, ancestor):
         QListWidget.__init__(self, ancestor)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setWindowFlags(Qt.SubWindow | Qt.FramelessWindowHint)
         self.textedit = parent
         self.completion_list = None
@@ -111,7 +112,7 @@ class CompletionWidget(QListWidget):
 
         self.type_list = types
         if any(types):
-            for (c, t) in zip(completion_list, types):
+            for c, t in zip(completion_list, types):
                 icon = icons_map.get(t, "no_match")
                 self.addItem(QListWidgetItem(get_icon(icon + ".png"), c))
         else:
@@ -125,8 +126,7 @@ class CompletionWidget(QListWidget):
         self.raise_()
 
         # Retrieving current screen height
-        desktop = QApplication.desktop()
-        srect = desktop.availableGeometry(desktop.screenNumber(self))
+        srect = self.textedit.screen().availableGeometry()
         screen_right = srect.right()
         screen_bottom = srect.bottom()
 

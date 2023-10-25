@@ -696,6 +696,7 @@ class GetHelpMixin(object):
                     arglist = self.get_arglist(text)
                     name = text.split(".")[-1]
                     argspec = signature = ""
+                    is_signature = True
                     if isinstance(arglist, bool):
                         arglist = []
                     if arglist:
@@ -709,13 +710,19 @@ class GetHelpMixin(object):
                             argspec = getargspecfromtext(doc)
                             if not argspec:
                                 signature = getsignaturefromtext(doc, name)
+                                if not signature:
+                                    signature = doc
+                                    is_signature = False
                     if argspec or signature:
                         if argspec:
                             tiptext = name + argspec
                         else:
                             tiptext = signature
                         self.show_calltip(
-                            _("Arguments"), tiptext, signature=True, color="#2D62FF"
+                            _("Arguments"),
+                            tiptext,
+                            signature=is_signature,
+                            color="#2D62FF",
                         )
 
     def get_last_obj(self, last=False):

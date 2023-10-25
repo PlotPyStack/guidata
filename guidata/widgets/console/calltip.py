@@ -216,7 +216,7 @@ class CallTipWidget(QLabel):
         # location based trying to minimize the  area that goes off-screen.
         padding = 3  # Distance in pixels between cursor bounds and tip box.
         cursor_rect = text_edit.cursorRect(cursor)
-        screen_rect = self.app.desktop().screenGeometry(text_edit)
+        screen_rect = text_edit.screen().geometry()
         point.setY(point.y() + padding)
         tip_height = self.size().height()
         tip_width = self.size().width()
