@@ -20,7 +20,7 @@
 
 ## Version 3.1.0 ##
 
-⚠ Exceptionnally, this release contains the following API breaking changes:
+⚠ Exceptionally, this release contains the following API breaking changes:
 
 * Moved `utils.update_dataset` to `dataset.conv.update_dataset`
 * Moved `utils.restore_dataset` to `dataset.conv.restore_dataset`
