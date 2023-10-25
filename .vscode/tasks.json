@@ -260,7 +260,6 @@
             "dependsOrder": "sequence",
             "dependsOn": [
                 "Clean Up",
-                "Build documentation"
             ]
         },
     ]
