@@ -544,7 +544,7 @@ class CollectionsDelegate(QItemDelegate):
                 self.parent(),
                 _("Error"),
                 _(
-                    "Spyder was unable to retrieve the value of "
+                    "Unable to retrieve the value of "
                     "this variable from the console.<br><br>"
                     "The error mesage was:<br>"
                     "<i>%s</i>"
@@ -1227,7 +1227,7 @@ class BaseTableView(QTableView):
                 QMessageBox.warning(
                     self,
                     _("Import error"),
-                    _("Please install <b>matplotlib</b>" " or <b>plotpy</b>."),
+                    _("Please install <b>PlotPy</b>" " or <b>matplotlib</b>."),
                 )
 
     def plot_item(self, funcname):
@@ -1610,15 +1610,3 @@ class CollectionsEditor(QDialog):
         # It is import to avoid accessing Qt C++ object as it has probably
         # already been destroyed, due to the Qt.WA_DeleteOnClose attribute
         return self.data_copy
-
-
-class DictEditor(CollectionsEditor):
-    """ """
-
-    def __init__(self, parent=None):
-        warnings.warn(
-            "`DictEditor` has been renamed to `CollectionsEditor` in "
-            "Spyder 3. Please use `CollectionsEditor` instead",
-            RuntimeWarning,
-        )
-        CollectionsEditor.__init__(self, parent)

@@ -11,12 +11,13 @@ from __future__ import annotations
 import platform
 import sys
 
-import guidata
 import qtpy
-from guidata.config import _
-from guidata.configtools import get_icon
 from qtpy.QtCore import Qt
 from qtpy.QtWidgets import QMainWindow, QMessageBox
+
+import guidata
+from guidata.config import _
+from guidata.configtools import get_icon
 
 
 def get_python_libs_infos(addinfos: str = "") -> str:
@@ -68,6 +69,8 @@ class AboutInfo:
         author: package author
         year: package year
         organization: package organization
+        project_url: package project url
+        doc_url: package documentation url
     """
 
     def __init__(
@@ -78,6 +81,8 @@ class AboutInfo:
         author: str,
         year: int,
         organization: str,
+        project_url: str = "",
+        doc_url: str = "",
     ) -> None:
         self.name = name
         self.version = version
@@ -85,6 +90,12 @@ class AboutInfo:
         self.author = author
         self.year = year
         self.organization = organization
+        if not project_url:
+            project_url = f"https://github.com/PlotPyStack/{name}"
+        self.project_url = project_url
+        if not doc_url:
+            doc_url = f"https://{name}.readthedocs.io"
+        self.doc_url = doc_url
 
     def __str__(self) -> str:
         return self.about()
@@ -106,12 +117,19 @@ class AboutInfo:
         if html:
             author = f"<a href='https://github.com/{auth.replace(' ','')}'>{auth}</a>"
             organization = f"<a href='https://github.com/{org}'>{org}</a>"
-        shdesc = f"{self.name} {self.version}\n{self.description}\n\n"
-        shdesc += _("Created by %s in %d.") % (author, year) + "\n"
-        shdesc += _("Maintained by the %s organization.") % organization
+        shdesc = f"{self.name} {self.version}\n{self.description}"
+        if html:
+            shdesc += "\n\n"
+            pname = _("Project website")
+            dname = _("Documentation")
+            plink = f"<a href='{self.project_url}'>{pname}</a>"
+            dlink = f"<a href='{self.doc_url}'>{dname}</a>"
+            shdesc += _("More details about %s on %s or %s") % (self.name, plink, dlink)
+        shdesc += "\n\n" + _("Created by %s in %d") % (author, year) + "\n"
+        shdesc += _("Maintained by the %s organization") % organization
         desc = get_general_infos(addinfos)
         if not copyright_only:
-            desc = f"{shdesc}\n\n{desc}"
+            desc = f"{shdesc}{desc}"
         if html:
             desc = desc.replace("\n", "<br />")
         return desc
