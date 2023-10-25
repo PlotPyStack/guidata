@@ -1,6 +1,6 @@
 # guidata Releases #
 
-## Version 3.1.1 (🚧 work in progress 🚧) ##
+## Version 3.1.1 ##
 
 🛠️ Bug fixes:
 
@@ -17,7 +17,6 @@
   * Now: `pytest guidata` (there is no use case for running tests with Qt event loop,
     so the `--unattended` option was removed and the *unattended* mode is now the default)
 * Removed CHM documentation (obsolete format)
-
 
 ## Version 3.1.0 ##
 
