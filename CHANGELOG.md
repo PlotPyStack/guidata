@@ -1,5 +1,11 @@
 # guidata Releases #
 
+## Version 3.1.2 *(work in progress)* ##
+
+🛠️ Bug fixes:
+
+* [Issue #67](https://github.com/PlotPyStack/guidata/issues/67) - JSONReader/Deserializing object list: TypeError: 'NoneType' object is not subscriptable
+
 ## Version 3.1.1 ##
 
 🛠️ Bug fixes:
