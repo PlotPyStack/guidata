@@ -71,7 +71,7 @@ from qtpy import QtGui as QG
 from qtpy import QtWidgets as QW
 
 import guidata
-from guidata.config import CONF, get_old_log_fname
+from guidata.config import CONF, _, get_old_log_fname
 from guidata.configtools import get_icon, get_module_data_path
 from guidata.env import execenv
 from guidata.external import darkdetect
