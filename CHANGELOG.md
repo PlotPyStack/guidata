@@ -1,10 +1,14 @@
 # guidata Releases #
 
-## Version 3.1.2 *(work in progress)* ##
+## Version 3.2.0 *(work in progress)* ##
 
 🛠️ Bug fixes:
 
 * [Issue #67](https://github.com/PlotPyStack/guidata/issues/67) - JSONReader/Deserializing object list: TypeError: 'NoneType' object is not subscriptable
+
+💥 Changes:
+
+* `qthelpers.qt_wait`: added `show_message` and `parent` arguments (backward compatible)
 
 ## Version 3.1.1 ##
 
