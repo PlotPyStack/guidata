@@ -18,12 +18,12 @@ Simple example of `guidata` datasets embedded in an application window:
 ![Example](https://raw.githubusercontent.com/PlotPyStack/guidata/master/doc/images/screenshots/editgroupbox.png)
 
 See [documentation](https://guidata.readthedocs.io/en/latest/) for more details on
-the library and [changelog](CHANGELOG.md) for recent history of changes.
+the library and [changelog](https://github.com/PlotPyStack/guidata/blob/master/CHANGELOG.md) for recent history of changes.
 
 Copyrights and licensing:
 
 * Copyright © 2023 [CEA](https://www.cea.fr), [Codra](https://codra.net/), [Pierre Raybaut](https://github.com/PierreRaybaut).
-* Licensed under the terms of the BSD 3-Clause (see [LICENSE](LICENSE)).
+* Licensed under the terms of the BSD 3-Clause (see [LICENSE](https://github.com/PlotPyStack/guidata/blob/master/LICENSE)).
 
 ## Features
 
