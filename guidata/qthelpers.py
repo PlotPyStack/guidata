@@ -55,11 +55,8 @@ Other
 
 from __future__ import annotations
 
-import faulthandler
 import os
 import os.path as osp
-import re
-import shutil
 import sys
 import time
 from contextlib import contextmanager
@@ -71,11 +68,10 @@ from qtpy import QtGui as QG
 from qtpy import QtWidgets as QW
 
 import guidata
-from guidata.config import CONF, _, get_old_log_fname
+from guidata.config import _
 from guidata.configtools import get_icon, get_module_data_path
 from guidata.env import execenv
 from guidata.external import darkdetect
-from guidata.utils.misc import to_string
 
 if TYPE_CHECKING:  # pragma: no cover
     from collections.abc import Callable
@@ -445,60 +441,6 @@ def show_std_icons() -> None:
     sys.exit(app.exec())
 
 
-QAPP_INSTANCE = None
-SHOTPATH = osp.join(
-    get_module_data_path("guidata"), os.pardir, "doc", "images", "shots"
-)
-
-
-def initialize_log_file(fname: str) -> bool:
-    """Eventually keep the previous log file
-    Returns True if there was a previous log file
-
-    Args:
-        fname (str): Log file name
-
-    Returns:
-        bool: True if there was a previous log file
-    """
-    contents = get_log_contents(fname)
-    if contents:
-        try:
-            shutil.move(fname, get_old_log_fname(fname))
-        except Exception:  # pylint: disable=broad-except
-            pass
-        return True
-    return False
-
-
-def remove_empty_log_file(fname: str) -> None:
-    """Eventually remove empty log files
-
-    Args:
-        fname (str): Log file name
-    """
-    if not get_log_contents(fname):
-        try:
-            os.remove(fname)
-        except Exception:  # pylint: disable=broad-except
-            pass
-
-
-def get_log_contents(fname: str) -> str | None:
-    """Return True if file exists and something was logged in it
-
-    Args:
-        fname (str): Log file name
-
-    Returns:
-        str or None: Log contents
-    """
-    if osp.exists(fname):
-        with open(fname, "rb") as fdesc:
-            return to_string(fdesc.read()).strip()
-    return None
-
-
 def close_widgets_and_quit(screenshot: bool = False) -> None:
     """Close Qt top level widgets and quit Qt event loop
 
@@ -528,49 +470,49 @@ def close_dialog_and_quit(widget, screenshot: bool = False) -> None:
         pass
 
 
+QAPP_INSTANCE = None
+
+
 @contextmanager
 def qt_app_context(exec_loop: bool = False) -> None:
     """Context manager handling Qt application creation and persistance
 
     Args:
         exec_loop (bool): If True, execute Qt event loop
+
+    .. note::
+
+        This context manager was strongly inspired by the one in the
+        `DataLab <https://github.com/Codra-Ingenierie-Informatique/DataLab>`_ project
+        which is more advanced and complete than this one (it handles faulthandler
+        and traceback log files, which need to be implemented at application level,
+        that is why they were not included here).
     """
     global QAPP_INSTANCE  # pylint: disable=global-statement
     if QAPP_INSTANCE is None:
         QAPP_INSTANCE = guidata.qapplication()
-
-    # === Use faulthandler for exceptions ----------------------------------------------
-    fh_log_fname = CONF.get("faulthandler", "log_path")
-    CONF.set("faulthandler", "enabled", initialize_log_file(fh_log_fname))
-
-    with open(fh_log_fname, "w", encoding="utf-8") as fh_log_fn:
-        faulthandler.enable(file=fh_log_fn)
-        exception_occured = False
-        try:
-            yield QAPP_INSTANCE
-        except Exception:  # pylint: disable=broad-except
-            exception_occured = True
-        finally:
-            if execenv.unattended:  # pragma: no cover
-                if execenv.delay > 0:
-                    mode = "Screenshot" if execenv.screenshot else "Unattended"
-                    message = f"{mode} mode (delay: {execenv.delay}s)"
-                    msec = execenv.delay * 1000 - 200
-                    for widget in QW.QApplication.instance().topLevelWidgets():
-                        if isinstance(widget, QW.QMainWindow):
-                            widget.statusBar().showMessage(message, msec)
-                QC.QTimer.singleShot(
-                    execenv.delay * 1000,
-                    lambda: close_widgets_and_quit(screenshot=execenv.screenshot),
-                )
-            if exec_loop and not exception_occured:
-                QAPP_INSTANCE.exec()
-        if exception_occured:
-            raise  # pylint: disable=misplaced-bare-raise
-
-    if CONF.get("faulthandler", "enabled"):
-        faulthandler.disable()
-    remove_empty_log_file(fh_log_fname)
+    exception_occured = False
+    try:
+        yield QAPP_INSTANCE
+    except Exception:  # pylint: disable=broad-except
+        exception_occured = True
+    finally:
+        if execenv.unattended:  # pragma: no cover
+            if execenv.delay > 0:
+                mode = "Screenshot" if execenv.screenshot else "Unattended"
+                message = f"{mode} mode (delay: {execenv.delay}s)"
+                msec = execenv.delay * 1000 - 200
+                for widget in QW.QApplication.instance().topLevelWidgets():
+                    if isinstance(widget, QW.QMainWindow):
+                        widget.statusBar().showMessage(message, msec)
+            QC.QTimer.singleShot(
+                execenv.delay * 1000,
+                lambda: close_widgets_and_quit(screenshot=execenv.screenshot),
+            )
+        if exec_loop and not exception_occured:
+            QAPP_INSTANCE.exec()
+    if exception_occured:
+        raise  # pylint: disable=misplaced-bare-raise
 
 
 def exec_dialog(dlg: QW.QDialog) -> int:
@@ -609,7 +551,16 @@ def grab_save_window(widget: QW.QWidget, name: str) -> None:  # pragma: no cover
     suffix = ""
     if not name[-1].isdigit() and not name.startswith(("s_", "i_")):
         suffix = "_" + datetime.now().strftime("%Y-%m-%d-%H%M%S")
-    pixmap.save(osp.join(SHOTPATH, f"{name}{suffix}.png"))
+    pixmap.save(
+        osp.join(
+            get_module_data_path("guidata"),
+            os.pardir,
+            "doc",
+            "images",
+            "shots",
+            f"{name}{suffix}.png",
+        )
+    )
 
 
 def click_on_widget(widget: QW.QWidget) -> None:
