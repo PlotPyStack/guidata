@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2023-10-25 14:01+0200\n"
+"POT-Creation-Date: 2023-11-09 17:24+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -138,6 +138,10 @@ msgstr "Aucun test trouvé dans ce package."
 #: guidata\widgets\dataframeeditor.py:862
 msgid "Error"
 msgstr "Erreur"
+
+#: guidata\qthelpers.py:690
+msgid "Waiting: %s s"
+msgstr "Attente : %s s"
 
 #: guidata\widgets\about.py:123
 msgid "Project website"

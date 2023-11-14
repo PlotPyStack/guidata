@@ -17,6 +17,7 @@ import os
 from uuid import uuid1
 
 import numpy as np
+
 from guidata.dataset.io.base import BaseIOHandler, WriterMixin
 
 
@@ -234,9 +235,8 @@ class JSONReader(JSONHandler):
                         break
                 with self.group(name):
                     group = self.get_parent_group()
-                    if name not in group:
-                        # This is an attribute (not a group), meaning that
-                        # the object was None when deserializing it
+                    if group[name] is None:
+                        # The object was None when deserializing it
                         obj = None
                     else:
                         obj = klass()

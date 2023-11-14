@@ -11,7 +11,7 @@ Version 2,Version 3
 ``.hdf5io.HDF5Reader``,``.dataset.io.HDF5Reader``
 ``.hdf5io.HDF5Writer``,``.dataset.io.HDF5Writer``
 ``.gettext_helpers``,``.utils.gettext_helpers``
-``.disthelpers``,``.utils.disthelpers``
+``.disthelpers``,*removed*
 ``.encoding``,``.utils.encoding``
 ``.encoding.transcode``,*removed*
 ``.encoding.getfilesystemencoding``,*removed*

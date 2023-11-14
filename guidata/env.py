@@ -15,6 +15,7 @@ import sys
 from typing import Any
 
 DEBUG = os.environ.get("DEBUG", "").lower() in ("1", "true")
+PARSE = os.environ.get("GUIDATA_PARSE_ARGS", "").lower() in ("1", "true")
 
 
 class VerbosityLevels(enum.Enum):
@@ -38,7 +39,8 @@ class ExecEnv:
     DELAY_ENV = "GUIDATA_DELAY_BEFORE_QUIT"
 
     def __init__(self):
-        self.parse_args()
+        if PARSE:
+            self.parse_args()
 
     def to_dict(self):
         """Return a dictionary representation of the object"""
