@@ -13,6 +13,7 @@
 * Disabled command line argument parsing in `guidata.env` module:
   * The `guidata` library is parsing command line arguments for the purpose of creating the environment execution object named `execenv` (see `guidata.env` module). This object is used to determine the execution environment mainly for testing purposes: for example, to bypass the Qt event loop when running tests thanks to the `--unattended` command line option.
   * However this argument parsing is not always desirable, for example when using `guidata` as a dependency in another library or application. This is why the parsing mechanism is now disabled by default, and may be enabled by setting the environment variable `GUIDATA_PARSE_ARGS` to `1` (or any other non-empty value). As of today, it is still unclear if there will be a need to enable this mechanism in the future, so this is why the environment variable is used instead of a function argument.
+* Removed deprecated `guidata.disthelpers` module (we recommend using [PyInstaller](https://www.pyinstaller.org/) instead)
 
 ## Version 3.1.1 ##
 
