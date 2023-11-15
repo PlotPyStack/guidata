@@ -9,20 +9,16 @@ REM (see PythonQwt LICENSE file for more details)
 REM ======================================================
 call %~dp0utils GetScriptPath SCRIPTPATH
 call %FUNC% GetLibName LIBNAME
+call %FUNC% GetModName MODNAME
 cd %SCRIPTPATH%\..\
 
 @REM Removing files/directories related to Python/doc build process
 if exist %LIBNAME%.egg-info ( rmdir /s /q %LIBNAME%.egg-info )
-if exist %LIBNAME%\%LIBNAME%.chm ( del /q %LIBNAME%\%LIBNAME%.chm )
+if exist %MODNAME%.egg-info ( rmdir /s /q %MODNAME%.egg-info )
 if exist MANIFEST ( del /q MANIFEST )
 if exist build ( rmdir /s /q build )
 if exist dist ( rmdir /s /q dist )
 if exist doc\_build ( rmdir /s /q doc\_build )
-
-@REM Removing files produced by tests
-del *.h5
-del *.json
-del *.pickle
 
 @REM Removing cache files/directories related to Python execution
 del /s /q *.pyc 1>nul 2>&1
