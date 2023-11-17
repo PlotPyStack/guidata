@@ -15,6 +15,7 @@ pytest-xvfb
 python-docs-theme
 requests
 sphinx
+myst_parser
 sphinx-copybutton
 sphinx_qt_documentation
 tomli

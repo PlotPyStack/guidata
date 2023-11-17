@@ -41,5 +41,6 @@ Table of contents
    widgets
    dev/index
    reference/index
+   changelog
 
 * :ref:`genindex`

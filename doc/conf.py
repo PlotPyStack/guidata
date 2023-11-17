@@ -15,6 +15,7 @@ release = guidata.__version__
 
 extensions = [
     "sphinx.ext.autodoc",
+    "myst_parser",
     "sphinx.ext.intersphinx",
     "sphinx.ext.doctest",
     "sphinx_copybutton",

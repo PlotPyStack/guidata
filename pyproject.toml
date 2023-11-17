@@ -49,6 +49,7 @@ doc = [
     "pillow",
     "pandas",
     "sphinx>6",
+    "myst_parser",
     "sphinx-copybutton",
     "sphinx_qt_documentation",
     "python-docs-theme",

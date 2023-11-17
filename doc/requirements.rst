@@ -72,6 +72,9 @@ Optional modules for building the documentation:
     * - sphinx
       - >6
       - Python documentation generator
+    * - myst_parser
+      - 
+      - An extended [CommonMark](https://spec.commonmark.org/) compliant parser,
     * - sphinx-copybutton
       - 
       - Add a copy button to each of your code cells.
