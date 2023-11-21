@@ -104,11 +104,12 @@ class Parameters(gds.DataSet):
             [
                 ("rect", "first choice", "gif.png"),
                 ("ell", "second choice", "txt.png"),
-                ("qcq", "third choice", "file.png"),
+                ("qcq", "third choice", "html.png"),
             ],
         )
         .set_pos(col=1)
         .set_prop("display", icon="file.png")
+        .set_prop("display", size=(32, 32))
     )
     mchoice3 = gds.MultipleChoiceItem(
         "MC type 3", [str(i) for i in range(10)]

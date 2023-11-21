@@ -737,6 +737,7 @@ class ChoiceItem(DataItem):
         check: if False, value is not checked (optional, default=True)
         radio: if True, shows radio buttons instead of a combo box
          (default is False)
+        size: size (optional) of the combo box or button widget (for radio buttons)
     """
 
     def __init__(
@@ -747,6 +748,7 @@ class ChoiceItem(DataItem):
         help: str = "",
         check: bool = True,
         radio: bool = False,
+        size: tuple[int, int] | None = None,
     ) -> None:
         _choices_data: Any
         if isinstance(choices, Callable):
@@ -762,6 +764,7 @@ class ChoiceItem(DataItem):
         super().__init__(label, default=default, help=help, check=check)
         self.set_prop("data", choices=_choices_data)
         self.set_prop("display", radio=radio)
+        self.set_prop("display", size=size)
 
     def _normalize_choice(
         self, idx: int, choice_tuple: tuple[Any, ...]
@@ -1011,6 +1014,7 @@ class ButtonItem(DataItem):
         default: default value passed to the callback (optional)
         help: text shown in button's tooltip (optional)
         check: if False, value is not checked (optional, default=True)
+        size: size (optional) of the button widget
 
     The value of this item is unspecified but is passed to the callback along
     with the whole dataset. The value is assigned the callback`s return value.
@@ -1024,10 +1028,12 @@ class ButtonItem(DataItem):
         default: Any | None = None,
         help: str = "",
         check: bool = True,
+        size: tuple[int, int] | None = None,
     ) -> None:
         super().__init__(label, default=default, help=help, check=check)
         self.set_prop("display", callback=callback)
         self.set_prop("display", icon=icon)
+        self.set_prop("display", size=size)
 
     def serialize(
         self,

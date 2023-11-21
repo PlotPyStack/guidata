@@ -27,7 +27,7 @@ from typing import TYPE_CHECKING, Any, Protocol
 
 import numpy
 from qtpy.compat import getexistingdirectory
-from qtpy.QtCore import Qt
+from qtpy.QtCore import QSize, Qt
 from qtpy.QtGui import QColor, QIcon, QPixmap
 from qtpy.QtWidgets import (
     QAbstractButton,
@@ -899,6 +899,7 @@ class ChoiceWidget(AbstractDataSetWidget):
         super().__init__(item, parent_layout)
         self._first_call = True
         self.is_radio = item.get_prop_value("display", "radio")
+        self.image_size = item.get_prop_value("display", "size", None)
         self.store = self.item.get_prop("display", "store", None)
         if self.is_radio:
             self.group = QGroupBox()
@@ -908,6 +909,9 @@ class ChoiceWidget(AbstractDataSetWidget):
             self._buttons: list[QAbstractButton] = []
         else:
             self.combobox = self.group = QComboBox()
+            if self.image_size is not None:
+                width, height = self.image_size
+                self.combobox.setIconSize(QSize(width, height))
             self.combobox.setToolTip(item.get_help())
             self.combobox.currentIndexChanged.connect(self.index_changed)  # type:ignore
 
@@ -933,6 +937,9 @@ class ChoiceWidget(AbstractDataSetWidget):
         for key, lbl, img in _choices:
             if self.is_radio:
                 button = QRadioButton(lbl, self.group)
+                if self.image_size is not None:
+                    width, height = self.image_size
+                    button.setIconSize(QSize(width, height))
             if img:
                 if isinstance(img, str):
                     if not osp.isfile(img):
@@ -1228,6 +1235,10 @@ class ButtonWidget(AbstractDataSetWidget):
         _label = self.item.get_prop_value("display", "label")
         self.button = self.group = QPushButton(_label)
         self.button.setToolTip(item.get_help())
+        image_size = item.get_prop_value("display", "size", None)
+        if image_size is not None:
+            width, height = image_size
+            self.button.setIconSize(QSize(width, height))
         _icon = self.item.get_prop_value("display", "icon")
         if _icon is not None:
             if isinstance(_icon, str):

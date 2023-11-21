@@ -1,5 +1,15 @@
 # Changelog #
 
+## Version 3.3.0 ##
+
+🛠️ Bug fixes:
+
+* Tests only: `qthelpers.close_widgets_and_quit` now ignores deleted widgets
+
+💥 Changes:
+
+* `dataset.ImageChoiceItem` and `dataset.ButtonItem`: added `size` argument to set the icon size
+
 ## Version 3.2.0 ##
 
 🛠️ Bug fixes:
