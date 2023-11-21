@@ -448,7 +448,11 @@ def close_widgets_and_quit(screenshot: bool = False) -> None:
         screenshot (bool): If True, save a screenshot of each widget
     """
     for widget in QW.QApplication.instance().topLevelWidgets():
-        wname = widget.objectName()
+        try:
+            wname = widget.objectName()
+        except RuntimeError:
+            # Widget has been deleted
+            continue
         if screenshot and wname and widget.isVisible():  # pragma: no cover
             grab_save_window(widget, wname.lower())
         assert widget.close()
