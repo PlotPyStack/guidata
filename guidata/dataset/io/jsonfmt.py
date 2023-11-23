@@ -143,7 +143,7 @@ class JSONWriter(JSONHandler, WriterMixin):
 
     write_sequence = (
         write_dict
-    ) = write_bool = write_int = write_float = write_array = write_any
+    ) = write_str = write_bool = write_int = write_float = write_array = write_any
 
     def write_object_list(self, seq, group_name):
         """Write object sequence in group.

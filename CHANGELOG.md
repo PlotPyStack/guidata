@@ -9,7 +9,7 @@
 💥 Changes:
 
 * `dataset.ImageChoiceItem` and `dataset.ButtonItem`: added `size` argument to set the icon size
-* `dataset.io` reader and writer classes: removed unused `write_str` and `write_unicode` methods
+* `dataset.io` reader and writer classes: removed deprecated `write_unicode` method
 
 ## Version 3.2.0 ##
 

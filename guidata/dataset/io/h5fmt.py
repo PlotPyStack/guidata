@@ -506,7 +506,7 @@ class HDF5Writer(HDF5Handler, WriterMixin):
         group = self.get_parent_group()
         group.attrs[self.option[-1]] = val
 
-    write_list = write_int = write_float = write_any
+    write_str = write_list = write_int = write_float = write_any
 
     def write_bool(self, val: bool) -> None:
         """
@@ -516,7 +516,6 @@ class HDF5Writer(HDF5Handler, WriterMixin):
             val (bool): The boolean value to write.
         """
         self.write_int(int(val))
-
 
     def write_array(self, val: np.ndarray) -> None:
         """

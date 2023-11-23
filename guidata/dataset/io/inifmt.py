@@ -110,7 +110,7 @@ class INIWriter(INIHandler, WriterMixin):
     # alias to write_any
     write_bool = (
         write_int
-    ) = write_float = write_array = write_sequence = write_dict = write_any
+    ) = write_str = write_float = write_array = write_sequence = write_dict = write_any
 
     def write_none(self) -> None:
         """
