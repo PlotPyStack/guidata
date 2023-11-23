@@ -1,6 +1,6 @@
 # Changelog #
 
-## Version 3.3.0 ##
+## Version 3.2.1 ##
 
 🛠️ Bug fixes:
 
