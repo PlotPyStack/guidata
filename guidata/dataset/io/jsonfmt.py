@@ -141,11 +141,9 @@ class JSONWriter(JSONHandler, WriterMixin):
         """Write None"""
         self.write_any(None)
 
-    write_str = (
-        write_sequence
-    ) = (
+    write_sequence = (
         write_dict
-    ) = write_unicode = write_bool = write_int = write_float = write_array = write_any
+    ) = write_bool = write_int = write_float = write_array = write_any
 
     def write_object_list(self, seq, group_name):
         """Write object sequence in group.

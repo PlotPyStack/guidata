@@ -517,19 +517,6 @@ class HDF5Writer(HDF5Handler, WriterMixin):
         """
         self.write_int(int(val))
 
-    write_str = write_any
-
-    def write_unicode(self, val: str) -> None:
-        """
-        Write the Unicode string value to the HDF5 file as an attribute.
-
-        Args:
-            val (str): The Unicode string value to write.
-        """
-        group = self.get_parent_group()
-        group.attrs[self.option[-1]] = val.encode("utf-8")
-
-    write_unicode = write_str
 
     def write_array(self, val: np.ndarray) -> None:
         """

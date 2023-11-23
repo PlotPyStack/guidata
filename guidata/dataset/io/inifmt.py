@@ -107,25 +107,10 @@ class INIWriter(INIHandler, WriterMixin):
         self.conf.set(self.section, option, val)
 
     # Make write_bool, write_int, write_float, write_array, write_sequence,
-    # and write_str alias to write_any
+    # alias to write_any
     write_bool = (
         write_int
-    ) = write_float = write_array = write_sequence = write_dict = write_str = write_any
-
-    def write_unicode(self, val: str) -> None:
-        """
-        Write a unicode string into the configuration.
-
-        This method encodes the unicode string as utf-8 and then writes it
-        into the configuration.
-
-        Args:
-            val (str): The unicode string to be written.
-        """
-        self.write_any(val.encode("utf-8"))
-
-    # Make write_unicode alias to write_str
-    write_unicode = write_str
+    ) = write_float = write_array = write_sequence = write_dict = write_any
 
     def write_none(self) -> None:
         """

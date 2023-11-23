@@ -153,8 +153,6 @@ class WriterMixin:
         elif isinstance(val, float):
             self.write_float(val)
         elif isinstance(val, str):
-            self.write_unicode(val)
-        elif isinstance(val, str):
             self.write_any(val)
         elif isinstance(val, np.ndarray):
             self.write_array(val)
