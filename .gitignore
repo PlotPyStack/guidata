@@ -5,12 +5,15 @@ Thumbs.db
 doctmp/
 *.h5
 *.stats
-.venv
 test.json
 doc/install_requires.txt
 doc/extras_require-dev.txt
 doc/extras_require-doc.txt
 *.bak
+
+# Visual Studio Code
+.env
+.venv
 
 # Created by https://www.gitignore.io/api/python
 
