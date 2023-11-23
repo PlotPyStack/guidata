@@ -1031,7 +1031,7 @@ class MultipleChoiceWidget(AbstractDataSetWidget):
         nx, ny = item.get_prop_value("display", "shape")
         cx, cy = 0, 0
         _choices = item.get_prop_value("data", "choices")
-        for _, choice, _img in _choices:
+        for _k, choice, _img in _choices:
             checkbox = QCheckBox(choice)
             checkbox.stateChanged.connect(lambda: self.notify_value_change())
             layout.addWidget(checkbox, cx, cy)

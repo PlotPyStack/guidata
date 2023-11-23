@@ -482,7 +482,7 @@ class DataSetEditLayout:
             self.change_callback()
 
 
-from guidata.dataset.dataitems import (
+from guidata.dataset.dataitems import (  # noqa: E402
     BoolItem,
     ButtonItem,
     ChoiceItem,
@@ -504,7 +504,7 @@ from guidata.dataset.dataitems import (
 )
 
 # Enregistrement des correspondances avec les widgets
-from guidata.dataset.qtitemwidgets import (
+from guidata.dataset.qtitemwidgets import (  # noqa: E402
     AbstractDataSetWidget,
     ButtonWidget,
     CheckBoxWidget,
@@ -827,7 +827,7 @@ class DataSetEditGroupBox(DataSetShowGroupBox):
         """Method called when any widget's value has changed"""
         self.set_apply_button_state(True)
 
-    def set(self, check:bool=True) -> None:
+    def set(self, check: bool = True) -> None:
         """Update data item values from layout contents
 
         Args:

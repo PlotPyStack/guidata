@@ -3,6 +3,8 @@
 # Licensed under the terms of the BSD 3-Clause
 # (see guidata/LICENSE for details)
 
+# flake8: noqa
+
 from .conv import (
     create_dataset_from_dict,
     create_dataset_from_func,

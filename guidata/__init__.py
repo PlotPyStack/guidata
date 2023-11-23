@@ -16,7 +16,7 @@ __version__ = "3.3.0"
 DATAPATH = LOCALEPATH = ""
 
 
-import guidata.config
+import guidata.config  # noqa: E402, F401
 
 
 def qapplication():
