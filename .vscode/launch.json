@@ -5,6 +5,19 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Run Test Launcher",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/guidata/tests/__init__.py",
+            "console": "integratedTerminal",
+            "envFile": "${workspaceFolder}/.env",
+            "python": "${config:python.defaultInterpreterPath}",
+            "justMyCode": true,
+            "env": {
+                "QT_COLOR_MODE": "light",
+            }
+        },
+        {
             "name": "Run current file",
             "type": "python",
             "request": "launch",
@@ -15,6 +28,22 @@
             "justMyCode": false,
             "args": [],
             "env": {}
+        },
+        {
+            "name": "Run current file (unattended)",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "envFile": "${workspaceFolder}/.env",
+            "python": "${config:python.defaultInterpreterPath}",
+            "justMyCode": false,
+            "args": [
+                "--unattended"
+            ],
+            "env": {
+                "GUIDATA_PARSE_ARGS": "1",
+            }
         },
     ]
 }
