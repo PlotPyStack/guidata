@@ -1,5 +1,17 @@
 # Changelog #
 
+## Version 3.2.3 ##
+
+🛠️ Bug fixes:
+
+* Qt console:
+  * Fixed `RuntimeError: wrapped C/C++ object of type DockableConsole has been deleted`
+    when closing the console widget (parent widget, e.g. a `QMainWindow`, was deleted)
+    while an output stream is still writing to the console (e.g. a `logging` handler
+    which will flush the output stream when closing the application)
+  * This concerns all console-related widgets: `DockableConsole`, `Console`,
+    `InternalShell`, `PythonShellWidget` and `ShellBaseWidget`
+
 ## Version 3.2.2 ##
 
 🛠️ Bug fixes:

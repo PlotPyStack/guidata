@@ -608,23 +608,29 @@ class ShellBaseWidget(ConsoleBaseWidget, SaveHistoryMixin, BrowseHistoryMixin):
 
     def flush(self, error=False, prompt=False):
         """Flush buffer, write text to console"""
-        # Fix for Issue 2452
-
+        # Fix for Spyder Issue #2452
         try:
             text = "".join(self.__buffer)
         except TypeError:
             text = b"".join(self.__buffer)
             try:
                 text = text.decode(locale.getpreferredencoding())
-            except:
+            except UnicodeDecodeError:
                 pass
-
         self.__buffer = []
-        self.insert_text(text, at_end=True, error=error, prompt=prompt)
-        QCoreApplication.processEvents()
-        self.repaint()
-        # Clear input buffer:
-        self.new_input_line = True
+        try:
+            self.insert_text(text, at_end=True, error=error, prompt=prompt)
+            QCoreApplication.processEvents()
+            self.repaint()
+            # Clear input buffer:
+            self.new_input_line = True
+        except RuntimeError:
+            # RuntimeError: wrapped C/C++ object of type QTextCursor has been deleted
+            #
+            # (This happens when the shell is closed while a thread is writing.
+            # For example, when closing host application with an active logging
+            # connected to the shell)
+            pass
 
     # ------ Text Insertion
     def insert_text(self, text, at_end=False, error=False, prompt=False):
