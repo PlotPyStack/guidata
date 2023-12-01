@@ -43,7 +43,7 @@ import sys
 from collections.abc import Callable
 from typing import TYPE_CHECKING
 
-from guidata.utils.misc import decode_fs_string, get_module_path
+from guidata.utils.misc import decode_fs_string, get_module_path, get_system_lang
 
 if TYPE_CHECKING:  # pragma: no cover
     from qtpy import QtCore as QC
@@ -93,9 +93,7 @@ def get_translation(modname: str, dirname: str | None = None) -> Callable[[str],
         dirname = modname
     # fixup environment var LANG in case it's unknown
     if "LANG" not in os.environ:
-        import locale  # Warning: 2to3 false alarm ('import' fixer)
-
-        lang = locale.getlocale()[0]
+        lang = get_system_lang()
         if lang is not None:
             os.environ["LANG"] = lang
     try:
@@ -458,4 +456,5 @@ def get_brush(
     color = QG.QColor(color)
     alpha = conf.get(section, option + "/alphaF", alpha)
     color.setAlphaF(alpha)
+    return QG.QBrush(color)
     return QG.QBrush(color)

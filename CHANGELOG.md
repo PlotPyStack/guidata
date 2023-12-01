@@ -1,5 +1,17 @@
 # Changelog #
 
+## Version 3.2.2 ##
+
+🛠️ Bug fixes:
+
+* Fixed translation support (`gettext`):
+  * Locale detection has been fixed in 3.1.1 (deprecation of `locale.getdefaultlocale`)
+  * However, on frozen distributions on Windows (e.g. with `pyinstaller`), function
+    `locale.getlocale` is returning `(None, None)` instead of proper locale infos
+  * Added a workaround: on Windows, if locale can't be detected, we now use the
+    Windows API to retrieve it (using the `GetUserDefaultLocaleName` function)
+  * [Issue #68](https://github.com/PlotPyStack/guidata/issues/68) - Windows: gettext translation is not working on frozen applications
+
 ## Version 3.2.1 ##
 
 🛠️ Bug fixes:

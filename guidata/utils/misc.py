@@ -29,7 +29,8 @@ Strings
 from __future__ import annotations
 
 import collections.abc
-import locale  # Warning: 2to3 false alarm ('import' fixer)
+import ctypes
+import locale
 import os
 import os.path as osp
 import subprocess
@@ -40,7 +41,7 @@ from typing import Any, Type
 from guidata.userconfig import get_home_dir
 
 # ==============================================================================
-# Strings
+# Strings, Locale
 # ==============================================================================
 
 
@@ -77,6 +78,31 @@ def decode_fs_string(string: str) -> str:
     if charset is None:
         charset = locale.getpreferredencoding()
     return string.decode(charset)
+
+
+def get_system_lang() -> str | None:
+    """
+    Retrieves the system language name.
+
+    This function uses `locale.getlocale()` to obtain the locale name based on
+    the current user's settings. If that fails on Windows (e.g. for frozen
+    applications), it uses the Win32 API function `GetUserDefaultLocaleName`
+    to obtain the locale name.
+
+    Returns:
+        The locale name in a format like 'en_US', or None if the function fails
+        to retrieve the locale name.
+    """
+    lang = locale.getlocale()[0]
+    if lang is None and os.name == "nt":
+        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        GetUserDefaultLocaleName = kernel32.GetUserDefaultLocaleName
+        GetUserDefaultLocaleName.argtypes = [ctypes.c_wchar_p, ctypes.c_int]
+        GetUserDefaultLocaleName.restype = ctypes.c_int
+        locale_name = ctypes.create_unicode_buffer(85)
+        if GetUserDefaultLocaleName(locale_name, 85):
+            lang = locale_name.value.replace("-", "_")
+    return lang
 
 
 # ==============================================================================
@@ -354,4 +380,5 @@ def convert_date_format(format_string: str) -> str:
             qt_format += format_string[i]
             i += 1
 
+    return qt_format
     return qt_format
