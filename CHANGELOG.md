@@ -11,6 +11,9 @@
   * Added a workaround: on Windows, if locale can't be detected, we now use the
     Windows API to retrieve it (using the `GetUserDefaultLocaleName` function)
   * [Issue #68](https://github.com/PlotPyStack/guidata/issues/68) - Windows: gettext translation is not working on frozen applications
+* Embedded Qt console:
+  * Fixed default encoding detection on frozen applications on Windows
+  * [Issue #69](https://github.com/PlotPyStack/guidata/issues/69) - Windows/Qt console: output encoding is not detected on frozen applications
 
 ## Version 3.2.1 ##
 

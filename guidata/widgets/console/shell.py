@@ -615,7 +615,7 @@ class ShellBaseWidget(ConsoleBaseWidget, SaveHistoryMixin, BrowseHistoryMixin):
         except TypeError:
             text = b"".join(self.__buffer)
             try:
-                text = text.decode(locale.getlocale()[1])
+                text = text.decode(locale.getpreferredencoding())
             except:
                 pass
 
