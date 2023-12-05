@@ -20,7 +20,11 @@ This package provides a NumPy Array Editor Dialog based on Qt.
 # pylint: disable=R0201
 
 
+import copy
 import io
+from multiprocessing import Value
+from re import S
+from typing import Any, Callable, NewType, TypeVar
 
 import numpy as np
 from qtpy.QtCore import (
@@ -29,7 +33,9 @@ from qtpy.QtCore import (
     QItemSelectionRange,
     QLocale,
     QModelIndex,
+    QPoint,
     Qt,
+    Signal,
     Slot,
 )
 from qtpy.QtGui import QColor, QCursor, QDoubleValidator, QKeySequence
@@ -140,91 +146,267 @@ def get_idx_rect(index_list):
     return (min(rows), max(rows), min(cols), max(cols))
 
 
+class ArrayHandler:
+    __slots__ = (
+        "_variable_size",
+        "_backup_array",
+        "_array",
+        "_dtype",
+        "is_masked_array",
+        "current_changes",
+        "current_mask_changes",
+        "is_record_array",
+    )
+
+    # TArray = NewType("TArray", np.ndarray)
+    # TMaskedArray = NewType("TArray", np.ma.MaskedArray)
+
+    def __init__(
+        self,
+        array: np.ndarray | np.ma.MaskedArray,
+        variable_size: bool = False,
+    ) -> None:
+        self._variable_size = variable_size
+        self._init_arrays(array)
+
+        self._dtype = array.dtype
+        self.is_masked_array = isinstance(array, np.ma.MaskedArray)
+        self.is_record_array = array.dtype is not None
+        self.current_mask_changes: dict[tuple[int, ...], Any] = {}
+        self.current_changes: dict[tuple[str | int, ...] | str, bool] = {}
+
+    def _init_arrays(self, array: np.ndarray | np.ma.masked_array):
+        if self._variable_size:
+            self._backup_array = array
+            self._array = copy.deepcopy(array)
+        else:
+            self._array = array
+        if self._array.ndim == 1:
+            self._array = self._array.reshape(-1, 1)
+
+    @property
+    def ndim(self) -> int:
+        return self._array.ndim
+
+    @property
+    def flags(self):
+        return self._array.flags
+
+    @property
+    def shape(self):
+        return self._array.shape
+
+    @property
+    def dtype(self):
+        return self._dtype
+
+    @property
+    def row_count(self) -> int:
+        return self._array.shape[0]
+
+    @property
+    def col_count(self) -> int:
+        try:
+            return self._array.shape[1]
+        except IndexError:
+            return 0
+
+    @property
+    def data(self):
+        return self._array.data
+
+    @property
+    def mask(self):
+        if self.is_masked_array:
+            # We check the array type in __init__
+            return self._array.mask  # type: ignore
+
+    def insert_on_axis(self, index: int, axis: int, default: Any = 0):
+        new_array = np.insert(self._array, index, default, axis=axis)
+        if self.is_masked_array:
+            # The check is performed at init and array type cannot change
+            new_mask = self._array.mask  # type: ignore
+            new_mask = np.insert(new_mask, index, False, axis=axis)
+            new_array.mask = new_mask  # type: ignore
+        self._array = new_array
+        print(self._array)
+
+    def delete_on_axis(self, index: int, axis: int):
+        new_array = np.delete(self._array, index, axis=axis)
+        if self.is_masked_array:
+            # The check is performed at init and array type cannot change
+            new_mask = self._array.mask  # type: ignore
+            new_mask = np.delete(new_mask, index, axis=axis)
+            new_array.mask = new_mask  # type: ignore
+        self._array = new_array
+
+    def apply_changes(self):
+        for coor, value in self.current_changes.items():
+            self._array[coor] = value
+        self.current_changes.clear()
+        if self.is_masked_array:
+            for coor, value in self.current_mask_changes.items():
+                self._array.mask[coor] = value
+
+    def get_array(self) -> np.ndarray:
+        return self._array
+
+    def new_row(self, index: int, default: Any):
+        self.insert_on_axis(index, 0, default)
+
+    def new_col(self, index: int, default: Any):
+        self.insert_on_axis(index, 1, default)
+
+    def __setitem__(self, key: tuple[int, ...] | str, item: Any):
+        if self._variable_size:
+            self._array[key] = item
+            return
+        self.current_changes[key] = item
+
+    def __getitem__(self, key: tuple[int, ...] | str) -> Any:
+        if not self._variable_size:
+            return self.current_changes.get(key, self._array[key])
+        return self._array[key]
+
+    def set_mask_value(self, key: tuple[int, ...], value: bool):
+        if self.is_masked_array:
+            if not self._variable_size:
+                self.current_mask_changes[key] = value
+            else:
+                self._array.mask[key] = value
+
+    def get_mask_value(self, key: tuple[int, ...]) -> bool:
+        if self.is_masked_array:
+            if not self._variable_size:
+                return self.current_mask_changes.get(key, self._array.mask[key])
+            return self._array.mask[key]
+        raise TypeError("Array is not a MaskedArray")
+
+    def get_data_value(self, key: tuple[int, ...]):
+        if not self._variable_size:
+            return self.current_changes.get(key, self._array.data[key])
+        return self._array.data[key]
+
+    def get_record_value(self, name: str, key: tuple[int, ...]):
+        if self.is_record_array:
+            if not self._variable_size:
+                return self.current_changes.get((name, *key), self._array[name][key])
+            return self._array[name][key]
+        raise TypeError("Array is not a Record array (no dtype.names)")
+
+    def set_record_value(self, name: str, key: tuple[int, ...], value: Any):
+        if self.is_record_array:
+            if not self._variable_size:
+                self.current_changes[(name, *key)] = value
+            else:
+                self._array[name][key] = value
+
+    def cancel_changes(self):
+        if not self._variable_size:
+            self.current_changes.clear()
+            self.current_mask_changes.clear()
+        else:
+            self._init_arrays(self._backup_array)
+
+
 # ==============================================================================
 # Main classes
-# ==============================================================================
 class ArrayModel(QAbstractTableModel):
+    # ==============================================================================
     """Array Editor Table Model"""
 
     ROWS_TO_LOAD = 500
     COLS_TO_LOAD = 40
 
+    sizeChanged = Signal()
+
+    __slots__ = (
+        "dialog",
+        "xlabels",
+        "ylabels",
+        "readonly",
+        "inplace_changes",
+        "test_array",
+        "rows_loaded",
+        "cols_loaded",
+        "color_func",
+        "color_func",
+        "huerange",
+        "sat",
+        "val",
+        "alp",
+        "_data",
+        "_format",
+        "bgcolor_enabled",
+        "_arr_subtype_getter",
+        "dtype_name",
+    )
+
+    array_subtype_getters = {
+        None: lambda handler: handler,
+        "normal": lambda handler: handler,
+        "masked": lambda handler: handler,
+        "data": lambda handler: handler.data,
+        "mask": lambda handler: handler.mask,
+        # case with "record" is handled with the .get in __init__
+    }
+
     def __init__(
         self,
-        data,
+        array_handler: ArrayHandler,
         format="%.6g",
         xlabels=None,
         ylabels=None,
         readonly=False,
         parent=None,
+        inplace_changes=False,
+        array_subtype: str | None = None,
+        dtype_name: str | None = None
+        # array_subtype_getter: Callable[
+        #     [np.ndarray | np.ma.MaskedArray], np.ndarray
+        # ] = lambda arr: arr,
     ):
         QAbstractTableModel.__init__(self)
 
         self.dialog = parent
-        self.changes = {}
         self.xlabels = xlabels
         self.ylabels = ylabels
         self.readonly = readonly
-        self.test_array = np.array([0], dtype=data.dtype)
+        self.inplace_changes = inplace_changes and not readonly
+        self.test_array = np.array([0], dtype=array_handler.dtype)
 
+        self.array_subtype = array_subtype
+        self.dtype_name = dtype_name
+        assert array_subtype in self.array_subtype_getters or array_subtype == "record"
+        self._arr_subtype_getter = self.array_subtype_getters.get(
+            array_subtype, lambda handler: handler[dtype_name]
+        )
+        # self._arr_subtype_getter = array_subtype_getter
         # for complex numbers, shading will be based on absolute value
         # but for all other types it will be the real part
-        if data.dtype in (np.complex64, np.complex128):
+        if array_handler.dtype in (np.complex64, np.complex128):
             self.color_func = np.abs
         else:
             self.color_func = np.real
 
         # Backgroundcolor settings
-        huerange = [0.66, 0.99]  # Hue
+        self.huerange = [0.66, 0.99]  # Hue
         self.sat = 0.7  # Saturation
         self.val = 1.0  # Value
         self.alp = 0.6  # Alpha-channel
 
-        self._data = data
+        self._array_handler = array_handler
         self._format = format
 
-        self.total_rows = self._data.shape[0]
-        self.total_cols = self._data.shape[1]
-        size = self.total_rows * self.total_cols
+        self.rows_loaded = 0
+        self.cols_loaded = 0
 
-        try:
-            self.vmin = np.nanmin(self.color_func(data))
-            self.vmax = np.nanmax(self.color_func(data))
-            if self.vmax == self.vmin:
-                self.vmin -= 1
-            self.hue0 = huerange[0]
-            self.dhue = huerange[1] - huerange[0]
-            self.bgcolor_enabled = True
-        except (TypeError, ValueError):
-            self.vmin = None
-            self.vmax = None
-            self.hue0 = None
-            self.dhue = None
-            self.bgcolor_enabled = False
-
-        # Use paging when the total size, number of rows or number of
-        # columns is too large
-        if size > LARGE_SIZE:
-            self.rows_loaded = self.ROWS_TO_LOAD
-            self.cols_loaded = self.COLS_TO_LOAD
-        else:
-            if self.total_rows > LARGE_NROWS:
-                self.rows_loaded = self.ROWS_TO_LOAD
-            else:
-                self.rows_loaded = self.total_rows
-            if self.total_cols > LARGE_COLS:
-                self.cols_loaded = self.COLS_TO_LOAD
-            else:
-                self.cols_loaded = self.total_cols
+        self.set_row_col_counts()
 
     def get_format(self):
         """Return current format"""
         # Avoid accessing the private attribute _format from outside
         return self._format
-
-    def get_data(self):
-        """Return data"""
-        return self._data
 
     def set_format(self, format):
         """Change display format"""
@@ -291,31 +473,40 @@ class ArrayModel(QAbstractTableModel):
         self.bgcolor_enabled = state > 0
         self.reset()
 
-    def get_value(self, index):
+    def get_value(self, index: tuple[int, ...]):
         """
 
         :param index:
         :return:
         """
-        i = index.row()
-        j = index.column()
-        if len(self._data.shape) == 1:
-            value = self._data[j]
-        else:
-            value = self._data[i, j]
-        return self.changes.get((i, j), value)
 
-    def data(self, index, role=Qt.DisplayRole):
+        if self.array_subtype == "data":
+            return self._array_handler.get_data_value(index)
+        elif self.array_subtype == "mask":
+            return self._array_handler.get_mask_value(index)
+        elif self.array_subtype == "record":
+            return self._array_handler.get_record_value(self.dtype_name, index)
+        return self._array_handler[index]
+
+    def set_value(self, index: tuple[int, ...], value: Any):
+        if self.array_subtype == "mask":
+            self._array_handler.set_mask_value(index, value)
+        elif self.array_subtype == "record":
+            self._array_handler.set_record_value(self.dtype_name, index, value)
+        else:
+            self._array_handler[index] = value
+
+    def data(self, index, role=Qt.ItemDataRole.DisplayRole):
         """Cell content"""
         if not index.isValid():
             return None
-        value = self.get_value(index)
+        value = self.get_value((index.row(), index.column()))
         if isinstance(value, bytes):
             try:
                 value = str(value, "utf8")
-            except:
+            except BaseException:
                 pass
-        if role == Qt.DisplayRole:
+        if role == Qt.ItemDataRole.DisplayRole:
             if value is np.ma.masked:
                 return ""
             else:
@@ -324,10 +515,10 @@ class ArrayModel(QAbstractTableModel):
                 except TypeError:
                     self.readonly = True
                     return repr(value)
-        elif role == Qt.TextAlignmentRole:
-            return int(Qt.AlignCenter | Qt.AlignVCenter)
+        elif role == Qt.ItemDataRole.TextAlignmentRole:
+            return int(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter)
         elif (
-            role == Qt.BackgroundColorRole
+            role == Qt.ItemDataRole.BackgroundColorRole
             and self.bgcolor_enabled
             and value is not np.ma.masked
         ):
@@ -340,17 +531,17 @@ class ArrayModel(QAbstractTableModel):
                 return color
             except TypeError:
                 return None
-        elif role == Qt.FontRole:
+        elif role == Qt.ItemDataRole.FontRole:
             return get_font(CONF, "arrayeditor", "font")
         return None
 
-    def setData(self, index, value, role=Qt.EditRole):
+    def setData(self, index, value, role=Qt.ItemDataRole.EditRole):
         """Cell content change"""
         if not index.isValid() or self.readonly:
             return False
         i = index.row()
         j = index.column()
-        dtype = self._data.dtype.name
+        dtype = self.get_array().dtype.name
         if dtype == "bool":
             try:
                 val = bool(float(value))
@@ -377,10 +568,9 @@ class ArrayModel(QAbstractTableModel):
             QMessageBox.critical(self.dialog, "Error", "Overflow error: %s" % str(e))
             return False
 
-        # Add change to self.changes
-        self.changes[(i, j)] = val
+        self.set_value((i, j), val)
         self.dataChanged.emit(index, index)
-        if not isinstance(val, (str, bytes)):
+        if isinstance(val, (int, float, complex)):
             if val > self.vmax:
                 self.vmax = val
             if val < self.vmin:
@@ -390,23 +580,104 @@ class ArrayModel(QAbstractTableModel):
     def flags(self, index):
         """Set editable flag"""
         if not index.isValid():
-            return Qt.ItemIsEnabled
-        return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable)
+            return Qt.ItemFlag.ItemIsEnabled
+        return Qt.ItemFlags(
+            QAbstractTableModel.flags(self, index) | Qt.ItemFlag.ItemIsEditable
+        )
 
-    def headerData(self, section, orientation, role=Qt.DisplayRole):
+    def headerData(self, section, orientation, role=Qt.ItemDataRole.DisplayRole):
         """Set header data"""
-        if role != Qt.DisplayRole:
+        if role != Qt.ItemDataRole.DisplayRole:
             return None
-        labels = self.xlabels if orientation == Qt.Horizontal else self.ylabels
+        labels = (
+            self.xlabels if orientation == Qt.Orientation.Horizontal else self.ylabels
+        )
         if labels is None:
             return int(section)
         else:
             return labels[section]
 
+    @property
+    def total_rows(self):
+        return self._array_handler.shape[0]
+
+    @property
+    def total_cols(self):
+        return self._array_handler.shape[1]
+
+    def set_row_col_counts(self):
+        size = self.total_rows * self.total_cols
+        try:
+            print("init table dims")
+            self.vmin = np.nanmin(self.color_func(self.get_array()))
+            self.vmax = np.nanmax(self.color_func(self.get_array()))
+            print(f"{self.vmax=}")
+            if self.vmax == self.vmin:
+                self.vmin -= 1
+            self.hue0 = self.huerange[0]
+            self.dhue = self.huerange[1] - self.huerange[0]
+            self.bgcolor_enabled = True
+        except (TypeError, ValueError):
+            self.vmin = None
+            self.vmax = None
+            self.hue0 = None
+            self.dhue = None
+            self.bgcolor_enabled = False
+
+        # Use paging when the total size, number of rows or number of
+        # columns is too large
+        if size > LARGE_SIZE:
+            self.rows_loaded = self.ROWS_TO_LOAD
+            self.cols_loaded = self.COLS_TO_LOAD
+        else:
+            if self.total_rows > LARGE_NROWS:
+                self.rows_loaded = self.ROWS_TO_LOAD
+            else:
+                self.rows_loaded = self.total_rows
+            if self.total_cols > LARGE_COLS:
+                self.cols_loaded = self.COLS_TO_LOAD
+            else:
+                self.cols_loaded = self.total_cols
+
+    @staticmethod
+    def handle_size_changed(model_method: Callable[["ArrayModel", Any], None]):
+        def wrapped_method(self: "ArrayModel", *args, **kwargs):
+            model_method(self, *args, **kwargs)
+            self.fetch_more(True, True)
+            self.sizeChanged.emit()
+
+        return wrapped_method
+
+    @handle_size_changed
+    def insert_column(self, index: int):
+        self._array_handler.insert_on_axis(index, 1)
+
+    @handle_size_changed
+    def insert_row(self, index: int):
+        self._array_handler.insert_on_axis(index, 0)
+
+    @handle_size_changed
+    def remove_column(self, index: int):
+        self._array_handler.delete_on_axis(index, 1)
+
+    @handle_size_changed
+    def remove_row(self, index: int):
+        self._array_handler.delete_on_axis(index, 0)
+
     def reset(self):
         """ """
         self.beginResetModel()
         self.endResetModel()
+
+    def get_array(self):
+        return self._arr_subtype_getter(self._array_handler.get_array())
+
+    def apply_changes(self):
+        print("we passed here")
+        self._array_handler.apply_changes()
+
+    def cancel_changes(self):
+        self._array_handler.cancel_changes()
 
 
 class ArrayDelegate(QItemDelegate):
@@ -418,16 +689,16 @@ class ArrayDelegate(QItemDelegate):
 
     def createEditor(self, parent, option, index):
         """Create editor widget"""
-        model = index.model()
-        value = model.get_value(index)
-        if model._data.dtype.name == "bool":
+        model: ArrayModel = index.model()  # type: ignore
+        value = model.get_value((index.row(), index.column()))
+        if model.get_array().dtype.name == "bool":
             value = not value
             model.setData(index, value)
             return
         elif value is not np.ma.masked:
             editor = QLineEdit(parent)
             editor.setFont(get_font(CONF, "arrayeditor", "font"))
-            editor.setAlignment(Qt.AlignCenter)
+            editor.setAlignment(Qt.AlignmentFlag.AlignCenter)
             if is_number(self.dtype):
                 validator = QDoubleValidator(editor)
                 validator.setLocale(QLocale("C"))
@@ -444,29 +715,31 @@ class ArrayDelegate(QItemDelegate):
             self.commitData.emit(editor)
         except AttributeError:
             pass
-        self.closeEditor.emit(editor, QAbstractItemDelegate.NoHint)
+        self.closeEditor.emit(editor, QAbstractItemDelegate.EndEditHint.NoHint)
 
     def setEditorData(self, editor, index):
         """Set editor widget's data"""
-        text = index.model().data(index, Qt.DisplayRole)
-        editor.setText(text)
+        if (model := index.model()) is not None and editor is not None:
+            text = model.data(index, Qt.ItemDataRole.DisplayRole)
+            editor.setText(text)
 
 
 # TODO: Implement "Paste" (from clipboard) feature
 class ArrayView(QTableView):
     """Array view class"""
 
-    def __init__(self, parent, model, dtype, shape):
+    def __init__(self, parent, model, dtype, shape, variable_size=False):
         QTableView.__init__(self, parent)
+        self.variable_size = variable_size
 
         self.setModel(model)
         self.setItemDelegate(ArrayDelegate(dtype, self))
         total_width = 0
+        self.cell_menu = self.setup_cell_menu()
         for k in range(shape[1]):
             total_width += self.columnWidth(k)
         self.viewport().resize(min(total_width, 1024), self.height())
-        self.shape = shape
-        self.menu = self.setup_menu()
+        self.shape = shape  # TODO Check if variable is used
         QShortcut(QKeySequence(QKeySequence.Copy), self, self.copy)
         self.horizontalScrollBar().valueChanged.connect(
             lambda val: self.load_more_data(val, columns=True)
@@ -474,6 +747,43 @@ class ArrayView(QTableView):
         self.verticalScrollBar().valueChanged.connect(
             lambda val: self.load_more_data(val, rows=True)
         )
+
+        # self.vheader_menu = self.setup_header_menu(0)
+        # vheader = self.verticalHeader()
+        # vheader.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        # vheader.customContextMenuRequested.connect(self.vheader_popup)
+
+        # self.hheader_menu = self.setup_header_menu(1)
+        # hheader = self.horizontalHeader()
+        # hheader.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        # hheader.customContextMenuRequested.connect(self.hheader_popup)
+
+    # def setup_header_menu(self, axis: int):
+    #     """Setup context menu"""
+    #     insert_action = create_action(
+    #         self,
+    #         title=_(f"Insert {axis} before"),
+    #         icon=get_icon("insert.png"),
+    #         triggered=self.insert_row if axis == 0 else self.insert_col,
+    #     )
+    #     menu = QMenu(self)
+    #     add_actions(
+    #         menu,
+    #         (insert_action,),
+    #     )
+    #     return menu
+    def model(self) -> ArrayModel:
+        if isinstance(model := super().model(), ArrayModel):
+            return model
+        raise ValueError(
+            f"No ArrayModel instance returned (returned value was {model})."
+        )
+
+    def vheader_popup(self, point: QPoint):
+        self.vheader_menu.popup(QCursor.pos())
+
+    def hheader_popup(self, point: QPoint):
+        self.hheader_menu.popup(QCursor.pos())
 
     def load_more_data(self, value, rows=False, columns=False):
         """
@@ -523,15 +833,35 @@ class ArrayView(QTableView):
                 new_selection, self.selectionModel().ClearAndSelect
             )
 
+    def insert_row(self):
+        i = self.selectedIndexes()[0].row()
+        print(f"Must insert new row at index {i}")
+        self.model().insert_row(i)
+
+    def insert_col(self):
+        j = self.selectedIndexes()[0].column()
+        print(f"Must insert new col at index {j}")
+        self.model().insert_column(j)
+
+    def remove_row(self):
+        i = self.selectedIndexes()[0].row()
+        print(f"Must remove row at index {i}")
+        self.model().remove_row(i)
+
+    def remove_col(self):
+        j = self.selectedIndexes()[0].column()
+        print(f"Must remove new col at index {j}")
+        self.model().remove_column(j)
+
     def resize_to_contents(self):
         """Resize cells to contents"""
-        QApplication.setOverrideCursor(QCursor(Qt.WaitCursor))
+        QApplication.setOverrideCursor(QCursor(Qt.CursorShape.WaitCursor))
         self.resizeColumnsToContents()
         self.model().fetch_more(columns=True)
         self.resizeColumnsToContents()
         QApplication.restoreOverrideCursor()
 
-    def setup_menu(self):
+    def setup_cell_menu(self):
         """Setup context menu"""
         self.copy_action = create_action(
             self,
@@ -539,7 +869,7 @@ class ArrayView(QTableView):
             shortcut=keybinding("Copy"),
             icon=get_icon("editcopy.png"),
             triggered=self.copy,
-            context=Qt.WidgetShortcut,
+            context=Qt.ShortcutContext.WidgetShortcut,
         )
         about_action = create_action(
             self,
@@ -547,13 +877,55 @@ class ArrayView(QTableView):
             icon=get_icon("guidata.svg"),
             triggered=about.show_about_dialog,
         )
+        if self.variable_size:
+            insert_row_action = create_action(
+                self,
+                title=_("Insert row before"),
+                icon=get_icon("insert.png"),
+                triggered=self.insert_row,
+            )
+            insert_col_action = create_action(
+                self,
+                title=_("Insert column before"),
+                icon=get_icon("insert.png"),
+                triggered=self.insert_col,
+            )
+            remove_row_action = create_action(
+                self,
+                title=_("Remove row"),
+                icon=get_icon("delete.png"),
+                triggered=self.remove_row,
+            )
+            remove_col_action = create_action(
+                self,
+                title=_("Remove column"),
+                icon=get_icon("delete.png"),
+                triggered=self.remove_col,
+            )
+            actions = (
+                self.copy_action,
+                None,
+                insert_row_action,
+                insert_col_action,
+                None,
+                remove_row_action,
+                remove_col_action,
+                None,
+                about_action,
+            )
+        else:
+            actions = (
+                self.copy_action,
+                None,
+                about_action,
+            )
         menu = QMenu(self)
-        add_actions(menu, (self.copy_action, None, about_action))
+        add_actions(menu, actions)
         return menu
 
     def contextMenuEvent(self, event):
         """Reimplement Qt method"""
-        self.menu.popup(event.globalPos())
+        self.cell_menu.popup(event.globalPos())
         event.accept()
 
     def keyPressEvent(self, event):
@@ -567,16 +939,18 @@ class ArrayView(QTableView):
         """Copy an array portion to a unicode string"""
         if not cell_range:
             return
+        model = self.model()
         row_min, row_max, col_min, col_max = get_idx_rect(cell_range)
-        if col_min == 0 and col_max == (self.model().cols_loaded - 1):
+        if col_min == 0 and col_max == (model.cols_loaded - 1):
             # we've selected a whole column. It isn't possible to
             # select only the first part of a column without loading more,
             # so we can treat it as intentional and copy the whole thing
-            col_max = self.model().total_cols - 1
-        if row_min == 0 and row_max == (self.model().rows_loaded - 1):
-            row_max = self.model().total_rows - 1
+            col_max = model.total_cols - 1
+        if row_min == 0 and row_max == (model.rows_loaded - 1):
+            row_max = model.total_rows - 1
 
-        _data = self.model().get_data()
+        model.apply_changes()
+        _data = model.get_array()  # TODO check if this should apply changes or not
         output = io.BytesIO()
 
         try:
@@ -584,9 +958,9 @@ class ArrayView(QTableView):
                 output,
                 _data[row_min : row_max + 1, col_min : col_max + 1],
                 delimiter="\t",
-                fmt=self.model().get_format(),
+                fmt=model.get_format(),
             )
-        except:
+        except BaseException:
             QMessageBox.warning(
                 self,
                 _("Warning"),
@@ -608,30 +982,55 @@ class ArrayView(QTableView):
 class ArrayEditorWidget(QWidget):
     """ """
 
-    def __init__(self, parent, data, readonly=False, xlabels=None, ylabels=None):
+    def __init__(
+        self,
+        parent,
+        data: np.ndarray | ArrayHandler,
+        readonly=False,
+        xlabels=None,
+        ylabels=None,
+        variable_size=False,
+        array_subtype: str | None = None,
+        dtype_name: str | None = None,
+    ):
         QWidget.__init__(self, parent)
-        self.data = data
-        self.old_data_shape = None
-        if len(self.data.shape) == 1:
-            self.old_data_shape = self.data.shape
-            self.data.shape = (self.data.shape[0], 1)
-        elif len(self.data.shape) == 0:
-            self.old_data_shape = self.data.shape
-            self.data.shape = (1, 1)
 
-        format = SUPPORTED_FORMATS.get(data.dtype.name, "%s")
+        self.variable_size = variable_size and not readonly
+        self.data = (
+            ArrayHandler(data, variable_size) if isinstance(data, np.ndarray) else data
+        )
+        self.old_data_shape = None
+        # if len(self.data.shape) == 1:
+        #     self.old_data_shape = self.data.shape
+        #     self.data.shape = (self.data.shape[0], 1)
+        # elif len(self.data.shape) == 0:
+        #     self.old_data_shape = self.data.shape
+        #     self.data.shape = (1, 1)
+
         self.model = ArrayModel(
             self.data,
-            format=format,
             xlabels=xlabels,
             ylabels=ylabels,
             readonly=readonly,
             parent=self,
+            inplace_changes=self.variable_size,
+            array_subtype=array_subtype,
+            dtype_name=dtype_name
+            # array_subtype_getter=array_subtype_getter
+            # custom_getter=custom_getter,
         )
-        self.view = ArrayView(self, self.model, data.dtype, data.shape)
+        format = SUPPORTED_FORMATS.get(self.model.get_array().dtype.name, "%s")
+        self.model.set_format(format)
+        self.view = ArrayView(
+            self,
+            self.model,
+            self.model.get_array().dtype,
+            data.shape,
+            self.variable_size,
+        )
 
         btn_layout = QHBoxLayout()
-        btn_layout.setAlignment(Qt.AlignLeft)
+        btn_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
         btn = QPushButton(_("Format"))
         # disable format button for int type
         btn.setEnabled(is_float(data.dtype))
@@ -653,15 +1052,11 @@ class ArrayEditorWidget(QWidget):
 
     def accept_changes(self):
         """Accept changes"""
-        for (i, j), value in list(self.model.changes.items()):
-            self.data[i, j] = value
-        if self.old_data_shape is not None:
-            self.data.shape = self.old_data_shape
+        self.model.apply_changes()
 
     def reject_changes(self):
         """Reject changes"""
-        if self.old_data_shape is not None:
-            self.data.shape = self.old_data_shape
+        self.model.cancel_changes()
 
     def change_format(self):
         """Change display format"""
@@ -676,7 +1071,7 @@ class ArrayEditorWidget(QWidget):
             format = str(format)
             try:
                 format % 1.1
-            except:
+            except BaseException:
                 QMessageBox.critical(
                     self, _("Error"), _("Format (%s) is incorrect") % format
                 )
@@ -687,6 +1082,23 @@ class ArrayEditorWidget(QWidget):
 class ArrayEditor(QDialog):
     """Array Editor Dialog"""
 
+    __slots__ = (
+        "data",
+        "is_record_array",
+        "is_masked_array",
+        "arraywidget",
+        "arraywidgets",
+        "stack",
+        "layout",
+        "btn_save_and_close",
+        "btn_close",
+        "dim_indexes",
+        "last_dim",
+    )
+    data: ArrayHandler
+    arraywidget: ArrayEditorWidget
+    layout: QGridLayout
+
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
         win32_fix_title_bar_background(self)
@@ -695,12 +1107,11 @@ class ArrayEditor(QDialog):
         # otherwise it may be garbage-collected in another QThread
         # (e.g. the editor's analysis thread in Spyder), thus leading to
         # a segmentation fault on UNIX or an application crash on Windows
-        self.setAttribute(Qt.WA_DeleteOnClose)
+        self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
 
-        self.data = None
-        self.arraywidget = None
-        self.stack = None
-        self.layout = None
+        self.is_record_array = False
+        self.is_masked_array = False
+        self.arraywidgets: list[ArrayEditorWidget] = []
         self.btn_save_and_close = None
         self.btn_close = None
         # Values for 3d array editor
@@ -708,16 +1119,24 @@ class ArrayEditor(QDialog):
         self.last_dim = 0  # Adjust this for changing the startup dimension
 
     def setup_and_check(
-        self, data, title="", readonly=False, xlabels=None, ylabels=None
+        self,
+        data: np.ndarray,
+        title="",
+        readonly=False,
+        xlabels=None,
+        ylabels=None,
+        variable_size=False,
     ):
         """
         Setup ArrayEditor:
         return False if data is not supported, True otherwise
         """
-        self.data = data
-        readonly = readonly or not self.data.flags.writeable
-        is_record_array = data.dtype.names is not None
-        is_masked_array = isinstance(data, np.ma.MaskedArray)
+        readonly = readonly or not data.flags.writeable
+        self.variable_size = variable_size and not readonly
+
+        self.data = ArrayHandler(data, variable_size)
+        self.is_record_array = data.dtype.names is not None
+        self.is_masked_array = isinstance(data, np.ma.MaskedArray)
 
         if data.ndim > 3:
             self.error(_("Arrays with more than 3 dimensions are not " "supported"))
@@ -732,7 +1151,7 @@ class ArrayEditor(QDialog):
                 _("The 'ylabels' argument length do no match array row " "number")
             )
             return False
-        if not is_record_array:
+        if not self.is_record_array:
             dtn = data.dtype.name
             if (
                 dtn not in SUPPORTED_FORMATS
@@ -757,37 +1176,73 @@ class ArrayEditor(QDialog):
 
         # Stack widget
         self.stack = QStackedWidget(self)
-        if is_record_array:
+        if self.is_record_array:
             for name in data.dtype.names:
-                self.stack.addWidget(
-                    ArrayEditorWidget(self, data[name], readonly, xlabels, ylabels)
+                w = ArrayEditorWidget(
+                    self,
+                    self.data,
+                    readonly,
+                    xlabels,
+                    ylabels,
+                    variable_size,
+                    # lambda arr: arr[name],
+                    "record",
+                    name,
                 )
-        elif is_masked_array:
-            self.stack.addWidget(
-                ArrayEditorWidget(self, data, readonly, xlabels, ylabels)
+                self.arraywidgets.append(w)
+                self.stack.addWidget(w)
+        elif self.is_masked_array:
+            w1 = ArrayEditorWidget(
+                self, self.data, readonly, xlabels, ylabels, variable_size, "masked"
             )
-            self.stack.addWidget(
-                ArrayEditorWidget(self, data.data, readonly, xlabels, ylabels)
+            self.arraywidgets.append(w1)
+            self.stack.addWidget(w1)
+
+            w2 = ArrayEditorWidget(
+                self,
+                self.data,
+                readonly,
+                xlabels,
+                ylabels,
+                variable_size,
+                # "data",
+                # lambda arr: arr.data,
+                "data",
             )
-            self.stack.addWidget(
-                ArrayEditorWidget(self, data.mask, readonly, xlabels, ylabels)
+            self.arraywidgets.append(w2)
+            self.stack.addWidget(w2)
+
+            w3 = ArrayEditorWidget(
+                self,
+                self.data,
+                readonly,
+                xlabels,
+                ylabels,
+                variable_size,
+                "mask",
+                # lambda arr: arr.mask,
             )
+            self.arraywidgets.append(w3)
+            self.stack.addWidget(w3)
         elif data.ndim == 3:
             pass
         else:
-            self.stack.addWidget(
-                ArrayEditorWidget(self, data, readonly, xlabels, ylabels)
+            w = ArrayEditorWidget(
+                self, self.data, readonly, xlabels, ylabels, variable_size
             )
+            self.stack.addWidget(w)
         self.arraywidget = self.stack.currentWidget()
         if self.arraywidget:
             self.arraywidget.model.dataChanged.connect(self.save_and_close_enable)
+        for wdg in self.arraywidgets:
+            wdg.model.sizeChanged.connect(self.update_all_tables)
         self.stack.currentChanged.connect(self.current_widget_changed)
         self.layout.addWidget(self.stack, 1, 0)
 
         # Buttons configuration
         btn_layout = QHBoxLayout()
-        if is_record_array or is_masked_array or data.ndim == 3:
-            if is_record_array:
+        if self.is_record_array or self.is_masked_array or data.ndim == 3:
+            if self.is_record_array:
                 btn_layout.addWidget(QLabel(_("Record array fields:")))
                 names = []
                 for name in data.dtype.names:
@@ -828,7 +1283,7 @@ class ArrayEditor(QDialog):
                 ra_combo.currentIndexChanged.connect(self.stack.setCurrentIndex)
                 ra_combo.addItems(names)
                 btn_layout.addWidget(ra_combo)
-            if is_masked_array:
+            if self.is_masked_array:
                 label = QLabel(_("<u>Warning</u>: changes are applied separately"))
                 label.setToolTip(
                     _(
@@ -857,9 +1312,15 @@ class ArrayEditor(QDialog):
         self.setMinimumSize(400, 300)
 
         # Make the dialog act as a window
-        self.setWindowFlags(Qt.Window)
+        self.setWindowFlags(Qt.WindowType.Window)
 
         return True
+
+    def update_all_tables(self):
+        print(f"trying to update widgets in {self.arraywidgets}")
+        for wdg in self.arraywidgets:
+            # qindex = QModelIndex()
+            wdg.model.fetch_more(True, True)
 
     @Slot(QModelIndex, QModelIndex)
     def save_and_close_enable(self, left_top, bottom_right):
@@ -899,7 +1360,11 @@ class ArrayEditor(QDialog):
             stack_index = self.stack.count()
             try:
                 self.stack.addWidget(
-                    ArrayEditorWidget(self, self.data[tuple(slice_index)])
+                    ArrayEditorWidget(
+                        self,
+                        self.data,
+                        array_subtype_getter=lambda arr: arr[tuple(slice_index)],
+                    )
                 )
             except IndexError:  # Handle arrays of size 0 in one axis
                 self.stack.addWidget(ArrayEditorWidget(self, self.data))
@@ -929,15 +1394,15 @@ class ArrayEditor(QDialog):
     @Slot()
     def accept(self):
         """Reimplement Qt method"""
-        for index in range(self.stack.count()):
-            self.stack.widget(index).accept_changes()
+        self.data.apply_changes()
         QDialog.accept(self)
 
     def get_value(self):
-        """Return modified array -- this is *not* a copy"""
+        """Return modified array -- the returned array is a copy if \
+            variable size is True and readonly is False"""
         # It is import to avoid accessing Qt C++ object as it has probably
         # already been destroyed, due to the Qt.WA_DeleteOnClose attribute
-        return self.data
+        return self.data.get_array()
 
     def error(self, message):
         """An error occured, closing the dialog box"""
@@ -948,16 +1413,23 @@ class ArrayEditor(QDialog):
     @Slot()
     def reject(self):
         """Reimplement Qt method"""
-        if self.arraywidget is not None:
-            for index in range(self.stack.count()):
-                self.stack.widget(index).reject_changes()
+        # if self.arraywidget is not None:
+        #     for index in range(self.stack.count()):
+        #         self.stack.widget(index).reject_changes()
+        self.data.cancel_changes()
         QDialog.reject(self)
 
 
 def launch_arrayeditor(data, title="", xlabels=None, ylabels=None):
     """Helper routine to launch an arrayeditor and return its result"""
     dlg = ArrayEditor()
-    assert dlg.setup_and_check(data, title, xlabels=xlabels, ylabels=ylabels)
+    assert dlg.setup_and_check(
+        data,
+        title,
+        xlabels=xlabels,
+        ylabels=ylabels,
+        variable_size=True,
+    )
     dlg.exec()
     # dlg.accept()  # trigger slot connected to OK button
     return dlg.get_value()
@@ -969,5 +1441,12 @@ if __name__ == "__main__":
     app = qapplication()
     from numpy.testing import assert_array_equal
 
-    arr = np.zeros((5, 5), dtype=np.float16)
-    assert_array_equal(arr, launch_arrayeditor(arr, "float16 array"))
+    # arr = np.ones((5, 5), dtype=np.int32)
+    # arr = np.ma.array([[1, 0], [1, 0]], mask=[[True, False], [False, False]])
+    arr = np.array(
+        [(0, 0.0), (0, 0.0), (0, 0.0)],
+        dtype=[(("title 1", "x"), "|i1"), (("title 2", "y"), ">f4")],
+    )
+    print(arr)
+    print("final array", launch_arrayeditor(arr, "Hello"))
+    # assert_array_equal(arr, launch_arrayeditor(arr, "float16 array"))
