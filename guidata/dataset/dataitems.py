@@ -97,7 +97,7 @@ import datetime
 import os
 import re
 from collections.abc import Callable
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Type
 
 from numpy import ndarray
 
@@ -127,7 +127,7 @@ class NumericTypeItem(DataItem):
         check: if False, value is not checked (optional, default=True)
     """
 
-    type: Callable = None
+    type_: Type[int] | Type[float]
 
     def __init__(
         self,
@@ -146,7 +146,7 @@ class NumericTypeItem(DataItem):
 
     def get_auto_help(self, instance: DataSet) -> str:
         """Override DataItem method"""
-        auto_help = {int: _("integer"), float: _("float")}[self.type]
+        auto_help = {int: _("integer"), float: _("float")}[self.type_]
         _min = self.get_prop_value("data", instance, "min")
         _max = self.get_prop_value("data", instance, "max")
         nonzero = self.get_prop_value("data", instance, "nonzero")
@@ -179,7 +179,7 @@ class NumericTypeItem(DataItem):
         """Override DataItem method"""
         if not self.get_prop("data", "check_value", True):
             return True
-        if not isinstance(value, self.type):
+        if not isinstance(value, self.type_):
             return False
         if self.get_prop("data", "nonzero") and value == 0:
             return False
@@ -201,7 +201,7 @@ class NumericTypeItem(DataItem):
             # pylint: disable=broad-except
             try:
                 # pylint: disable=not-callable
-                return self.type(eval(value))
+                return self.type_(eval(value))
             except:  # noqa
                 pass
         return None
@@ -225,7 +225,7 @@ class FloatItem(NumericTypeItem):
         check: if False, value is not checked (optional, default=True)
     """
 
-    type = float
+    type_ = float
 
     def __init__(
         self,
@@ -279,7 +279,7 @@ class IntItem(NumericTypeItem):
         check: if False, value is not checked (optional, default=True)
     """
 
-    type = int
+    type_ = int
 
     def __init__(
         self,
@@ -352,7 +352,7 @@ class StringItem(DataItem):
         check: if False, value is not checked (ineffective for strings)
     """
 
-    type: Any = str
+    type_: Any = str
 
     def __init__(
         self,
@@ -387,7 +387,7 @@ class StringItem(DataItem):
             return False
         regexp = self.get_prop("data", "regexp")
         if regexp is not None:
-            return re.match(regexp, "" if value is None else value)
+            return bool(re.match(regexp, "" if value is None else value))
         return True
 
     def from_string(self, value: str) -> str:
@@ -446,7 +446,7 @@ class BoolItem(DataItem):
         check: if False, value is not checked (optional, default=True)
     """
 
-    type = bool
+    type_ = bool
 
     def __init__(
         self,
@@ -478,7 +478,7 @@ class DateItem(DataItem):
         check: check value (default: True)
     """
 
-    type = datetime.date
+    type_ = datetime.date
 
     def __init__(
         self,
@@ -521,7 +521,7 @@ class ColorItem(StringItem):
         """Override DataItem method"""
         if not self.get_prop("data", "check_value", True):
             return True
-        if not isinstance(value, self.type):
+        if not isinstance(value, self.type_):
             return False
         from qtpy import QtGui as QG
 
@@ -560,12 +560,15 @@ class FileSaveItem(StringItem):
         help: str = "",
         check: bool = True,
     ) -> None:
+        default = os.path.join(*default) if isinstance(default, list) else default
+
         super().__init__(label, default=default, regexp=regexp, help=help, check=check)
         if isinstance(formats, str):
             formats = [formats]  # type:ignore
         self.set_prop("data", formats=formats)
         self.set_prop("data", basedir=basedir)
         self.set_prop("data", all_files_first=all_files_first)
+        self.set_prop("display", func=os.path.basename)
 
     def get_auto_help(self, instance: DataSet) -> str:
         """Override DataItem method"""
@@ -580,7 +583,7 @@ class FileSaveItem(StringItem):
         """Override DataItem method"""
         if not self.get_prop("data", "check_value", True):
             return True
-        if not isinstance(value, self.type):
+        if not isinstance(value, self.type_):
             return False
         return len(value) > 0
 
@@ -615,7 +618,7 @@ class FileOpenItem(FileSaveItem):
         """Override DataItem method"""
         if not self.get_prop("data", "check_value", True):
             return True
-        if not isinstance(value, self.type):
+        if not isinstance(value, self.type_):
             return False
         return os.path.exists(value) and os.path.isfile(value)
 
@@ -633,7 +636,7 @@ class FilesOpenItem(FileSaveItem):
         check: if False, value is not checked (optional, default=True)
     """
 
-    type = list
+    type_ = list
 
     def __init__(
         self,
@@ -657,6 +660,15 @@ class FilesOpenItem(FileSaveItem):
             regexp=regexp,
             help=help,
             check=check,
+        )
+        self.set_prop("display", func=self.paths_basename)
+
+    @staticmethod
+    def paths_basename(paths: str | list[str]):
+        return (
+            [os.path.basename(p) for p in paths]
+            if isinstance(paths, list)
+            else os.path.basename(paths)
         )
 
     def check_value(self, value: str) -> bool:
@@ -709,7 +721,7 @@ class DirectoryItem(StringItem):
         """Override DataItem method"""
         if not self.get_prop("data", "check_value", True):
             return True
-        if not isinstance(value, self.type):
+        if not isinstance(value, self.type_):
             return False
         return os.path.exists(value) and os.path.isdir(value)
 
@@ -744,7 +756,7 @@ class ChoiceItem(DataItem):
         self,
         label: str,
         choices: Any,
-        default: tuple[()] | type[FirstChoice] | int | None = FirstChoice,
+        default: tuple[()] | Type[FirstChoice] | int | None = FirstChoice,
         help: str = "",
         check: bool = True,
         radio: bool = False,

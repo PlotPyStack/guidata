@@ -40,8 +40,16 @@ from collections.abc import Callable
 from typing import TYPE_CHECKING, Any, Type
 
 from qtpy.compat import getopenfilename, getopenfilenames, getsavefilename
-from qtpy.QtCore import QRect, QSize, Qt, Signal
-from qtpy.QtGui import QBrush, QColor, QIcon, QPainter, QPicture
+from qtpy.QtCore import (
+    QAbstractTableModel,
+    QModelIndex,
+    QObject,
+    QRect,
+    QSize,
+    Qt,
+    Signal,
+)
+from qtpy.QtGui import QBrush, QColor, QCursor, QIcon, QPainter, QPicture
 from qtpy.QtWidgets import (
     QAbstractButton,
     QApplication,
@@ -53,13 +61,14 @@ from qtpy.QtWidgets import (
     QMessageBox,
     QPushButton,
     QSpacerItem,
+    QTableView,
     QTabWidget,
     QVBoxLayout,
     QWidget,
 )
 
-from guidata.config import _
-from guidata.configtools import get_icon
+from guidata.config import CONF, _
+from guidata.configtools import get_font, get_icon
 from guidata.dataset.datatypes import (
     BeginGroup,
     DataItem,
@@ -242,7 +251,7 @@ class DataSetGroupEditDialog(DataSetEditDialog):
         """
         from guidata.dataset.datatypes import DataSetGroup
 
-        assert isinstance(instance, DataSetGroup)
+        # assert isinstance(instance, DataSetGroup)
         tabs = QTabWidget()
         #        tabs.setUsesScrollButtons(False)
         self._layout.addWidget(tabs)
@@ -862,3 +871,165 @@ class DataSetEditGroupBox(DataSetShowGroupBox):
         if not app_name:
             app_name = str(self.title())
         return "%s - %s" % (app_name, item.label())
+
+
+class DataSetTableModel(QAbstractTableModel):
+    """DataSet Table Model.
+
+    Args:
+        datasets: list of DataSet object. The Datasets must all contain identical \
+            DataItem(s) (content can vary) so they can be decomposed into table \
+            columns.
+        parent: Parent. Defaults to None.
+    """
+
+    def __init__(self, datasets: list[DataSet], parent: QObject | None = None):
+        super().__init__(parent)
+        self.datasets = datasets
+
+        ref_col_names = self.datasets[0].get_items(copy=False)
+        self._col_names = tuple(item.name for item in ref_col_names)
+        self._col_count = len(self._col_names)
+        self.validate_datasets()
+
+        self._row_names = tuple(dataset.get_title() for dataset in datasets)
+        self._row_count = len(self._row_names)
+
+        self.item_pointers = [dataset.get_items() for dataset in datasets]
+
+    def validate_datasets(self):
+        for dataset in self.datasets:
+            if any(
+                map(
+                    lambda item: item.name not in self._col_names,
+                    dataset.get_items(copy=False),
+                )
+            ):
+                raise ValueError(
+                    "All given DataSet inctances must contain DataItem instances with "
+                    "the same names."
+                )
+
+    def rowCount(self, parent: QObject | None = None):
+        return self._row_count
+
+    def columnCount(self, parent: QObject | None = None):
+        return self._col_count
+
+    def headerData(
+        self,
+        section: int,
+        orientation: Qt.Orientation,
+        role: Qt.ItemDataRole = Qt.ItemDataRole.DisplayRole,
+    ) -> Any:
+        if (
+            orientation == Qt.Orientation.Horizontal
+            and role == Qt.ItemDataRole.DisplayRole
+        ):
+            return self._col_names[section]
+        if (
+            orientation == Qt.Orientation.Vertical
+            and role == Qt.ItemDataRole.DisplayRole
+        ):
+            return self._row_names[section]
+        return super().headerData(section, orientation, role)
+
+    def data(self, index: QModelIndex, role=Qt.ItemDataRole.DisplayRole) -> Any:
+        if role == Qt.ItemDataRole.DisplayRole:
+            item = self.item_pointers[index.row()][index.column()]
+            return item.get_string_value(self.datasets[index.row()])
+        elif role == Qt.ItemDataRole.TextAlignmentRole:
+            return int(Qt.AlignCenter | Qt.AlignVCenter)  # type: ignore
+        elif role == Qt.ItemDataRole.FontRole:
+            return get_font(CONF, "arrayeditor", "font")
+        return None
+
+
+class DatasetTableView(QTableView):
+    """Array view class"""
+
+    def __init__(self, model: DataSetTableModel, parent: QWidget | None = None):
+        QTableView.__init__(self, parent)
+
+        self.setModel(model)
+
+        total_width = 0
+        self.shape = (model.rowCount(), model.columnCount())
+        for k in range(self.shape[1]):
+            total_width += self.columnWidth(k)
+        if viewport := self.viewport():
+            viewport.resize(min(total_width, 1024), self.height())
+
+        self.doubleClicked.connect(self.open_dataset_dialog)
+        self.setSelectionMode(self.SelectionMode.SingleSelection)
+        self.setSelectionBehavior(self.SelectionBehavior.SelectRows)
+
+    def resize_to_contents(self):
+        """Resize cells to contents"""
+        QApplication.setOverrideCursor(QCursor(Qt.CursorShape.WaitCursor))
+        self.resizeColumnsToContents()
+        QApplication.restoreOverrideCursor()
+
+    def open_dataset_dialog(self, index: QModelIndex):
+        if isinstance((model := self.model()), DataSetTableModel):
+            model.datasets[index.row()].edit(self)
+
+
+class DataSetGroupTableEditDialog(QDialog):
+    """DataSetGroup Table Edit Dialog use to edit DataSet in a DataSetGroup object
+    using a table where each row represents a dataset"""
+
+    def __init__(
+        self,
+        instance: DataSetGroup,
+        icon: str | QIcon = "",
+        parent: QWidget | None = None,
+        apply: Callable | None = None,
+        wordwrap: bool = True,
+        size: QSize | tuple[int, int] | None = None,
+    ):
+        super().__init__(parent)
+        win32_fix_title_bar_background(self)
+        self.wordwrap = wordwrap
+        self.apply_func = apply
+        self._layout = QVBoxLayout()
+        if instance.get_comment():
+            label = QLabel(instance.get_comment())
+            label.setWordWrap(wordwrap)
+            self._layout.addWidget(label)
+        self.instance = instance
+
+        self.setup_instance(instance)
+
+        self.setLayout(self._layout)
+
+        if parent is None:
+            if not isinstance(icon, QIcon):
+                icon = get_icon(icon, default="guidata.svg")
+            self.setWindowIcon(icon)  # type:ignore
+
+        self.setModal(True)
+        self.setWindowTitle(instance.get_title())
+
+        if size is not None:
+            if isinstance(size, QSize):
+                self.resize(size)
+            else:
+                self.resize(*size)
+
+    def setup_instance(self, instance: DataSetGroup):
+        """
+        Setup DataSetGroupTableEditDialog:
+        return False if data is not supported, True otherwise
+        """
+        """Construct main layout
+
+        Args:
+            instance: DataSet instance to edit
+        """
+        grid = QGridLayout()
+        grid.setAlignment(Qt.AlignTop)  # type:ignore
+        self._layout.addLayout(grid)
+        table_model = DataSetTableModel(instance.datasets, parent=self)
+        self._layout.addWidget(DatasetTableView(table_model, parent=self))
+        return True

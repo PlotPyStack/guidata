@@ -23,7 +23,19 @@ def test_dataset_group():
     with qt_app_context():
         e1 = Parameters("DataSet #1")
         e2 = Parameters("DataSet #2")
+
         g = DataSetGroup([e1, e2], title="Parameters group")
+        g.edit()
+        execenv.print(e1)
+        g.edit()
+        execenv.print("OK")
+
+        g = DataSetGroup([e1, e2], title="Parameters group")
+        g.edit(mode="table")
+        execenv.print(e1)
+        g.edit()
+        execenv.print("OK")
+
         g.edit()
         execenv.print(e1)
         g.edit()

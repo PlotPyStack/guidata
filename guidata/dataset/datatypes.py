@@ -62,8 +62,9 @@ from __future__ import annotations
 
 import re
 import sys
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from collections.abc import Callable
+from copy import deepcopy
 from typing import TYPE_CHECKING, Any
 
 from guidata.dataset.io import INIReader, INIWriter
@@ -73,7 +74,7 @@ DEBUG_DESERIALIZE = False
 
 if TYPE_CHECKING:  # pragma: no cover
     from qtpy.QtCore import QSize
-    from qtpy.QtWidgets import QWidget
+    from qtpy.QtWidgets import QDialog, QWidget
 
     from guidata.dataset.io import HDF5Reader, HDF5Writer, JSONReader, JSONWriter
     from guidata.dataset.qtwidgets import DataSetEditDialog
@@ -248,7 +249,7 @@ class FuncProp(ItemProperty):
         self.property.set(instance, item, self.inverse_function(value))
 
 
-class DataItem:
+class DataItem(ABC):
     """DataSet data item
 
     Args:
@@ -332,10 +333,7 @@ class DataItem:
         Returns:
             DataItem: self
         """  # noqa
-        prop = self._props.get(realm)
-        if not prop:
-            prop = {}
-            self._props[realm] = prop
+        prop = self._props.setdefault(realm, {})
         prop.update(kwargs)
         return self
 
@@ -365,13 +363,13 @@ class DataItem:
             str: tooltip
         """
         auto_help = self.get_auto_help(instance)
-        help = self._help
+        help_ = self._help or ""
         if auto_help:
-            if help:
-                help = help + "\n(" + auto_help + ")"
+            if help_:
+                help_ = help_ + "\n(" + auto_help + ")"
             else:
-                help = auto_help.capitalize()
-        return help
+                help_ = auto_help.capitalize()
+        return help_
 
     def get_auto_help(self, instance: DataSet) -> str:
         """Return the automatically generated part of data item's tooltip
@@ -510,14 +508,14 @@ class DataItem:
         value = getattr(instance, "_%s" % (self._name))
         return self.check_value(value)
 
-    def check_value(self, value: Any) -> Any:
+    def check_value(self, value: Any) -> bool:
         """Check if `value` is valid for this data item
 
         Args:
             value (Any): value to check
 
         Returns:
-            Any: value
+            bool: value
         """
         raise NotImplementedError()
 
@@ -600,6 +598,10 @@ class DataItem:
             self.set_default(instance)
             return
         self.__set__(instance, value)
+
+    @property
+    def name(self) -> str:
+        return self._name or ""
 
 
 class Obj:
@@ -1028,6 +1030,19 @@ class DataSet(metaclass=DataSetMeta):
         # Set default values
         self.set_defaults()
 
+    def get_items(self, copy=True) -> list[DataItem]:
+        """Returns all the DataItem objects from the DataSet instance. Ignore private
+        items that have a name starting with an underscore (e.g. '_private_item = ...')
+
+        Args:
+            copy: If True, deepcopy the DataItem list, else return the original. Defaults to False.
+
+        Returns:
+            _description_
+        """
+        result_items = self._items if not copy else deepcopy(self._items)
+        return list(filter(lambda s: not s.name.startswith("_"), result_items))
+
     @classmethod
     def create(cls, **kwargs) -> DataSet:
         """Create a new instance of the DataSet class
@@ -1399,8 +1414,13 @@ class DataSetGroup:
     contained dataset.
     """
 
+    allowed_modes = ("tabs", "table", None)
+
     def __init__(
-        self, datasets: list[DataSet], title: str | None = None, icon: str = ""
+        self,
+        datasets: list[DataSet],
+        title: str | None = None,
+        icon: str = "",
     ) -> None:
         self.__icon = icon
         self.datasets = datasets
@@ -1454,6 +1474,7 @@ class DataSetGroup:
         apply: Callable | None = None,
         wordwrap: bool = True,
         size: QSize | tuple[int, int] | None = None,
+        mode: str | None = None,
     ) -> int:
         """Open a dialog box to edit data set
 
@@ -1462,6 +1483,11 @@ class DataSetGroup:
             apply: apply callback. Defaults to None.
             wordwrap: if True, comment text is wordwrapped
             size: dialog size (default: None)
+            mode: (str): dialog window style to use. Allowed values are "tabs", "table" and \
+            None.
+                * tabs : use tabs to navigate between datasets.
+                * table : create a table with one dataset by row. Allows dataset editing.\
+                by double clicking on a row. \
 
         Returns:
             int: dialog box return code
@@ -1469,18 +1495,36 @@ class DataSetGroup:
         # Importing those modules here avoids Qt dependency when
         # guidata is used without Qt
         # pylint: disable=import-outside-toplevel
-        from guidata.dataset.qtwidgets import DataSetGroupEditDialog
+
+        assert mode in self.allowed_modes
+
+        from guidata.dataset.qtwidgets import (
+            DataSetGroupEditDialog,
+            DataSetGroupTableEditDialog,
+        )
         from guidata.qthelpers import exec_dialog
 
-        dial = DataSetGroupEditDialog(
-            self,
-            icon=self.__icon,
-            parent=parent,
-            apply=apply,
-            wordwrap=wordwrap,
-            size=size,
-        )
-        return exec_dialog(dial)
+        dial: QDialog
+        if mode in ("tabs", None):
+            dial = DataSetGroupEditDialog(
+                instance=self,  # type: ignore
+                icon=self.__icon,
+                parent=parent,
+                apply=apply,
+                wordwrap=wordwrap,
+                size=size,
+            )
+            return exec_dialog(dial)
+        else:
+            dial = DataSetGroupTableEditDialog(
+                instance=self,
+                icon=self.__icon,
+                parent=parent,
+                apply=apply,
+                wordwrap=wordwrap,
+                size=size,
+            )
+            return exec_dialog(dial)
 
     def accept(self, vis: object) -> None:
         """Helper function that passes the visitor to the accept methods of all
