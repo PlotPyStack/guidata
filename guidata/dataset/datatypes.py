@@ -1016,6 +1016,7 @@ class DataSet(metaclass=DataSetMeta):
         title: str | None = None,
         comment: str | None = None,
         icon: str = "",
+        readonly: bool = True,
     ):
         self.__comment = comment
         self.__icon = icon
@@ -1027,6 +1028,7 @@ class DataSet(metaclass=DataSetMeta):
         if comment is None:
             self.__comment = comp_comment
         self.__changed = False
+        self.__active = readonly
         # Set default values
         self.set_defaults()
 
@@ -1146,6 +1148,7 @@ class DataSet(metaclass=DataSetMeta):
         apply: Callable | None = None,
         wordwrap: bool = True,
         size: QSize | tuple[int, int] | None = None,
+        readonly: bool = False,
     ) -> DataSetEditDialog:
         """Open a dialog box to edit data set
 
@@ -1161,6 +1164,8 @@ class DataSet(metaclass=DataSetMeta):
         from guidata.dataset.qtwidgets import DataSetEditDialog
         from guidata.qthelpers import exec_dialog
 
+        self.active = not readonly
+
         dlg = DataSetEditDialog(
             self,
             icon=self.__icon,
@@ -1169,6 +1174,7 @@ class DataSet(metaclass=DataSetMeta):
             wordwrap=wordwrap,
             size=size,
         )
+
         return exec_dialog(dlg)
 
     def view(
@@ -1194,6 +1200,24 @@ class DataSet(metaclass=DataSetMeta):
             self, icon=self.__icon, parent=parent, wordwrap=wordwrap, size=size
         )
         return exec_dialog(dial)
+
+    @property
+    def active(self):
+        return self.__active
+
+    @active.setter
+    def active(self, active: bool):
+        if active != self.__active:
+            for item in self.get_items(copy=False):
+                print(item)
+                if (
+                    item.get_prop("edit", "readonly", default=None) is not None
+                ):  # eg for FloatArrayItem where we still want to click the array but not edit it
+                    item.set_prop("edit", readonly=not active)
+                    print("READONLY FOUND")
+                    continue
+                item.set_prop("display", active=active)
+            self.__active = active
 
     def to_string(
         self,

@@ -22,6 +22,7 @@ This package provides a NumPy Array Editor Dialog based on Qt.
 
 import copy
 import io
+from functools import reduce
 from typing import Any, Callable
 
 import numpy as np
@@ -410,6 +411,7 @@ class BaseArrayModel(QAbstractTableModel):
         ylabels=None,
         readonly=False,
         parent=None,
+        current_slice: tuple[slice | int, ...] | None = None,
     ):
         QAbstractTableModel.__init__(self)
 
@@ -418,16 +420,21 @@ class BaseArrayModel(QAbstractTableModel):
         self.ylabels = ylabels
         self.readonly = readonly
         self.test_array = np.array([0], dtype=array_handler.dtype)
-        self._arr_transform_getter = lambda handler: handler
-        # self._arr_subtype_getter = array_subtype_getter
-        # for complex numbers, shading will be based on absolute value
-        # but for all other types it will be the real part
+
         if array_handler.dtype in (np.complex64, np.complex128):
             self.color_func = np.abs
         else:
             self.color_func = np.real
 
         # Backgroundcolor settings
+        # assert isinstance(current_slice, slice | None)
+        self.current_slice = (
+            (slice(None),) * array_handler.ndim
+            if current_slice is None
+            else current_slice
+        )
+
+        # self._row_axis_2d = self._correct_ndim_axis_for_current_slice()
         self.huerange = [0.66, 0.99]  # Hue
         self.sat = 0.7  # Saturation
         self.val = 1.0  # Value
@@ -455,6 +462,7 @@ class BaseArrayModel(QAbstractTableModel):
     def columnCount(self, qindex=QModelIndex()):
         """Array column number"""
         if self.total_cols <= self.cols_loaded:
+            print(f"{self.total_cols=}")
             return self.total_cols
         else:
             return self.cols_loaded
@@ -462,6 +470,7 @@ class BaseArrayModel(QAbstractTableModel):
     def rowCount(self, qindex=QModelIndex()):
         """Array row number"""
         if self.total_rows <= self.rows_loaded:
+            print(f"{self.total_rows=}")
             return self.total_rows
         else:
             return self.rows_loaded
@@ -545,16 +554,40 @@ class BaseArrayModel(QAbstractTableModel):
         :param index:
         :return:
         """
-        return self._array_handler[index]
+        print(index)
+        new_index = self._compute_ndim_index(index)
+        print(new_index)
+        return self._array_handler[new_index]
 
     def set_value(self, index: tuple[int, ...], value: Any):
-        self._array_handler[index] = value
+        new_index = self._compute_ndim_index(index)
+        print(new_index)
+        self._array_handler[new_index] = value
+
+    def _compute_ndim_index(self, index: tuple[int, ...]) -> tuple[int, ...]:
+        print(self.current_slice)
+        index_iter = iter(index)
+        new_index: tuple[int, ...] = tuple(
+            next(index_iter) if isinstance(s, slice) else s for s in self.current_slice
+        )
+        return new_index
+
+    def _correct_ndim_axis_for_current_slice(self, d2_axis: int) -> int:
+        print(f"{d2_axis=}")
+        axis_offset = reduce(
+            lambda x, y: x + 1 if isinstance(y, int) else x,
+            self.current_slice[:d2_axis+1],
+            0,
+        )
+        print(f"{(d2_axis + axis_offset)=}")
+        return d2_axis + axis_offset
 
     def data(self, index, role=Qt.ItemDataRole.DisplayRole):
         """Cell content"""
         if not index.isValid():
             return None
         value = self.get_value((index.row(), index.column()))
+        print(f"{value=}")
         if isinstance(value, bytes):
             try:
                 value = str(value, "utf8")
@@ -653,11 +686,13 @@ class BaseArrayModel(QAbstractTableModel):
 
     @property
     def total_rows(self):
-        return self._array_handler.shape[0]
+        corrected_axis = self._correct_ndim_axis_for_current_slice(0)
+        return self._array_handler.shape[corrected_axis]
 
     @property
     def total_cols(self):
-        return self._array_handler.shape[1]
+        corrected_axis = self._correct_ndim_axis_for_current_slice(1)
+        return self._array_handler.shape[corrected_axis]
 
     def set_row_col_counts(self):
         # Use paging when the total size, number of rows or number of
@@ -725,19 +760,27 @@ class BaseArrayModel(QAbstractTableModel):
 
     @handle_size_change(rows=True)
     def insert_row(self, index: int, insert_number: int = 1, default_value: Any = 0):
-        self._array_handler.insert_on_axis(index, 0, insert_number, default_value)
+        new_axis = self._correct_ndim_axis_for_current_slice(0)
+        self._array_handler.insert_on_axis(
+            index, new_axis, insert_number, default_value
+        )
 
     @handle_size_change(rows=True)
     def remove_row(self, index: int, remove_number: int = 1):
-        self._array_handler.delete_on_axis(index, 0, remove_number)
+        new_axis = self._correct_ndim_axis_for_current_slice(0)
+        self._array_handler.delete_on_axis(index, new_axis, remove_number)
 
     @handle_size_change(cols=True)
     def insert_column(self, index: int, insert_number: int = 1, default_value: Any = 0):
-        self._array_handler.insert_on_axis(index, 1, insert_number, default_value)
+        new_axis = self._correct_ndim_axis_for_current_slice(1)
+        self._array_handler.insert_on_axis(
+            index, new_axis, insert_number, default_value
+        )
 
     @handle_size_change(cols=True)
     def remove_column(self, index: int, remove_number: int = 1):
-        self._array_handler.delete_on_axis(index, 1, remove_number)
+        new_axis = self._correct_ndim_axis_for_current_slice(1)
+        self._array_handler.delete_on_axis(index, new_axis, remove_number)
 
     def reset(self):
         """ """
@@ -745,7 +788,8 @@ class BaseArrayModel(QAbstractTableModel):
         self.endResetModel()
 
     def get_array(self) -> np.ndarray | np.ma.MaskedArray:
-        return self._array_handler.get_array()
+        print(self.current_slice)
+        return self._array_handler.get_array()[self.current_slice]
 
     def apply_changes(self):
         self._array_handler.apply_changes()
@@ -947,7 +991,7 @@ class ArrayView(QTableView):
         for k in range(shape[1]):
             total_width += self.columnWidth(k)
         self.viewport().resize(min(total_width, 1024), self.height())
-        self.shape = shape  # TODO Check if variable is used
+        # TODO Check if variable is used
         QShortcut(QKeySequence(QKeySequence.Copy), self, self.copy)
         self.horizontalScrollBar().valueChanged.connect(
             lambda val: self.load_more_data(val, columns=True)
@@ -1367,14 +1411,14 @@ class BaseArrayEditorWidget(QWidget):
         xlabels=None,
         ylabels=None,
         variable_size=False,
+        current_slice: tuple[slice | int, ...] | None = None,
     ):
         QWidget.__init__(self, parent)
 
         self._variable_size = variable_size and not readonly
-
         self.data: BaseArrayHandler | MaskedArrayHandler
         self._init_handler(data)
-        self._init_model(xlabels, ylabels, readonly)
+        self._init_model(xlabels, ylabels, readonly, current_slice=current_slice)
 
         self.old_data_shape = None
 
@@ -1415,9 +1459,20 @@ class BaseArrayEditorWidget(QWidget):
         else:
             self.data = data
 
-    def _init_model(self, xlabels, ylabels, readonly):
+    def _init_model(
+        self,
+        xlabels,
+        ylabels,
+        readonly,
+        current_slice: tuple[slice | int, ...] | None = None,
+    ):
         self.model = BaseArrayModel(
-            self.data, xlabels=xlabels, ylabels=ylabels, readonly=readonly, parent=self
+            self.data,
+            xlabels=xlabels,
+            ylabels=ylabels,
+            readonly=readonly,
+            parent=self,
+            current_slice=current_slice,
         )
 
     def accept_changes(self):
@@ -1831,11 +1886,8 @@ class ArrayEditor(QDialog):
         self.arraywidget = self.stack.widget(index)
         self.arraywidget.model.dataChanged.connect(self.save_and_close_enable)
 
-    def change_active_widget(self, index):
-        """
-        This is implemented for handling negative values in index for
-        3d arrays, to give the same behavior as slicing
-        """
+    def _compute_slice(self, index) -> tuple[tuple[slice | int, ...], int]:
+        print(f"computing a new slice for {index=}")
         string_index = [":"] * 3
         string_index[self.last_dim] = "<font color=red>%i</font>"
         self.slicing_label.setText(
@@ -1847,6 +1899,19 @@ class ArrayEditor(QDialog):
             data_index = index
         slice_index = [slice(None)] * 3
         slice_index[self.last_dim] = data_index
+        return tuple(slice_index), data_index
+
+    def change_active_widget(self, index):
+        """
+        This is implemented for handling negative values in index for
+        3d arrays, to give the same behavior as slicing
+        """
+        slice_index, data_index = self._compute_slice(index)
+
+        # TODO: check if triggered when changing axis
+        for wdg in self.arraywidgets:
+            print("Updating slices")
+            wdg.model.current_slice = slice_index
 
         stack_index = self.dim_indexes[self.last_dim].get(data_index)
         if stack_index is None:
@@ -1854,13 +1919,19 @@ class ArrayEditor(QDialog):
             try:
                 self.stack.addWidget(
                     BaseArrayEditorWidget(
-                        self, self.data, variable_size=self._variable_size
+                        self,
+                        self.data,
+                        variable_size=self._variable_size,
+                        current_slice=slice_index,
                     )
                 )
             except IndexError:  # Handle arrays of size 0 in one axis
                 self.stack.addWidget(
                     BaseArrayEditorWidget(
-                        self, self.data, variable_size=self._variable_size
+                        self,
+                        self.data,
+                        variable_size=self._variable_size,
+                        current_slice=slice_index,
                     )
                 )
             self.dim_indexes[self.last_dim][data_index] = stack_index
@@ -1935,7 +2006,7 @@ if __name__ == "__main__":
 
     app = qapplication()
 
-    # arr = np.ones((5, 5), dtype=np.int32)
+    arr = np.ones((5, 5), dtype=np.int32)
     # arr = np.array(
     #     [(0, 0.0), (0, 0.0), (0, 0.0)],
     #     dtype=[(("title 1", "x"), "|i1"), (("title 2", "y"), ">f4")],

@@ -925,9 +925,12 @@ class FloatArrayItem(DataItem):
         transpose: bool = False,
         minmax: str = "all",
         check: bool = True,
+        readonly=False,
+        variable_size=False,
     ) -> None:
         super().__init__(label, default=default, help=help, check=check)
         self.set_prop("display", format=format, transpose=transpose, minmax=minmax)
+        self.set_prop("edit", readonly=readonly, variable_size=variable_size)
 
     def format_string(
         self, instance: DataSet, value: Any, fmt: str, func: Callable

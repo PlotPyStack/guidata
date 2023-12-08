@@ -1137,8 +1137,12 @@ class FloatArrayWidget(AbstractDataSetWidget):
         """Open an array editor dialog"""
         parent = self.parent_layout.parent
         label = self.item.get_prop_value("display", "label")
+        readonly = self.item.get_prop_value("edit", "readonly", default=False)
+        variable_size = self.item.get_prop_value("edit", "variable_size", default=False)
         editor = ArrayEditor(parent)
-        if editor.setup_and_check(self.arr, title=label):
+        if editor.setup_and_check(
+            self.arr, title=label, readonly=readonly, variable_size=variable_size
+        ):
             if editor.exec():
                 self.update(self.arr)
                 self.notify_value_change()
