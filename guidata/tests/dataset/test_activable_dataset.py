@@ -49,10 +49,14 @@ def test_activable_dataset():
     """Test activable dataset"""
     with qt_app_context():
         prm = Parameters()
-        prm.set_writeable()
+        prm.set_activable(True)
+        prm.edit()
+        prm.set_activable(False)
         prm.edit()
         prm.set_readonly()
-        prm.view()
+        prm.edit()
+        prm.set_readonly(False)
+        prm.edit()
         execenv.print("OK")
 
 

@@ -1016,7 +1016,7 @@ class DataSet(metaclass=DataSetMeta):
         title: str | None = None,
         comment: str | None = None,
         icon: str = "",
-        readonly: bool = True,
+        readonly: bool = False,
     ):
         self.__comment = comment
         self.__icon = icon
@@ -1028,11 +1028,12 @@ class DataSet(metaclass=DataSetMeta):
         if comment is None:
             self.__comment = comp_comment
         self.__changed = False
-        self.__active = readonly
-        # Set default values
+
+        self.__readonly: bool = readonly
+
         self.set_defaults()
 
-    def get_items(self, copy=True) -> list[DataItem]:
+    def get_items(self, copy=False) -> list[DataItem]:
         """Returns all the DataItem objects from the DataSet instance. Ignore private
         items that have a name starting with an underscore (e.g. '_private_item = ...')
 
@@ -1148,7 +1149,6 @@ class DataSet(metaclass=DataSetMeta):
         apply: Callable | None = None,
         wordwrap: bool = True,
         size: QSize | tuple[int, int] | None = None,
-        readonly: bool = False,
     ) -> DataSetEditDialog:
         """Open a dialog box to edit data set
 
@@ -1163,8 +1163,6 @@ class DataSet(metaclass=DataSetMeta):
         # pylint: disable=import-outside-toplevel
         from guidata.dataset.qtwidgets import DataSetEditDialog
         from guidata.qthelpers import exec_dialog
-
-        self.active = not readonly
 
         dlg = DataSetEditDialog(
             self,
@@ -1201,23 +1199,12 @@ class DataSet(metaclass=DataSetMeta):
         )
         return exec_dialog(dial)
 
-    @property
-    def active(self):
-        return self.__active
+    def is_readonly(self) -> bool:
+        return bool(self.__readonly)
 
-    @active.setter
-    def active(self, active: bool):
-        if active != self.__active:
-            for item in self.get_items(copy=False):
-                print(item)
-                if (
-                    item.get_prop("edit", "readonly", default=None) is not None
-                ):  # eg for FloatArrayItem where we still want to click the array but not edit it
-                    item.set_prop("edit", readonly=not active)
-                    print("READONLY FOUND")
-                    continue
-                item.set_prop("display", active=active)
-            self.__active = active
+    def set_readonly(self, readonly: bool = True):
+        self.__readonly = readonly
+        # self.set_global_prop("display", readonly=readonly)
 
     def to_string(
         self,
@@ -1382,9 +1369,9 @@ class ActivableDataSet(DataSet):
         icon (str): dataset icon. Default is "" (no icon)
     """
 
-    _ro = True  # default *instance* attribute value
+    _activable = True  # default *instance* attribute value
     _active = True
-    _ro_prop = GetAttrProp("_ro")
+    _ro_prop = GetAttrProp("_activable")
     _active_prop = GetAttrProp("_active")
 
     @property
@@ -1400,8 +1387,6 @@ class ActivableDataSet(DataSet):
     ):
         DataSet.__init__(self, title, comment, icon)
 
-    #        self.set_readonly()
-
     @classmethod
     def active_setup(cls) -> None:
         """
@@ -1413,14 +1398,8 @@ class ActivableDataSet(DataSet):
             "display", active=True, hide=cls._ro_prop, store=cls._active_prop
         )
 
-    def set_readonly(self) -> None:
-        """The dataset is now in read-only mode, i.e. all data items are disabled"""
-        self._ro = True
-        self._active = self.enable
-
-    def set_writeable(self) -> None:
-        """The dataset is now in read/write mode, i.e. all data items are enabled"""
-        self._ro = False
+    def set_activable(self, activable: bool):
+        self._activable = not activable
         self._active = self.enable
 
 
@@ -1559,6 +1538,14 @@ class DataSetGroup:
         """
         for dataset in self.datasets:
             dataset.accept(vis)
+
+    def is_readonly(self) -> bool:
+        """Return True if all datasets in the DataSetGroup are in readonly mode.
+
+        Returns:
+            True if all datasets are in readonly, else False
+        """
+        return all((ds.is_readonly() for ds in self.datasets))
 
 
 class GroupItem(DataItemProxy):

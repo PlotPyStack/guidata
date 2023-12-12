@@ -914,6 +914,7 @@ class FloatArrayItem(DataItem):
         large: view all float of the array
         minmax: "all" (default), "columns", "rows"
         check: if False, value is not checked (optional, default=True)
+        variable_size: if True, allows to add/remove row/columns on all axis
     """
 
     def __init__(
@@ -925,12 +926,11 @@ class FloatArrayItem(DataItem):
         transpose: bool = False,
         minmax: str = "all",
         check: bool = True,
-        readonly=False,
         variable_size=False,
     ) -> None:
         super().__init__(label, default=default, help=help, check=check)
         self.set_prop("display", format=format, transpose=transpose, minmax=minmax)
-        self.set_prop("edit", readonly=readonly, variable_size=variable_size)
+        self.set_prop("edit", variable_size=variable_size)
 
     def format_string(
         self, instance: DataSet, value: Any, fmt: str, func: Callable
@@ -986,7 +986,7 @@ class DictItem(DataItem):
 
     @staticmethod
     # pylint: disable=unused-argument
-    def __dictedit(instance, item, value, parent):
+    def __dictedit(instance: DataSet, item: DataItem, value: dict, parent):
         """Open a dictionary editor"""
         # pylint: disable=import-outside-toplevel
         from guidata.qthelpers import exec_dialog
@@ -996,7 +996,7 @@ class DictItem(DataItem):
         value_was_none = value is None
         if value_was_none:
             value = {}
-        editor.setup(value)
+        editor.setup(value, readonly=instance.is_readonly())
         if exec_dialog(editor):
             return editor.get_value()
         if value_was_none:

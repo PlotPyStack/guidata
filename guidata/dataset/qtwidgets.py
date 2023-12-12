@@ -119,10 +119,12 @@ class DataSetEditDialog(QDialog):
 
         self.setup_instance(instance)
 
-        if apply is not None:
+        readonly_mode = instance.is_readonly()
+        if apply is not None and not readonly_mode:
             apply_button = QDialogButtonBox.Apply  # type:ignore
         else:
             apply_button = QDialogButtonBox.NoButton  # type:ignore
+
         bbox = QDialogButtonBox(
             QDialogButtonBox.Ok | QDialogButtonBox.Cancel | apply_button  # type:ignore
         )
@@ -588,7 +590,6 @@ class DataSetShowWidget(AbstractDataSetWidget):
         self.group.setToolTip(item.get_help())
         self.group.setStyleSheet(LABEL_CSS)
         self.group.setTextInteractionFlags(Qt.TextSelectableByMouse)  # type:ignore
-        # self.group.setEnabled(False)
 
     def get(self) -> None:
         """Update widget contents from data item value"""
@@ -749,7 +750,7 @@ class DataSetShowGroupBox(QGroupBox):
     """
 
     def __init__(
-        self, label: QLabel, klass: Type, wordwrap: bool = False, **kwargs
+        self, label: QLabel, klass: Type[DataSet], wordwrap: bool = False, **kwargs
     ) -> None:
         QGroupBox.__init__(self, label)
         self.apply_button: QPushButton | None = None
@@ -778,7 +779,10 @@ class DataSetShowGroupBox(QGroupBox):
         for widget in self.edit.widgets:
             widget.build_mode = True
             widget.get()
+            widget.set_state()
             widget.build_mode = False
+        if self.apply_button is not None:
+            self.apply_button.setVisible(not self.dataset.is_readonly())
 
 
 class DataSetEditGroupBox(DataSetShowGroupBox):
@@ -800,7 +804,7 @@ class DataSetEditGroupBox(DataSetShowGroupBox):
     def __init__(
         self,
         label: QLabel,
-        klass: Type,
+        klass: Type[DataSet],
         button_text: str | None = None,
         button_icon: QIcon | str | None = None,
         show_button: bool = True,

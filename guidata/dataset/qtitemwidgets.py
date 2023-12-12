@@ -27,7 +27,7 @@ from typing import TYPE_CHECKING, Any, Protocol
 
 import numpy
 from qtpy.compat import getexistingdirectory
-from qtpy.QtCore import QSize, Qt
+from qtpy.QtCore import QMetaObject, QSize, Qt
 from qtpy.QtGui import QColor, QIcon, QPixmap
 from qtpy.QtWidgets import (
     QAbstractButton,
@@ -145,6 +145,14 @@ class AbstractDataSetWidget:
             True if associated item is active
         """
         return self.item.get_prop_value("display", "active", True)
+
+    def is_readonly(self) -> bool:
+        """Is the parent dataset in readonly mode
+
+        Returns:
+            True if associated dataset is readonly
+        """
+        return self.item.instance.is_readonly()
 
     def check(self) -> bool:
         """Item validator
@@ -406,6 +414,13 @@ class LineEditWidget(AbstractDataSetWidget):
         value = self.item.from_string(str(self.edit.text()))
         return self.item.check_value(value)
 
+    def set_state(self):
+        """Update the visual status of the widget and modify the widget to readonly if
+        necessary"""
+        super().set_state()
+        print(f"Readonly set to {self.is_readonly()=} for {self.item.label()}")
+        self.edit.setReadOnly(self.is_readonly())
+
 
 class TextEditWidget(AbstractDataSetWidget):
     """
@@ -460,6 +475,12 @@ class TextEditWidget(AbstractDataSetWidget):
         """
         value = self.item.from_string(self.__get_text())
         return self.item.check_value(value)
+
+    def set_state(self):
+        """Update the visual status of the widget and modify the widget to readonly if
+        necessary"""
+        super().set_state()
+        self.edit.setReadOnly(self.is_readonly())
 
 
 class CheckBoxWidget(AbstractDataSetWidget):
@@ -531,6 +552,12 @@ class CheckBoxWidget(AbstractDataSetWidget):
         self.store.set(self.item.instance, self.item.item, state)
         self.parent_layout.refresh_widgets()
 
+    def set_state(self):
+        """Update the visual status of the widget and modify the widget to readonly if
+        necessary"""
+        super().set_state()
+        self.checkbox.setEnabled(not self.is_readonly())
+
 
 class DateWidget(AbstractDataSetWidget):
     """
@@ -576,6 +603,12 @@ class DateWidget(AbstractDataSetWidget):
             return self.dateedit.date().toPyDate()
         except AttributeError:
             return self.dateedit.dateTime().toPython().date()  # type:ignore # PySide
+
+    def set_state(self):
+        """Update the visual status of the widget and modify the widget to readonly if
+        necessary"""
+        super().set_state()
+        self.dateedit.setReadOnly(self.is_readonly())
 
 
 class DateTimeWidget(AbstractDataSetWidget):
@@ -625,6 +658,12 @@ class DateTimeWidget(AbstractDataSetWidget):
             return self.dateedit.dateTime().toPyDateTime()
         except AttributeError:
             return self.dateedit.dateTime().toPython()  # type:ignore # PySide
+
+    def set_state(self):
+        """Update the visual status of the widget and modify the widget to readonly if
+        necessary"""
+        super().set_state()
+        self.dateedit.setReadOnly(self.is_readonly())
 
 
 class GroupLayout(QHBoxLayout):
@@ -702,7 +741,7 @@ class ColorWidget(HLayoutMixin, LineEditWidget):
         super().__init__(item, parent_layout)
         self.button = QPushButton("")
         self.button.setMaximumWidth(32)
-        self.button.clicked.connect(self.select_color)  # type:ignore
+        self.__handle_button_connection()
         self.group.addWidget(self.button)
 
     def update(self, value: str) -> None:
@@ -728,6 +767,24 @@ class ColorWidget(HLayoutMixin, LineEditWidget):
             self.edit.setText(value)
             self.update(value)
             self.notify_value_change()
+
+    def __handle_button_connection(self):
+        """Connect the button the the color selection function if parent dataset is not
+        in readonly mode and signal is not already connected and disconnect it if the
+        dataset is readonly.
+        """
+        if not (
+            QMetaObject.isSignalConnected(self.button.clicked) and self.is_readonly()
+        ):
+            self.button.clicked.connect(self.select_color)
+        elif self.is_readonly():
+            self.button.clicked.disconnect()
+
+    def set_state(self):
+        """Update the visual status of the widget and modify the widget to readonly if
+        necessary"""
+        super().set_state()
+        self.__handle_button_connection()
 
 
 class SliderWidget(HLayoutMixin, LineEditWidget):
@@ -777,6 +834,13 @@ class SliderWidget(HLayoutMixin, LineEditWidget):
         self.edit.setText(value)
         self.update(value)
 
+    def set_state(self):
+        """Update the visual status of the widget and modify the widget to readonly if
+        necessary"""
+        super().set_state()
+        if self.slider is not None:
+            self.slider.setEnabled(not self.is_readonly())
+
 
 class FloatSliderWidget(SliderWidget):
     """
@@ -821,11 +885,11 @@ class FileWidget(HLayoutMixin, LineEditWidget):
     ) -> None:
         super().__init__(item, parent_layout)
         self.filedialog = filedialog
-        button = QPushButton()
+        self.button = QPushButton()
         fmt = item.get_prop_value("data", "formats")
-        button.setIcon(get_icon("%s.png" % fmt[0].lower(), default="file.png"))
-        button.clicked.connect(self.select_file)  # type:ignore
-        self.group.addWidget(button)
+        self.button.setIcon(get_icon("%s.png" % fmt[0].lower(), default="file.png"))
+        self.button.clicked.connect(self.select_file)  # type:ignore
+        self.group.addWidget(self.button)
         self.basedir = item.get_prop_value("data", "basedir")
         self.all_files_first = item.get_prop_value("data", "all_files_first")
 
@@ -863,6 +927,12 @@ class FileWidget(HLayoutMixin, LineEditWidget):
                 fname = str(fname)
             self.edit.setText(fname)
 
+    def set_state(self):
+        """Update the visual status of the widget and modify the widget to readonly if
+        necessary"""
+        super().set_state()
+        self.button.setEnabled(not self.is_readonly())
+
 
 class DirectoryWidget(HLayoutMixin, LineEditWidget):
     """
@@ -873,10 +943,10 @@ class DirectoryWidget(HLayoutMixin, LineEditWidget):
         self, item: "DataItemVariable", parent_layout: "DataSetEditLayout"
     ) -> None:
         super().__init__(item, parent_layout)
-        button = QPushButton()
-        button.setIcon(get_std_icon("DirOpenIcon"))
-        button.clicked.connect(self.select_directory)  # type:ignore
-        self.group.addWidget(button)
+        self.button = QPushButton()
+        self.button.setIcon(get_std_icon("DirOpenIcon"))
+        self.button.clicked.connect(self.select_directory)  # type:ignore
+        self.group.addWidget(self.button)
 
     def select_directory(self) -> None:
         """Open a directory selection dialog box"""
@@ -886,6 +956,12 @@ class DirectoryWidget(HLayoutMixin, LineEditWidget):
         dname = getexistingdirectory(parent, child_title(self.item), value)
         if dname:
             self.edit.setText(dname)
+
+    def set_state(self):
+        """Update the visual status of the widget and modify the widget to readonly if
+        necessary"""
+        super().set_state()
+        self.button.setEnabled(not self.is_readonly())
 
 
 class ChoiceWidget(AbstractDataSetWidget):
@@ -1015,6 +1091,16 @@ class ChoiceWidget(AbstractDataSetWidget):
         choices = self.item.get_prop_value("data", "choices")
         return choices[index][0]
 
+    def set_state(self):
+        """Update the visual status of the widget and modify the widget to readonly if
+        necessary"""
+        super().set_state()
+        enabled = not self.is_readonly()
+        if self.is_radio:
+            self.vbox.setEnabled(enabled)
+        else:
+            self.combobox.setEnabled(enabled)
+
 
 class MultipleChoiceWidget(AbstractDataSetWidget):
     """
@@ -1091,6 +1177,12 @@ class MultipleChoiceWidget(AbstractDataSetWidget):
         """
         layout.addWidget(self.group, row, label_column, row_span, column_span + 1)
 
+    def set_state(self):
+        """Update the visual status of the widget and modify the widget to readonly if
+        necessary"""
+        super().set_state()
+        self.groupbox.setEnabled(not self.is_readonly())
+
 
 class FloatArrayWidget(AbstractDataSetWidget):
     """
@@ -1137,11 +1229,13 @@ class FloatArrayWidget(AbstractDataSetWidget):
         """Open an array editor dialog"""
         parent = self.parent_layout.parent
         label = self.item.get_prop_value("display", "label")
-        readonly = self.item.get_prop_value("edit", "readonly", default=False)
         variable_size = self.item.get_prop_value("edit", "variable_size", default=False)
         editor = ArrayEditor(parent)
         if editor.setup_and_check(
-            self.arr, title=label, readonly=readonly, variable_size=variable_size
+            self.arr,
+            title=label,
+            readonly=self.is_readonly(),
+            variable_size=variable_size,
         ):
             if editor.exec():
                 self.update(self.arr)
