@@ -61,6 +61,7 @@ class BaseArrayModel(QAbstractTableModel):
         index_field: IntItem
         insert_number: IntItem
         default_value: DataItem
+        new_label: DataItem | None
 
         @abstractmethod
         def get_values_to_insert(self) -> tuple[Any, ...]:
@@ -176,6 +177,15 @@ class BaseArrayModel(QAbstractTableModel):
         ]
         ptype = type(np.zeros(1, dtype=dtype)[0].item())
         value_label = _("Value")
+        # TODO use this as a template to insert/delete labels
+        # label = (self.ylabels, self.xlabels)[axis]
+        # if isinstance(label, Sequence):
+        #     label_type = type(label[0])
+        # elif isinstance(label, np.ndarray):
+        #     label_type = type(np.zeros(1, dtype=label.dtype)[0].item())
+        # else:
+        #     label_type = None
+        # label_label = str("New label")
 
         class NewInsertionDataSet(self.InsertionDataSet):
             index_field = IntItem(
@@ -208,6 +218,22 @@ class BaseArrayModel(QAbstractTableModel):
                     default=0,
                 )
                 default_value.set_prop("display", active=False, valid=False)
+
+            # TODO use this as a template to insert/delete labels
+            # if label is not None:
+            #     print("I passed by here")
+            #     if label_type is int:
+            #         new_label = IntItem(label=label_label, default=0)
+            #     elif label_type is float:
+            #         new_label = FloatItem(label=label_label, default=0.0)
+            #     elif label_type is bool:
+            #         new_label = BoolItem(label=label_label, default=False)
+            #     elif label_type is str:
+            #         new_label = StringItem(label=label_label, default="")
+            #     else:
+            #         new_label = None
+            # else:
+            new_label = None
 
             def get_values_to_insert(self) -> tuple[Any, ...]:
                 return (self.default_value,)

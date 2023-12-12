@@ -361,14 +361,12 @@ class ArrayEditor(QDialog):
         """This change the active axis the array editor is plotting over
         in 3D
         """
-        print("Current dim changed")
         self.last_dim = index
         string_size = ["%i"] * 3
         string_size[index] = "<font color=red>%i</font>"
         self.shape_label.setText(
             ("Shape: (" + ", ".join(string_size) + ")    ") % self._data.shape
         )
-        print(f"Label was changed to {self.shape_label.text()}")
         if self.index_spin.value() != 0:
             self.index_spin.setValue(0)
         else:
