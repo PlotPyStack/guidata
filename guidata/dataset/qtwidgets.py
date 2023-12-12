@@ -119,20 +119,22 @@ class DataSetEditDialog(QDialog):
 
         self.setup_instance(instance)
 
-        readonly_mode = instance.is_readonly()
-        if apply is not None and not readonly_mode:
+        if apply is not None:
             apply_button = QDialogButtonBox.Apply  # type:ignore
         else:
             apply_button = QDialogButtonBox.NoButton  # type:ignore
 
-        bbox = QDialogButtonBox(
-            QDialogButtonBox.Ok | QDialogButtonBox.Cancel | apply_button  # type:ignore
-        )
-        self.bbox = bbox
-        bbox.accepted.connect(self.accept)  # type:ignore
-        bbox.rejected.connect(self.reject)  # type:ignore
-        bbox.clicked.connect(self.button_clicked)  # type:ignore
-        self._layout.addWidget(bbox)
+        if not instance.is_readonly():
+            bbox = QDialogButtonBox(
+                QDialogButtonBox.Ok
+                | QDialogButtonBox.Cancel
+                | apply_button  # type:ignore
+            )
+            self.bbox = bbox
+            bbox.accepted.connect(self.accept)  # type:ignore
+            bbox.rejected.connect(self.reject)  # type:ignore
+            bbox.clicked.connect(self.button_clicked)  # type:ignore
+            self._layout.addWidget(bbox)
 
         self.setLayout(self._layout)
 

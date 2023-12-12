@@ -1204,7 +1204,6 @@ class DataSet(metaclass=DataSetMeta):
 
     def set_readonly(self, readonly: bool = True):
         self.__readonly = readonly
-        # self.set_global_prop("display", readonly=readonly)
 
     def to_string(
         self,
@@ -1546,6 +1545,14 @@ class DataSetGroup:
             True if all datasets are in readonly, else False
         """
         return all((ds.is_readonly() for ds in self.datasets))
+
+    def set_readonly(self, readonly=True):
+        """Set all datasets of the dataset group to readonly mode
+
+        Args:
+            readonly: Readonly flag. Defaults to True.
+        """
+        _ = [d.set_readonly(readonly) for d in self.datasets]
 
 
 class GroupItem(DataItemProxy):

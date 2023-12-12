@@ -258,6 +258,10 @@ class GroupWidget(AbstractDataSetWidget):
         """
         layout.addWidget(self.group, row, label_column, row_span, column_span + 1)
 
+    def set_state(self) -> None:
+        super().set_state()
+        self.edit.refresh_widgets()
+
 
 class TabGroupWidget(AbstractDataSetWidget):
     """TabGroupItem widget
@@ -335,6 +339,11 @@ class TabGroupWidget(AbstractDataSetWidget):
             column_span: number of columns to span
         """
         layout.addWidget(self.tabs, row, label_column, row_span, column_span + 1)
+
+    def set_state(self) -> None:
+        super().set_state()
+        for widget in self.widgets:
+            widget.set_state()
 
 
 def _display_callback(widget: AbstractDataSetWidget, value):
@@ -741,6 +750,7 @@ class ColorWidget(HLayoutMixin, LineEditWidget):
         super().__init__(item, parent_layout)
         self.button = QPushButton("")
         self.button.setMaximumWidth(32)
+        self.__signal_connected: bool = False
         self.__handle_button_connection()
         self.group.addWidget(self.button)
 
@@ -773,12 +783,12 @@ class ColorWidget(HLayoutMixin, LineEditWidget):
         in readonly mode and signal is not already connected and disconnect it if the
         dataset is readonly.
         """
-        if not (
-            QMetaObject.isSignalConnected(self.button.clicked) and self.is_readonly()
-        ):
+        if not (self.__signal_connected and self.is_readonly()):
+            self.__signal_connected = True
             self.button.clicked.connect(self.select_color)
         elif self.is_readonly():
             self.button.clicked.disconnect()
+            self.__signal_connected = False
 
     def set_state(self):
         """Update the visual status of the widget and modify the widget to readonly if
