@@ -1,16 +1,11 @@
+# -*- coding: utf-8 -*-
 #
-# Copyright © Spyder Project Contributors
-# Licensed under the terms of the MIT License
-# (see spyder/__init__.py for details)
-
-"""guidata.widgets.arrayeditor
-===========================
-
-This package provides a NumPy Array Editor Dialog based on Qt.
-
-.. autoclass:: ArrayEditor
-
-"""
+# Licensed under the terms of the BSD 3-Clause
+# (see guidata/LICENSE for details)
+#
+# The array editor subpackage was derived from Spyder's arrayeditor.py module
+# which is licensed under the terms of the MIT License (see spyder/__init__.py
+# for details), copyright © Spyder Project Contributors
 
 # pylint: disable=C0103
 # pylint: disable=R0903
