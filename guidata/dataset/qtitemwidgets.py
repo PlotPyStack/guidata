@@ -427,7 +427,6 @@ class LineEditWidget(AbstractDataSetWidget):
         """Update the visual status of the widget and modify the widget to readonly if
         necessary"""
         super().set_state()
-        print(f"Readonly set to {self.is_readonly()=} for {self.item.label()}")
         self.edit.setReadOnly(self.is_readonly())
 
 

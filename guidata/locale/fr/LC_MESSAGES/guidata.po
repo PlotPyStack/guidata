@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2023-11-09 17:24+0100\n"
+"POT-Creation-Date: 2023-12-13 13:16+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -68,47 +68,47 @@ msgstr "non vide"
 msgid "regexp:"
 msgstr "expr. rég. :"
 
-#: guidata\dataset\dataitems.py:574
+#: guidata\dataset\dataitems.py:577
 msgid "all file types"
 msgstr "tout type de fichier"
 
-#: guidata\dataset\dataitems.py:576
+#: guidata\dataset\dataitems.py:579
 msgid "supported file types:"
 msgstr "types de fichiers pris en charge : "
 
-#: guidata\dataset\qtitemwidgets.py:845
+#: guidata\dataset\qtitemwidgets.py:918
 msgid "%s files"
 msgstr "Fichiers %s"
 
-#: guidata\dataset\qtitemwidgets.py:847
+#: guidata\dataset\qtitemwidgets.py:920
 msgid "All supported files"
 msgstr "Tous les fichiers pris en charge"
 
-#: guidata\dataset\qtitemwidgets.py:1104
+#: guidata\dataset\qtitemwidgets.py:1212
 msgid "Number of rows x Number of columns"
 msgstr "Nombre de lignes x Nombre de colonnes"
 
-#: guidata\dataset\qtitemwidgets.py:1107
+#: guidata\dataset\qtitemwidgets.py:1215
 msgid "Edit array contents"
 msgstr "Modifier le contenu du tableau"
 
-#: guidata\dataset\qtitemwidgets.py:1113
+#: guidata\dataset\qtitemwidgets.py:1221
 msgid "Smallest element in array"
 msgstr "Valeur minimale du tableau"
 
-#: guidata\dataset\qtitemwidgets.py:1117
+#: guidata\dataset\qtitemwidgets.py:1225
 msgid "Largest element in array"
 msgstr "Valeur maximale du tableau"
 
-#: guidata\dataset\qtwidgets.py:210 guidata\tests\unit\test_translations.py:13
+#: guidata\dataset\qtwidgets.py:223 guidata\tests\unit\test_translations.py:13
 msgid "Some required entries are incorrect"
 msgstr "Les champs surlignés n'ont pas été remplis correctement."
 
-#: guidata\dataset\qtwidgets.py:212
+#: guidata\dataset\qtwidgets.py:225
 msgid "Please check highlighted fields."
 msgstr "Veuillez vérifier votre saisie."
 
-#: guidata\dataset\qtwidgets.py:804
+#: guidata\dataset\qtwidgets.py:819
 msgid "Apply"
 msgstr "Appliquer"
 
@@ -132,14 +132,14 @@ msgstr "Tests - Module %s"
 msgid "No test found in this package."
 msgstr "Aucun test trouvé dans ce package."
 
-#: guidata\guitest.py:341 guidata\widgets\arrayeditor.py:681
+#: guidata\guitest.py:341 guidata\widgets\arrayeditor\edirotwidget.py:687
 #: guidata\widgets\collectionseditor.py:545
 #: guidata\widgets\dataframeeditor.py:858
 #: guidata\widgets\dataframeeditor.py:862
 msgid "Error"
 msgstr "Erreur"
 
-#: guidata\qthelpers.py:690
+#: guidata\qthelpers.py:645
 msgid "Waiting: %s s"
 msgstr "Attente : %s s"
 
@@ -173,113 +173,101 @@ msgstr ""
 msgid "About"
 msgstr "A propos"
 
-#: guidata\widgets\arrayeditor.py:538 guidata\widgets\collectionseditor.py:842
-#: guidata\widgets\console\shell.py:147 guidata\widgets\dataframeeditor.py:672
-msgid "Copy"
-msgstr "Copier"
+#: guidata\widgets\arrayeditor\arrayeditor.py:107
+msgid "Conflicing edition flags"
+msgstr "Modes d'éditions conflictuels"
 
-#: guidata\widgets\arrayeditor.py:546 guidata\widgets\codeeditor.py:124
-#: guidata\widgets\console\internalshell.py:307
-msgid "About..."
-msgstr "A propos..."
+#: guidata\widgets\arrayeditor\arrayeditor.py:108
+msgid "Array editor was initialized in both readonly and variable size mode."
+msgstr ""
+"L'éditeur de tableaux a été initialisé en mode lecture seule et taille "
+"variable."
 
-#: guidata\widgets\arrayeditor.py:592 guidata\widgets\collectionseditor.py:529
-#: guidata\widgets\collectionseditor.py:1311
-#: guidata\widgets\collectionseditor.py:1324
-msgid "Warning"
-msgstr "Avertissement"
+#: guidata\widgets\arrayeditor\arrayeditor.py:112
+msgid "The array editor will remain in readonly mode."
+msgstr "L'éditeur de tableaux reste en mode lecture seule."
 
-#: guidata\widgets\arrayeditor.py:593
-msgid "It was not possible to copy values for this array"
-msgstr "Impossible de copier les valeurs pour ce tableau"
+#: guidata\widgets\arrayeditor\arrayeditor.py:118
+msgid "Unsupported array format"
+msgstr "Type de tableau non pris en charge"
 
-#: guidata\widgets\arrayeditor.py:635 guidata\widgets\arrayeditor.py:670
-#: guidata\widgets\dataframeeditor.py:785
-#: guidata\widgets\dataframeeditor.py:847
-msgid "Format"
-msgstr "Format"
+#: guidata\widgets\arrayeditor\arrayeditor.py:119
+msgid ""
+"Array editor does not support array with x/y labels in variable size mode."
+msgstr ""
+"L'editeur de tableau ne prend pas en charge les tableaux avec des labels x/y "
+"enmode taille variable."
 
-#: guidata\widgets\arrayeditor.py:640 guidata\widgets\dataframeeditor.py:789
-msgid "Resize"
-msgstr "Ajuster"
+#: guidata\widgets\arrayeditor\arrayeditor.py:123
+msgid "You will not be able to add or remove rows/columns."
+msgstr "Vous ne pourrez pas insérer ou supprimer de lignes/colonnes"
 
-#: guidata\widgets\arrayeditor.py:643 guidata\widgets\dataframeeditor.py:793
-msgid "Background color"
-msgstr "Couleur de fond"
-
-#: guidata\widgets\arrayeditor.py:671 guidata\widgets\dataframeeditor.py:848
-msgid "Float formatting"
-msgstr "Format de flottant"
-
-#: guidata\widgets\arrayeditor.py:681
-msgid "Format (%s) is incorrect"
-msgstr "Le format (%s) est incorrect"
-
-#: guidata\widgets\arrayeditor.py:723
+#: guidata\widgets\arrayeditor\arrayeditor.py:137
 msgid "Arrays with more than 3 dimensions are not supported"
 msgstr "Les tableaux ayant plus de trois dimensions ne sont pas pris en charge"
 
-#: guidata\widgets\arrayeditor.py:727
+#: guidata\widgets\arrayeditor\arrayeditor.py:141
 msgid "The 'xlabels' argument length do no match array column number"
 msgstr ""
 "La taille de l'argument 'xlabels' ne correspond pas au nombre de colonnes du "
 "tableau"
 
-#: guidata\widgets\arrayeditor.py:732
+#: guidata\widgets\arrayeditor\arrayeditor.py:146
 msgid "The 'ylabels' argument length do no match array row number"
 msgstr ""
 "La taille de l'argument 'ylabels' ne correspond pas au nombre de lignes du "
 "tableau"
 
-#: guidata\widgets\arrayeditor.py:742
+#: guidata\widgets\arrayeditor\arrayeditor.py:156
 msgid "%s arrays"
 msgstr "les tableaux %s"
 
-#: guidata\widgets\arrayeditor.py:743
+#: guidata\widgets\arrayeditor\arrayeditor.py:157
 msgid "%s are currently not supported"
 msgstr "Attention: %s ne sont pas pris en charge"
 
-#: guidata\widgets\arrayeditor.py:750
+#: guidata\widgets\arrayeditor\arrayeditor.py:164
 msgid "NumPy array"
 msgstr "Tableau NumPy"
 
-#: guidata\widgets\arrayeditor.py:752 guidata\widgets\arrayeditor.py:944
+#: guidata\widgets\arrayeditor\arrayeditor.py:166
+#: guidata\widgets\arrayeditor\arrayeditor.py:419
 msgid "Array editor"
 msgstr "Éditeur de tableaux"
 
-#: guidata\widgets\arrayeditor.py:754
+#: guidata\widgets\arrayeditor\arrayeditor.py:168
 msgid "read only"
 msgstr "lecture seule"
 
-#: guidata\widgets\arrayeditor.py:791
+#: guidata\widgets\arrayeditor\arrayeditor.py:240
 msgid "Record array fields:"
-msgstr "Champs :"
+msgstr "Champs:"
 
-#: guidata\widgets\arrayeditor.py:803
+#: guidata\widgets\arrayeditor\arrayeditor.py:252
 msgid "Data"
 msgstr "Données"
 
-#: guidata\widgets\arrayeditor.py:803
+#: guidata\widgets\arrayeditor\arrayeditor.py:252
 msgid "Mask"
 msgstr "Masque"
 
-#: guidata\widgets\arrayeditor.py:803
+#: guidata\widgets\arrayeditor\arrayeditor.py:252
 msgid "Masked data"
 msgstr "Données masquées"
 
-#: guidata\widgets\arrayeditor.py:814
+#: guidata\widgets\arrayeditor\arrayeditor.py:263
 msgid "Axis:"
-msgstr "Axe :"
+msgstr "Axe:"
 
-#: guidata\widgets\arrayeditor.py:819
+#: guidata\widgets\arrayeditor\arrayeditor.py:268
 msgid "Index:"
-msgstr "Indice :"
+msgstr "Indice:"
 
-#: guidata\widgets\arrayeditor.py:832
+#: guidata\widgets\arrayeditor\arrayeditor.py:281
 msgid "<u>Warning</u>: changes are applied separately"
 msgstr "<u>Attention</u>: les changements sont appliqués séparément"
 
-#: guidata\widgets\arrayeditor.py:834
+#: guidata\widgets\arrayeditor\arrayeditor.py:283
 msgid ""
 "For performance reasons, changes applied to masked array won't be reflected "
 "in array's data (and vice-versa)."
@@ -287,15 +275,146 @@ msgstr ""
 "Pour des raisons de performance, les changements appliqués au masque ne sont "
 "pas reflétés dans le tableau associé (et vice-versa)."
 
-#: guidata\widgets\arrayeditor.py:845 guidata\widgets\collectionseditor.py:1575
+#: guidata\widgets\arrayeditor\arrayeditor.py:294
+#: guidata\widgets\collectionseditor.py:1575
 #: guidata\widgets\dataframeeditor.py:809 guidata\widgets\texteditor.py:79
 msgid "Save and Close"
 msgstr "Enregistrer et Fermer"
 
-#: guidata\widgets\arrayeditor.py:850 guidata\widgets\collectionseditor.py:1580
+#: guidata\widgets\arrayeditor\arrayeditor.py:299
+#: guidata\widgets\collectionseditor.py:1580
 #: guidata\widgets\dataframeeditor.py:814 guidata\widgets\texteditor.py:84
 msgid "Close"
 msgstr "Fermer"
+
+#: guidata\widgets\arrayeditor\datamodel.py:180
+msgid "Insert at row"
+msgstr "Insérer à la ligne"
+
+#: guidata\widgets\arrayeditor\datamodel.py:182
+msgid "Insert at column"
+msgstr "Insérer à la colonne"
+
+#: guidata\widgets\arrayeditor\datamodel.py:187
+#: guidata\widgets\arrayeditor\datamodel.py:276
+msgid "Number of rows"
+msgstr "Nombre de lignes"
+
+#: guidata\widgets\arrayeditor\datamodel.py:189
+#: guidata\widgets\arrayeditor\datamodel.py:278
+msgid "Number of columns"
+msgstr "Nombre de colonnes"
+
+#: guidata\widgets\arrayeditor\datamodel.py:193
+#: guidata\widgets\collectionseditor.py:422
+msgid "Value"
+msgstr "Valeur"
+
+#: guidata\widgets\arrayeditor\datamodel.py:227
+msgid "Unsupported type %s, defaults to: "
+msgstr "Type %s non pris en charge, valeur par défaut: "
+
+#: guidata\widgets\arrayeditor\datamodel.py:269
+msgid "Delete from row"
+msgstr "Supprimer à partir de la ligne"
+
+#: guidata\widgets\arrayeditor\datamodel.py:271
+msgid "Delete from column"
+msgstr "Supprimer à partir de la colonne"
+
+#: guidata\widgets\arrayeditor\datamodel.py:587
+msgid ""
+"Slice %s is not valid. Expected an Iterable of slices and int like "
+"(slice(None), slice(None), n1, n2, ..., nX) with maximum two slices."
+msgstr ""
+"Slice %s incorrecte. Un itérable de slices et d'entiers au format "
+"(slice(None), slice(None), n1, n2, ..., nX) avec un maximum de deux slices "
+"était attendu."
+
+#: guidata\widgets\arrayeditor\edirotwidget.py:317
+msgid "Row(s) insertion"
+msgstr "Insertion de ligne(s)"
+
+#: guidata\widgets\arrayeditor\edirotwidget.py:319
+msgid "Column(s) insertion"
+msgstr "Insertion de colonnes(s)"
+
+#: guidata\widgets\arrayeditor\edirotwidget.py:356
+msgid "Row(s) deletion"
+msgstr "Suppression de ligne(s)"
+
+#: guidata\widgets\arrayeditor\edirotwidget.py:358
+msgid "Column(s) deletion"
+msgstr "Suppression de colonne(s)"
+
+#: guidata\widgets\arrayeditor\edirotwidget.py:388
+#: guidata\widgets\collectionseditor.py:842
+#: guidata\widgets\console\shell.py:147 guidata\widgets\dataframeeditor.py:672
+msgid "Copy"
+msgstr "Copier"
+
+#: guidata\widgets\arrayeditor\edirotwidget.py:396
+#: guidata\widgets\codeeditor.py:124
+#: guidata\widgets\console\internalshell.py:307
+msgid "About..."
+msgstr "A propos..."
+
+#: guidata\widgets\arrayeditor\edirotwidget.py:403
+#: guidata\widgets\arrayeditor\edirotwidget.py:457
+msgid "Insert row(s)"
+msgstr "Insertion de ligne(s)"
+
+#: guidata\widgets\arrayeditor\edirotwidget.py:409
+#: guidata\widgets\arrayeditor\edirotwidget.py:461
+msgid "Insert column(s)"
+msgstr "Insertion de colonne(s)"
+
+#: guidata\widgets\arrayeditor\edirotwidget.py:415
+#: guidata\widgets\arrayeditor\edirotwidget.py:458
+msgid "Remove row(s)"
+msgstr "Suppression de ligne(s)"
+
+#: guidata\widgets\arrayeditor\edirotwidget.py:421
+#: guidata\widgets\arrayeditor\edirotwidget.py:462
+msgid "Remove column(s)"
+msgstr "Suppression de colonne(s)"
+
+#: guidata\widgets\arrayeditor\edirotwidget.py:549
+#: guidata\widgets\collectionseditor.py:529
+#: guidata\widgets\collectionseditor.py:1311
+#: guidata\widgets\collectionseditor.py:1324
+msgid "Warning"
+msgstr "Avertissement"
+
+#: guidata\widgets\arrayeditor\edirotwidget.py:550
+msgid "It was not possible to copy values for this array"
+msgstr "Impossible de copier les valeurs pour ce tableau"
+
+#: guidata\widgets\arrayeditor\edirotwidget.py:610
+#: guidata\widgets\arrayeditor\edirotwidget.py:676
+#: guidata\widgets\dataframeeditor.py:785
+#: guidata\widgets\dataframeeditor.py:847
+msgid "Format"
+msgstr "Format"
+
+#: guidata\widgets\arrayeditor\edirotwidget.py:615
+#: guidata\widgets\dataframeeditor.py:789
+msgid "Resize"
+msgstr "Ajuster"
+
+#: guidata\widgets\arrayeditor\edirotwidget.py:618
+#: guidata\widgets\dataframeeditor.py:793
+msgid "Background color"
+msgstr "Couleur de fond"
+
+#: guidata\widgets\arrayeditor\edirotwidget.py:677
+#: guidata\widgets\dataframeeditor.py:848
+msgid "Float formatting"
+msgstr "Format de flottant"
+
+#: guidata\widgets\arrayeditor\edirotwidget.py:687
+msgid "Format (%s) is incorrect"
+msgstr "Le format (%s) est incorrect"
 
 #: guidata\widgets\collectionseditor.py:209
 msgid "Index"
@@ -336,10 +455,6 @@ msgstr "Taille"
 #: guidata\widgets\collectionseditor.py:422
 msgid "Type"
 msgstr "Type"
-
-#: guidata\widgets\collectionseditor.py:422
-msgid "Value"
-msgstr "Valeur"
 
 #: guidata\widgets\collectionseditor.py:530
 msgid ""

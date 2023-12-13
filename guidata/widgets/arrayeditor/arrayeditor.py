@@ -97,7 +97,31 @@ class ArrayEditor(QDialog):
         return False if data is not supported, True otherwise
         """
         readonly = readonly or not data.flags.writeable
-        self._variable_size = variable_size and not readonly
+        self._variable_size = (
+            variable_size and not readonly and xlabels is None and ylabels is None
+        )
+
+        if readonly and variable_size:
+            QMessageBox.warning(
+                self,
+                _("Conflicing edition flags"),
+                _(
+                    "Array editor was initialized in both readonly and variable size mode."
+                )
+                + "\n"
+                + _("The array editor will remain in readonly mode."),
+            )
+
+        if variable_size and (xlabels is not None or ylabels is not None):
+            QMessageBox.warning(
+                self,
+                _("Unsupported array format"),
+                _(
+                    "Array editor does not support array with x/y labels in variable size mode."
+                )
+                + "\n"
+                + _("You will not be able to add or remove rows/columns."),
+            )
 
         self.is_record_array = data.dtype.names is not None
         self.is_masked_array = isinstance(data, np.ma.MaskedArray)

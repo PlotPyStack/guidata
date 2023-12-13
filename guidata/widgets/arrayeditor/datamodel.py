@@ -176,6 +176,20 @@ class BaseArrayModel(QAbstractTableModel):
             self.correct_ndim_axis_for_current_slice(axis)
         ]
         ptype = type(np.zeros(1, dtype=dtype)[0].item())
+        index_label = (
+            _("Insert at row")
+            if axis == 0
+            else _("Insert at column")
+            if axis == 1
+            else ""
+        )
+        number_label = (
+            _("Number of rows")
+            if axis == 0
+            else _("Number of columns")
+            if axis == 1
+            else ""
+        )
         value_label = _("Value")
         # TODO use this as a template to insert/delete labels
         # label = (self.ylabels, self.xlabels)[axis]
@@ -189,17 +203,13 @@ class BaseArrayModel(QAbstractTableModel):
 
         class NewInsertionDataSet(self.InsertionDataSet):
             index_field = IntItem(
-                label=_(
-                    f"Insert at {'row' if axis==0 else 'column' if axis==1 else ''} index"
-                ),
+                label=index_label,
                 default=index,
                 min=-1,
                 max=max_index,
             )
             insert_number = IntItem(
-                label=_(
-                    f"Number of {'rows' if axis==0 else 'columns' if axis==1 else ''} to insert"
-                ),
+                label=number_label,
                 default=1,
                 min=1,
             )
@@ -214,7 +224,7 @@ class BaseArrayModel(QAbstractTableModel):
                 default_value = StringItem(label=value_label, default="")
             else:
                 default_value = IntItem(
-                    label=_(f'Unsupported type "{ptype.__name__}", defaults to:'),
+                    label=_("Unsupported type %s, defaults to: ") % ptype.__name__,
                     default=0,
                 )
                 default_value.set_prop("display", active=False, valid=False)
@@ -255,20 +265,30 @@ class BaseArrayModel(QAbstractTableModel):
         max_index = self._array_handler.shape[
             self.correct_ndim_axis_for_current_slice(axis)
         ]
+        index_label = (
+            _("Delete from row")
+            if axis == 0
+            else _("Delete from column")
+            if axis == 1
+            else ""
+        )
+        number_label = (
+            _("Number of rows")
+            if axis == 0
+            else _("Number of columns")
+            if axis == 1
+            else ""
+        )
 
         class NewDeletionDataSet(self.DeletionDataSet):
             index_field = IntItem(
-                label=_(
-                    f"Delete from {'rows' if axis==0 else 'columns' if axis==1 else ''} "
-                ),
+                label=index_label,
                 default=index,
                 min=-1,
                 max=max_index,
             )
             remove_number = IntItem(
-                label=_(
-                    f"Number of {'rows' if axis==0 else 'columns' if axis==1 else ''} to remove"
-                ),
+                number_label,
                 default=1,
                 min=1,
             )
@@ -544,17 +564,15 @@ class BaseArrayModel(QAbstractTableModel):
         )
         return default_slice
 
-    def set_slice(self, new_slice: Sequence[int | slice]):
+    def set_slice(self, new_slice: Sequence[int | slice] | None):
         """Use this method to change the current slice handled by the model
 
         Args:
         ----
             new_slice: new_slice to set
-
-        Raises:
-        ------
-            ValueError: Value error if an invalid slice is given
         """
+        if new_slice is None:
+            new_slice = self.default_slice()
         is_slice_valid = reduce(
             lambda x, s: x + 1 if isinstance(s, slice) else x, new_slice, 0
         ) == min(2, self._array_handler.ndim)
@@ -566,10 +584,12 @@ class BaseArrayModel(QAbstractTableModel):
                 None if isinstance(s, slice) else s for s in new_slice
             ]
         else:
-            raise ValueError(
-                f"Given slice ({new_slice} is not valid. Was awaiting for a Iterable of "
-                "slices and int (slice(None), slice(None), n1, n2, ..., nX) with maximum two slices."
-            )
+            err_msg = _(
+                "Slice %s is not valid. Expected an Iterable of "
+                "slices and int like (slice(None), slice(None), n1, n2, ..., nX) with maximum two slices."
+            ) % str(new_slice)
+            print(err_msg)
+            QMessageBox.critical(self.dialog, "Error", err_msg)
 
     def flags(self, index):
         """Set editable flag"""
@@ -686,7 +706,6 @@ class BaseArrayModel(QAbstractTableModel):
             index: row index at which to start the deletion
             remove_number: number of rows to delete. Defaults to 1.
         """
-        print(f"Removing {remove_number} rows from {index} ")
         self._array_handler.delete_on_axis(index, self._row_axis_nd, remove_number)
 
     @handle_size_change(cols=True)

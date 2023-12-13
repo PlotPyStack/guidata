@@ -313,9 +313,15 @@ class ArrayView(QTableView):
             User inputs
         """
         InsertionDataSet = self.model().get_insertion_dataset(index, axis)
-
+        title = (
+            _("Row(s) insertion")
+            if axis == 0
+            else _("Column(s) insertion")
+            if axis == 1
+            else ""
+        )
         insertion_dataset = InsertionDataSet(
-            title=_(f"{'Rows' if axis==0 else 'Columns' if axis==1 else ''} insertion"),
+            title=title,
             icon="insert.png",
         )
 
@@ -346,8 +352,15 @@ class ArrayView(QTableView):
             User inputs
         """
         DeletionDataSet = self.model().get_deletion_dataset(index, axis)
+        title = (
+            _("Row(s) deletion")
+            if axis == 0
+            else _("Column(s) deletion")
+            if axis == 1
+            else ""
+        )
         deletion_dataset = DeletionDataSet(
-            title=_(f"{'Rows' if axis==0 else 'Columns' if axis==1 else ''} deletions"),
+            title=title,
             icon="delete.png",
         )
         is_ok = deletion_dataset.edit()
@@ -534,7 +547,7 @@ class ArrayView(QTableView):
             QMessageBox.warning(
                 self,
                 _("Warning"),
-                _("It was not possible to copy values for " "this array"),
+                _("It was not possible to copy values for this array"),
             )
             return
         contents = output.getvalue().decode("utf-8")
