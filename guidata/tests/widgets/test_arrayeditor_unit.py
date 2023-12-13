@@ -108,7 +108,9 @@ MODIFIED_LABELED_ARRAYS = tuple(
 )
 
 
-def launch_arrayeditor_insert(data, title="", xlabels=None, ylabels=None):
+def launch_arrayeditor_insert(
+    data, title="", xlabels=None, ylabels=None, open_dlg=True
+) -> ArrayEditor:
     """Helper routine to launch an arrayeditor and return its result"""
     dlg = ArrayEditor()
     dlg.setup_and_check(
@@ -122,8 +124,24 @@ def launch_arrayeditor_insert(data, title="", xlabels=None, ylabels=None):
     dlg.arraywidget.view.model().insert_column(
         DEFAULT_INSERTION_INDEX, DEFAULT_INS_DEL_COUNT, DEFAULT_COL_VALUE
     )
-    exec_dialog(dlg)
-    return dlg.get_value()
+    if open_dlg:
+        exec_dialog(dlg)
+    return dlg
+
+
+def launch_arrayeditor_insert_delete(
+    data, title="", xlabels=None, ylabels=None, open_dlg=True
+) -> ArrayEditor:
+    dlg = launch_arrayeditor_insert(data, title, xlabels, ylabels, open_dlg=False)
+    dlg.arraywidget.view.model().remove_row(
+        DEFAULT_INSERTION_INDEX, DEFAULT_INS_DEL_COUNT
+    )
+    dlg.arraywidget.view.model().remove_column(
+        DEFAULT_INSERTION_INDEX, DEFAULT_INS_DEL_COUNT
+    )
+    if open_dlg:
+        exec_dialog(dlg)
+    return dlg
 
 
 def test_arrayeditor():
@@ -132,17 +150,20 @@ def test_arrayeditor():
         for (title, data), (_, awaited_result) in zip(
             BASIC_ARRAYS, MODIFIED_BASIC_ARRAYS
         ):
-            new_arr = launch_arrayeditor_insert(data, title)
-            assert (new_arr == awaited_result).all()
+            new_arr_1 = launch_arrayeditor_insert(data, title).get_value()
+            assert (new_arr_1 == awaited_result).all()
 
-        # TODO: This section can be uncommented when the support for label insertion alongside new row/values works
+            new_arr_2 = launch_arrayeditor_insert_delete(data, title).get_value()
+            assert (new_arr_2 == data).all()
+
+        # # TODO: This section can be uncommented when the support for label insertion alongside new row/values works
         # for (title, data, xlabels, ylabels), (*_, awaited_result) in zip(
         #     LABELED_ARRAYS, MODIFIED_LABELED_ARRAYS
         # ):
         #     new_arr = launch_arrayeditor_insert(data, title, xlabels, ylabels)
         #     # assert (new_arr == awaited_result).all()
 
-        execenv.print("OK")
+        # execenv.print("OK")
 
 
 if __name__ == "__main__":
