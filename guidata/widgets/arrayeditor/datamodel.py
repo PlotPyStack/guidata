@@ -15,7 +15,7 @@
 
 from abc import abstractmethod
 from functools import reduce
-from typing import Any, Callable, Sequence
+from typing import Any, Callable, Generic, Sequence, TypeVar
 
 import numpy as np
 from qtpy.QtCore import QAbstractTableModel, QModelIndex, Qt, Signal
@@ -32,6 +32,8 @@ from guidata.widgets.arrayeditor.arrayhandler import (
     MaskedArrayHandler,
     RecordArrayHandler,
 )
+
+ArrayModelType = TypeVar("ArrayModelType", bound="BaseArrayModel")
 
 
 class BaseArrayModel(QAbstractTableModel):
@@ -668,10 +670,10 @@ class BaseArrayModel(QAbstractTableModel):
         """
 
         def inner_handle_size_change(
-            model_method: Callable[["BaseArrayModel", int, int, Any], None]
-            | Callable[["BaseArrayModel", int, int], None]
+            model_method: Callable[["ArrayModelType", int, int, Any], None]
+            | Callable[["ArrayModelType", int, int], None]
         ):
-            def wrapped_method(self: "BaseArrayModel", *args, **kwargs):
+            def wrapped_method(self: "ArrayModelType", *args, **kwargs):
                 model_method(self, *args, **kwargs)
                 self.fetch(rows, cols)
                 self.set_hue_values()
@@ -774,6 +776,8 @@ class MaskedArrayModel(BaseArrayModel):
         return a 2d array when applied to it. Defaults to None.
     """
 
+    _array_handler: MaskedArrayHandler
+
     def __init__(
         self,
         array_handler: MaskedArrayHandler,
@@ -805,7 +809,7 @@ class MaskedArrayModel(BaseArrayModel):
 
     @BaseArrayModel.handle_size_change(rows=True)
     def insert_row(
-        self: BaseArrayModel,
+        self,
         index: int,
         insert_number: int,
         default_value: Any,
@@ -826,7 +830,7 @@ class MaskedArrayModel(BaseArrayModel):
 
     @BaseArrayModel.handle_size_change(cols=True)
     def insert_column(
-        self: BaseArrayModel,
+        self,
         index,
         insert_number,
         default_value,
@@ -854,7 +858,7 @@ class MaskArrayModel(MaskedArrayModel):
         return a 2d array when applied to it. Defaults to None.
     """
 
-    _array_handler = MaskedArrayHandler
+    _array_handler: MaskedArrayHandler
 
     def __init__(
         self,
@@ -876,7 +880,7 @@ class MaskArrayModel(MaskedArrayModel):
         Returns:
             Boolean mask
         """
-        return self._array_handler.mask  # type: ignore
+        return self._array_handler.mask
 
     def get_value(self, index: tuple[int, ...]) -> bool:
         """Get a mask value (include the changes made). Like get_array(),
@@ -888,7 +892,7 @@ class MaskArrayModel(MaskedArrayModel):
         Returns:
             Mask boolean
         """
-        return self._array_handler.get_mask_value(index)  # type: ignore -> the _array_handler must be a MaskedArrayHandler
+        return self._array_handler.get_mask_value(index)
 
     def set_value(self, index: tuple[int, ...], value: bool):
         """Set mask value (override of the BaseArrayModel.set_value() method)
@@ -897,7 +901,7 @@ class MaskArrayModel(MaskedArrayModel):
             index: index at which to set the value
             value: mask boolean
         """
-        self._array_handler.set_mask_value(index, value)  # type: ignore
+        self._array_handler.set_mask_value(index, value)
 
 
 class DataArrayModel(MaskedArrayModel):
@@ -951,10 +955,10 @@ class DataArrayModel(MaskedArrayModel):
         Returns:
             Data value at index
         """
-        return self._array_handler.get_data_value(index)  # type: ignore -> the _array_handler must be a MaskedArrayHandler
+        return self._array_handler.get_data_value(index)
 
     def set_value(self, index: tuple[int, ...], value: Any):
-        self._array_handler.set_data_value(index, value)  # type: ignore
+        self._array_handler.set_data_value(index, value)
 
 
 class RecordArrayModel(BaseArrayModel):
@@ -999,7 +1003,7 @@ class RecordArrayModel(BaseArrayModel):
         """:param index:
         :return:
         """
-        return self._array_handler.get_record_value(self._dtype_name, index)  # type: ignore -> the _array_handler must be a MaskedArrayHandler
+        return self._array_handler.get_record_value(self._dtype_name, index)
 
     def set_value(self, index: tuple[int, ...], value: Any):
-        self._array_handler.set_record_value(self._dtype_name, index, value)  # type: ignore
+        self._array_handler.set_record_value(self._dtype_name, index, value)

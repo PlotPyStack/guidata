@@ -61,7 +61,7 @@ class ArrayEditor(QDialog):
         "dim_indexes",
         "last_dim",
     )
-    data: BaseArrayHandler | MaskedArrayHandler | RecordArrayHandler
+    _data: BaseArrayHandler | MaskedArrayHandler | RecordArrayHandler
     arraywidget: BaseArrayEditorWidget | MaskArrayEditorWidget | DataArrayEditorWidget | RecordArrayEditorWidget
     layout: QGridLayout
 

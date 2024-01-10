@@ -65,7 +65,7 @@ import sys
 from abc import ABC, abstractmethod
 from collections.abc import Callable
 from copy import deepcopy
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, TypeVar
 
 from guidata.dataset.io import INIReader, INIWriter
 from guidata.userconfig import UserConfig
@@ -73,11 +73,10 @@ from guidata.userconfig import UserConfig
 DEBUG_DESERIALIZE = False
 
 if TYPE_CHECKING:  # pragma: no cover
-    from qtpy.QtCore import QSize
-    from qtpy.QtWidgets import QDialog, QWidget
-
     from guidata.dataset.io import HDF5Reader, HDF5Writer, JSONReader, JSONWriter
     from guidata.dataset.qtwidgets import DataSetEditDialog
+    from qtpy.QtCore import QSize
+    from qtpy.QtWidgets import QDialog, QWidget
 
 
 class NoDefault:
@@ -997,6 +996,9 @@ class DataSetMeta(type):
 
 
 Meta_Py3Compat = DataSetMeta("Meta_Py3Compat", (object,), {})
+
+
+DataSetType = TypeVar("DataSetType", bound="DataSet")
 
 
 class DataSet(metaclass=DataSetMeta):

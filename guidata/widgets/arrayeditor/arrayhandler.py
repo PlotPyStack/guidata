@@ -53,14 +53,14 @@ class BaseArrayHandler:
     ) -> None:
         self._variable_size = variable_size
         self._og_shape = None
-        self._backup_array: np.ndarray = np.ndarray(0)
-        self._array: np.ndarray | np.ma.MaskedArray
+        self._array = array
+        self._backup_array = array
         self._init_arrays(array)
 
         self._dtype = array.dtype
         self.current_changes: dict[tuple[str | int, ...] | str, bool] = {}
 
-    def _init_arrays(self, array: np.ndarray | np.ma.masked_array):
+    def _init_arrays(self, array: np.ndarray | np.ma.MaskedArray):
         """Small method to handle variable initializations dependent on the array.
 
         Args:
@@ -143,7 +143,7 @@ class BaseArrayHandler:
         indexes = range(index, index + remove_number)
         self._array = np.delete(self._array, indexes, axis=axis)
 
-    def get_array(self) -> np.ndarray | np.ma.MaskedArray:
+    def get_array(self):
         """Returns the current wrapped array. If variable_size is False, the returned array
         does not contain the current modifications as they are saved separately.
 
@@ -219,7 +219,7 @@ class BaseArrayHandler:
                 self._array[coor] = value
             self.current_changes.clear()
         else:
-            self._backup_array = self._array.copy()
+            self._backup_array = copy.deepcopy(self._array)
 
     def clear_changes(self):
         """Deletes all the changes made until that point. If the variable_size flag is
@@ -254,16 +254,11 @@ class MaskedArrayHandler(BaseArrayHandler):
         information. Defaults to False.
     """
 
-    __slots__ = (
-        "_variable_size",
-        "_backup_array",
-        "_array",
-        "_dtype",
-        "current_changes",
-        "current_mask_changes",
-    )
+    __slots__ = ("current_mask_changes",)
     # TArray = NewType("TArray", np.ndarray)
     # TMaskedArray = NewType("TArray", np.ma.MaskedArray)
+    _array: np.ma.MaskedArray
+    _backup_array: np.ma.MaskedArray
 
     def __init__(
         self,
@@ -275,7 +270,7 @@ class MaskedArrayHandler(BaseArrayHandler):
 
     @property
     def mask(self) -> np.ndarray:
-        return self._array.mask  # type: ignore
+        return self._array.mask
 
     def insert_on_axis(
         self,
@@ -299,11 +294,13 @@ class MaskedArrayHandler(BaseArrayHandler):
             default_mask: default mask value to insert. Defaults to False.
         """
         indexes = (index,) * insert_number
-        new_array = np.insert(self._array, indexes, default, axis=axis)
+        new_array: np.ma.MaskedArray = np.insert(
+            self._array, indexes, default, axis=axis
+        )
         # The check is performed at init and array type cannot change
-        new_mask = self._array.mask  # type: ignore
+        new_mask = self._array.mask
         new_mask = np.insert(new_mask, indexes, default_mask, axis=axis)
-        new_array.mask = new_mask  # type: ignore
+        new_array.mask = new_mask
         self._array = new_array
 
     def delete_on_axis(self, index: int, axis: int, remove_number: int = 1):
@@ -319,11 +316,11 @@ class MaskedArrayHandler(BaseArrayHandler):
         """
         # indexes = (index,) * remove_number
         indexes = range(index, min(index + remove_number, self._array.shape[axis]))
-        new_array = np.delete(self._array, indexes, axis=axis)
+        new_array: np.ma.MaskedArray = np.delete(self._array, indexes, axis=axis)
         # The check is performed at init and array type cannot change
-        new_mask = self._array.mask  # type: ignore
+        new_mask = self._array.mask
         new_mask = np.delete(new_mask, indexes, axis=axis)
-        new_array.mask = new_mask  # type: ignore
+        new_array.mask = new_mask
         self._array = new_array
 
     def set_mask_value(self, key: tuple[int, ...], value: bool):
@@ -338,7 +335,7 @@ class MaskedArrayHandler(BaseArrayHandler):
         if not self._variable_size:
             self.current_mask_changes[key] = value
         else:
-            self._array.mask[key] = value  # type: ignore
+            self._array.mask[key] = value
 
     def get_mask_value(self, key: tuple[int, ...]) -> bool:
         """Getter for the mask values. Identical to BaseArrayHandler.__getitem__ but for
@@ -354,8 +351,8 @@ class MaskedArrayHandler(BaseArrayHandler):
             The requested value from the mask
         """
         if not self._variable_size:
-            return self.current_mask_changes.get(key, self._array.mask[key])  # type: ignore
-        return self._array.mask[key]  # type: ignore
+            return self.current_mask_changes.get(key, self._array.mask[key])
+        return self._array.mask[key]
 
     def get_data_value(self, key: tuple[int, ...]):
         """Setter for the data values (unmasked). Identical to BaseArrayHandler.__setitem__ but for
@@ -371,8 +368,8 @@ class MaskedArrayHandler(BaseArrayHandler):
             The requested value from the array
         """
         if not self._variable_size:
-            return self.current_changes.get(key, self._array.data[key])  # type: ignore
-        return self._array.data[key]  # type: ignore
+            return self.current_changes.get(key, self._array.data[key])
+        return self._array.data[key]
 
     def set_data_value(self, key: tuple[int, ...], value: bool):
         """Getter for the data values (unmasked). Identical to BaseArrayHandler.__getitem__ but for
@@ -385,13 +382,13 @@ class MaskedArrayHandler(BaseArrayHandler):
         if not self._variable_size:
             self.current_changes[key] = value
         else:
-            self._array.data[key] = value  # type: ignore
+            self._array.data[key] = value
 
     def apply_changes(self):
         """Same as BaseArrayHandler.apply_changes but also applies changes to the mask."""
         super().apply_changes()
         for coor, value in self.current_mask_changes.items():
-            self._array.mask[coor] = value  # type: ignore
+            self._array.mask[coor] = value
         self.current_mask_changes.clear()
 
     def clear_changes(self):
@@ -443,8 +440,8 @@ class RecordArrayHandler(BaseArrayHandler):
             The requested value from the array
         """
         if not self._variable_size:
-            return self.current_changes.get((name, *key), self._array[name][key])  # type: ignore
-        return self._array[name][key]  # type: ignore
+            return self.current_changes.get((name, *key), self._array[name][key])
+        return self._array[name][key]
 
     def set_record_value(self, name: str, key: tuple[str | int, ...], value: Any):
         """Setter for the Numpy's structured array. Identical to BaseArrayHandler.__setitem__ but for

@@ -694,6 +694,8 @@ class MaskedArrayEditorWidget(BaseArrayEditorWidget):
     """Same as BaseArrayWidgetEditorWidget but specifically handles MaskedArrayHandler
     and MaskedArrayModel. Specifically the masked data."""
 
+    _data: MaskedArrayHandler
+
     def _init_handler(self, data: np.ma.MaskedArray | MaskedArrayHandler):
         if isinstance(data, np.ma.MaskedArray):
             self._data = MaskedArrayHandler(data, self._variable_size)
@@ -720,6 +722,8 @@ class MaskArrayEditorWidget(MaskedArrayEditorWidget):
     """Same as BaseArrayWidgetEditorWidget but specifically handles MaskedArrayHandler
     and MaskArrayModel. Specifically the boolean mask."""
 
+    _data: MaskedArrayHandler
+
     def _init_model(self, xlabels, ylabels, readonly, current_slice):
         assert isinstance(self._data, MaskedArrayHandler)
         self.model = MaskArrayModel(
@@ -735,6 +739,8 @@ class MaskArrayEditorWidget(MaskedArrayEditorWidget):
 class DataArrayEditorWidget(MaskedArrayEditorWidget):
     """Same as BaseArrayWidgetEditorWidget but specifically handles MaskedArrayHandler
     and DataArrayModel. Specifically the raw unmasked data."""
+
+    _data: MaskedArrayHandler
 
     def __init__(
         self,
@@ -765,6 +771,8 @@ class DataArrayEditorWidget(MaskedArrayEditorWidget):
 class RecordArrayEditorWidget(BaseArrayEditorWidget):
     """Same as BaseArrayWidgetEditorWidget but specifically handles RecordArrayHandler
     and RecordArrayModel which are made to wrap Numpy's structured arrays."""
+
+    _data: RecordArrayHandler
 
     def __init__(
         self,

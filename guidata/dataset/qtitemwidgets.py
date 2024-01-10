@@ -778,14 +778,14 @@ class ColorWidget(HLayoutMixin, LineEditWidget):
             self.notify_value_change()
 
     def __handle_button_connection(self):
-        """Connect the button the the color selection function if parent dataset is not
-        in readonly mode and signal is not already connected and disconnect it if the
+        """Connects the button for the color selection function if parent dataset is not
+        in readonly mode and signal is not already connected but disconnects it if the
         dataset is readonly.
         """
-        if not (self.__signal_connected and self.is_readonly()):
+        if not self.__signal_connected and not self.is_readonly():
             self.__signal_connected = True
             self.button.clicked.connect(self.select_color)
-        elif self.is_readonly():
+        elif self.__signal_connected and self.is_readonly():
             self.button.clicked.disconnect()
             self.__signal_connected = False
 

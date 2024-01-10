@@ -42,6 +42,7 @@ from .datatypes import (
     DataSet,
     DataSetGroup,
     DataSetMeta,
+    DataSetType,
     EndGroup,
     EndTabGroup,
     FormatProp,

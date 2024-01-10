@@ -37,7 +37,7 @@ Layouts for DataSet editing and showing
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import TYPE_CHECKING, Any, Type
+from typing import TYPE_CHECKING, Any, Generic, Type
 
 from qtpy.compat import getopenfilename, getopenfilenames, getsavefilename
 from qtpy.QtCore import (
@@ -74,6 +74,7 @@ from guidata.dataset.datatypes import (
     DataItem,
     DataItemVariable,
     DataSet,
+    DataSetType,
     EndGroup,
     GroupItem,
     TabGroupItem,
@@ -305,7 +306,7 @@ class DataSetEditLayout:
     def __init__(
         self,
         parent: QWidget | None,
-        instance: DataSet,
+        instance: DataSetType,
         layout: QGridLayout,
         items: list[DataItem] | None = None,
         first_line: int = 0,
@@ -495,9 +496,9 @@ class DataSetEditLayout:
             self.change_callback()
 
 
-from guidata.dataset.dataitems import (  # noqa: E402
+from guidata.dataset.dataitems import (
     BoolItem,
-    ButtonItem,
+    ButtonItem,  # noqa: E402
     ChoiceItem,
     ColorItem,
     DateItem,
@@ -517,8 +518,8 @@ from guidata.dataset.dataitems import (  # noqa: E402
 )
 
 # Enregistrement des correspondances avec les widgets
-from guidata.dataset.qtitemwidgets import (  # noqa: E402
-    AbstractDataSetWidget,
+from guidata.dataset.qtitemwidgets import (
+    AbstractDataSetWidget,  # noqa: E402
     ButtonWidget,
     CheckBoxWidget,
     ChoiceWidget,
@@ -741,7 +742,7 @@ DataSetShowLayout.register(FloatArrayItem, DataSetShowWidget)
 DataSetShowLayout.register(DictItem, DataSetShowWidget)
 
 
-class DataSetShowGroupBox(QGroupBox):
+class DataSetShowGroupBox(Generic[DataSetType], QGroupBox):
     """Group box widget showing a read-only DataSet
 
     Args:
@@ -752,12 +753,12 @@ class DataSetShowGroupBox(QGroupBox):
     """
 
     def __init__(
-        self, label: QLabel, klass: Type[DataSet], wordwrap: bool = False, **kwargs
+        self, label: QLabel, klass: type[DataSetType], wordwrap: bool = False, **kwargs
     ) -> None:
         QGroupBox.__init__(self, label)
         self.apply_button: QPushButton | None = None
         self.klass = klass
-        self.dataset = klass(**kwargs)
+        self.dataset: DataSetType = klass(**kwargs)
         self._layout = QVBoxLayout()
         if self.dataset.get_comment():
             label = QLabel(self.dataset.get_comment())
@@ -787,7 +788,7 @@ class DataSetShowGroupBox(QGroupBox):
             self.apply_button.setVisible(not self.dataset.is_readonly())
 
 
-class DataSetEditGroupBox(DataSetShowGroupBox):
+class DataSetEditGroupBox(DataSetShowGroupBox[DataSetType]):
     """Group box widget including a DataSet
 
     Args:
@@ -806,7 +807,7 @@ class DataSetEditGroupBox(DataSetShowGroupBox):
     def __init__(
         self,
         label: QLabel,
-        klass: Type[DataSet],
+        klass: type[DataSetType],
         button_text: str | None = None,
         button_icon: QIcon | str | None = None,
         show_button: bool = True,
@@ -879,7 +880,7 @@ class DataSetEditGroupBox(DataSetShowGroupBox):
         return "%s - %s" % (app_name, item.label())
 
 
-class DataSetTableModel(QAbstractTableModel):
+class DataSetTableModel(Generic[DataSetType], QAbstractTableModel):
     """DataSet Table Model.
 
     Args:
@@ -889,7 +890,7 @@ class DataSetTableModel(QAbstractTableModel):
         parent: Parent. Defaults to None.
     """
 
-    def __init__(self, datasets: list[DataSet], parent: QObject | None = None):
+    def __init__(self, datasets: list[DataSetType], parent: QObject | None = None):
         super().__init__(parent)
         self.datasets = datasets
 
