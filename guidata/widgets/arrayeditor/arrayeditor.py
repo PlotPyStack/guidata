@@ -12,6 +12,10 @@
 # pylint: disable=R0911
 # pylint: disable=R0201
 
+"""Module that provides array editor dialog boxes to edit various types of numpy
+array.
+"""
+
 from typing import Generic
 
 import numpy as np
@@ -28,10 +32,10 @@ from qtpy.QtWidgets import (
     QStackedWidget,
 )
 
-import guidata.widgets.arrayeditor.utils as utils
 from guidata.config import _
 from guidata.configtools import get_icon
 from guidata.qthelpers import win32_fix_title_bar_background
+from guidata.widgets.arrayeditor import utils
 from guidata.widgets.arrayeditor.arrayhandler import (
     ArrayT,
     BaseArrayHandler,
@@ -409,7 +413,9 @@ class ArrayEditor(QDialog, Generic[ArrayT]):
         QDialog.accept(self)
 
     def get_value(self) -> ArrayT:
-        """Return modified array -- the returned array is a copy if variable size is True and readonly is False"""
+        """Return modified array -- the returned array is a copy if variable size is
+        True and readonly is False
+        """
         # It is import to avoid accessing Qt C++ object as it has probably
         # already been destroyed, due to the Qt.WA_DeleteOnClose attribute
         self._data.reset_shape_if_changed()

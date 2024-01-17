@@ -12,6 +12,7 @@
 # pylint: disable=R0911
 # pylint: disable=R0201
 
+"""Array editor widget"""
 
 import io
 from typing import Any, Generic, Sequence, cast
@@ -36,11 +37,11 @@ from qtpy.QtWidgets import (
     QWidget,
 )
 
-import guidata.widgets.arrayeditor.utils as utils
 from guidata.config import CONF, _
 from guidata.configtools import get_font, get_icon
 from guidata.qthelpers import add_actions, create_action, keybinding
 from guidata.widgets import about
+from guidata.widgets.arrayeditor import utils
 from guidata.widgets.arrayeditor.arrayhandler import (
     ArrayT,
     BaseArrayHandler,
@@ -64,15 +65,15 @@ class ArrayDelegate(QItemDelegate):
         QItemDelegate.__init__(self, parent)
         self.dtype = dtype
 
-    def createEditor(self, parent, option, index):
+    def createEditor(self, parent, option, index) -> QLineEdit | None:
         """Create editor widget"""
         model: BaseArrayModel = index.model()  # type: ignore
         value = model.get_value((index.row(), index.column()))
         if model.get_array().dtype.name == "bool":
             value = not value
             model.setData(index, value)
-            return
-        elif value is not np.ma.masked:
+            return None
+        if value is not np.ma.masked:
             editor = QLineEdit(parent)
             editor.setFont(get_font(CONF, "arrayeditor", "font"))
             editor.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -82,8 +83,9 @@ class ArrayDelegate(QItemDelegate):
                 editor.setValidator(validator)
             editor.returnPressed.connect(self.commitAndCloseEditor)
             return editor
+        return None
 
-    def commitAndCloseEditor(self):
+    def commitAndCloseEditor(self) -> None:
         """Commit and close editor"""
         editor = self.sender()
         # Avoid a segfault with PyQt5. Variable value won't be changed
@@ -95,7 +97,7 @@ class ArrayDelegate(QItemDelegate):
             pass
         self.closeEditor.emit(editor, QAbstractItemDelegate.EndEditHint.NoHint)
 
-    def setEditorData(self, editor, index):
+    def setEditorData(self, editor, index) -> None:
         """Set editor widget's data"""
         if (model := index.model()) is not None and editor is not None:
             text = model.data(index, Qt.ItemDataRole.DisplayRole)
@@ -105,12 +107,12 @@ class ArrayDelegate(QItemDelegate):
 class DefaultValueDelegate(QItemDelegate):
     """Array Editor Item Delegate"""
 
-    def __init__(self, dtype: np.dtype, parent=None):
+    def __init__(self, dtype: np.dtype, parent=None) -> None:
         QItemDelegate.__init__(self, parent)
         self.dtype = dtype
         (self.default_value,) = np.zeros(1, dtype=dtype)
 
-    def createEditor(self, parent, option, index):
+    def createEditor(self, parent, option, index) -> QLineEdit:
         """Create editor widget"""
         editor = QLineEdit(parent)
         editor.setFont(get_font(CONF, "arrayeditor", "font"))
@@ -248,7 +250,7 @@ class ArrayView(QTableView, Generic[ArrayModelType]):
                 i,
                 insert_number,
                 default_values,
-                new_label,
+                _new_label,
                 valid,
             ) = self.ask_default_inserted_value(i, 0)
             if valid:
@@ -285,7 +287,7 @@ class ArrayView(QTableView, Generic[ArrayModelType]):
                 j,
                 insert_number,
                 default_value,
-                new_label,
+                _new_label,
                 valid,
             ) = self.ask_default_inserted_value(j, 1)
             if valid:
@@ -524,10 +526,10 @@ class ArrayView(QTableView, Generic[ArrayModelType]):
         else:
             QTableView.keyPressEvent(self, event)
 
-    def _sel_to_text(self, cell_range):
+    def _sel_to_text(self, cell_range) -> str | None:
         """Copy an array portion to a unicode string"""
         if not cell_range:
-            return
+            return None
         model = self.model()
         row_min, row_max, col_min, col_max = utils.get_idx_rect(cell_range)
         if col_min == 0 and col_max == (model.cols_loaded - 1):
@@ -555,7 +557,7 @@ class ArrayView(QTableView, Generic[ArrayModelType]):
                 _("Warning"),
                 _("It was not possible to copy values for this array"),
             )
-            return
+            return None
         contents = output.getvalue().decode("utf-8")
         output.close()
         return contents
@@ -569,7 +571,8 @@ class ArrayView(QTableView, Generic[ArrayModelType]):
 
 
 class BaseArrayEditorWidget(QWidget):
-    """Base ArrayEditdorWidget class. Used to wrap handle n-dimensional normal Numpy's ndarray.
+    """Base ArrayEditdorWidget class. Used to wrap handle n-dimensional normal Numpy's
+    ndarray.
 
     Args:
         parent: parent QObject
@@ -632,7 +635,7 @@ class BaseArrayEditorWidget(QWidget):
         layout.addLayout(btn_layout)
         self.setLayout(layout)
 
-    def _init_handler(self, data: ArrayT | BaseArrayHandler[ArrayT]):
+    def _init_handler(self, data: ArrayT | BaseArrayHandler[ArrayT]) -> None:
         if isinstance(data, np.ndarray):
             self._data = BaseArrayHandler[ArrayT](data, self._variable_size)
         elif isinstance(data, BaseArrayHandler):
@@ -647,7 +650,7 @@ class BaseArrayEditorWidget(QWidget):
         self,
         xlabels,
         ylabels,
-        readonly,
+        readonly: bool,
         current_slice: Sequence[slice | int] | None = None,
     ):
         """Initializes and set the instance model to use
@@ -668,15 +671,15 @@ class BaseArrayEditorWidget(QWidget):
             current_slice=current_slice,
         )
 
-    def accept_changes(self):
+    def accept_changes(self) -> None:
         """Accept changes"""
         self.model.apply_changes()
 
-    def reject_changes(self):
+    def reject_changes(self) -> None:
         """Reject changes"""
         self.model.clear_changes()
 
-    def change_format(self):
+    def change_format(self) -> None:
         """Change display format"""
         format, valid = QInputDialog.getText(
             self,
@@ -703,7 +706,7 @@ class MaskedArrayEditorWidget(BaseArrayEditorWidget):
 
     # _data: MaskedArrayHandler
 
-    def _init_handler(self, data: np.ma.MaskedArray | MaskedArrayHandler):
+    def _init_handler(self, data: np.ma.MaskedArray | MaskedArrayHandler) -> None:
         if isinstance(data, np.ma.MaskedArray):
             self._data = MaskedArrayHandler(data, self._variable_size)
         elif isinstance(data, MaskedArrayHandler):
@@ -720,7 +723,7 @@ class MaskedArrayEditorWidget(BaseArrayEditorWidget):
         ylabels,
         readonly: bool,
         current_slice: Sequence[slice | int] | None = None,
-    ):
+    ) -> None:
         assert isinstance(self._data, MaskedArrayHandler)
         self.model = MaskedArrayModel(
             self._data,
@@ -738,7 +741,13 @@ class MaskArrayEditorWidget(MaskedArrayEditorWidget):
 
     # _data: MaskedArrayHandler
 
-    def _init_model(self, xlabels, ylabels, readonly, current_slice):
+    def _init_model(
+        self,
+        xlabels,
+        ylabels,
+        readonly: bool,
+        current_slice: Sequence[slice | int] | None = None,
+    ) -> None:
         assert isinstance(self._data, MaskedArrayHandler)
         self.model = MaskArrayModel(
             self._data,
@@ -765,12 +774,18 @@ class DataArrayEditorWidget(MaskedArrayEditorWidget):
         ylabels=None,
         variable_size=False,
         current_slice: Sequence[slice | int] | None = None,
-    ):
+    ) -> None:
         super().__init__(
             parent, data, readonly, xlabels, ylabels, variable_size, current_slice
         )
 
-    def _init_model(self, xlabels, ylabels, readonly, current_slice):
+    def _init_model(
+        self,
+        xlabels,
+        ylabels,
+        readonly: bool,
+        current_slice: Sequence[slice | int] | None = None,
+    ) -> None:
         assert isinstance(self._data, MaskedArrayHandler)
         self.model = DataArrayModel(
             self._data,
@@ -798,13 +813,13 @@ class RecordArrayEditorWidget(BaseArrayEditorWidget):
         ylabels=None,
         variable_size=False,
         current_slice: Sequence[slice | int] | None = None,
-    ):
+    ) -> None:
         self._dtype_name = dtype_name
         super().__init__(
             parent, data, readonly, xlabels, ylabels, variable_size, current_slice
         )
 
-    def _init_handler(self, data: np.ndarray | RecordArrayHandler):
+    def _init_handler(self, data: np.ndarray | RecordArrayHandler) -> None:
         if isinstance(data, np.ma.MaskedArray):
             self._data = RecordArrayHandler(data, self._variable_size)
         elif isinstance(data, RecordArrayHandler):
@@ -814,7 +829,13 @@ class RecordArrayEditorWidget(BaseArrayEditorWidget):
                 f"Given data must be of type np.ndarray or RecordArrayHandler, not {type(data)}"
             )
 
-    def _init_model(self, xlabels, ylabels, readonly, current_slice):
+    def _init_model(
+        self,
+        xlabels,
+        ylabels,
+        readonly: bool,
+        current_slice: Sequence[slice | int] | None = None,
+    ) -> None:
         assert isinstance(self._data, RecordArrayHandler)
         self.model = RecordArrayModel(
             self._data,

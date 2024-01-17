@@ -12,6 +12,10 @@
 # pylint: disable=R0911
 # pylint: disable=R0201
 
+""" Provide classes to wrap Numpy arrays and handle changes made to them. Array handlers
+acts as a pointer to the original array and allows to share the same array in multiple
+models/widgets and views. They handle data access and changes.
+"""
 
 import copy
 from typing import Any, Generic, TypeVar, cast
@@ -63,7 +67,7 @@ class BaseArrayHandler(Generic[ArrayT]):
         self._dtype = array.dtype
         self.current_changes: dict[tuple[str | int, ...] | str, bool] = {}
 
-    def _init_arrays(self, array: np.ndarray | np.ma.MaskedArray):
+    def _init_arrays(self, array: np.ndarray | np.ma.MaskedArray) -> None:
         """Small method to handle variable initializations dependent on the array.
 
         Args:
@@ -85,26 +89,33 @@ class BaseArrayHandler(Generic[ArrayT]):
 
     @property
     def variable_size(self) -> bool:
+        """Returns the variable_size flag. If True, the array is resizable and
+        changes"""
         return self._variable_size
 
     @property
     def ndim(self) -> int:
+        """Numpy ndim property. Returns the number of dimensions of the array."""
         return self._array.ndim
 
     @property
     def flags(self):
+        """Numpy flags property. Returns the flags of the array."""
         return self._array.flags
 
     @property
     def shape(self) -> tuple[int, ...]:
+        """Numpy shape property. Returns the shape of the array."""
         return self._array.shape
 
     @shape.setter
-    def shape(self, value: tuple[int, ...]):
+    def shape(self, value: tuple[int, ...]) -> None:
+        """Numpy shape property setter. Sets the shape of the array."""
         self._array.shape = value
 
     @property
-    def dtype(self):
+    def dtype(self) -> Any:
+        """Numpy dtype property. Returns the dtype of the array."""
         return self._dtype
 
     @property
@@ -131,6 +142,7 @@ class BaseArrayHandler(Generic[ArrayT]):
             insert_number: Number of rows to insert at once. Defaults to 1.
             default: default value to insert. Defaults to the "zero value" of a type
             (e.g. "" for str or False for Booleans). Defaults to 0.
+            _args: additional arguments that can be defined and used in child classes
         """
         indexes = (index,) * insert_number
         self._array = np.insert(self._array, indexes, default, axis=axis)
@@ -272,6 +284,7 @@ class MaskedArrayHandler(BaseArrayHandler[np.ma.MaskedArray]):
 
     @property
     def mask(self) -> np.ndarray:
+        """Numpy mask property. Returns the mask of the array."""
         return self._array.mask
 
     def insert_on_axis(
@@ -387,16 +400,16 @@ class MaskedArrayHandler(BaseArrayHandler[np.ma.MaskedArray]):
             self._array.data[key] = value
 
     def apply_changes(self):
-        """Same as BaseArrayHandler.apply_changes but also applies changes to the mask."""
+        """Same as BaseArrayHandler.apply_changes but also applies changes to the
+        mask."""
         super().apply_changes()
         for coor, value in self.current_mask_changes.items():
             self._array.mask[coor] = value
         self.current_mask_changes.clear()
 
     def clear_changes(self):
-        """Same as BaseArrayHandler.clear_changes but also clears the changes made to the
-        mask.
-        """
+        """Same as BaseArrayHandler.clear_changes but also clears the changes made to
+        the mask."""
         super().clear_changes()
         if not self._variable_size:
             self.current_mask_changes.clear()

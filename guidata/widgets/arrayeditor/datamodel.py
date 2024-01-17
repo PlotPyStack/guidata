@@ -11,22 +11,23 @@
 # pylint: disable=R0903
 # pylint: disable=R0911
 # pylint: disable=R0201
-
+"""Data models for the array editor widget.
+"""
 
 from abc import abstractmethod
 from functools import reduce
-from typing import Any, Callable, Generic, Sequence, TypeVar
+from typing import Any, Generic, Sequence, TypeVar
 
 import numpy as np
 from qtpy.QtCore import QAbstractTableModel, QModelIndex, Qt, Signal
 from qtpy.QtGui import QColor
 from qtpy.QtWidgets import QMessageBox
 
-import guidata.widgets.arrayeditor.utils as utils
 from guidata.config import CONF, _
 from guidata.configtools import get_font
 from guidata.dataset.dataitems import BoolItem, FloatItem, IntItem, StringItem
 from guidata.dataset.datatypes import DataItem, DataSet
+from guidata.widgets.arrayeditor import utils
 from guidata.widgets.arrayeditor.arrayhandler import (
     ArrayHandlerT,
     ArrayT,
@@ -328,15 +329,13 @@ class BaseArrayModel(QAbstractTableModel, Generic[ArrayHandlerT, ArrayT]):
         """Array column number"""
         if self.total_cols <= self.cols_loaded:
             return self.total_cols
-        else:
-            return self.cols_loaded
+        return self.cols_loaded
 
     def rowCount(self, qindex=QModelIndex()):
         """Array row number"""
         if self.total_rows <= self.rows_loaded:
             return self.total_rows
-        else:
-            return self.rows_loaded
+        return self.rows_loaded
 
     def can_fetch_more(self, rows=False, columns=False) -> bool:
         """Args:
@@ -500,12 +499,11 @@ class BaseArrayModel(QAbstractTableModel, Generic[ArrayHandlerT, ArrayT]):
         if role == Qt.ItemDataRole.DisplayRole:
             if value is np.ma.masked:
                 return ""
-            else:
-                try:
-                    return self._format % value
-                except TypeError:
-                    self.readonly = True
-                    return repr(value)
+            try:
+                return self._format % value
+            except TypeError:
+                self.readonly = True
+                return repr(value)
         elif role == Qt.ItemDataRole.TextAlignmentRole:
             return int(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter)
         elif (
@@ -550,13 +548,15 @@ class BaseArrayModel(QAbstractTableModel, Generic[ArrayHandlerT, ArrayT]):
                 if not val.imag:
                     val = val.real
             except ValueError as e:
-                QMessageBox.critical(self.dialog, "Error", "Value error: %s" % str(e))
+                QMessageBox.critical(
+                    self.dialog, "Error", _("Value error: %s") % str(e)
+                )
                 return False
         try:
             self.test_array[0] = val  # will raise an Exception eventually
         except OverflowError as e:
             print("OverflowError: " + str(e))  # spyder: test-skip
-            QMessageBox.critical(self.dialog, "Error", "Overflow error: %s" % str(e))
+            QMessageBox.critical(self.dialog, "Error", _("Overflow error: %s") % str(e))
             return False
 
         self.set_value((i, j), val)
@@ -629,15 +629,16 @@ class BaseArrayModel(QAbstractTableModel, Generic[ArrayHandlerT, ArrayT]):
         )
         if labels is None:
             return int(section)
-        else:
-            return labels[section]
+        return labels[section]
 
     @property
-    def total_rows(self):
+    def total_rows(self) -> int:
+        """Total number of rows in the array"""
         return self._array_handler.shape[self._row_axis_nd]
 
     @property
-    def total_cols(self):
+    def total_cols(self) -> int:
+        """Total number of columns in the array"""
         try:
             return self._array_handler.shape[self._col_axis_nd]
         except IndexError:
@@ -821,6 +822,7 @@ class MaskedArrayModel(BaseArrayModel[MaskedArrayHandler, np.ma.MaskedArray]):
             mask_value = BoolItem(label="Mask value", default=False)
 
             def get_values_to_insert(self) -> tuple[Any, ...]:
+                """See BaseArrayModel.InsertionDataSet.get_values_to_insert()"""
                 return (self.default_value, self.mask_value)
 
         return NewInsertionDataSet
@@ -876,19 +878,17 @@ class MaskArrayModel(MaskedArrayModel):
         return a 2d array when applied to it. Defaults to None.
     """
 
-    def __init__(
-        self,
-        array_handler: MaskedArrayHandler,
-        format="%.6g",
-        xlabels=None,
-        ylabels=None,
-        readonly=False,
-        parent=None,
-        current_slice: Sequence[slice | int] | None = None,
-    ):
-        super().__init__(
-            array_handler, format, xlabels, ylabels, readonly, parent, current_slice
-        )
+    # def __init__(
+    #     self,
+    #     array_handler: MaskedArrayHandler,
+    #     format="%.6g",
+    #     xlabels=None,
+    #     ylabels=None,
+    #     readonly=False,
+    #     parent=None,
+    #     current_slice: Sequence[slice | int] | None = None,
+    # ):
+    #     ...
 
     def get_array(self) -> np.ndarray:
         """Returns the array mask (override of the BaseArrayModel.get_array() method)

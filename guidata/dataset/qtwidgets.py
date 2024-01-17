@@ -201,7 +201,7 @@ class DataSetEditDialog(QDialog):
         app_name = QApplication.applicationName()
         if not app_name:
             app_name = self.instance.get_title()
-        return "%s - %s" % (app_name, item.label())
+        return f"{app_name} - {item.label()}"
 
     def check(self) -> bool:
         """Check input of all widgets
@@ -369,16 +369,13 @@ class DataSetEditLayout(Generic[DataSetT]):
             """Return last column (which depends on column span)"""
             if not span:
                 return col
-            else:
-                return col + span - 1
+            return col + span - 1
 
         colmax = max(
-            [
-                last_col(
-                    item.get_prop("display", "col"), item.get_prop("display", "colspan")
-                )
-                for item in items
-            ]
+            last_col(
+                item.get_prop("display", "col"), item.get_prop("display", "colspan")
+            )
+            for item in items
         )
 
         # Check if specified rows are consistent
@@ -390,11 +387,11 @@ class DataSetEditLayout(Generic[DataSetT]):
             if row is not None:
                 if row in rows:
                     raise ValueError(
-                        "Duplicate row index (%d) for item %r" % (row, item.name)
+                        f"Duplicate row index ({row}) for item {item.name}"
                     )
                 if row < 0 or row >= len(items):
                     raise ValueError(
-                        "Out of range row index (%d) for item %r" % (row, item.name)
+                        f"Out of range row index ({row}) for item {item.name}"
                     )
                 rows.append(row)
                 sorted_items[row] = item
@@ -984,9 +981,9 @@ class DataSetTableModel(QAbstractTableModel, Generic[DataSetT]):
         if role == Qt.ItemDataRole.DisplayRole:
             item = self.item_pointers[index.row()][index.column()]
             return item.get_string_value(self.datasets[index.row()])
-        elif role == Qt.ItemDataRole.TextAlignmentRole:
+        if role == Qt.ItemDataRole.TextAlignmentRole:
             return int(Qt.AlignCenter | Qt.AlignVCenter)  # type: ignore
-        elif role == Qt.ItemDataRole.FontRole:
+        if role == Qt.ItemDataRole.FontRole:
             return get_font(CONF, "arrayeditor", "font")
         return None
 

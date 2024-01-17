@@ -50,7 +50,7 @@ from guidata.qthelpers import get_std_icon, win32_fix_title_bar_background
 from guidata.widgets.codeeditor import CodeEditor
 
 
-def get_test_package(package) -> str:
+def get_test_package(package):
     """Return test package for package
 
     Args:
@@ -77,6 +77,9 @@ def get_tests(package, category: str) -> list[TestModule]:
     assert category in ("all", "visible", "batch")
     tests = []
     test_package = get_test_package(package)
+    if test_package.__file__ is None:
+        print("Returning empty list")
+        return tests
     test_path = osp.dirname(osp.realpath(test_package.__file__))
     # Iterate over test scripts recursively within test package:
     for root, _dirs, files in os.walk(test_path):

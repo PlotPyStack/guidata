@@ -81,6 +81,20 @@ def insert_rows_and_cols(
     insert_size=DEFAULT_INS_DEL_COUNT,
     default_mask_value=DEFAULT_MASK_VALUE,
 ):
+    """Inserts new rows and columns into a numpy array and returns the result.
+
+    Args:
+        arr: numpy array to be edited.
+        default_row_value: Default value to insert. Defaults to DEFAULT_ROW_VALUE.
+        default_col_value: Default value to insert. Defaults to DEFAULT_COL_VALUE.
+        index: index at which to insert. Defaults to DEFAULT_INSERTION_INDEX.
+        insert_size: number of rows/cols to insert. Defaults to DEFAULT_INS_DEL_COUNT.
+        default_mask_value: Default mask value in case the input array is a MaskedArray.
+        Defaults to DEFAULT_MASK_VALUE.
+
+    Returns:
+        _description_
+    """
     if arr.ndim == 1:
         arr.shape = (arr.size, 1)
     (default_np_row_value,) = np.array([default_row_value], dtype=arr.dtype)

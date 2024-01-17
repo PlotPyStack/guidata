@@ -8,6 +8,10 @@
 # for details), copyright © Spyder Project Contributors
 
 # Note: string and unicode data types will be formatted with '%s' (see below)
+
+
+"""Basic utilitarian functions and variables for the various array editor classes"""
+
 SUPPORTED_FORMATS = {
     "single": "%.6g",
     "double": "%.6g",
