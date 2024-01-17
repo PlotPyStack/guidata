@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Licensed under the terms of the BSD 3-Clause
 # (see guidata/LICENSE for details)
@@ -97,16 +96,22 @@ import datetime
 import os
 import re
 from collections.abc import Callable
-from typing import TYPE_CHECKING, Any, Type
-
-from numpy import ndarray
+from typing import TYPE_CHECKING, Any
 
 from guidata.config import _
 from guidata.dataset.datatypes import DataItem, DataSet, ItemProperty
-from guidata.dataset.io import INIReader, INIWriter
 
 if TYPE_CHECKING:  # pragma: no cover
-    from guidata.dataset.io import HDF5Reader, HDF5Writer, JSONReader, JSONWriter
+    from numpy import ndarray
+
+    from guidata.dataset.io import (
+        HDF5Reader,
+        HDF5Writer,
+        INIReader,
+        INIWriter,
+        JSONReader,
+        JSONWriter,
+    )
 
 
 class NumericTypeItem(DataItem):
@@ -127,7 +132,7 @@ class NumericTypeItem(DataItem):
         check: if False, value is not checked (optional, default=True)
     """
 
-    type_: Type[int] | Type[float]
+    type: type[int | float]
 
     def __init__(
         self,
@@ -146,7 +151,7 @@ class NumericTypeItem(DataItem):
 
     def get_auto_help(self, instance: DataSet) -> str:
         """Override DataItem method"""
-        auto_help = {int: _("integer"), float: _("float")}[self.type_]
+        auto_help = {int: _("integer"), float: _("float")}[self.type]
         _min = self.get_prop_value("data", instance, "min")
         _max = self.get_prop_value("data", instance, "max")
         nonzero = self.get_prop_value("data", instance, "nonzero")
@@ -179,18 +184,16 @@ class NumericTypeItem(DataItem):
         """Override DataItem method"""
         if not self.get_prop("data", "check_value", True):
             return True
-        if not isinstance(value, self.type_):
+        if not isinstance(value, self.type):
             return False
         if self.get_prop("data", "nonzero") and value == 0:
             return False
         _min = self.get_prop("data", "min")
-        if _min is not None:
-            if value < _min:
-                return False
+        if _min is not None and value < _min:
+            return False
         _max = self.get_prop("data", "max")
-        if _max is not None:
-            if value > _max:
-                return False
+        if _max is not None and value > _max:
+            return False
         return True
 
     def from_string(self, value: str) -> Any | None:
@@ -201,7 +204,7 @@ class NumericTypeItem(DataItem):
             # pylint: disable=broad-except
             try:
                 # pylint: disable=not-callable
-                return self.type_(eval(value))
+                return self.type(eval(value))
             except:  # noqa
                 pass
         return None
@@ -225,7 +228,7 @@ class FloatItem(NumericTypeItem):
         check: if False, value is not checked (optional, default=True)
     """
 
-    type_ = float
+    type = float
 
     def __init__(
         self,
@@ -279,7 +282,7 @@ class IntItem(NumericTypeItem):
         check: if False, value is not checked (optional, default=True)
     """
 
-    type_ = int
+    type = int
 
     def __init__(
         self,
@@ -352,7 +355,7 @@ class StringItem(DataItem):
         check: if False, value is not checked (ineffective for strings)
     """
 
-    type_: Any = str
+    type: Any = str
 
     def __init__(
         self,
@@ -446,7 +449,7 @@ class BoolItem(DataItem):
         check: if False, value is not checked (optional, default=True)
     """
 
-    type_ = bool
+    type = bool
 
     def __init__(
         self,
@@ -478,7 +481,7 @@ class DateItem(DataItem):
         check: check value (default: True)
     """
 
-    type_ = datetime.date
+    type = datetime.date
 
     def __init__(
         self,
@@ -521,7 +524,7 @@ class ColorItem(StringItem):
         """Override DataItem method"""
         if not self.get_prop("data", "check_value", True):
             return True
-        if not isinstance(value, self.type_):
+        if not isinstance(value, self.type):
             return False
         from qtpy import QtGui as QG
 
@@ -583,7 +586,7 @@ class FileSaveItem(StringItem):
         """Override DataItem method"""
         if not self.get_prop("data", "check_value", True):
             return True
-        if not isinstance(value, self.type_):
+        if not isinstance(value, self.type):
             return False
         return len(value) > 0
 
@@ -596,9 +599,13 @@ class FileSaveItem(StringItem):
         `value`: possible value for data item"""
         value = str(value)
         formats = self.get_prop("data", "formats")
-        if len(formats) == 1 and formats[0] != "*":
-            if not value.endswith("." + formats[0]) and len(value) > 0:
-                return value + "." + formats[0]
+        if (
+            len(formats) == 1
+            and formats[0] != "*"
+            and not value.endswith("." + formats[0])
+            and len(value) > 0
+        ):
+            return value + "." + formats[0]
         return value
 
 
@@ -618,7 +625,7 @@ class FileOpenItem(FileSaveItem):
         """Override DataItem method"""
         if not self.get_prop("data", "check_value", True):
             return True
-        if not isinstance(value, self.type_):
+        if not isinstance(value, self.type):
             return False
         return os.path.exists(value) and os.path.isfile(value)
 
@@ -636,7 +643,7 @@ class FilesOpenItem(FileSaveItem):
         check: if False, value is not checked (optional, default=True)
     """
 
-    type_ = list
+    type = list
 
     def __init__(
         self,
@@ -665,6 +672,7 @@ class FilesOpenItem(FileSaveItem):
 
     @staticmethod
     def paths_basename(paths: str | list[str]):
+        """Return the basename of a path or a list of paths"""
         return (
             [os.path.basename(p) for p in paths]
             if isinstance(paths, list)
@@ -684,10 +692,7 @@ class FilesOpenItem(FileSaveItem):
 
     def from_string(self, value: Any) -> list[str]:  # type:ignore
         """Override DataItem method"""
-        if value.endswith("']") or value.endswith('"]'):
-            value = eval(value)
-        else:
-            value = [value]
+        value = eval(value) if value.endswith("']") or value.endswith('"]') else [value]
         return [self.add_extension(path) for path in value]
 
     def serialize(
@@ -721,7 +726,7 @@ class DirectoryItem(StringItem):
         """Override DataItem method"""
         if not self.get_prop("data", "check_value", True):
             return True
-        if not isinstance(value, self.type_):
+        if not isinstance(value, self.type):
             return False
         return os.path.exists(value) and os.path.isdir(value)
 
@@ -756,7 +761,7 @@ class ChoiceItem(DataItem):
         self,
         label: str,
         choices: Any,
-        default: tuple[()] | Type[FirstChoice] | int | None = FirstChoice,
+        default: tuple[()] | type[FirstChoice] | int | None = FirstChoice,
         help: str = "",
         check: bool = True,
         radio: bool = False,
@@ -796,8 +801,7 @@ class ChoiceItem(DataItem):
         for choice in choices:
             if choice[0] == value:
                 return str(choice[1])
-        else:
-            return DataItem.get_string_value(self, instance)
+        return DataItem.get_string_value(self, instance)
 
 
 class MultipleChoiceItem(ChoiceItem):

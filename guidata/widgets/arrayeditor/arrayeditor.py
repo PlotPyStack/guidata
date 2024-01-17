@@ -12,6 +12,7 @@
 # pylint: disable=R0911
 # pylint: disable=R0201
 
+from typing import Generic
 
 import numpy as np
 from qtpy.QtCore import QModelIndex, Qt, Slot
@@ -32,6 +33,7 @@ from guidata.config import _
 from guidata.configtools import get_icon
 from guidata.qthelpers import win32_fix_title_bar_background
 from guidata.widgets.arrayeditor.arrayhandler import (
+    ArrayT,
     BaseArrayHandler,
     MaskedArrayHandler,
     RecordArrayHandler,
@@ -45,7 +47,7 @@ from guidata.widgets.arrayeditor.edirotwidget import (
 )
 
 
-class ArrayEditor(QDialog):
+class ArrayEditor(QDialog, Generic[ArrayT]):
     """Array Editor Dialog"""
 
     __slots__ = (
@@ -62,7 +64,12 @@ class ArrayEditor(QDialog):
         "last_dim",
     )
     _data: BaseArrayHandler | MaskedArrayHandler | RecordArrayHandler
-    arraywidget: BaseArrayEditorWidget | MaskArrayEditorWidget | DataArrayEditorWidget | RecordArrayEditorWidget
+    arraywidget: (
+        BaseArrayEditorWidget
+        | MaskArrayEditorWidget
+        | DataArrayEditorWidget
+        | RecordArrayEditorWidget
+    )
     layout: QGridLayout
 
     def __init__(self, parent=None):
@@ -83,10 +90,11 @@ class ArrayEditor(QDialog):
         # Values for 3d array editor
         self.dim_indexes = [{}, {}, {}]
         self.last_dim = 0  # Adjust this for changing the startup dimension
+        self.stack: QStackedWidget | None = None
 
     def setup_and_check(
         self,
-        data: np.ndarray | np.ma.MaskedArray,
+        data: ArrayT,
         title="",
         readonly=False,
         xlabels=None,
@@ -106,7 +114,8 @@ class ArrayEditor(QDialog):
                 self,
                 _("Conflicing edition flags"),
                 _(
-                    "Array editor was initialized in both readonly and variable size mode."
+                    "Array editor was initialized in both readonly and variable "
+                    "size mode."
                 )
                 + "\n"
                 + _("The array editor will remain in readonly mode."),
@@ -117,7 +126,8 @@ class ArrayEditor(QDialog):
                 self,
                 _("Unsupported array format"),
                 _(
-                    "Array editor does not support array with x/y labels in variable size mode."
+                    "Array editor does not support array with x/y labels in "
+                    "variable size mode."
                 )
                 + "\n"
                 + _("You will not be able to add or remove rows/columns."),
@@ -127,24 +137,22 @@ class ArrayEditor(QDialog):
         self.is_masked_array = isinstance(data, np.ma.MaskedArray)
 
         if self.is_masked_array:
-            self._data = MaskedArrayHandler(data, self._variable_size)
+            self._data = MaskedArrayHandler(data, self._variable_size)  # type: ignore
         elif self.is_record_array:
             self._data = RecordArrayHandler(data, self._variable_size)
         else:
             self._data = BaseArrayHandler(data, self._variable_size)
 
         if data.ndim > 3:
-            self.error(_("Arrays with more than 3 dimensions are not " "supported"))
+            self.error(_("Arrays with more than 3 dimensions are not supported"))
             return False
         if xlabels is not None and len(xlabels) != self._data.shape[1]:
             self.error(
-                _("The 'xlabels' argument length do no match array " "column number")
+                _("The 'xlabels' argument length do no match array column number")
             )
             return False
         if ylabels is not None and len(ylabels) != self._data.shape[0]:
-            self.error(
-                _("The 'ylabels' argument length do no match array row " "number")
-            )
+            self.error(_("The 'ylabels' argument length do no match array row number"))
             return False
         if not self.is_record_array:
             dtn = data.dtype.name
@@ -153,17 +161,14 @@ class ArrayEditor(QDialog):
                 and not dtn.startswith("str")
                 and not dtn.startswith("unicode")
             ):
-                arr = _("%s arrays") % data.dtype.name
-                self.error(_("%s are currently not supported") % arr)
+                arr_ = _("%s arrays") % data.dtype.name
+                self.error(_("%s are currently not supported") % arr_)
                 return False
 
         self.layout = QGridLayout()
         self.setLayout(self.layout)
         self.setWindowIcon(get_icon("arredit.png"))
-        if title:
-            title = str(title) + " - " + _("NumPy array")
-        else:
-            title = _("Array editor")
+        title = str(title) + " - " + _("NumPy array") if title else _("Array editor")
         if readonly:
             title += " (" + _("read only") + ")"
         self.setWindowTitle(title)
@@ -175,7 +180,7 @@ class ArrayEditor(QDialog):
             for name in data.dtype.names:
                 w = RecordArrayEditorWidget(
                     self,
-                    self._data,
+                    self._data,  # type: ignore
                     name,
                     readonly,
                     xlabels,
@@ -196,7 +201,7 @@ class ArrayEditor(QDialog):
 
             w2 = DataArrayEditorWidget(
                 self,
-                self._data,
+                self._data,  # type: ignore
                 readonly,
                 xlabels,
                 ylabels,
@@ -229,7 +234,7 @@ class ArrayEditor(QDialog):
         if self.arraywidget:
             self.arraywidget.model.dataChanged.connect(self.save_and_close_enable)
         for wdg in self.arraywidgets:
-            wdg.model.sizeChanged.connect(self.update_all_tables_on_size_change)
+            wdg.model.SIZE_CHANGED.connect(self.update_all_tables_on_size_change)
         self.stack.currentChanged.connect(self.current_widget_changed)
         self.layout.addWidget(self.stack, 1, 0)
 
@@ -326,7 +331,7 @@ class ArrayEditor(QDialog):
             self.current_dim_changed(self.last_dim)
 
     @Slot(QModelIndex, QModelIndex)
-    def save_and_close_enable(self, left_top, bottom_right):
+    def save_and_close_enable(self, _left_top, _bottom_right):
         """Handle the data change event to enable the save and close button."""
         if self.btn_save_and_close:
             self.btn_save_and_close.setEnabled(True)
@@ -335,8 +340,9 @@ class ArrayEditor(QDialog):
 
     def current_widget_changed(self, index):
         """:param index:"""
-        self.arraywidget = self.stack.widget(index)
-        self.arraywidget.model.dataChanged.connect(self.save_and_close_enable)
+        if self.stack is not None:
+            self.arraywidget = self.stack.widget(index)
+            self.arraywidget.model.dataChanged.connect(self.save_and_close_enable)
 
     def change_active_widget(self, index):
         """This is implemented for handling negative values in index for
@@ -347,15 +353,12 @@ class ArrayEditor(QDialog):
         self.slicing_label.setText(
             (r"Slicing: [" + ", ".join(string_index) + "]") % index
         )
-        if index < 0:
-            data_index = self._data.shape[self.last_dim] + index
-        else:
-            data_index = index
+        data_index = self._data.shape[self.last_dim] + index if index < 0 else index
         slice_index = [slice(None)] * 3
         slice_index[self.last_dim] = data_index
 
         stack_index = self.dim_indexes[self.last_dim].get(data_index)
-        if stack_index is None:
+        if stack_index is None and self.stack is not None:
             stack_index = self.stack.count()
             try:
                 w = BaseArrayEditorWidget(
@@ -376,10 +379,10 @@ class ArrayEditor(QDialog):
             self.arraywidgets.append(
                 w
             )  # required to fetch the new columns/rows if added/deleted
-            w.model.sizeChanged.connect(self.update_all_tables_on_size_change)
+            w.model.SIZE_CHANGED.connect(self.update_all_tables_on_size_change)
             self.dim_indexes[self.last_dim][data_index] = stack_index
             self.stack.update()
-        self.stack.setCurrentIndex(stack_index)
+            self.stack.setCurrentIndex(stack_index)
 
     def current_dim_changed(self, index):
         """This change the active axis the array editor is plotting over
@@ -405,10 +408,8 @@ class ArrayEditor(QDialog):
         self._data.apply_changes()
         QDialog.accept(self)
 
-    def get_value(self):
-        """Return modified array -- the returned array is a copy if \
-        variable size is True and readonly is False
-        """
+    def get_value(self) -> ArrayT:
+        """Return modified array -- the returned array is a copy if variable size is True and readonly is False"""
         # It is import to avoid accessing Qt C++ object as it has probably
         # already been destroyed, due to the Qt.WA_DeleteOnClose attribute
         self._data.reset_shape_if_changed()
@@ -430,9 +431,27 @@ class ArrayEditor(QDialog):
         QDialog.reject(self)
 
 
-def launch_arrayeditor(data, title="", xlabels=None, ylabels=None, variable_size=False):
+class BaseArrayEditor(ArrayEditor[np.ndarray]):
+    """Optional wrapper class to get type inferance for normal numpy arrays"""
+
+
+class RecordArrayEditor(ArrayEditor[np.ndarray]):
+    """Optional wrapper class to get type inferance for record numpy arrays"""
+
+
+class MaskedArrayEditor(ArrayEditor[np.ma.MaskedArray]):
+    """Optional wrapper class to get type inferance for masked numpy arrays"""
+
+
+def launch_arrayeditor(
+    data: ArrayT,
+    title="",
+    xlabels=None,
+    ylabels=None,
+    variable_size=False,
+) -> ArrayT:
     """Helper routine to launch an arrayeditor and return its result"""
-    dlg = ArrayEditor()
+    dlg = ArrayEditor[ArrayT]()
     assert dlg.setup_and_check(
         data,
         title,
@@ -449,19 +468,12 @@ if __name__ == "__main__":
     from guidata import qapplication
 
     app = qapplication()
+    # arr_ = np.ones((5, 5), dtype=np.int32)
+    arr: np.ma.MaskedArray = np.ma.MaskedArray(
+        [[1, 0], [1, 0]], mask=[[True, False], [False, False]]
+    )
+    ed = ArrayEditor[np.ma.MaskedArray](None)
+    ed.setup_and_check(arr, "Test array editor")
+    x = ed.get_value()
 
-    arr = np.ones((5, 5), dtype=np.int32)
-    # arr = np.array(
-    #     [(0, 0.0), (0, 0.0), (0, 0.0)],
-    #     dtype=[(("title 1", "x"), "|i1"), (("title 2", "y"), ">f4")],
-    # )
-    arr = np.ma.array([[1, 0], [1, 0]], mask=[[True, False], [False, False]])
-    # arr = np.round(np.random.rand(5, 5) * 10) + np.round(np.random.rand(5, 5) * 10) * 1j
-    # arr = np.zeros((100, 100, 100), dtype=complex)
-    # arr[0, 0, 0] = 1
-    # arr[0, 0, 1] = 2
-    # arr[0, 0, 2] = 3
-    # arr = np.ma.MaskedArray(arr)
-    # print(arr)
-    print("final array", launch_arrayeditor(arr, "Hello", variable_size=True))
-    # assert_array_equal(arr, launch_arrayeditor(arr, "float16 array"))
+    x_ = launch_arrayeditor(arr, "Test array editor")

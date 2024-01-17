@@ -28,7 +28,8 @@ from guidata.configtools import get_font
 from guidata.dataset.dataitems import BoolItem, FloatItem, IntItem, StringItem
 from guidata.dataset.datatypes import DataItem, DataSet
 from guidata.widgets.arrayeditor.arrayhandler import (
-    BaseArrayHandler,
+    ArrayHandlerT,
+    ArrayT,
     MaskedArrayHandler,
     RecordArrayHandler,
 )
@@ -36,7 +37,7 @@ from guidata.widgets.arrayeditor.arrayhandler import (
 ArrayModelType = TypeVar("ArrayModelType", bound="BaseArrayModel")
 
 
-class BaseArrayModel(QAbstractTableModel):
+class BaseArrayModel(QAbstractTableModel, Generic[ArrayHandlerT, ArrayT]):
     # ==============================================================================
     """Array Editor Table Model that implements all the core functionnalities
 
@@ -55,7 +56,7 @@ class BaseArrayModel(QAbstractTableModel):
     ROWS_TO_LOAD = 500
     COLS_TO_LOAD = 40
 
-    sizeChanged = Signal(bool, bool)  # first bool is for rows, second is for columns
+    SIZE_CHANGED = Signal(bool, bool)  # first bool is for rows, second is for columns
 
     class InsertionDataSet(DataSet):
         """Abstract class to create a dataset to insert new rows/columns in a table."""
@@ -67,6 +68,17 @@ class BaseArrayModel(QAbstractTableModel):
 
         @abstractmethod
         def get_values_to_insert(self) -> tuple[Any, ...]:
+            """Getter for the field values to insert in the table. The values are
+            returned as a tuple in the same order as the fields are declared in the
+            dataset.
+
+            Raises:
+                NotImplementedError: must be implemented by every subclass of
+                InsertionDataSet
+
+            Returns:
+                Tuple of values to insert
+            """
             raise NotImplementedError
 
     class DeletionDataSet(DataSet):
@@ -101,7 +113,7 @@ class BaseArrayModel(QAbstractTableModel):
 
     def __init__(
         self,
-        array_handler: BaseArrayHandler,
+        array_handler: ArrayHandlerT,
         format="%.6g",
         xlabels=None,
         ylabels=None,
@@ -132,6 +144,7 @@ class BaseArrayModel(QAbstractTableModel):
         self.sat = 0.7  # Saturation
         self.val = 1.0  # Value
         self.alp = 0.6  # Alpha-channel
+        self.bgcolor_enabled = False
 
         self._format = format
 
@@ -193,7 +206,7 @@ class BaseArrayModel(QAbstractTableModel):
             else ""
         )
         value_label = _("Value")
-        # TODO use this as a template to insert/delete labels
+        # use this as a template to insert/delete labels
         # label = (self.ylabels, self.xlabels)[axis]
         # if isinstance(label, Sequence):
         #     label_type = type(label[0])
@@ -204,6 +217,8 @@ class BaseArrayModel(QAbstractTableModel):
         # label_label = str("New label")
 
         class NewInsertionDataSet(self.InsertionDataSet):
+            """InsertionDataSet child class"""
+
             index_field = IntItem(
                 label=index_label,
                 default=index,
@@ -231,7 +246,7 @@ class BaseArrayModel(QAbstractTableModel):
                 )
                 default_value.set_prop("display", active=False, valid=False)
 
-            # TODO use this as a template to insert/delete labels
+            # use this as a template to insert/delete labels
             # if label is not None:
             #     print("I passed by here")
             #     if label_type is int:
@@ -283,6 +298,8 @@ class BaseArrayModel(QAbstractTableModel):
         )
 
         class NewDeletionDataSet(self.DeletionDataSet):
+            """InsertionDataSet child class"""
+
             index_field = IntItem(
                 label=index_label,
                 default=index,
@@ -470,7 +487,7 @@ class BaseArrayModel(QAbstractTableModel):
         )
         return d2_axis + axis_offset
 
-    def data(self, index, role=Qt.ItemDataRole.DisplayRole):
+    def data(self, index: QModelIndex, role=Qt.ItemDataRole.DisplayRole):
         """Cell content"""
         if not index.isValid():
             return None
@@ -478,8 +495,8 @@ class BaseArrayModel(QAbstractTableModel):
         if isinstance(value, bytes):
             try:
                 value = str(value, "utf8")
-            except BaseException:
-                pass
+            except BaseException as e:
+                print(e)
         if role == Qt.ItemDataRole.DisplayRole:
             if value is np.ma.masked:
                 return ""
@@ -556,7 +573,8 @@ class BaseArrayModel(QAbstractTableModel):
 
         Returns
         -------
-            A tuple containing 0s and 2 slices of the form: (0, ..., 0, slice(None), slice(None))
+            A tuple containing 0s and 2 slices of the form: (0, ..., 0, slice(None),
+            slice(None))
         """
         default_slice = tuple(
             map(
@@ -588,7 +606,8 @@ class BaseArrayModel(QAbstractTableModel):
         else:
             err_msg = _(
                 "Slice %s is not valid. Expected an Iterable of "
-                "slices and int like (slice(None), slice(None), n1, n2, ..., nX) with maximum two slices."
+                "slices and int like (slice(None), slice(None), n1, n2, ..., nX) "
+                "with maximum two slices."
             ) % str(new_slice)
             print(err_msg)
             QMessageBox.critical(self.dialog, "Error", err_msg)
@@ -660,7 +679,7 @@ class BaseArrayModel(QAbstractTableModel):
     @staticmethod
     def handle_size_change(rows=False, cols=False):
         """Wrapper to signal when the table changed dimenstions, i.e. when a row or
-        column is inserted. This decorator emits the BaseArrayModel.sizeChanged signal
+        column is inserted. This decorator emits the BaseArrayModel.SIZE_CHANGED signal
         and fetch/update the model.
 
         Args:
@@ -670,14 +689,13 @@ class BaseArrayModel(QAbstractTableModel):
         """
 
         def inner_handle_size_change(
-            model_method: Callable[["ArrayModelType", int, int, Any], None]
-            | Callable[["ArrayModelType", int, int], None]
+            model_method,
         ):
-            def wrapped_method(self: "ArrayModelType", *args, **kwargs):
+            def wrapped_method(self: "BaseArrayModel", *args, **kwargs):
                 model_method(self, *args, **kwargs)
                 self.fetch(rows, cols)
                 self.set_hue_values()
-                self.sizeChanged.emit(rows, cols)
+                self.SIZE_CHANGED.emit(rows, cols)
                 qidx = QModelIndex()
                 self.dataChanged.emit(qidx, qidx)
 
@@ -736,11 +754,11 @@ class BaseArrayModel(QAbstractTableModel):
         self._array_handler.delete_on_axis(index, self._col_axis_nd, remove_number)
 
     def reset(self):
-        """ """
+        """Reset the model."""
         self.beginResetModel()
         self.endResetModel()
 
-    def get_array(self) -> np.ndarray | np.ma.MaskedArray:
+    def get_array(self) -> ArrayT:
         """Return the array.
 
         Returns
@@ -759,9 +777,9 @@ class BaseArrayModel(QAbstractTableModel):
         self._array_handler.clear_changes()
 
 
-class MaskedArrayModel(BaseArrayModel):
-    """Wrapper around a MaskedArrayHandler. More specifically, this model handles the masked
-    data. Check BaseArrayModel for more info on core
+class MaskedArrayModel(BaseArrayModel[MaskedArrayHandler, np.ma.MaskedArray]):
+    """Wrapper around a MaskedArrayHandler. More specifically, this model handles the
+    masked data. Check BaseArrayModel for more info on core
     functionnalities.
 
     Args:
@@ -775,8 +793,6 @@ class MaskedArrayModel(BaseArrayModel):
         current_slice: slice of the same dimension as the Numpy ndarray that will
         return a 2d array when applied to it. Defaults to None.
     """
-
-    _array_handler: MaskedArrayHandler
 
     def __init__(
         self,
@@ -800,6 +816,8 @@ class MaskedArrayModel(BaseArrayModel):
         """
 
         class NewInsertionDataSet(super().get_insertion_dataset(index, axis)):
+            """InsertionDataSet child class to handle new mask value on insertion"""
+
             mask_value = BoolItem(label="Mask value", default=False)
 
             def get_values_to_insert(self) -> tuple[Any, ...]:
@@ -842,8 +860,8 @@ class MaskedArrayModel(BaseArrayModel):
 
 
 class MaskArrayModel(MaskedArrayModel):
-    """Wrapper around a MaskedArrayHandler. More specifically, this model handles the mask
-    data. Check BaseArrayModel and MaskedArrayHandler
+    """Wrapper around a MaskedArrayHandler. More specifically, this model handles the
+    mask data. Check BaseArrayModel and MaskedArrayHandler
     for more core functionnalites.
 
     Args:
@@ -857,8 +875,6 @@ class MaskArrayModel(MaskedArrayModel):
         current_slice: slice of the same dimension as the Numpy ndarray that will
         return a 2d array when applied to it. Defaults to None.
     """
-
-    _array_handler: MaskedArrayHandler
 
     def __init__(
         self,
@@ -921,22 +937,6 @@ class DataArrayModel(MaskedArrayModel):
         return a 2d array when applied to it. Defaults to None.
     """
 
-    _array_handler: MaskedArrayHandler
-
-    def __init__(
-        self,
-        array_handler: MaskedArrayHandler,
-        format="%.6g",
-        xlabels=None,
-        ylabels=None,
-        readonly=False,
-        parent=None,
-        current_slice: Sequence[slice | int] | None = None,
-    ):
-        super().__init__(
-            array_handler, format, xlabels, ylabels, readonly, parent, current_slice
-        )
-
     def get_array(self) -> memoryview:
         """Returns a memoryview that correspond to the raw (unmasked) data in the
         MaskedArray. Th ememoryview can be used like a standard numpy array.
@@ -961,7 +961,7 @@ class DataArrayModel(MaskedArrayModel):
         self._array_handler.set_data_value(index, value)
 
 
-class RecordArrayModel(BaseArrayModel):
+class RecordArrayModel(BaseArrayModel[RecordArrayHandler, ArrayT]):
     """Array Editor Table Model made for record arrays (= Numpy's structured arrays).
 
     Args:
@@ -977,8 +977,8 @@ class RecordArrayModel(BaseArrayModel):
         return a 2d array when applied to it. Defaults to None.
     """
 
-    __slots__ = "_dtype_name"
-    _array_handler: RecordArrayHandler
+    __slots__ = ("_dtype_name",)
+    # _array_handler: RecordArrayHandler
 
     def __init__(
         self,

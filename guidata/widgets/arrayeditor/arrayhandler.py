@@ -14,12 +14,15 @@
 
 
 import copy
-from typing import Any
+from typing import Any, Generic, TypeVar, cast
 
 import numpy as np
 
+ArrayT = TypeVar("ArrayT", bound=np.ndarray | np.ma.MaskedArray)
+ArrayHandlerT = TypeVar("ArrayHandlerT", bound="BaseArrayHandler")
 
-class BaseArrayHandler:
+
+class BaseArrayHandler(Generic[ArrayT]):
     """Wrapper class around a Numpy nparray that is used a pointer to share the same
     array in multiple models/widgets and views. It handles data access and changes.
 
@@ -48,7 +51,7 @@ class BaseArrayHandler:
 
     def __init__(
         self,
-        array: np.ndarray | np.ma.MaskedArray,
+        array: ArrayT,
         variable_size: bool = False,
     ) -> None:
         self._variable_size = variable_size
@@ -81,7 +84,7 @@ class BaseArrayHandler:
             self._array = array
 
     @property
-    def variable_size(self):
+    def variable_size(self) -> bool:
         return self._variable_size
 
     @property
@@ -93,7 +96,7 @@ class BaseArrayHandler:
         return self._array.flags
 
     @property
-    def shape(self):
+    def shape(self) -> tuple[int, ...]:
         return self._array.shape
 
     @shape.setter
@@ -106,7 +109,8 @@ class BaseArrayHandler:
 
     @property
     def data(self) -> memoryview:
-        """Used to get the underlying data of an array. Useful for Numpy's structured arrays.
+        """Used to get the underlying data of an array. Useful for Numpy's structured
+        arrays.
 
         Returns
         -------
@@ -143,15 +147,15 @@ class BaseArrayHandler:
         indexes = range(index, index + remove_number)
         self._array = np.delete(self._array, indexes, axis=axis)
 
-    def get_array(self):
-        """Returns the current wrapped array. If variable_size is False, the returned array
-        does not contain the current modifications as they are saved separately.
+    def get_array(self) -> ArrayT:
+        """Returns the current wrapped array. If variable_size is False, the returned
+        array does not contain the current modifications as they are saved separately.
 
         Returns
         -------
-            np.ndarray | np.ma.MaksedArray
+            Numpy array contained in the handler instance
         """
-        return self._array
+        return cast(ArrayT, self._array)
 
     def new_row(self, index: int, insert_number: int = 1, default: Any = 0):
         """Insert new row(s) on axis 0. Do not for 3D+ arrays. Prefer the method
@@ -210,9 +214,9 @@ class BaseArrayHandler:
         return self._array[key]
 
     def apply_changes(self):
-        """Apply changes. Only useful if flag viariable_size is False as it will write the
-        values stored in a dictionary in the original array. This operation is non-reversible
-        as it writes inplace.
+        """Apply changes. Only useful if flag viariable_size is False as it will write
+        the values stored in a dictionary in the original array. This operation is
+        non-reversible as it writes inplace.
         """
         if not self._variable_size:
             for coor, value in self.current_changes.items():
@@ -232,18 +236,18 @@ class BaseArrayHandler:
             self._init_arrays(self._backup_array)
 
     def reset_shape_if_changed(self):
-        """When a numpy array is 1D, the handler changes the shape to add a second dimension
-        of size 1 to act like a normal 2d array in the BaseArrayModel. In some instances,
-        the shape must be reset (i.e. when getting the array when the ArrayEditor is closed).
-        When the shape is reset, the array editor may not work properly as the awaited
-        2nd dimension is removed. The method _init_arrays(array) or clear_changes() must
-        be called to avoid errors possible IndexError.
+        """When a numpy array is 1D, the handler changes the shape to add a second
+        dimension of size 1 to act like a normal 2d array in the BaseArrayModel. In some
+        instances, the shape must be reset (i.e. when getting the array when the
+        ArrayEditor is closed). When the shape is reset, the array editor may not work
+        properly as the awaited 2nd dimension is removed. The method _init_arrays(array)
+        or clear_changes() must be called to avoid errors possible IndexError.
         """
         if self._og_shape is not None:
             self._array.shape = self._og_shape
 
 
-class MaskedArrayHandler(BaseArrayHandler):
+class MaskedArrayHandler(BaseArrayHandler[np.ma.MaskedArray]):
     """Same as the class BaseArrayHandler but with additionnal functionnalities to
     handled a Numpy MaskedArray.
 
@@ -255,8 +259,6 @@ class MaskedArrayHandler(BaseArrayHandler):
     """
 
     __slots__ = ("current_mask_changes",)
-    # TArray = NewType("TArray", np.ndarray)
-    # TMaskedArray = NewType("TArray", np.ma.MaskedArray)
     _array: np.ma.MaskedArray
     _backup_array: np.ma.MaskedArray
 
@@ -355,8 +357,8 @@ class MaskedArrayHandler(BaseArrayHandler):
         return self._array.mask[key]
 
     def get_data_value(self, key: tuple[int, ...]):
-        """Setter for the data values (unmasked). Identical to BaseArrayHandler.__setitem__ but for
-        the unmasked array data.
+        """Setter for the data values (unmasked). Identical to
+        BaseArrayHandler.__setitem__ but for the unmasked array data.
 
         Args:
         ----
@@ -372,8 +374,8 @@ class MaskedArrayHandler(BaseArrayHandler):
         return self._array.data[key]
 
     def set_data_value(self, key: tuple[int, ...], value: bool):
-        """Getter for the data values (unmasked). Identical to BaseArrayHandler.__getitem__ but for
-        the unmasked array data.
+        """Getter for the data values (unmasked). Identical to
+        BaseArrayHandler.__getitem__ but for the unmasked array data.
 
         Args:
         ----
@@ -400,7 +402,7 @@ class MaskedArrayHandler(BaseArrayHandler):
             self.current_mask_changes.clear()
 
 
-class RecordArrayHandler(BaseArrayHandler):
+class RecordArrayHandler(BaseArrayHandler[np.ndarray]):
     """Same as the class BaseArrayHandler but with additionnal functionnalities to
     handled Numpy's structured arrays.
 
@@ -411,24 +413,16 @@ class RecordArrayHandler(BaseArrayHandler):
         information. Defaults to False.
     """
 
-    __slots__ = (
-        "_variable_size",
-        "_backup_array",
-        "_array",
-        "_dtype",
-        "current_changes",
-    )
-
     def __init__(
         self,
-        array: np.ndarray,
+        array: np.recarray,
         variable_size: bool = False,
     ) -> None:
         super().__init__(array, variable_size)
 
     def get_record_value(self, name: str, key: tuple[str | int, ...]) -> Any:
-        """Getter for the Numpy's structured array. Identical to BaseArrayHandler.__getitem__ but for
-        the named values.
+        """Getter for the Numpy's structured array. Identical to
+        BaseArrayHandler.__getitem__ but for the named values.
 
         Args:
         ----
@@ -444,8 +438,8 @@ class RecordArrayHandler(BaseArrayHandler):
         return self._array[name][key]
 
     def set_record_value(self, name: str, key: tuple[str | int, ...], value: Any):
-        """Setter for the Numpy's structured array. Identical to BaseArrayHandler.__setitem__ but for
-        the named values.
+        """Setter for the Numpy's structured array. Identical to
+        BaseArrayHandler.__setitem__ but for the named values.
 
         Args:
         ----
