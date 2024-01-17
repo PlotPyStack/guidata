@@ -468,12 +468,11 @@ if __name__ == "__main__":
     from guidata import qapplication
 
     app = qapplication()
-    # arr_ = np.ones((5, 5), dtype=np.int32)
     arr: np.ma.MaskedArray = np.ma.MaskedArray(
         [[1, 0], [1, 0]], mask=[[True, False], [False, False]]
     )
-    ed = ArrayEditor[np.ma.MaskedArray](None)
+    ed = ArrayEditor[type(arr)](None)
     ed.setup_and_check(arr, "Test array editor")
     x = ed.get_value()
 
-    x_ = launch_arrayeditor(arr, "Test array editor")
+    y = launch_arrayeditor(arr, "Test array editor")
