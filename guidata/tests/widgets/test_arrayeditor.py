@@ -20,7 +20,7 @@ from guidata.widgets.arrayeditor import ArrayEditor
 def launch_arrayeditor(data, title="", xlabels=None, ylabels=None):
     """Helper routine to launch an arrayeditor and return its result"""
     dlg = ArrayEditor()
-    dlg.setup_and_check(data, title, xlabels=xlabels, ylabels=ylabels, variable_size=True)
+    dlg.setup_and_check(data, title, xlabels=xlabels, ylabels=ylabels)
     exec_dialog(dlg)
     return dlg.get_value()
 

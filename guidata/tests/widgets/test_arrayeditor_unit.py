@@ -10,7 +10,6 @@ Unit tests for arrayeditor.py and its rows/columns insertion/deletion features
 
 # guitest: show
 
-from pprint import pprint
 from typing import Any
 
 import numpy as np
@@ -130,8 +129,26 @@ def launch_arrayeditor_insert(
 
 
 def launch_arrayeditor_insert_delete(
-    data, title="", xlabels=None, ylabels=None, open_dlg=True
+    data: np.ndarray | np.ma.MaskedArray,
+    title="",
+    xlabels=None,
+    ylabels=None,
+    open_dlg=True,
 ) -> ArrayEditor:
+    """Creates a new arrayeditor with given data, adds new rows and columns,
+    and then deletes them before opening a new dialog box with the result.
+
+    Args:
+        data: numpy array to be edited.
+        title: title of the arrayeditor. Defaults to "".
+        xlabels: xlabels to use in the ArrayEditor. Defaults to None.
+        ylabels: ylabels to use in the ArrayEditor. Defaults to None.
+        open_dlg: flag to open the ArrayEditor dialog box before returning.
+        Defaults to True.
+
+    Returns:
+        _description_
+    """
     dlg = launch_arrayeditor_insert(data, title, xlabels, ylabels, open_dlg=False)
     dlg.arraywidget.view.model().remove_row(
         DEFAULT_INSERTION_INDEX, DEFAULT_INS_DEL_COUNT
@@ -156,14 +173,15 @@ def test_arrayeditor():
             new_arr_2 = launch_arrayeditor_insert_delete(data, title).get_value()
             assert (new_arr_2 == data).all()
 
-        # # TODO: This section can be uncommented when the support for label insertion alongside new row/values works
+        # # TODO: This section can be uncommented when the support for label insertion
+        # # alongside new row/values works
         # for (title, data, xlabels, ylabels), (*_, awaited_result) in zip(
         #     LABELED_ARRAYS, MODIFIED_LABELED_ARRAYS
         # ):
         #     new_arr = launch_arrayeditor_insert(data, title, xlabels, ylabels)
         #     # assert (new_arr == awaited_result).all()
 
-        # execenv.print("OK")
+        execenv.print("OK")
 
 
 if __name__ == "__main__":

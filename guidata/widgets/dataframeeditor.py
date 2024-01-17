@@ -27,37 +27,7 @@ The current version is qtpandas/models/DataFrameModel.py of the
 import io
 
 import numpy as np
-
 from pandas import DataFrame, DatetimeIndex, Series
-from guidata.configtools import get_font, get_icon
-from guidata.qthelpers import (
-    add_actions,
-    create_action,
-    keybinding,
-    win32_fix_title_bar_background,
-)
-from guidata.config import CONF, _
-from qtpy.QtWidgets import (
-    QApplication,
-    QCheckBox,
-    QGridLayout,
-    QHBoxLayout,
-    QDialog,
-    QHeaderView,
-    QInputDialog,
-    QLineEdit,
-    QMenu,
-    QMessageBox,
-    QPushButton,
-    QTableView,
-    QShortcut,
-    QAbstractItemView,
-)
-from qtpy.QtGui import (
-    QKeySequence,
-    QColor,
-    QCursor,
-)
 from qtpy.QtCore import (
     QAbstractTableModel,
     QModelIndex,
@@ -65,7 +35,37 @@ from qtpy.QtCore import (
     Signal,
     Slot,
 )
-from guidata.widgets.arrayeditor import get_idx_rect
+from qtpy.QtGui import (
+    QColor,
+    QCursor,
+    QKeySequence,
+)
+from qtpy.QtWidgets import (
+    QAbstractItemView,
+    QApplication,
+    QCheckBox,
+    QDialog,
+    QGridLayout,
+    QHBoxLayout,
+    QHeaderView,
+    QInputDialog,
+    QLineEdit,
+    QMenu,
+    QMessageBox,
+    QPushButton,
+    QShortcut,
+    QTableView,
+)
+
+from guidata.config import CONF, _
+from guidata.configtools import get_font, get_icon
+from guidata.qthelpers import (
+    add_actions,
+    create_action,
+    keybinding,
+    win32_fix_title_bar_background,
+)
+from guidata.widgets.arrayeditor.utils import get_idx_rect
 
 try:
     from pandas._libs.tslib import OutOfBoundsDatetime
@@ -325,7 +325,7 @@ class DataFrameModel(QAbstractTableModel):
                         return str(value)
                     except Exception:
                         self.display_error_idxs.append(index)
-                        return u"Display Error!"
+                        return "Display Error!"
         elif role == Qt.BackgroundColorRole:
             return self.get_bgcolor(index)
         elif role == Qt.FontRole:

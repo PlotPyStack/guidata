@@ -7,7 +7,8 @@
 DataSetGroup demo
 
 DataSet objects may be grouped into DataSetGroup, allowing them to be edited
-in a single dialog box (with one tab per DataSet object).
+in a single dialog box (with one tab per DataSet object). This code tests both the
+normal dataset group mode and the table mode (with one tab per DataSet object).
 """
 
 # guitest: show
@@ -30,7 +31,7 @@ def test_dataset_group():
         g.edit()
         execenv.print("OK")
 
-        g = DataSetGroup([e1, e2], title="Parameters group")
+        g = DataSetGroup([e1, e2], title="Parameters group in table mode")
         g.edit(mode="table")
         execenv.print(e1)
         g.edit()

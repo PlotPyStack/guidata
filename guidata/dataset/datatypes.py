@@ -73,10 +73,11 @@ from guidata.userconfig import UserConfig
 DEBUG_DESERIALIZE = False
 
 if TYPE_CHECKING:  # pragma: no cover
-    from guidata.dataset.io import HDF5Reader, HDF5Writer, JSONReader, JSONWriter
-    from guidata.dataset.qtwidgets import DataSetEditDialog
     from qtpy.QtCore import QSize
     from qtpy.QtWidgets import QDialog, QWidget
+
+    from guidata.dataset.io import HDF5Reader, HDF5Writer, JSONReader, JSONWriter
+    from guidata.dataset.qtwidgets import DataSetEditDialog
 
 
 class NoDefault:
@@ -142,7 +143,7 @@ class FormatProp(ItemProperty):
             return self.fmt % dic
         except TypeError:
             if not self.ignore_error:
-                print("Wrong Format for %s : %r %% %r" % (item._name, self.fmt, dic))
+                print(f"Wrong Format for {item._name} : {self.fmt!r} % {dic!r}")
                 raise
 
 
@@ -350,7 +351,7 @@ class DataItem(ABC):
         return self
 
     def __str__(self) -> str:
-        return "%s : %s" % (self._name, self.__class__.__name__)
+        return f"{self._name} : {self.__class__.__name__}"
 
     def get_help(self, instance: DataSet) -> str:
         """Return data item's tooltip
@@ -362,13 +363,10 @@ class DataItem(ABC):
             str: tooltip
         """
         auto_help = self.get_auto_help(instance)
-        help_ = self._help or ""
+        help = self._help or ""
         if auto_help:
-            if help_:
-                help_ = help_ + "\n(" + auto_help + ")"
-            else:
-                help_ = auto_help.capitalize()
-        return help_
+            help = help + "\n(" + auto_help + ")" if help else auto_help.capitalize()
+        return help
 
     def get_auto_help(self, instance: DataSet) -> str:
         """Return the automatically generated part of data item's tooltip
@@ -998,7 +996,7 @@ class DataSetMeta(type):
 Meta_Py3Compat = DataSetMeta("Meta_Py3Compat", (object,), {})
 
 
-DataSetType = TypeVar("DataSetType", bound="DataSet")
+DataSetT = TypeVar("DataSetT", bound="DataSet")
 
 
 class DataSet(metaclass=DataSetMeta):
@@ -1040,7 +1038,8 @@ class DataSet(metaclass=DataSetMeta):
         items that have a name starting with an underscore (e.g. '_private_item = ...')
 
         Args:
-            copy: If True, deepcopy the DataItem list, else return the original. Defaults to False.
+            copy: If True, deepcopy the DataItem list, else return the original.
+            Defaults to False.
 
         Returns:
             _description_
@@ -1265,17 +1264,14 @@ class DataSet(metaclass=DataSetMeta):
                 indent = indent[:-2]
                 continue
             value = getattr(self, "_%s" % (item._name))
-            if value is None:
-                value_str = "-"
-            else:
-                value_str = item.get_string_value(self)
+            value_str = "-" if value is None else item.get_string_value(self)
             if debug:
                 label = item._name
             else:
                 label = item.get_prop_value("display", self, "label")
             if length and label is not None:
                 label = label.ljust(length)
-            txt += "%s%s: %s" % (indent, label, value_str)
+            txt += f"{indent}{label}: {value_str}"
             if debug:
                 txt += " (" + item.__class__.__name__ + ")"
         return txt
@@ -1487,11 +1483,11 @@ class DataSetGroup:
             apply: apply callback. Defaults to None.
             wordwrap: if True, comment text is wordwrapped
             size: dialog size (default: None)
-            mode: (str): dialog window style to use. Allowed values are "tabs", "table" and \
-            None.
-                * tabs : use tabs to navigate between datasets.
-                * table : create a table with one dataset by row. Allows dataset editing.\
-                by double clicking on a row. \
+            mode: (str): dialog window style to use. Allowed values are "tabs",
+            "table" and None.\n\r
+            * tabs : use tabs to navigate between datasets.\n\r
+            * table : create a table with one dataset by row. Allows dataset
+            editing by double clicking on a row.
 
         Returns:
             int: dialog box return code

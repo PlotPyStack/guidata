@@ -4,7 +4,8 @@
 # (see guidata/LICENSE for details)
 
 """
-All guidata item/group features demo
+Same as test_all_items.py but with readonly=True to check that the readonly mode works
+on all DataItem types.
 """
 
 # guitest: show
