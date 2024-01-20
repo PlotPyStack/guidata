@@ -61,7 +61,7 @@ import sys
 import time
 from contextlib import contextmanager
 from datetime import datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Iterable
 
 from qtpy import QtCore as QC
 from qtpy import QtGui as QG
@@ -304,7 +304,7 @@ def add_separator(target: QW.QMenu | QW.QToolBar) -> None:
 
 def add_actions(
     target: QW.QMenu | QW.QToolBar,
-    actions: list[QW.QAction | QW.QMenu | QW.QToolButton | QW.QPushButton | None],
+    actions: Iterable[QW.QAction | QW.QMenu | QW.QToolButton | QW.QPushButton | None],
 ) -> None:
     """
     Add actions (list of QAction instances) to target (menu, toolbar)

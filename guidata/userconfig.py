@@ -56,6 +56,7 @@ import os
 import os.path as osp
 import re
 import sys
+from typing import Any
 
 
 def get_home_dir() -> str:
@@ -310,7 +311,7 @@ class UserConfig(cp.ConfigParser):
         options = self.defaults.get(section, {})
         return options.get(option, NoDefault)
 
-    def get(self, section, option, default=NoDefault, raw=None, **kwargs):
+    def get(self, section, option, default: Any = NoDefault, raw=None, **kwargs):
         """
         Get an option
         section=None: attribute a default section name

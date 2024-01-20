@@ -141,8 +141,12 @@ class MainWindow(QMainWindow):
         editparam4_action = create_action(
             self, "Edit dataset 4", triggered=self.edit_dataset4
         )
+        ro_param4_action = create_action(
+            self, "dataset 4 readonly", toggled=self.ro_dataset4
+        )
         add_actions(
-            edit_menu, (editparam1_action, editparam2_action, editparam4_action)
+            edit_menu,
+            (editparam1_action, editparam2_action, editparam4_action, ro_param4_action),
         )
 
         # ? menu
@@ -167,6 +171,10 @@ class MainWindow(QMainWindow):
         self.groupbox1.dataset.set_readonly()  # This is an activable dataset
         self.groupbox1.get()
         self.groupbox2.get()
+        self.groupbox4.get()
+
+    def ro_dataset4(self, readonly: bool):
+        self.groupbox4.dataset.set_readonly(readonly)
         self.groupbox4.get()
 
     def edit_dataset1(self):

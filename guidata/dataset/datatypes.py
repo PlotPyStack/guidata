@@ -62,9 +62,10 @@ from __future__ import annotations
 
 import re
 import sys
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from collections.abc import Callable
-from typing import TYPE_CHECKING, Any
+from copy import deepcopy
+from typing import TYPE_CHECKING, Any, TypeVar
 
 from guidata.dataset.io import INIReader, INIWriter
 from guidata.userconfig import UserConfig
@@ -73,7 +74,7 @@ DEBUG_DESERIALIZE = False
 
 if TYPE_CHECKING:  # pragma: no cover
     from qtpy.QtCore import QSize
-    from qtpy.QtWidgets import QWidget
+    from qtpy.QtWidgets import QDialog, QWidget
 
     from guidata.dataset.io import HDF5Reader, HDF5Writer, JSONReader, JSONWriter
     from guidata.dataset.qtwidgets import DataSetEditDialog
@@ -142,7 +143,7 @@ class FormatProp(ItemProperty):
             return self.fmt % dic
         except TypeError:
             if not self.ignore_error:
-                print("Wrong Format for %s : %r %% %r" % (item._name, self.fmt, dic))
+                print(f"Wrong Format for {item._name} : {self.fmt!r} % {dic!r}")
                 raise
 
 
@@ -248,7 +249,7 @@ class FuncProp(ItemProperty):
         self.property.set(instance, item, self.inverse_function(value))
 
 
-class DataItem:
+class DataItem(ABC):
     """DataSet data item
 
     Args:
@@ -332,10 +333,7 @@ class DataItem:
         Returns:
             DataItem: self
         """  # noqa
-        prop = self._props.get(realm)
-        if not prop:
-            prop = {}
-            self._props[realm] = prop
+        prop = self._props.setdefault(realm, {})
         prop.update(kwargs)
         return self
 
@@ -353,7 +351,7 @@ class DataItem:
         return self
 
     def __str__(self) -> str:
-        return "%s : %s" % (self._name, self.__class__.__name__)
+        return f"{self._name} : {self.__class__.__name__}"
 
     def get_help(self, instance: DataSet) -> str:
         """Return data item's tooltip
@@ -365,12 +363,9 @@ class DataItem:
             str: tooltip
         """
         auto_help = self.get_auto_help(instance)
-        help = self._help
+        help = self._help or ""
         if auto_help:
-            if help:
-                help = help + "\n(" + auto_help + ")"
-            else:
-                help = auto_help.capitalize()
+            help = help + "\n(" + auto_help + ")" if help else auto_help.capitalize()
         return help
 
     def get_auto_help(self, instance: DataSet) -> str:
@@ -510,14 +505,14 @@ class DataItem:
         value = getattr(instance, "_%s" % (self._name))
         return self.check_value(value)
 
-    def check_value(self, value: Any) -> Any:
+    def check_value(self, value: Any) -> bool:
         """Check if `value` is valid for this data item
 
         Args:
             value (Any): value to check
 
         Returns:
-            Any: value
+            bool: value
         """
         raise NotImplementedError()
 
@@ -600,6 +595,10 @@ class DataItem:
             self.set_default(instance)
             return
         self.__set__(instance, value)
+
+    @property
+    def name(self) -> str:
+        return self._name or ""
 
 
 class Obj:
@@ -997,6 +996,9 @@ class DataSetMeta(type):
 Meta_Py3Compat = DataSetMeta("Meta_Py3Compat", (object,), {})
 
 
+DataSetT = TypeVar("DataSetT", bound="DataSet")
+
+
 class DataSet(metaclass=DataSetMeta):
     """Construct a DataSet object is a set of DataItem objects
 
@@ -1014,6 +1016,7 @@ class DataSet(metaclass=DataSetMeta):
         title: str | None = None,
         comment: str | None = None,
         icon: str = "",
+        readonly: bool = False,
     ):
         self.__comment = comment
         self.__icon = icon
@@ -1025,8 +1028,24 @@ class DataSet(metaclass=DataSetMeta):
         if comment is None:
             self.__comment = comp_comment
         self.__changed = False
-        # Set default values
+
+        self.__readonly: bool = readonly
+
         self.set_defaults()
+
+    def get_items(self, copy=False) -> list[DataItem]:
+        """Returns all the DataItem objects from the DataSet instance. Ignore private
+        items that have a name starting with an underscore (e.g. '_private_item = ...')
+
+        Args:
+            copy: If True, deepcopy the DataItem list, else return the original.
+            Defaults to False.
+
+        Returns:
+            _description_
+        """
+        result_items = self._items if not copy else deepcopy(self._items)
+        return list(filter(lambda s: not s.name.startswith("_"), result_items))
 
     @classmethod
     def create(cls, **kwargs) -> DataSet:
@@ -1154,6 +1173,7 @@ class DataSet(metaclass=DataSetMeta):
             wordwrap=wordwrap,
             size=size,
         )
+
         return exec_dialog(dlg)
 
     def view(
@@ -1179,6 +1199,12 @@ class DataSet(metaclass=DataSetMeta):
             self, icon=self.__icon, parent=parent, wordwrap=wordwrap, size=size
         )
         return exec_dialog(dial)
+
+    def is_readonly(self) -> bool:
+        return bool(self.__readonly)
+
+    def set_readonly(self, readonly: bool = True):
+        self.__readonly = readonly
 
     def to_string(
         self,
@@ -1238,17 +1264,14 @@ class DataSet(metaclass=DataSetMeta):
                 indent = indent[:-2]
                 continue
             value = getattr(self, "_%s" % (item._name))
-            if value is None:
-                value_str = "-"
-            else:
-                value_str = item.get_string_value(self)
+            value_str = "-" if value is None else item.get_string_value(self)
             if debug:
                 label = item._name
             else:
                 label = item.get_prop_value("display", self, "label")
             if length and label is not None:
                 label = label.ljust(length)
-            txt += "%s%s: %s" % (indent, label, value_str)
+            txt += f"{indent}{label}: {value_str}"
             if debug:
                 txt += " (" + item.__class__.__name__ + ")"
         return txt
@@ -1343,9 +1366,9 @@ class ActivableDataSet(DataSet):
         icon (str): dataset icon. Default is "" (no icon)
     """
 
-    _ro = True  # default *instance* attribute value
+    _activable = True  # default *instance* attribute value
     _active = True
-    _ro_prop = GetAttrProp("_ro")
+    _ro_prop = GetAttrProp("_activable")
     _active_prop = GetAttrProp("_active")
 
     @property
@@ -1361,8 +1384,6 @@ class ActivableDataSet(DataSet):
     ):
         DataSet.__init__(self, title, comment, icon)
 
-    #        self.set_readonly()
-
     @classmethod
     def active_setup(cls) -> None:
         """
@@ -1374,14 +1395,8 @@ class ActivableDataSet(DataSet):
             "display", active=True, hide=cls._ro_prop, store=cls._active_prop
         )
 
-    def set_readonly(self) -> None:
-        """The dataset is now in read-only mode, i.e. all data items are disabled"""
-        self._ro = True
-        self._active = self.enable
-
-    def set_writeable(self) -> None:
-        """The dataset is now in read/write mode, i.e. all data items are enabled"""
-        self._ro = False
+    def set_activable(self, activable: bool):
+        self._activable = not activable
         self._active = self.enable
 
 
@@ -1399,8 +1414,13 @@ class DataSetGroup:
     contained dataset.
     """
 
+    allowed_modes = ("tabs", "table", None)
+
     def __init__(
-        self, datasets: list[DataSet], title: str | None = None, icon: str = ""
+        self,
+        datasets: list[DataSet],
+        title: str | None = None,
+        icon: str = "",
     ) -> None:
         self.__icon = icon
         self.datasets = datasets
@@ -1454,6 +1474,7 @@ class DataSetGroup:
         apply: Callable | None = None,
         wordwrap: bool = True,
         size: QSize | tuple[int, int] | None = None,
+        mode: str | None = None,
     ) -> int:
         """Open a dialog box to edit data set
 
@@ -1462,6 +1483,11 @@ class DataSetGroup:
             apply: apply callback. Defaults to None.
             wordwrap: if True, comment text is wordwrapped
             size: dialog size (default: None)
+            mode: (str): dialog window style to use. Allowed values are "tabs",
+            "table" and None.\n\r
+            * tabs : use tabs to navigate between datasets.\n\r
+            * table : create a table with one dataset by row. Allows dataset
+            editing by double clicking on a row.
 
         Returns:
             int: dialog box return code
@@ -1469,18 +1495,36 @@ class DataSetGroup:
         # Importing those modules here avoids Qt dependency when
         # guidata is used without Qt
         # pylint: disable=import-outside-toplevel
-        from guidata.dataset.qtwidgets import DataSetGroupEditDialog
+
+        assert mode in self.allowed_modes
+
+        from guidata.dataset.qtwidgets import (
+            DataSetGroupEditDialog,
+            DataSetGroupTableEditDialog,
+        )
         from guidata.qthelpers import exec_dialog
 
-        dial = DataSetGroupEditDialog(
-            self,
-            icon=self.__icon,
-            parent=parent,
-            apply=apply,
-            wordwrap=wordwrap,
-            size=size,
-        )
-        return exec_dialog(dial)
+        dial: QDialog
+        if mode in ("tabs", None):
+            dial = DataSetGroupEditDialog(
+                instance=self,  # type: ignore
+                icon=self.__icon,
+                parent=parent,
+                apply=apply,
+                wordwrap=wordwrap,
+                size=size,
+            )
+            return exec_dialog(dial)
+        else:
+            dial = DataSetGroupTableEditDialog(
+                instance=self,
+                icon=self.__icon,
+                parent=parent,
+                apply=apply,
+                wordwrap=wordwrap,
+                size=size,
+            )
+            return exec_dialog(dial)
 
     def accept(self, vis: object) -> None:
         """Helper function that passes the visitor to the accept methods of all
@@ -1491,6 +1535,22 @@ class DataSetGroup:
         """
         for dataset in self.datasets:
             dataset.accept(vis)
+
+    def is_readonly(self) -> bool:
+        """Return True if all datasets in the DataSetGroup are in readonly mode.
+
+        Returns:
+            True if all datasets are in readonly, else False
+        """
+        return all((ds.is_readonly() for ds in self.datasets))
+
+    def set_readonly(self, readonly=True):
+        """Set all datasets of the dataset group to readonly mode
+
+        Args:
+            readonly: Readonly flag. Defaults to True.
+        """
+        _ = [d.set_readonly(readonly) for d in self.datasets]
 
 
 class GroupItem(DataItemProxy):

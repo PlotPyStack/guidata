@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Licensed under the terms of the BSD 3-Clause
 # (see guidata/LICENSE for details)
@@ -99,14 +98,20 @@ import re
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Any
 
-from numpy import ndarray
-
 from guidata.config import _
 from guidata.dataset.datatypes import DataItem, DataSet, ItemProperty
-from guidata.dataset.io import INIReader, INIWriter
 
 if TYPE_CHECKING:  # pragma: no cover
-    from guidata.dataset.io import HDF5Reader, HDF5Writer, JSONReader, JSONWriter
+    from numpy import ndarray
+
+    from guidata.dataset.io import (
+        HDF5Reader,
+        HDF5Writer,
+        INIReader,
+        INIWriter,
+        JSONReader,
+        JSONWriter,
+    )
 
 
 class NumericTypeItem(DataItem):
@@ -127,7 +132,7 @@ class NumericTypeItem(DataItem):
         check: if False, value is not checked (optional, default=True)
     """
 
-    type: Callable = None
+    type: type[int | float]
 
     def __init__(
         self,
@@ -184,13 +189,11 @@ class NumericTypeItem(DataItem):
         if self.get_prop("data", "nonzero") and value == 0:
             return False
         _min = self.get_prop("data", "min")
-        if _min is not None:
-            if value < _min:
-                return False
+        if _min is not None and value < _min:
+            return False
         _max = self.get_prop("data", "max")
-        if _max is not None:
-            if value > _max:
-                return False
+        if _max is not None and value > _max:
+            return False
         return True
 
     def from_string(self, value: str) -> Any | None:
@@ -387,7 +390,7 @@ class StringItem(DataItem):
             return False
         regexp = self.get_prop("data", "regexp")
         if regexp is not None:
-            return re.match(regexp, "" if value is None else value)
+            return bool(re.match(regexp, "" if value is None else value))
         return True
 
     def from_string(self, value: str) -> str:
@@ -560,12 +563,15 @@ class FileSaveItem(StringItem):
         help: str = "",
         check: bool = True,
     ) -> None:
+        default = os.path.join(*default) if isinstance(default, list) else default
+
         super().__init__(label, default=default, regexp=regexp, help=help, check=check)
         if isinstance(formats, str):
             formats = [formats]  # type:ignore
         self.set_prop("data", formats=formats)
         self.set_prop("data", basedir=basedir)
         self.set_prop("data", all_files_first=all_files_first)
+        self.set_prop("display", func=os.path.basename)
 
     def get_auto_help(self, instance: DataSet) -> str:
         """Override DataItem method"""
@@ -593,9 +599,13 @@ class FileSaveItem(StringItem):
         `value`: possible value for data item"""
         value = str(value)
         formats = self.get_prop("data", "formats")
-        if len(formats) == 1 and formats[0] != "*":
-            if not value.endswith("." + formats[0]) and len(value) > 0:
-                return value + "." + formats[0]
+        if (
+            len(formats) == 1
+            and formats[0] != "*"
+            and not value.endswith("." + formats[0])
+            and len(value) > 0
+        ):
+            return value + "." + formats[0]
         return value
 
 
@@ -658,6 +668,16 @@ class FilesOpenItem(FileSaveItem):
             help=help,
             check=check,
         )
+        self.set_prop("display", func=self.paths_basename)
+
+    @staticmethod
+    def paths_basename(paths: str | list[str]):
+        """Return the basename of a path or a list of paths"""
+        return (
+            [os.path.basename(p) for p in paths]
+            if isinstance(paths, list)
+            else os.path.basename(paths)
+        )
 
     def check_value(self, value: str) -> bool:
         """Override DataItem method"""
@@ -672,10 +692,7 @@ class FilesOpenItem(FileSaveItem):
 
     def from_string(self, value: Any) -> list[str]:  # type:ignore
         """Override DataItem method"""
-        if value.endswith("']") or value.endswith('"]'):
-            value = eval(value)
-        else:
-            value = [value]
+        value = eval(value) if value.endswith("']") or value.endswith('"]') else [value]
         return [self.add_extension(path) for path in value]
 
     def serialize(
@@ -784,8 +801,7 @@ class ChoiceItem(DataItem):
         for choice in choices:
             if choice[0] == value:
                 return str(choice[1])
-        else:
-            return DataItem.get_string_value(self, instance)
+        return DataItem.get_string_value(self, instance)
 
 
 class MultipleChoiceItem(ChoiceItem):
@@ -902,6 +918,7 @@ class FloatArrayItem(DataItem):
         large: view all float of the array
         minmax: "all" (default), "columns", "rows"
         check: if False, value is not checked (optional, default=True)
+        variable_size: if True, allows to add/remove row/columns on all axis
     """
 
     def __init__(
@@ -913,9 +930,11 @@ class FloatArrayItem(DataItem):
         transpose: bool = False,
         minmax: str = "all",
         check: bool = True,
+        variable_size=False,
     ) -> None:
         super().__init__(label, default=default, help=help, check=check)
         self.set_prop("display", format=format, transpose=transpose, minmax=minmax)
+        self.set_prop("edit", variable_size=variable_size)
 
     def format_string(
         self, instance: DataSet, value: Any, fmt: str, func: Callable
@@ -971,7 +990,7 @@ class DictItem(DataItem):
 
     @staticmethod
     # pylint: disable=unused-argument
-    def __dictedit(instance, item, value, parent):
+    def __dictedit(instance: DataSet, item: DataItem, value: dict, parent):
         """Open a dictionary editor"""
         # pylint: disable=import-outside-toplevel
         from guidata.qthelpers import exec_dialog
@@ -981,7 +1000,7 @@ class DictItem(DataItem):
         value_was_none = value is None
         if value_was_none:
             value = {}
-        editor.setup(value)
+        editor.setup(value, readonly=instance.is_readonly())
         if exec_dialog(editor):
             return editor.get_value()
         if value_was_none:
