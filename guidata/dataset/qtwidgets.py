@@ -68,12 +68,12 @@ from qtpy.QtWidgets import (
 from guidata.config import CONF, _
 from guidata.configtools import get_font, get_icon
 from guidata.dataset.datatypes import (
+    AnyDataSet,
     BeginGroup,
     DataItem,
     DataItemVariable,
     DataSet,
     DataSetGroup,
-    DataSetT,
     EndGroup,
     GroupItem,
     TabGroupItem,
@@ -274,7 +274,7 @@ class DataSetGroupEditDialog(DataSetEditDialog):
                 tabs.addTab(page, dataset.get_title())
 
 
-class DataSetEditLayout(Generic[DataSetT]):
+class DataSetEditLayout(Generic[AnyDataSet]):
     """Layout in which data item widgets are placed
 
     Args:
@@ -301,7 +301,7 @@ class DataSetEditLayout(Generic[DataSetT]):
     def __init__(
         self,
         parent: QWidget | None,
-        instance: DataSetT,
+        instance: AnyDataSet,
         layout: QGridLayout,
         items: list[DataItem] | None = None,
         first_line: int = 0,
@@ -734,7 +734,7 @@ DataSetShowLayout.register(FloatArrayItem, DataSetShowWidget)
 DataSetShowLayout.register(DictItem, DataSetShowWidget)
 
 
-class DataSetShowGroupBox(Generic[DataSetT], QGroupBox):
+class DataSetShowGroupBox(Generic[AnyDataSet], QGroupBox):
     """Group box widget showing a read-only DataSet
 
     Args:
@@ -747,14 +747,14 @@ class DataSetShowGroupBox(Generic[DataSetT], QGroupBox):
     def __init__(
         self,
         label: QLabel | str,
-        klass: type[DataSetT],
+        klass: type[AnyDataSet],
         wordwrap: bool = False,
         **kwargs,
     ) -> None:
         QGroupBox.__init__(self, label)
         self.apply_button: QPushButton | None = None
         self.klass = klass
-        self.dataset: DataSetT = klass(**kwargs)
+        self.dataset: AnyDataSet = klass(**kwargs)
         self._layout = QVBoxLayout()
         if self.dataset.get_comment():
             label = QLabel(self.dataset.get_comment())
@@ -765,7 +765,7 @@ class DataSetShowGroupBox(Generic[DataSetT], QGroupBox):
         self.setLayout(self._layout)
         self.edit = self.get_edit_layout()
 
-    def get_edit_layout(self) -> DataSetEditLayout[DataSetT]:
+    def get_edit_layout(self) -> DataSetEditLayout[AnyDataSet]:
         """Return edit layout
 
         Returns:
@@ -784,7 +784,7 @@ class DataSetShowGroupBox(Generic[DataSetT], QGroupBox):
             self.apply_button.setVisible(not self.dataset.is_readonly())
 
 
-class DataSetEditGroupBox(DataSetShowGroupBox[DataSetT]):
+class DataSetEditGroupBox(DataSetShowGroupBox[AnyDataSet]):
     """Group box widget including a DataSet
 
     Args:
@@ -803,7 +803,7 @@ class DataSetEditGroupBox(DataSetShowGroupBox[DataSetT]):
     def __init__(
         self,
         label: QLabel | str,
-        klass: type[DataSetT],
+        klass: type[AnyDataSet],
         button_text: str | None = None,
         button_icon: QIcon | str | None = None,
         show_button: bool = True,
@@ -825,7 +825,7 @@ class DataSetEditGroupBox(DataSetShowGroupBox[DataSetT]):
                 applyb, layout.rowCount(), 0, 1, -1, Qt.AlignRight  # type:ignore
             )
 
-    def get_edit_layout(self) -> DataSetEditLayout[DataSetT]:
+    def get_edit_layout(self) -> DataSetEditLayout[AnyDataSet]:
         """Return edit layout
 
         Returns:
@@ -875,7 +875,7 @@ class DataSetEditGroupBox(DataSetShowGroupBox[DataSetT]):
         return f"{app_name} - {item.label()}"
 
 
-class DataSetTableModel(QAbstractTableModel, Generic[DataSetT]):
+class DataSetTableModel(QAbstractTableModel, Generic[AnyDataSet]):
     """DataSet Table Model.
 
     Args:
@@ -885,7 +885,9 @@ class DataSetTableModel(QAbstractTableModel, Generic[DataSetT]):
         parent: Parent. Defaults to None.
     """
 
-    def __init__(self, datasets: list[DataSetT], parent: QObject | None = None) -> None:
+    def __init__(
+        self, datasets: list[AnyDataSet], parent: QObject | None = None
+    ) -> None:
         super().__init__(parent)
         self.datasets = datasets
 

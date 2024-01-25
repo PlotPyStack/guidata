@@ -1000,7 +1000,7 @@ class DataSetMeta(type):
 Meta_Py3Compat = DataSetMeta("Meta_Py3Compat", (object,), {})
 
 
-DataSetT = TypeVar("DataSetT", bound="DataSet")
+AnyDataSet = TypeVar("AnyDataSet", bound="DataSet")
 
 
 class DataSet(metaclass=DataSetMeta):

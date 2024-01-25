@@ -34,6 +34,7 @@ from .dataitems import (
 )
 from .datatypes import (
     ActivableDataSet,
+    AnyDataSet,
     BeginGroup,
     BeginTabGroup,
     DataItem,
@@ -42,7 +43,6 @@ from .datatypes import (
     DataSet,
     DataSetGroup,
     DataSetMeta,
-    DataSetT,
     EndGroup,
     EndTabGroup,
     FormatProp,
