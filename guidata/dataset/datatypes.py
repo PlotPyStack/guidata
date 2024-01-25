@@ -1418,7 +1418,7 @@ class DataSetGroup:
     contained dataset.
     """
 
-    allowed_modes = ("tabs", "table", None)
+    ALLOWED_MODES = ("tabs", "table", None)
 
     def __init__(
         self,
@@ -1500,7 +1500,7 @@ class DataSetGroup:
         # guidata is used without Qt
         # pylint: disable=import-outside-toplevel
 
-        assert mode in self.allowed_modes
+        assert mode in self.ALLOWED_MODES
 
         from guidata.dataset.qtwidgets import (
             DataSetGroupEditDialog,
