@@ -1488,10 +1488,9 @@ class DataSetGroup:
             wordwrap: if True, comment text is wordwrapped
             size: dialog size (default: None)
             mode: (str): dialog window style to use. Allowed values are "tabs",
-            "table" and None.\n\r
-            * tabs : use tabs to navigate between datasets.\n\r
-            * table : create a table with one dataset by row. Allows dataset
-            editing by double clicking on a row.
+             "table" and None. Use "tabs" to navigate between datasets with tabs.
+             Use "table" to create a table with one dataset by row (allows
+             dataset editing by double clicking on a row). Defaults to None.
 
         Returns:
             int: dialog box return code
