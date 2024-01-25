@@ -22,11 +22,11 @@ from typing import Any, Generic, TypeVar, cast
 
 import numpy as np
 
-ArrayT = TypeVar("ArrayT", bound=np.ndarray | np.ma.MaskedArray)
-ArrayHandlerT = TypeVar("ArrayHandlerT", bound="BaseArrayHandler")
+AnySupportedArray = TypeVar("AnySupportedArray", bound=np.ndarray | np.ma.MaskedArray)
+AnyArrayHandler = TypeVar("AnyArrayHandler", bound="BaseArrayHandler")
 
 
-class BaseArrayHandler(Generic[ArrayT]):
+class BaseArrayHandler(Generic[AnySupportedArray]):
     """Wrapper class around a Numpy nparray that is used a pointer to share the same
     array in multiple models/widgets and views. It handles data access and changes.
 
@@ -55,7 +55,7 @@ class BaseArrayHandler(Generic[ArrayT]):
 
     def __init__(
         self,
-        array: ArrayT,
+        array: AnySupportedArray,
         variable_size: bool = False,
     ) -> None:
         self._variable_size = variable_size
@@ -159,7 +159,7 @@ class BaseArrayHandler(Generic[ArrayT]):
         indexes = range(index, index + remove_number)
         self._array = np.delete(self._array, indexes, axis=axis)
 
-    def get_array(self) -> ArrayT:
+    def get_array(self) -> AnySupportedArray:
         """Returns the current wrapped array. If variable_size is False, the returned
         array does not contain the current modifications as they are saved separately.
 
@@ -167,7 +167,7 @@ class BaseArrayHandler(Generic[ArrayT]):
         -------
             Numpy array contained in the handler instance
         """
-        return cast(ArrayT, self._array)
+        return cast(AnySupportedArray, self._array)
 
     def new_row(self, index: int, insert_number: int = 1, default: Any = 0):
         """Insert new row(s) on axis 0. Do not for 3D+ arrays. Prefer the method

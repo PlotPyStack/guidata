@@ -37,7 +37,7 @@ from guidata.configtools import get_icon
 from guidata.qthelpers import win32_fix_title_bar_background
 from guidata.widgets.arrayeditor import utils
 from guidata.widgets.arrayeditor.arrayhandler import (
-    ArrayT,
+    AnySupportedArray,
     BaseArrayHandler,
     MaskedArrayHandler,
     RecordArrayHandler,
@@ -51,7 +51,7 @@ from guidata.widgets.arrayeditor.edirotwidget import (
 )
 
 
-class ArrayEditor(QDialog, Generic[ArrayT]):
+class ArrayEditor(QDialog, Generic[AnySupportedArray]):
     """Array Editor Dialog"""
 
     __slots__ = (
@@ -98,7 +98,7 @@ class ArrayEditor(QDialog, Generic[ArrayT]):
 
     def setup_and_check(
         self,
-        data: ArrayT,
+        data: AnySupportedArray,
         title="",
         readonly=False,
         xlabels=None,
@@ -412,7 +412,7 @@ class ArrayEditor(QDialog, Generic[ArrayT]):
         self._data.apply_changes()
         QDialog.accept(self)
 
-    def get_value(self) -> ArrayT:
+    def get_value(self) -> AnySupportedArray:
         """Return modified array -- the returned array is a copy if variable size is
         True and readonly is False
         """
@@ -450,14 +450,14 @@ class MaskedArrayEditor(ArrayEditor[np.ma.MaskedArray]):
 
 
 def launch_arrayeditor(
-    data: ArrayT,
+    data: AnySupportedArray,
     title="",
     xlabels=None,
     ylabels=None,
     variable_size=False,
-) -> ArrayT:
+) -> AnySupportedArray:
     """Helper routine to launch an arrayeditor and return its result"""
-    dlg = ArrayEditor[ArrayT]()
+    dlg = ArrayEditor[AnySupportedArray]()
     assert dlg.setup_and_check(
         data,
         title,

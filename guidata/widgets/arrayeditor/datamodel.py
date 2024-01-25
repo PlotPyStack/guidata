@@ -29,8 +29,8 @@ from guidata.dataset.dataitems import BoolItem, FloatItem, IntItem, StringItem
 from guidata.dataset.datatypes import DataItem, DataSet
 from guidata.widgets.arrayeditor import utils
 from guidata.widgets.arrayeditor.arrayhandler import (
-    ArrayHandlerT,
-    ArrayT,
+    AnyArrayHandler,
+    AnySupportedArray,
     MaskedArrayHandler,
     RecordArrayHandler,
 )
@@ -38,7 +38,7 @@ from guidata.widgets.arrayeditor.arrayhandler import (
 ArrayModelType = TypeVar("ArrayModelType", bound="BaseArrayModel")
 
 
-class BaseArrayModel(QAbstractTableModel, Generic[ArrayHandlerT, ArrayT]):
+class BaseArrayModel(QAbstractTableModel, Generic[AnyArrayHandler, AnySupportedArray]):
     # ==============================================================================
     """Array Editor Table Model that implements all the core functionnalities
 
@@ -114,7 +114,7 @@ class BaseArrayModel(QAbstractTableModel, Generic[ArrayHandlerT, ArrayT]):
 
     def __init__(
         self,
-        array_handler: ArrayHandlerT,
+        array_handler: AnyArrayHandler,
         format="%.6g",
         xlabels=None,
         ylabels=None,
@@ -759,7 +759,7 @@ class BaseArrayModel(QAbstractTableModel, Generic[ArrayHandlerT, ArrayT]):
         self.beginResetModel()
         self.endResetModel()
 
-    def get_array(self) -> ArrayT:
+    def get_array(self) -> AnySupportedArray:
         """Return the array.
 
         Returns
@@ -961,7 +961,7 @@ class DataArrayModel(MaskedArrayModel):
         self._array_handler.set_data_value(index, value)
 
 
-class RecordArrayModel(BaseArrayModel[RecordArrayHandler, ArrayT]):
+class RecordArrayModel(BaseArrayModel[RecordArrayHandler, AnySupportedArray]):
     """Array Editor Table Model made for record arrays (= Numpy's structured arrays).
 
     Args:

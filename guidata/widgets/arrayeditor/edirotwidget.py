@@ -43,7 +43,7 @@ from guidata.qthelpers import add_actions, create_action, keybinding
 from guidata.widgets import about
 from guidata.widgets.arrayeditor import utils
 from guidata.widgets.arrayeditor.arrayhandler import (
-    ArrayT,
+    AnySupportedArray,
     BaseArrayHandler,
     MaskedArrayHandler,
     RecordArrayHandler,
@@ -635,9 +635,11 @@ class BaseArrayEditorWidget(QWidget):
         layout.addLayout(btn_layout)
         self.setLayout(layout)
 
-    def _init_handler(self, data: ArrayT | BaseArrayHandler[ArrayT]) -> None:
+    def _init_handler(
+        self, data: AnySupportedArray | BaseArrayHandler[AnySupportedArray]
+    ) -> None:
         if isinstance(data, np.ndarray):
-            self._data = BaseArrayHandler[ArrayT](data, self._variable_size)
+            self._data = BaseArrayHandler[AnySupportedArray](data, self._variable_size)
         elif isinstance(data, BaseArrayHandler):
             self._data = data
         else:
