@@ -447,38 +447,3 @@ class RecordArrayEditor(ArrayEditor[np.ndarray]):
 
 class MaskedArrayEditor(ArrayEditor[np.ma.MaskedArray]):
     """Optional wrapper class to get type inferance for masked numpy arrays"""
-
-
-def launch_arrayeditor(
-    data: AnySupportedArray,
-    title="",
-    xlabels=None,
-    ylabels=None,
-    variable_size=False,
-) -> AnySupportedArray:
-    """Helper routine to launch an arrayeditor and return its result"""
-    dlg = ArrayEditor[AnySupportedArray]()
-    assert dlg.setup_and_check(
-        data,
-        title,
-        xlabels=xlabels,
-        ylabels=ylabels,
-        variable_size=variable_size,
-    )
-    dlg.exec()
-    # dlg.accept()  # trigger slot connected to OK button
-    return dlg.get_value()
-
-
-if __name__ == "__main__":
-    from guidata import qapplication
-
-    app = qapplication()
-    arr: np.ma.MaskedArray = np.ma.MaskedArray(
-        [[1, 0], [1, 0]], mask=[[True, False], [False, False]]
-    )
-    ed = ArrayEditor[type(arr)](None)
-    ed.setup_and_check(arr, "Test array editor")
-    x = ed.get_value()
-
-    y = launch_arrayeditor(arr, "Test array editor")
