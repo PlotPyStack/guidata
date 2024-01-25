@@ -1372,7 +1372,7 @@ class ActivableDataSet(DataSet):
 
     _activable = True  # default *instance* attribute value
     _active = True
-    _ro_prop = GetAttrProp("_activable")
+    _activable_prop = GetAttrProp("_activable")
     _active_prop = GetAttrProp("_active")
 
     @property
@@ -1396,7 +1396,7 @@ class ActivableDataSet(DataSet):
         """
         cls.set_global_prop("display", active=cls._active_prop)
         cls.enable.set_prop(  # type:ignore
-            "display", active=True, hide=cls._ro_prop, store=cls._active_prop
+            "display", active=True, hide=cls._activable_prop, store=cls._active_prop
         )
 
     def set_activable(self, activable: bool):
