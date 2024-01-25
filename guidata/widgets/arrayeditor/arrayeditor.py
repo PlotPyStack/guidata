@@ -190,9 +190,6 @@ class ArrayEditor(QDialog, Generic[AnySupportedArray]):
                     xlabels,
                     ylabels,
                     variable_size,
-                    # # lambda arr: arr[name],
-                    # "record",
-                    # name,
                 )
                 self.arraywidgets.append(w)
                 self.stack.addWidget(w)
@@ -210,8 +207,6 @@ class ArrayEditor(QDialog, Generic[AnySupportedArray]):
                 xlabels,
                 ylabels,
                 variable_size,
-                # "data",
-                # lambda arr: arr.data,
             )
             self.arraywidgets.append(w2)
             self.stack.addWidget(w2)
@@ -223,7 +218,6 @@ class ArrayEditor(QDialog, Generic[AnySupportedArray]):
                 xlabels,
                 ylabels,
                 variable_size,
-                # lambda arr: arr.mask,
             )
             self.arraywidgets.append(w3)
             self.stack.addWidget(w3)
@@ -328,7 +322,6 @@ class ArrayEditor(QDialog, Generic[AnySupportedArray]):
             cols: Flag to indicate the number of columns changed
         """
         for wdg in self.arraywidgets:
-            # qindex = QModelIndex()
             wdg.model.fetch(rows, cols)
             wdg.model.set_hue_values()
         if self._data.ndim == 3:
@@ -430,9 +423,6 @@ class ArrayEditor(QDialog, Generic[AnySupportedArray]):
     @Slot()
     def reject(self):
         """Reimplement Qt method"""
-        # if self.arraywidget is not None:
-        #     for index in range(self.stack.count()):
-        #         self.stack.widget(index).reject_changes()
         self._data.clear_changes()
         QDialog.reject(self)
 

@@ -254,18 +254,6 @@ class ArrayView(QTableView, Generic[ArrayModelType]):
                 valid,
             ) = self.ask_default_inserted_value(i, 0)
             if valid:
-                # TODO use this as a template to insert/delete labels
-                # ylabels = self.model().ylabels
-                # if isinstance(ylabels, list):
-                #     ylabels[i:i] = [new_label] * insert_number
-                # elif isinstance(ylabels, tuple):
-                #     tmp_labels = list(ylabels)
-                #     tmp_labels[i:i] = [new_label] * insert_number
-                #     self.model().ylabels = tuple(tmp_labels)
-                # elif isinstance(ylabels, np.ndarray):
-                #     self.model().ylabels = np.insert(
-                #         ylabels, (i,) * insert_number, new_label
-                #     )
                 self.model().insert_row(i, insert_number, *default_values)
             self._current_row_index = None
 
@@ -274,9 +262,6 @@ class ArrayView(QTableView, Generic[ArrayModelType]):
         if (i := self._current_row_index) is not None:
             i, remove_number, valid = self.ask_rows_cols_to_remove(i, 0)
             if valid:
-                # ylabels = self.model().ylabels
-                # if ylabels is not None:
-                #     del ylabels[i : i + remove_number]
                 self.model().remove_row(i, remove_number)
             self._current_row_index = None
 
@@ -291,9 +276,6 @@ class ArrayView(QTableView, Generic[ArrayModelType]):
                 valid,
             ) = self.ask_default_inserted_value(j, 1)
             if valid:
-                # xlabels = self.model().xlabels
-                # if xlabels is not None:
-                #     xlabels[j:j] = [new_label] * insert_number
                 self.model().insert_column(j, insert_number, *default_value)
             self._current_col_index = None
 
@@ -302,9 +284,6 @@ class ArrayView(QTableView, Generic[ArrayModelType]):
         if (j := self._current_col_index) is not None:
             j, remove_number, valid = self.ask_rows_cols_to_remove(j, 1)
             if valid:
-                # xlabels = self.model().xlabels
-                # if xlabels is not None:
-                #     del xlabels[j : j + remove_number]
                 self.model().remove_column(j, remove_number)
             self._current_col_index = None
 
@@ -802,8 +781,6 @@ class DataArrayEditorWidget(MaskedArrayEditorWidget):
 class RecordArrayEditorWidget(BaseArrayEditorWidget):
     """Same as BaseArrayWidgetEditorWidget but specifically handles RecordArrayHandler
     and RecordArrayModel which are made to wrap Numpy's structured arrays."""
-
-    # _data: RecordArrayHandler
 
     def __init__(
         self,

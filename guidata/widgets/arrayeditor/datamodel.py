@@ -207,15 +207,6 @@ class BaseArrayModel(QAbstractTableModel, Generic[AnyArrayHandler, AnySupportedA
             else ""
         )
         value_label = _("Value")
-        # use this as a template to insert/delete labels
-        # label = (self.ylabels, self.xlabels)[axis]
-        # if isinstance(label, Sequence):
-        #     label_type = type(label[0])
-        # elif isinstance(label, np.ndarray):
-        #     label_type = type(np.zeros(1, dtype=label.dtype)[0].item())
-        # else:
-        #     label_type = None
-        # label_label = str("New label")
 
         class NewInsertionDataSet(self.InsertionDataSet):
             """InsertionDataSet child class"""
@@ -247,20 +238,6 @@ class BaseArrayModel(QAbstractTableModel, Generic[AnyArrayHandler, AnySupportedA
                 )
                 default_value.set_prop("display", active=False, valid=False)
 
-            # use this as a template to insert/delete labels
-            # if label is not None:
-            #     print("I passed by here")
-            #     if label_type is int:
-            #         new_label = IntItem(label=label_label, default=0)
-            #     elif label_type is float:
-            #         new_label = FloatItem(label=label_label, default=0.0)
-            #     elif label_type is bool:
-            #         new_label = BoolItem(label=label_label, default=False)
-            #     elif label_type is str:
-            #         new_label = StringItem(label=label_label, default="")
-            #     else:
-            #         new_label = None
-            # else:
             new_label = None
 
             def get_values_to_insert(self) -> tuple[Any, ...]:
@@ -878,18 +855,6 @@ class MaskArrayModel(MaskedArrayModel):
         return a 2d array when applied to it. Defaults to None.
     """
 
-    # def __init__(
-    #     self,
-    #     array_handler: MaskedArrayHandler,
-    #     format="%.6g",
-    #     xlabels=None,
-    #     ylabels=None,
-    #     readonly=False,
-    #     parent=None,
-    #     current_slice: Sequence[slice | int] | None = None,
-    # ):
-    #     ...
-
     def get_array(self) -> np.ndarray:
         """Returns the array mask (override of the BaseArrayModel.get_array() method)
 
@@ -978,7 +943,6 @@ class RecordArrayModel(BaseArrayModel[RecordArrayHandler, AnySupportedArray]):
     """
 
     __slots__ = ("_dtype_name",)
-    # _array_handler: RecordArrayHandler
 
     def __init__(
         self,
