@@ -422,6 +422,14 @@ class DataItem(ABC):
                 text = ""
             return text
 
+    def get_name(self) -> str:
+        """Return data item's name
+
+        Returns:
+            str: name
+        """
+        return self._name or ""
+
     def set_name(self, new_name: str) -> None:
         """Set data item's name
 
@@ -595,10 +603,6 @@ class DataItem(ABC):
             self.set_default(instance)
             return
         self.__set__(instance, value)
-
-    @property
-    def name(self) -> str:
-        return self._name or ""
 
 
 class Obj:
@@ -1045,7 +1049,7 @@ class DataSet(metaclass=DataSetMeta):
             _description_
         """
         result_items = self._items if not copy else deepcopy(self._items)
-        return list(filter(lambda s: not s.name.startswith("_"), result_items))
+        return list(filter(lambda s: not s.get_name().startswith("_"), result_items))
 
     @classmethod
     def create(cls, **kwargs) -> DataSet:

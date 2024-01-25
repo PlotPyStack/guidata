@@ -387,11 +387,11 @@ class DataSetEditLayout(Generic[DataSetT]):
             if row is not None:
                 if row in rows:
                     raise ValueError(
-                        f"Duplicate row index ({row}) for item {item.name}"
+                        f"Duplicate row index ({row}) for item {item.get_name()}"
                     )
                 if row < 0 or row >= len(items):
                     raise ValueError(
-                        f"Out of range row index ({row}) for item {item.name}"
+                        f"Out of range row index ({row}) for item {item.get_name()}"
                     )
                 rows.append(row)
                 sorted_items[row] = item
@@ -456,7 +456,7 @@ class DataSetEditLayout(Generic[DataSetT]):
         try:
             widget.get()
         except Exception:
-            print("Error building item :", item.item.name)
+            print("Error building item :", item.item.get_name())
             raise
 
     def refresh_widgets(self) -> None:
@@ -488,9 +488,9 @@ class DataSetEditLayout(Generic[DataSetT]):
             self.change_callback()
 
 
+from guidata.dataset.dataitems import ButtonItem  # noqa: E402
 from guidata.dataset.dataitems import (
     BoolItem,
-    ButtonItem,  # noqa: E402
     ChoiceItem,
     ColorItem,
     DateItem,
@@ -890,7 +890,7 @@ class DataSetTableModel(QAbstractTableModel, Generic[DataSetT]):
         self.datasets = datasets
 
         ref_col_names = self.datasets[0].get_items(copy=False)
-        self._col_names = tuple(item.name for item in ref_col_names)
+        self._col_names = tuple(item.get_name() for item in ref_col_names)
         self._col_count = len(self._col_names)
         self.validate_datasets()
 
