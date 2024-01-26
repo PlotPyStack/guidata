@@ -21,7 +21,7 @@ This package provides an Editor widget based on QtGui.QPlainTextEdit.
 # pylint: disable=R0201
 
 from qtpy.QtCore import QRect, QSize, Qt
-from qtpy.QtGui import QColor, QPainter
+from qtpy.QtGui import QColor, QFont, QPainter
 from qtpy.QtWidgets import QPlainTextEdit, QWidget
 
 import guidata.widgets.syntaxhighlighters as sh
@@ -237,11 +237,11 @@ class CodeEditor(QPlainTextEdit):
         for top, line_number, block in self.visible_blocks:
             if self.linenumbers_margin:
                 if line_number == active_line_number:
-                    font.setWeight(font.Bold)
+                    font.setWeight(QFont.Bold)
                     painter.setFont(font)
                     painter.setPen(self.normal_color)
                 else:
-                    font.setWeight(font.Normal)
+                    font.setWeight(QFont.Normal)
                     painter.setFont(font)
                     painter.setPen(self.linenumbers_color)
 
