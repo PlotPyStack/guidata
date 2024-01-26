@@ -41,6 +41,33 @@ from guidata.widgets.arrayeditor.arrayhandler import (
 ArrayModelType = TypeVar("ArrayModelType", bound="BaseArrayModel")
 
 
+def handle_size_change(rows=False, cols=False):
+    """Wrapper to signal when the table changed dimenstions, i.e. when a row or
+    column is inserted. This decorator emits the BaseArrayModel.SIZE_CHANGED signal
+    and fetch/update the model.
+
+    Args:
+    ----
+        rows: If rows are inserter. Defaults to False.
+        cols: If columns are inserter. Defaults to False.
+    """
+
+    def inner_handle_size_change(
+        model_method,
+    ):
+        def wrapped_method(self: "BaseArrayModel", *args, **kwargs):
+            model_method(self, *args, **kwargs)
+            self.fetch(rows, cols)
+            self.set_hue_values()
+            self.SIZE_CHANGED.emit(rows, cols)
+            qidx = QModelIndex()
+            self.dataChanged.emit(qidx, qidx)
+
+        return wrapped_method
+
+    return inner_handle_size_change
+
+
 class BaseArrayModel(QAbstractTableModel, Generic[AnyArrayHandler, AnySupportedArray]):
     # ==============================================================================
     """Array Editor Table Model that implements all the core functionnalities
@@ -657,33 +684,6 @@ class BaseArrayModel(QAbstractTableModel, Generic[AnyArrayHandler, AnySupportedA
             self.dhue = None
             self.bgcolor_enabled = False
 
-    @staticmethod
-    def handle_size_change(rows=False, cols=False):
-        """Wrapper to signal when the table changed dimenstions, i.e. when a row or
-        column is inserted. This decorator emits the BaseArrayModel.SIZE_CHANGED signal
-        and fetch/update the model.
-
-        Args:
-        ----
-            rows: If rows are inserter. Defaults to False.
-            cols: If columns are inserter. Defaults to False.
-        """
-
-        def inner_handle_size_change(
-            model_method,
-        ):
-            def wrapped_method(self: "BaseArrayModel", *args, **kwargs):
-                model_method(self, *args, **kwargs)
-                self.fetch(rows, cols)
-                self.set_hue_values()
-                self.SIZE_CHANGED.emit(rows, cols)
-                qidx = QModelIndex()
-                self.dataChanged.emit(qidx, qidx)
-
-            return wrapped_method
-
-        return inner_handle_size_change
-
     @handle_size_change(rows=True)
     def insert_row(self, index: int, insert_number: int = 1, default_value: Any = 0):
         """Insert new rows with a default value.
@@ -807,7 +807,7 @@ class MaskedArrayModel(BaseArrayModel[MaskedArrayHandler, np.ma.MaskedArray]):
 
         return NewInsertionDataSet
 
-    @BaseArrayModel.handle_size_change(rows=True)
+    @handle_size_change(rows=True)
     def insert_row(
         self,
         index: int,
@@ -828,7 +828,7 @@ class MaskedArrayModel(BaseArrayModel[MaskedArrayHandler, np.ma.MaskedArray]):
             index, self._row_axis_nd, insert_number, default_value, default_mask_value
         )  # calls MaskedArrayHandler.insert_on_axis which has a default_mask argument
 
-    @BaseArrayModel.handle_size_change(cols=True)
+    @handle_size_change(cols=True)
     def insert_column(
         self,
         index,
