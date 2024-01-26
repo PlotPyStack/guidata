@@ -17,10 +17,12 @@ from guidata.qthelpers import exec_dialog, qt_app_context
 from guidata.widgets.arrayeditor import ArrayEditor
 
 
-def launch_arrayeditor(data, title="", xlabels=None, ylabels=None):
+def launch_arrayeditor(data, title="", xlabels=None, ylabels=None, variable_size=False):
     """Helper routine to launch an arrayeditor and return its result"""
     dlg = ArrayEditor()
-    dlg.setup_and_check(data, title, xlabels=xlabels, ylabels=ylabels)
+    dlg.setup_and_check(
+        data, title, xlabels=xlabels, ylabels=ylabels, variable_size=variable_size
+    )
     exec_dialog(dlg)
     return dlg.get_value()
 
@@ -28,6 +30,16 @@ def launch_arrayeditor(data, title="", xlabels=None, ylabels=None):
 def test_arrayeditor():
     """Test array editor for all supported data types"""
     with qt_app_context():
+        # Variable size version
+        for title, data in (
+            ("string array", np.array(["kjrekrjkejr"])),
+            (
+                "masked array",
+                np.ma.array([[1, 0], [1, 0]], mask=[[True, False], [False, False]]),
+            ),
+            ("int array", np.array([1, 2, 3], dtype="int8")),
+        ):
+            launch_arrayeditor(data, "[Variable size] " + title, variable_size=True)
         for title, data in (
             ("string array", np.array(["kjrekrjkejr"])),
             ("unicode array", np.array(["ñññéáíó"])),
