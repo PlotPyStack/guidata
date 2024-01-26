@@ -27,7 +27,7 @@ from typing import TYPE_CHECKING, Any, Protocol
 
 import numpy
 from qtpy.compat import getexistingdirectory
-from qtpy.QtCore import QMetaObject, QSize, Qt
+from qtpy.QtCore import QSize, Qt
 from qtpy.QtGui import QColor, QIcon, QPixmap
 from qtpy.QtWidgets import (
     QAbstractButton,
@@ -1082,9 +1082,8 @@ class ChoiceWidget(AbstractDataSetWidget):
             for index, widget in enumerate(self._buttons):
                 if widget.isChecked():
                     return index
-            return None  # TODO:Faire comme ca ?
-        else:
-            return self.combobox.currentIndex()
+            return None
+        return self.combobox.currentIndex()
 
     def get(self) -> None:
         """Update widget contents from data item value"""
