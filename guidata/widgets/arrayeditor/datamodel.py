@@ -118,30 +118,6 @@ class BaseArrayModel(QAbstractTableModel, Generic[AnyArrayHandler, AnySupportedA
         index_field: IntItem
         remove_number: IntItem
 
-    __slots__ = (
-        "dialog",
-        "xlabels",
-        "ylabels",
-        "readonly",
-        "test_array",
-        "rows_loaded",
-        "cols_loaded",
-        "color_func",
-        "color_func",
-        "huerange",
-        "sat",
-        "val",
-        "alp",
-        "_data",
-        "_format",
-        "bgcolor_enabled",
-        "_arr_transform_getter",
-        "_current_slice",
-        "_row_axis_nd",
-        "_col_axis_nd",
-        "_nd_index_template",
-    )
-
     def __init__(
         self,
         array_handler: AnyArrayHandler,
