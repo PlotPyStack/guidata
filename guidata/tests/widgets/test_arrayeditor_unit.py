@@ -17,7 +17,7 @@ from typing import Any
 import numpy as np
 
 from guidata.env import execenv
-from guidata.qthelpers import exec_dialog, qt_app_context
+from guidata.qthelpers import qt_app_context
 from guidata.widgets.arrayeditor import ArrayEditor
 
 DEFAULT_ROW_VALUE = 1
@@ -26,10 +26,19 @@ DEFAULT_MASK_VALUE = True
 DEFAULT_INS_DEL_COUNT = 3
 DEFAULT_INSERTION_INDEX = 1
 
-arr_3d = np.zeros((3, 3, 4))
-arr_3d[0, 0, 0] = 1
-arr_3d[0, 0, 1] = 2
-arr_3d[0, 0, 2] = 3
+
+def _create_3d_array() -> np.ndarray:
+    """Creates a 3D numpy array with a single element in the first slice
+
+    Returns:
+        A 3D numpy array with a single element in the first slice
+    """
+    arr_3d = np.zeros((3, 3, 4))
+    arr_3d[0, 0, 0] = 1
+    arr_3d[0, 0, 1] = 2
+    arr_3d[0, 0, 2] = 3
+    return arr_3d
+
 
 REQUIRED_3D_SLICE = [slice(None), slice(None), 0]
 
@@ -61,7 +70,7 @@ BASIC_ARRAYS = (
     ("bool array", np.array([True, False, True])),
     ("int array", np.array([1, 2, 3], dtype="int8")),
     ("float16 array", np.zeros((5, 5), dtype=np.float16)),
-    ("3D array", arr_3d),
+    ("3D array", _create_3d_array()),
 )
 
 LABELED_ARRAYS = (
@@ -82,7 +91,7 @@ def insert_rows_and_cols(
     index=DEFAULT_INSERTION_INDEX,
     insert_size=DEFAULT_INS_DEL_COUNT,
     default_mask_value=DEFAULT_MASK_VALUE,
-):
+) -> np.ndarray | np.ma.MaskedArray:
     """Inserts new rows and columns into a numpy array and returns the result.
 
     Args:
@@ -95,7 +104,7 @@ def insert_rows_and_cols(
         Defaults to DEFAULT_MASK_VALUE.
 
     Returns:
-        _description_
+        A numpy array with the new rows and columns inserted.
     """
     if arr.ndim == 1:
         arr.shape = (arr.size, 1)
@@ -124,9 +133,19 @@ MODIFIED_LABELED_ARRAYS = tuple(
 
 
 def launch_arrayeditor_insert(
-    data, title="", xlabels=None, ylabels=None, open_dlg=True
+    data, title="", xlabels=None, ylabels=None
 ) -> ArrayEditor:
-    """Helper routine to launch an arrayeditor and return its result"""
+    """Helper routine to launch an arrayeditor and return its result
+
+    Args:
+        data: numpy array to be edited.
+        title: title of the arrayeditor. Defaults to "".
+        xlabels: xlabels to use in the ArrayEditor. Defaults to None.
+        ylabels: ylabels to use in the ArrayEditor. Defaults to None.
+
+    Returns:
+        An ArrayEditor instance with the given data and labels.
+    """
     dlg = ArrayEditor()
     dlg.setup_and_check(
         data, title, xlabels=xlabels, ylabels=ylabels, variable_size=True
@@ -139,8 +158,6 @@ def launch_arrayeditor_insert(
     dlg.arraywidget.view.model().insert_column(
         DEFAULT_INSERTION_INDEX, DEFAULT_INS_DEL_COUNT, DEFAULT_COL_VALUE
     )
-    if open_dlg:
-        exec_dialog(dlg)
     return dlg
 
 
@@ -149,7 +166,6 @@ def launch_arrayeditor_insert_delete(
     title="",
     xlabels=None,
     ylabels=None,
-    open_dlg=True,
 ) -> ArrayEditor:
     """Creates a new arrayeditor with given data, adds new rows and columns,
     and then deletes them before opening a new dialog box with the result.
@@ -159,25 +175,21 @@ def launch_arrayeditor_insert_delete(
         title: title of the arrayeditor. Defaults to "".
         xlabels: xlabels to use in the ArrayEditor. Defaults to None.
         ylabels: ylabels to use in the ArrayEditor. Defaults to None.
-        open_dlg: flag to open the ArrayEditor dialog box before returning.
-        Defaults to True.
 
     Returns:
-        _description_
+        An ArrayEditor instance with the given data and labels.
     """
-    dlg = launch_arrayeditor_insert(data, title, xlabels, ylabels, open_dlg=False)
+    dlg = launch_arrayeditor_insert(data, title, xlabels, ylabels)
     dlg.arraywidget.view.model().remove_row(
         DEFAULT_INSERTION_INDEX, DEFAULT_INS_DEL_COUNT
     )
     dlg.arraywidget.view.model().remove_column(
         DEFAULT_INSERTION_INDEX, DEFAULT_INS_DEL_COUNT
     )
-    if open_dlg:
-        exec_dialog(dlg)
     return dlg
 
 
-def test_arrayeditor():
+def test_arrayeditor() -> None:
     """Test array editor for all supported data types"""
     with qt_app_context():
         for (title, data), (_, awaited_result) in zip(
