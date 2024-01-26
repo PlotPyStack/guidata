@@ -11,8 +11,11 @@
 # pylint: disable=R0903
 # pylint: disable=R0911
 # pylint: disable=R0201
+
 """Data models for the array editor widget.
 """
+
+from __future__ import annotations
 
 from abc import abstractmethod
 from functools import reduce

@@ -17,12 +17,18 @@ acts as a pointer to the original array and allows to share the same array in mu
 models/widgets and views. They handle data access and changes.
 """
 
+from __future__ import annotations
+
 import copy
-from typing import Any, Generic, TypeVar, cast
+from typing import Any, Generic, TypeVar, Union, cast
 
 import numpy as np
 
-AnySupportedArray = TypeVar("AnySupportedArray", bound=np.ndarray | np.ma.MaskedArray)
+# TODO: (When Python 3.8-3.9 support is dropped) Use `np.ndarray | np.ma.MaskedArray`
+# instead of `Union[np.ndarray, np.ma.MaskedArray]`
+AnySupportedArray = TypeVar(
+    "AnySupportedArray", bound=Union[np.ndarray, np.ma.MaskedArray]
+)
 AnyArrayHandler = TypeVar("AnyArrayHandler", bound="BaseArrayHandler")
 
 

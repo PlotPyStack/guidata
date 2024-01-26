@@ -16,6 +16,8 @@
 array.
 """
 
+from __future__ import annotations
+
 from typing import Generic
 
 import numpy as np
