@@ -45,7 +45,7 @@ from guidata.widgets.arrayeditor.arrayhandler import (
     MaskedArrayHandler,
     RecordArrayHandler,
 )
-from guidata.widgets.arrayeditor.edirotwidget import (
+from guidata.widgets.arrayeditor.editorwidget import (
     BaseArrayEditorWidget,
     DataArrayEditorWidget,
     MaskArrayEditorWidget,
