@@ -12,12 +12,14 @@
 # pylint: disable=R0911
 # pylint: disable=R0201
 
-"""Data models for the array editor widget.
+"""
+Data models for the array editor widget.
 """
 
 from __future__ import annotations
 
 from abc import abstractmethod
+from collections.abc import Callable
 from functools import reduce
 from typing import Any, Generic, Sequence, TypeVar
 
@@ -41,15 +43,17 @@ from guidata.widgets.arrayeditor.arrayhandler import (
 ArrayModelType = TypeVar("ArrayModelType", bound="BaseArrayModel")
 
 
-def handle_size_change(rows=False, cols=False):
+def handle_size_change(rows=False, cols=False) -> Callable:
     """Wrapper to signal when the table changed dimenstions, i.e. when a row or
     column is inserted. This decorator emits the BaseArrayModel.SIZE_CHANGED signal
     and fetch/update the model.
 
     Args:
-    ----
         rows: If rows are inserter. Defaults to False.
         cols: If columns are inserter. Defaults to False.
+
+    Returns:
+        The wrapped method
     """
 
     def inner_handle_size_change(
@@ -69,19 +73,17 @@ def handle_size_change(rows=False, cols=False):
 
 
 class BaseArrayModel(QAbstractTableModel, Generic[AnyArrayHandler, AnySupportedArray]):
-    # ==============================================================================
     """Array Editor Table Model that implements all the core functionnalities
 
     Args:
-    ----
-            array_handler: instance of BaseArrayHandler or child classes.
-            format: format of the displayed values. Defaults to "%.6g".
-            xlabels: TODO. Defaults to None.
-            ylabels: TODO. Defaults to None.
-            readonly: Flag to set the data in readonly mode. Defaults to False.
-            parent: parent QObject. Defaults to None.
-            current_slice: slice of the same dimension as the Numpy ndarray that will
-            return a 2d array when applied to it. Defaults to None.
+        array_handler: instance of BaseArrayHandler or child classes.
+        format: format of the displayed values. Defaults to "%.6g".
+        xlabels: labels for the columns (header). Defaults to None.
+        ylabels: labels for the rows (header). Defaults to None.
+        readonly: Flag to set the data in readonly mode. Defaults to False.
+        parent: parent QObject. Defaults to None.
+        current_slice: slice of the same dimension as the Numpy ndarray that will
+         return a 2d array when applied to it. Defaults to None.
     """
 
     ROWS_TO_LOAD = 500
@@ -166,7 +168,6 @@ class BaseArrayModel(QAbstractTableModel, Generic[AnyArrayHandler, AnySupportedA
         """Property to simplify access to the array shape
 
         Returns
-        -------
             The shape of the array
         """
         return self._array_handler.shape
@@ -176,7 +177,6 @@ class BaseArrayModel(QAbstractTableModel, Generic[AnyArrayHandler, AnySupportedA
         """Property to simplify access to the array dimension
 
         Returns
-        -------
             The number of dimensions of the array
         """
         return self._array_handler.ndim
@@ -185,12 +185,10 @@ class BaseArrayModel(QAbstractTableModel, Generic[AnyArrayHandler, AnySupportedA
         """Wrapper around the abstract class InsertionDataSet
 
         Args:
-        ----
             index: default insertion index used in the dataset
             axis: axis on which to perform the insertion (row/column)
 
         Returns:
-        -------
             new InsertionDataSet child class
         """
         dtype = self._array_handler.dtype
@@ -255,12 +253,10 @@ class BaseArrayModel(QAbstractTableModel, Generic[AnyArrayHandler, AnySupportedA
         """Wrapper around the abstract class DeletionDataSet
 
         Args:
-        ----
             index: default deletion index used in the dataset
             axis: axis on which to perform the deletion (row/column)
 
         Returns:
-        -------
             new DeletionDataSet child class
         """
         max_index = self._array_handler.shape[
@@ -298,36 +294,46 @@ class BaseArrayModel(QAbstractTableModel, Generic[AnyArrayHandler, AnySupportedA
 
         return NewDeletionDataSet
 
-    def get_format(self):
-        """Return current format"""
+    def get_format(self) -> str:
+        """Return current format
+
+        Returns:
+            Current format
+        """
         # Avoid accessing the private attribute _format from outside
         return self._format
 
-    def set_format(self, format):
-        """Change display format"""
+    def set_format(self, format: str) -> None:
+        """Change display format
+
+        Args:
+            format: new format
+        """
         self._format = format
         self.reset()
 
-    def columnCount(self, qindex=QModelIndex()):
+    def columnCount(self, qindex=QModelIndex()) -> int:
         """Array column number"""
         if self.total_cols <= self.cols_loaded:
             return self.total_cols
         return self.cols_loaded
 
-    def rowCount(self, qindex=QModelIndex()):
+    def rowCount(self, qindex=QModelIndex()) -> int:
         """Array row number"""
         if self.total_rows <= self.rows_loaded:
             return self.total_rows
         return self.rows_loaded
 
     def can_fetch_more(self, rows=False, columns=False) -> bool:
-        """Args:
-        ----
+        """
+        Is there more data than the current slice can show?
+        Useful when variable_size is True and columns/rows are added
+
+        Args:
             rows: Should check the rows. Defaults to False.
             columns: Should check the columns. Defaults to False.
 
         Returns
-        -------
             True if new data can be fetched
         """
         return (
@@ -338,15 +344,15 @@ class BaseArrayModel(QAbstractTableModel, Generic[AnyArrayHandler, AnySupportedA
         )
 
     def can_fetch_less(self, rows=False, columns=False) -> bool:
-        """Useful when variable_size is True and columns/rows are deleted
+        """
+        Is there less data than the current slice can show?
+        Useful when variable_size is True and columns/rows are deleted
 
         Args:
-        ----
             rows: Should check the rows. Defaults to False.
             columns: Should check the columns. Defaults to False.
 
         Returns:
-        -------
             True if less data should be fetched
         """
         return (
@@ -356,9 +362,13 @@ class BaseArrayModel(QAbstractTableModel, Generic[AnyArrayHandler, AnySupportedA
             and self.total_cols < self.cols_loaded
         )
 
-    def fetch(self, rows=False, columns=False):
-        """:param rows:
-        :param columns:
+    def fetch(self, rows=False, columns=False) -> None:
+        """
+        Fetch more data if necessary.
+
+        Args:
+            rows: Should fetch rows. Defaults to False.
+            columns: Should fetch columns. Defaults to False.
         """
         if self.can_fetch_more(rows=rows):
             reminder = self.total_rows - self.rows_loaded
@@ -398,8 +408,12 @@ class BaseArrayModel(QAbstractTableModel, Generic[AnyArrayHandler, AnySupportedA
             self.cols_loaded -= items_to_remove
             self.endRemoveColumns()
 
-    def bgcolor(self, state):
-        """Toggle backgroundcolor"""
+    def bgcolor(self, state: int) -> None:
+        """Toggle backgroundcolor
+
+        Args:
+            state: 0 or 2, 0 means disabled, 2 means enabled
+        """
         self.bgcolor_enabled = state > 0
         self.reset()
 
@@ -410,22 +424,19 @@ class BaseArrayModel(QAbstractTableModel, Generic[AnyArrayHandler, AnySupportedA
         return new changes.
 
         Args:
-        ----
             index: 2d index tuple
 
         Returns:
-        -------
             The value requested in the ArrayHandler
         """
         return self._array_handler[self._compute_ndim_index(index)]
 
-    def set_value(self, index: tuple[int, int], value: Any):
+    def set_value(self, index: tuple[int, int], value: Any) -> None:
         """Same as get_value() but to set a value in the array handler. The input 2d
         index tuple is converted to n-dim and used to set value. Use this instead of
         get_array()[index] because this methods handles the changes storage.
 
         Args:
-        ----
             index: 2d index tuple
             value: value to set
         """
@@ -436,11 +447,9 @@ class BaseArrayModel(QAbstractTableModel, Generic[AnyArrayHandler, AnySupportedA
         the array model.
 
         Args:
-        ----
             index: 2d index tuple
 
         Returns:
-        -------
             New index tuple in n-dim
         """
         (
@@ -455,11 +464,9 @@ class BaseArrayModel(QAbstractTableModel, Generic[AnyArrayHandler, AnySupportedA
         interface.
 
         Args:
-        ----
             d2_axis: 2d axis (0 or 1)
 
         Returns:
-        -------
             The corresponding axis in n-dim (1 -> 2 if current slice is [0, :, :])
         """
         axis_offset = reduce(
@@ -469,7 +476,7 @@ class BaseArrayModel(QAbstractTableModel, Generic[AnyArrayHandler, AnySupportedA
         )
         return d2_axis + axis_offset
 
-    def data(self, index: QModelIndex, role=Qt.ItemDataRole.DisplayRole):
+    def data(self, index: QModelIndex, role=Qt.ItemDataRole.DisplayRole) -> Any:
         """Cell content"""
         if not index.isValid():
             return None
@@ -507,7 +514,7 @@ class BaseArrayModel(QAbstractTableModel, Generic[AnyArrayHandler, AnySupportedA
             return get_font(CONF, "arrayeditor", "font")
         return None
 
-    def setData(self, index, value, role=Qt.ItemDataRole.EditRole):
+    def setData(self, index, value, role=Qt.ItemDataRole.EditRole) -> bool:
         """Cell content change"""
         if not index.isValid() or self.readonly:
             return False
@@ -555,7 +562,6 @@ class BaseArrayModel(QAbstractTableModel, Generic[AnyArrayHandler, AnySupportedA
         """Computes a default n-dim slice to use to get a 2d array.
 
         Returns
-        -------
             A tuple containing 0s and 2 slices of the form: (0, ..., 0, slice(None),
             slice(None))
         """
@@ -567,11 +573,10 @@ class BaseArrayModel(QAbstractTableModel, Generic[AnyArrayHandler, AnySupportedA
         )
         return default_slice
 
-    def set_slice(self, new_slice: Sequence[int | slice] | None):
+    def set_slice(self, new_slice: Sequence[int | slice] | None) -> None:
         """Use this method to change the current slice handled by the model
 
         Args:
-        ----
             new_slice: new_slice to set
         """
         if new_slice is None:
@@ -595,7 +600,7 @@ class BaseArrayModel(QAbstractTableModel, Generic[AnyArrayHandler, AnySupportedA
             print(err_msg)
             QMessageBox.critical(self.dialog, "Error", err_msg)
 
-    def flags(self, index):
+    def flags(self, index: QModelIndex) -> Qt.ItemFlags:
         """Set editable flag"""
         if not index.isValid():
             return Qt.ItemFlag.ItemIsEnabled
@@ -603,7 +608,7 @@ class BaseArrayModel(QAbstractTableModel, Generic[AnyArrayHandler, AnySupportedA
             QAbstractTableModel.flags(self, index) | Qt.ItemFlag.ItemIsEditable
         )
 
-    def headerData(self, section, orientation, role=Qt.ItemDataRole.DisplayRole):
+    def headerData(self, section, orientation, role=Qt.ItemDataRole.DisplayRole) -> Any:
         """Set header data"""
         if role != Qt.ItemDataRole.DisplayRole:
             return None
@@ -627,7 +632,7 @@ class BaseArrayModel(QAbstractTableModel, Generic[AnyArrayHandler, AnySupportedA
         except IndexError:
             return 1
 
-    def set_row_col_counts(self):
+    def set_row_col_counts(self) -> None:
         """Set rows and columns instance variables"""
         size = self.total_rows * self.total_cols
         if size > utils.LARGE_SIZE:
@@ -643,7 +648,7 @@ class BaseArrayModel(QAbstractTableModel, Generic[AnyArrayHandler, AnySupportedA
             else:
                 self.cols_loaded = self.total_cols
 
-    def set_hue_values(self):
+    def set_hue_values(self) -> None:
         """Set hue values depending on array values (min/max)"""
         try:
             self.vmin = np.nanmin(self.color_func(self.get_array()))
@@ -661,11 +666,12 @@ class BaseArrayModel(QAbstractTableModel, Generic[AnyArrayHandler, AnySupportedA
             self.bgcolor_enabled = False
 
     @handle_size_change(rows=True)
-    def insert_row(self, index: int, insert_number: int = 1, default_value: Any = 0):
+    def insert_row(
+        self, index: int, insert_number: int = 1, default_value: Any = 0
+    ) -> None:
         """Insert new rows with a default value.
 
         Args:
-        ----
             index: row index at which start the insertion
             insert_number: number of rows to insert. Defaults to 1.
             default_value: default value to insert. Defaults to 0.
@@ -675,22 +681,22 @@ class BaseArrayModel(QAbstractTableModel, Generic[AnyArrayHandler, AnySupportedA
         )
 
     @handle_size_change(rows=True)
-    def remove_row(self, index: int, remove_number: int = 1):
+    def remove_row(self, index: int, remove_number: int = 1) -> None:
         """Removes rows from the array.
 
         Args:
-        ----
             index: row index at which to start the deletion
             remove_number: number of rows to delete. Defaults to 1.
         """
         self._array_handler.delete_on_axis(index, self._row_axis_nd, remove_number)
 
     @handle_size_change(cols=True)
-    def insert_column(self, index: int, insert_number: int = 1, default_value: Any = 0):
+    def insert_column(
+        self, index: int, insert_number: int = 1, default_value: Any = 0
+    ) -> None:
         """Insert new columns with a default value.
 
         Args:
-        ----
             index: column index at which start the insertion
             insert_number: number of columns to insert. Defaults to 1.
             default_value: default value to insert. Defaults to 0.
@@ -700,17 +706,16 @@ class BaseArrayModel(QAbstractTableModel, Generic[AnyArrayHandler, AnySupportedA
         )
 
     @handle_size_change(cols=True)
-    def remove_column(self, index: int, remove_number: int = 1):
+    def remove_column(self, index: int, remove_number: int = 1) -> None:
         """Removes columns from the array.
 
         Args:
-        ----
             index: column index at which to start the deletion
             remove_number: number of columns to delete. Defaults to 1.
         """
         self._array_handler.delete_on_axis(index, self._col_axis_nd, remove_number)
 
-    def reset(self):
+    def reset(self) -> None:
         """Reset the model."""
         self.beginResetModel()
         self.endResetModel()
@@ -719,17 +724,16 @@ class BaseArrayModel(QAbstractTableModel, Generic[AnyArrayHandler, AnySupportedA
         """Return the array.
 
         Returns
-        -------
             Array stored in the array handler. Does not include data changes if not in
             variable_size mode.
         """
         return self._array_handler.get_array()
 
-    def apply_changes(self):
+    def apply_changes(self) -> None:
         """Validates and apply changes in the array. Irreversible."""
         self._array_handler.apply_changes()
 
-    def clear_changes(self):
+    def clear_changes(self) -> None:
         """Cancel all changes in the array. Irreversible."""
         self._array_handler.clear_changes()
 
@@ -740,15 +744,14 @@ class MaskedArrayModel(BaseArrayModel[MaskedArrayHandler, np.ma.MaskedArray]):
     functionnalities.
 
     Args:
-    ----
         array_handler: instance of MaskedArrayHandler.
         format: format of the displayed values. Defaults to "%.6g".
-        xlabels: TODO. Defaults to None.
-        ylabels: TODO. Defaults to None.
+        xlabels: labels for the columns (header). Defaults to None.
+        ylabels: labels for the rows (header). Defaults to None.
         readonly: Flag to set the data in readonly mode. Defaults to False.
         parent: parent QObject. Defaults to None.
         current_slice: slice of the same dimension as the Numpy ndarray that will
-        return a 2d array when applied to it. Defaults to None.
+         return a 2d array when applied to it. Defaults to None.
     """
 
     def __init__(
@@ -760,7 +763,7 @@ class MaskedArrayModel(BaseArrayModel[MaskedArrayHandler, np.ma.MaskedArray]):
         readonly=False,
         parent=None,
         current_slice: Sequence[slice | int] | None = None,
-    ):
+    ) -> None:
         super().__init__(
             array_handler, format, xlabels, ylabels, readonly, parent, current_slice
         )
@@ -790,15 +793,14 @@ class MaskedArrayModel(BaseArrayModel[MaskedArrayHandler, np.ma.MaskedArray]):
         insert_number: int,
         default_value: Any,
         default_mask_value: bool = True,
-    ):
+    ) -> None:
         """Same as BaseArrayModel.insert_row() but adds the capacity to add a row
 
         Args:
-        ----
-            index: _description_
-            insert_number: _description_
-            default_value: _description_
-            default_mask_value: _description_. Defaults to True.
+            index: index at which to insert the row
+            insert_number: number of rows to insert
+            default_value: default value to insert
+            default_mask_value: default mask value to insert. Defaults to True.
         """
         self._array_handler.insert_on_axis(
             index, self._row_axis_nd, insert_number, default_value, default_mask_value
@@ -807,11 +809,19 @@ class MaskedArrayModel(BaseArrayModel[MaskedArrayHandler, np.ma.MaskedArray]):
     @handle_size_change(cols=True)
     def insert_column(
         self,
-        index,
-        insert_number,
-        default_value,
+        index: int,
+        insert_number: int,
+        default_value: Any,
         default_mask_value: bool = False,
-    ):
+    ) -> None:
+        """Same as BaseArrayModel.insert_column() but adds the capacity to add a column
+
+        Args:
+            index: index at which to insert the column
+            insert_number: number of columns to insert
+            default_value: default value to insert
+            default_mask_value: default mask value to insert. Defaults to False.
+        """
         self._array_handler.insert_on_axis(
             index, self._col_axis_nd, insert_number, default_value, default_mask_value
         )  # calls MaskedArrayHandler.insert_on_axis which has a default_mask argument
@@ -823,15 +833,14 @@ class MaskArrayModel(MaskedArrayModel):
     for more core functionnalites.
 
     Args:
-    ----
         array_handler: instance of MaskedArrayHander.
         format: format of the displayed values. Defaults to "%.6g".
-        xlabels: TODO. Defaults to None.
-        ylabels: TODO. Defaults to None.
+        xlabels: labels for the columns (header). Defaults to None.
+        ylabels: labels for the rows (header). Defaults to None.
         readonly: Flag to set the data in readonly mode. Defaults to False.
         parent: parent QObject. Defaults to None.
         current_slice: slice of the same dimension as the Numpy ndarray that will
-        return a 2d array when applied to it. Defaults to None.
+         return a 2d array when applied to it. Defaults to None.
     """
 
     def get_array(self) -> np.ndarray:
@@ -854,7 +863,7 @@ class MaskArrayModel(MaskedArrayModel):
         """
         return self._array_handler.get_mask_value(index)
 
-    def set_value(self, index: tuple[int, ...], value: bool):
+    def set_value(self, index: tuple[int, ...], value: bool) -> None:
         """Set mask value (override of the BaseArrayModel.set_value() method)
 
         Args:
@@ -870,15 +879,14 @@ class DataArrayModel(MaskedArrayModel):
     for more core functionnalites.
 
     Args:
-    ----
         array_handler: instance of MaskedArrayHander.
         format: format of the displayed values. Defaults to "%.6g".
-        xlabels: TODO. Defaults to None.
-        ylabels: TODO. Defaults to None.
+        xlabels: labels for the columns (header). Defaults to None.
+        ylabels: labels for the rows (header). Defaults to None.
         readonly: Flag to set the data in readonly mode. Defaults to False.
         parent: parent QObject. Defaults to None.
         current_slice: slice of the same dimension as the Numpy ndarray that will
-        return a 2d array when applied to it. Defaults to None.
+         return a 2d array when applied to it. Defaults to None.
     """
 
     def get_array(self) -> memoryview:
@@ -901,7 +909,13 @@ class DataArrayModel(MaskedArrayModel):
         """
         return self._array_handler.get_data_value(index)
 
-    def set_value(self, index: tuple[int, ...], value: Any):
+    def set_value(self, index: tuple[int, ...], value: Any) -> None:
+        """Set a value in the underlying masked array data.
+
+        Args:
+            index: index at which to set the value
+            value: value to set
+        """
         self._array_handler.set_data_value(index, value)
 
 
@@ -909,16 +923,15 @@ class RecordArrayModel(BaseArrayModel[RecordArrayHandler, AnySupportedArray]):
     """Array Editor Table Model made for record arrays (= Numpy's structured arrays).
 
     Args:
-    ----
         array_handler: instance of BaseArrayHandler or child classes.
         dtype_name: name of the type to handle in the model
         format: format of the displayed values. Defaults to "%.6g".
-        xlabels: TODO. Defaults to None.
-        ylabels: TODO. Defaults to None.
+        xlabels: labels for the columns (header). Defaults to None.
+        ylabels: labels for the rows (header). Defaults to None.
         readonly: Flag to set the data in readonly mode. Defaults to False.
         parent: parent QObject. Defaults to None.
         current_slice: slice of the same dimension as the Numpy ndarray that will
-        return a 2d array when applied to it. Defaults to None.
+         return a 2d array when applied to it. Defaults to None.
     """
 
     __slots__ = ("_dtype_name",)
@@ -933,20 +946,37 @@ class RecordArrayModel(BaseArrayModel[RecordArrayHandler, AnySupportedArray]):
         readonly=False,
         parent=None,
         current_slice: Sequence[slice | int] | None = None,
-    ):
+    ) -> None:
         self._dtype_name = dtype_name
         super().__init__(
             array_handler, format, xlabels, ylabels, readonly, parent, current_slice
         )
 
     def get_array(self) -> np.ndarray:
+        """Returns the array (override of the BaseArrayModel.get_array() method)
+
+        Returns:
+            Array stored in the array handler. Does not include data changes if not in
+            variable_size mode.
+        """
         return self._array_handler.get_array()[self._dtype_name]
 
-    def get_value(self, index: tuple[int, ...]):
-        """:param index:
-        :return:
+    def get_value(self, index: tuple[int, ...]) -> Any:
+        """Get a value from underlying masked array data.
+
+        Args:
+            index: index to get a value from
+
+        Returns:
+            Data value at index
         """
         return self._array_handler.get_record_value(self._dtype_name, index)
 
-    def set_value(self, index: tuple[int, ...], value: Any):
+    def set_value(self, index: tuple[int, ...], value: Any) -> None:
+        """Set a value in the underlying masked array data.
+
+        Args:
+            index: index at which to set the value
+            value: value to set
+        """
         self._array_handler.set_record_value(self._dtype_name, index, value)

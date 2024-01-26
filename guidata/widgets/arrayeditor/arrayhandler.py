@@ -12,7 +12,8 @@
 # pylint: disable=R0911
 # pylint: disable=R0201
 
-""" Provide classes to wrap Numpy arrays and handle changes made to them. Array handlers
+"""
+Provide classes to wrap Numpy arrays and handle changes made to them. Array handlers
 acts as a pointer to the original array and allows to share the same array in multiple
 models/widgets and views. They handle data access and changes.
 """
@@ -37,17 +38,12 @@ class BaseArrayHandler(Generic[AnySupportedArray]):
     array in multiple models/widgets and views. It handles data access and changes.
 
     Args:
-    ----
         array: Numpy array to wrap
         variable_size: Flag to indicate if the size of the array can be modified (i.e.
-        that data can be inserted on any axis). This flag changes the underlying
-        data management strategy. If True, the original array will be copied and changes
-        will be done inplace in the copy, else changes are stored in a dictionnary
-        and applied inplace when the appropriate method is called. Defaults to False.
-
-    Returns:
-    -------
-        BaseArrayHandler instance
+         that data can be inserted on any axis). This flag changes the underlying
+         data management strategy. If True, the original array will be copied and changes
+         will be done inplace in the copy, else changes are stored in a dictionnary
+         and applied inplace when the appropriate method is called. Defaults to False.
     """
 
     __slots__ = (
@@ -77,7 +73,6 @@ class BaseArrayHandler(Generic[AnySupportedArray]):
         """Small method to handle variable initializations dependent on the array.
 
         Args:
-        ----
             array: Numpy array to use
         """
         if self._variable_size:
@@ -95,33 +90,55 @@ class BaseArrayHandler(Generic[AnySupportedArray]):
 
     @property
     def variable_size(self) -> bool:
-        """Returns the variable_size flag. If True, the array is resizable and
-        changes"""
+        """Returns the variable_size flag. If True, the array is resizable and changes
+
+        Returns
+            Variable size flag
+        """
         return self._variable_size
 
     @property
     def ndim(self) -> int:
-        """Numpy ndim property. Returns the number of dimensions of the array."""
+        """Numpy ndim property.
+
+        Returns
+            Number of dimensions of the array
+        """
         return self._array.ndim
 
     @property
-    def flags(self):
-        """Numpy flags property. Returns the flags of the array."""
+    def flags(self) -> np.flagsobj:
+        """Numpy flags property.
+
+        Returns
+            Flags of the array"""
         return self._array.flags
 
     @property
     def shape(self) -> tuple[int, ...]:
-        """Numpy shape property. Returns the shape of the array."""
+        """Numpy shape property.
+
+        Returns
+            Shape of the array
+        """
         return self._array.shape
 
     @shape.setter
     def shape(self, value: tuple[int, ...]) -> None:
-        """Numpy shape property setter. Sets the shape of the array."""
+        """Numpy shape property setter. Sets the shape of the array.
+
+        Args:
+            value: new shape of the array
+        """
         self._array.shape = value
 
     @property
     def dtype(self) -> Any:
-        """Numpy dtype property. Returns the dtype of the array."""
+        """Numpy dtype property.
+
+        Returns
+            dtype of the array
+        """
         return self._dtype
 
     @property
@@ -130,25 +147,22 @@ class BaseArrayHandler(Generic[AnySupportedArray]):
         arrays.
 
         Returns
-        -------
             A memoryview to the underlying data (= a np.ndarray)
         """
         return self._array.data
 
     def insert_on_axis(
         self, index: int, axis: int, insert_number: int = 1, default: Any = 0
-    ):
+    ) -> None:
         """Insert new row(s) of default values on an axis. Makes a copy of the original
         array.
 
         Args:
-        ----
             index: Index from which to start the insertion.
             axis: axis on which to make the insertion.
             insert_number: Number of rows to insert at once. Defaults to 1.
             default: default value to insert. Defaults to the "zero value" of a type
-            (e.g. "" for str or False for Booleans). Defaults to 0.
-            _args: additional arguments that can be defined and used in child classes
+             (e.g. "" for str or False for Booleans). Defaults to 0.
         """
         indexes = (index,) * insert_number
         self._array = np.insert(self._array, indexes, default, axis=axis)
@@ -157,7 +171,6 @@ class BaseArrayHandler(Generic[AnySupportedArray]):
         """Delete row(s) on an axis. Makes a copy of the original array.
 
         Args:
-        ----
             index: index from which to start the deletion.
             axis: axis on which to make the deletion.
             remove_number: Number of rows to delete at once. Defaults to 1.
@@ -170,7 +183,6 @@ class BaseArrayHandler(Generic[AnySupportedArray]):
         array does not contain the current modifications as they are saved separately.
 
         Returns
-        -------
             Numpy array contained in the handler instance
         """
         return cast(AnySupportedArray, self._array)
@@ -180,11 +192,10 @@ class BaseArrayHandler(Generic[AnySupportedArray]):
         'insert_on_axis' instead to be sure to insert on the right axis from the Model.
 
         Args:
-        ----
             index: Index from which to start the insertion.
             insert_number: Number of rows to insert at once. Defaults to 1.
             default: default value to insert. Defaults to the "zero value" of a type
-            (e.g. "" for str or False for Booleans). Defaults to 0.
+             (e.g. "" for str or False for Booleans). Defaults to 0.
         """
         self.insert_on_axis(index, 0, insert_number, default)
 
@@ -193,11 +204,10 @@ class BaseArrayHandler(Generic[AnySupportedArray]):
         'insert_on_axis' instead to be sure to insert on the right axis from the Model.
 
         Args:
-        ----
             index: Index from which to start the insertion.
             insert_number: Number of columns to insert at once. Defaults to 1.
             default: default value to insert. Defaults to the "zero value" of a type
-            (e.g. "" for str or False for Booleans). Defaults to 0.
+             (e.g. "" for str or False for Booleans). Defaults to 0.
         """
         self.insert_on_axis(index, 1, insert_number, default)
 
@@ -206,7 +216,6 @@ class BaseArrayHandler(Generic[AnySupportedArray]):
         storage strategy changes depending on the variable_size flag.
 
         Args:
-        ----
             key: key to set (=array index)
             item: value to set. Must be of the same type as the array data.
         """
@@ -220,18 +229,16 @@ class BaseArrayHandler(Generic[AnySupportedArray]):
         retrieval strategy changes depending on the variable_size flag.
 
         Args:
-        ----
             key: key to get (=array index)
 
         Returns:
-        -------
             The requested value from the array
         """
         if not self._variable_size:
             return self.current_changes.get(key, self._array[key])
         return self._array[key]
 
-    def apply_changes(self):
+    def apply_changes(self) -> None:
         """Apply changes. Only useful if flag viariable_size is False as it will write
         the values stored in a dictionary in the original array. This operation is
         non-reversible as it writes inplace.
@@ -243,7 +250,7 @@ class BaseArrayHandler(Generic[AnySupportedArray]):
         else:
             self._backup_array = copy.deepcopy(self._array)
 
-    def clear_changes(self):
+    def clear_changes(self) -> None:
         """Deletes all the changes made until that point. If the variable_size flag is
         True, then restores a copy of the origninal array (makes new copy needed). Else,
         clears the dictionnary where changes are temporarily stored.
@@ -253,7 +260,7 @@ class BaseArrayHandler(Generic[AnySupportedArray]):
         else:
             self._init_arrays(self._backup_array)
 
-    def reset_shape_if_changed(self):
+    def reset_shape_if_changed(self) -> None:
         """When a numpy array is 1D, the handler changes the shape to add a second
         dimension of size 1 to act like a normal 2d array in the BaseArrayModel. In some
         instances, the shape must be reset (i.e. when getting the array when the
@@ -270,10 +277,9 @@ class MaskedArrayHandler(BaseArrayHandler[np.ma.MaskedArray]):
     handled a Numpy MaskedArray.
 
     Args:
-    ----
         array: Numpy MaskedArray to wrap
         variable_size: array resizability flag, refer to BaseArrayHandler for more
-        information. Defaults to False.
+         information. Defaults to False.
     """
 
     __slots__ = ("current_mask_changes",)
@@ -290,7 +296,11 @@ class MaskedArrayHandler(BaseArrayHandler[np.ma.MaskedArray]):
 
     @property
     def mask(self) -> np.ndarray:
-        """Numpy mask property. Returns the mask of the array."""
+        """Numpy mask property.
+
+        Returns:
+            The mask of the array
+        """
         return self._array.mask
 
     def insert_on_axis(
@@ -300,18 +310,17 @@ class MaskedArrayHandler(BaseArrayHandler[np.ma.MaskedArray]):
         insert_number: int = 1,
         default: Any = 0,
         default_mask: bool = False,
-    ):
+    ) -> None:
         """Refer to BaseArrayHandler.insert_on_axis for the full details.
         The only difference is that with this method is that it also inserts default
         values for the mask.
 
         Args:
-        ----
             index: index from which to start the insertion.
             axis: axis on which to make the insertion.
             insert_number: Number of rows to insert at once. Defaults to 1.
             default: default value to insert. Defaults to the "zero value" of a type
-            (e.g. "" for str or False for Booleans). Defaults to 0.
+             (e.g. "" for str or False for Booleans). Defaults to 0.
             default_mask: default mask value to insert. Defaults to False.
         """
         indexes = (index,) * insert_number
@@ -324,13 +333,12 @@ class MaskedArrayHandler(BaseArrayHandler[np.ma.MaskedArray]):
         new_array.mask = new_mask
         self._array = new_array
 
-    def delete_on_axis(self, index: int, axis: int, remove_number: int = 1):
+    def delete_on_axis(self, index: int, axis: int, remove_number: int = 1) -> None:
         """Refer to BaseArrayHandler.delete_on_axis for the full details.
         The only difference is that with this method is that it also keep the previous
         value of the mask.
 
         Args:
-        ----
             index: index from which to start the deletion.
             axis: axis on which to make the deletion.
             remove_number: number of rows to delete. Defaults to 1.
@@ -344,12 +352,11 @@ class MaskedArrayHandler(BaseArrayHandler[np.ma.MaskedArray]):
         new_array.mask = new_mask
         self._array = new_array
 
-    def set_mask_value(self, key: tuple[int, ...], value: bool):
+    def set_mask_value(self, key: tuple[int, ...], value: bool) -> None:
         """Setter for the mask values. Identical to BaseArrayHandler.__setitem__ but for
         the mask.
 
         Args:
-        ----
             key:  key to set (=mask index).
             item: value to set.
         """
@@ -363,41 +370,35 @@ class MaskedArrayHandler(BaseArrayHandler[np.ma.MaskedArray]):
         the mask.
 
         Args:
-        ----
             key:  key to get (=mask index).
 
-
         Returns:
-        -------
             The requested value from the mask
         """
         if not self._variable_size:
             return self.current_mask_changes.get(key, self._array.mask[key])
         return self._array.mask[key]
 
-    def get_data_value(self, key: tuple[int, ...]):
+    def get_data_value(self, key: tuple[int, ...]) -> Any:
         """Setter for the data values (unmasked). Identical to
         BaseArrayHandler.__setitem__ but for the unmasked array data.
 
         Args:
-        ----
             key:  key to set (=mask index). Must be the same type as the array.
             item: value to set.
 
         Returns:
-        -------
             The requested value from the array
         """
         if not self._variable_size:
             return self.current_changes.get(key, self._array.data[key])
         return self._array.data[key]
 
-    def set_data_value(self, key: tuple[int, ...], value: bool):
+    def set_data_value(self, key: tuple[int, ...], value: bool) -> None:
         """Getter for the data values (unmasked). Identical to
         BaseArrayHandler.__getitem__ but for the unmasked array data.
 
         Args:
-        ----
             key:  key to get (=array index).
         """
         if not self._variable_size:
@@ -405,7 +406,7 @@ class MaskedArrayHandler(BaseArrayHandler[np.ma.MaskedArray]):
         else:
             self._array.data[key] = value
 
-    def apply_changes(self):
+    def apply_changes(self) -> None:
         """Same as BaseArrayHandler.apply_changes but also applies changes to the
         mask."""
         super().apply_changes()
@@ -413,7 +414,7 @@ class MaskedArrayHandler(BaseArrayHandler[np.ma.MaskedArray]):
             self._array.mask[coor] = value
         self.current_mask_changes.clear()
 
-    def clear_changes(self):
+    def clear_changes(self) -> None:
         """Same as BaseArrayHandler.clear_changes but also clears the changes made to
         the mask."""
         super().clear_changes()
@@ -426,10 +427,9 @@ class RecordArrayHandler(BaseArrayHandler[np.ndarray]):
     handled Numpy's structured arrays.
 
     Args:
-    ----
         array: Numpy ndarray
         variable_size: array resizability flag, refer to BaseArrayHandler for more
-        information. Defaults to False.
+         information. Defaults to False.
     """
 
     def __init__(
@@ -444,24 +444,23 @@ class RecordArrayHandler(BaseArrayHandler[np.ndarray]):
         BaseArrayHandler.__getitem__ but for the named values.
 
         Args:
-        ----
             name: type name to get.
             key:  key to get.
 
         Returns:
-        -------
             The requested value from the array
         """
         if not self._variable_size:
             return self.current_changes.get((name, *key), self._array[name][key])
         return self._array[name][key]
 
-    def set_record_value(self, name: str, key: tuple[str | int, ...], value: Any):
+    def set_record_value(
+        self, name: str, key: tuple[str | int, ...], value: Any
+    ) -> None:
         """Setter for the Numpy's structured array. Identical to
         BaseArrayHandler.__setitem__ but for the named values.
 
         Args:
-        ----
             name: type name to get.
             key:  key to set (i.e. array index).
         """

@@ -61,9 +61,14 @@ from guidata.widgets.arrayeditor.datamodel import (
 
 
 class ArrayDelegate(QItemDelegate):
-    """Array Editor Item Delegate"""
+    """Array Editor Item Delegate
 
-    def __init__(self, dtype, parent=None):
+    Args:
+        dtype: Numpy's dtype of the array to edit
+        parent: parent QObject
+    """
+
+    def __init__(self, dtype: np.dtype, parent=None) -> None:
         QItemDelegate.__init__(self, parent)
         self.dtype = dtype
 
@@ -107,7 +112,12 @@ class ArrayDelegate(QItemDelegate):
 
 
 class DefaultValueDelegate(QItemDelegate):
-    """Array Editor Item Delegate"""
+    """Array Editor Item Delegate
+
+    Args:
+        dtype: Numpy's dtype of the array to edit
+        parent: parent QObject
+    """
 
     def __init__(self, dtype: np.dtype, parent=None) -> None:
         QItemDelegate.__init__(self, parent)
@@ -147,11 +157,21 @@ class DefaultValueDelegate(QItemDelegate):
 
 # TODO: Implement "Paste" (from clipboard) feature
 class ArrayView(QTableView, Generic[ArrayModelType]):
-    """Array view class"""
+    """Array view class
+
+    Args:
+        parent: parent QObject
+        model: BaseArrayModel to use
+        dtype: Numpy's dtype of the array to edit
+        shape: Numpy's shape of the array to edit
+        variable_size: Flag to indicate if the array dimensions can be modified.
+         If a BaseArrayHandler is given as input, the handler should also be in
+         readonly mode. Defaults to False.
+    """
 
     def __init__(
-        self, parent, model: ArrayModelType, dtype, shape, variable_size=False
-    ):
+        self, parent: QWidget, model: ArrayModelType, dtype, shape, variable_size=False
+    ) -> None:
         QTableView.__init__(self, parent)
         self._variable_size = variable_size
 
@@ -161,7 +181,6 @@ class ArrayView(QTableView, Generic[ArrayModelType]):
         for k in range(self.model().shape[1]):
             total_width += self.columnWidth(k)
         self.viewport().resize(min(total_width, 1024), self.height())
-        # TODO Check if variable is used
         QShortcut(QKeySequence(QKeySequence.Copy), self, self.copy)
         self.horizontalScrollBar().valueChanged.connect(
             lambda val: self.load_more_data(val, columns=True)
@@ -199,10 +218,13 @@ class ArrayView(QTableView, Generic[ArrayModelType]):
         assert isinstance(model := super().model(), BaseArrayModel)
         return cast(ArrayModelType, model)
 
-    def load_more_data(self, value, rows=False, columns=False):
-        """:param value:
-        :param rows:
-        :param columns:
+    def load_more_data(self, value: int, rows=False, columns=False) -> None:
+        """Load more data if needed
+
+        Args:
+            value: scrollbar value
+            rows: Flag to indicate if rows should be loaded
+            columns: Flag to indicate if columns should be loaded
         """
         old_selection = self.selectionModel().selection()
         old_rows_loaded = old_cols_loaded = None
@@ -245,7 +267,7 @@ class ArrayView(QTableView, Generic[ArrayModelType]):
                 new_selection, self.selectionModel().ClearAndSelect
             )
 
-    def insert_row(self):
+    def insert_row(self) -> None:
         """Insert row(s) in the array."""
         if (i := self._current_row_index) is not None:
             (
@@ -259,7 +281,7 @@ class ArrayView(QTableView, Generic[ArrayModelType]):
                 self.model().insert_row(i, insert_number, *default_values)
             self._current_row_index = None
 
-    def remove_row(self):
+    def remove_row(self) -> None:
         """Remove row(s) in the array"""
         if (i := self._current_row_index) is not None:
             i, remove_number, valid = self.ask_rows_cols_to_remove(i, 0)
@@ -267,7 +289,7 @@ class ArrayView(QTableView, Generic[ArrayModelType]):
                 self.model().remove_row(i, remove_number)
             self._current_row_index = None
 
-    def insert_col(self):
+    def insert_col(self) -> None:
         """Insert column(s) in the array"""
         if (j := self._current_col_index) is not None:
             (
@@ -281,7 +303,7 @@ class ArrayView(QTableView, Generic[ArrayModelType]):
                 self.model().insert_column(j, insert_number, *default_value)
             self._current_col_index = None
 
-    def remove_col(self):
+    def remove_col(self) -> None:
         """Remove column(s) in the array"""
         if (j := self._current_col_index) is not None:
             j, remove_number, valid = self.ask_rows_cols_to_remove(j, 1)
@@ -362,7 +384,7 @@ class ArrayView(QTableView, Generic[ArrayModelType]):
         number_to_del = min(deletion_dataset.remove_number, max_index - index_)
         return index_, number_to_del, is_ok  # type: ignore
 
-    def resize_to_contents(self):
+    def resize_to_contents(self) -> None:
         """Resize cells to contents"""
         QApplication.setOverrideCursor(QCursor(Qt.CursorShape.WaitCursor))
         self.resizeColumnsToContents()
@@ -370,8 +392,12 @@ class ArrayView(QTableView, Generic[ArrayModelType]):
         self.resizeColumnsToContents()
         QApplication.restoreOverrideCursor()
 
-    def setup_cell_menu(self):
-        """Setup context menu"""
+    def setup_cell_menu(self) -> QMenu:
+        """Setup context menu
+
+        Returns:
+            New QMenu object
+        """
         self.copy_action = create_action(
             self,
             _("Copy"),
@@ -432,7 +458,7 @@ class ArrayView(QTableView, Generic[ArrayModelType]):
         add_actions(menu, actions)
         return menu
 
-    def setup_header_menu(self, axis: int):
+    def setup_header_menu(self, axis: int) -> QMenu:
         """Creates and return a contextual menu for a header depending on input axis.
 
         Args:
@@ -472,19 +498,19 @@ class ArrayView(QTableView, Generic[ArrayModelType]):
         add_actions(menu, actions)
         return menu
 
-    def verticalHeaderContextMenu(self, pos: QPoint):
+    def verticalHeaderContextMenu(self, pos: QPoint) -> None:
         """Reimplement Qt method"""
         vheader = self.verticalHeader()
         self._current_row_index = vheader.logicalIndexAt(pos)
         self.vheader_menu.popup(vheader.mapToGlobal(pos))
 
-    def horizontalHeaderContextMenu(self, pos: QPoint):
+    def horizontalHeaderContextMenu(self, pos: QPoint) -> None:
         """Reimplement Qt method"""
         hheader = self.horizontalHeader()
         self._current_col_index = hheader.logicalIndexAt(pos)
         self.hheader_menu.popup(hheader.mapToGlobal(pos))
 
-    def cellContextMenu(self, pos: QPoint):
+    def cellContextMenu(self, pos: QPoint) -> None:
         """Reimplement Qt method"""
         try:
             selected_index = self.selectedIndexes()[0]
@@ -500,15 +526,23 @@ class ArrayView(QTableView, Generic[ArrayModelType]):
 
         self.cell_menu.popup(self.viewport().mapToGlobal(pos))
 
-    def keyPressEvent(self, event):
+    def keyPressEvent(self, event) -> None:
         """Reimplement Qt method"""
         if event == QKeySequence.Copy:
             self.copy()
         else:
             QTableView.keyPressEvent(self, event)
 
-    def _sel_to_text(self, cell_range) -> str | None:
-        """Copy an array portion to a unicode string"""
+    def _sel_to_text(self, cell_range: list[QItemSelectionRange]) -> str | None:
+        """Copy an array portion to a unicode string
+
+        Args:
+            cell_range: list of QItemSelectionRange objects
+
+        Returns:
+            String representation of the selected array portion, or None if
+             the selection is empty
+        """
         if not cell_range:
             return None
         model = self.model()
@@ -544,7 +578,7 @@ class ArrayView(QTableView, Generic[ArrayModelType]):
         return contents
 
     @Slot()
-    def copy(self):
+    def copy(self) -> None:
         """Copy text to clipboard"""
         cliptxt = self._sel_to_text(self.selectedIndexes())
         clipboard = QApplication.clipboard()
@@ -559,13 +593,13 @@ class BaseArrayEditorWidget(QWidget):
         parent: parent QObject
         data: Numpy's ndarray or BaseArrayHandler to use.
         readonly: Flag for readonly mode. Defaults to False.
-        xlabels: TODO. Defaults to None.
-        ylabels: TODO. Defaults to None.
+        xlabels: labels for the columns (header). Defaults to None.
+        ylabels: labels for the rows (header). Defaults to None.
         variable_size: Flag to indicate if the array dimensions can be modified.
-        If a BaseArrayHandler is given as input, the handler should also be in
-        readonly mode Defaults to False.
+         If a BaseArrayHandler is given as input, the handler should also be in
+         readonly mode Defaults to False.
         current_slice: slice of the same dimension as the Numpy ndarray that will.
-        Defaults to None
+         Defaults to None
     """
 
     def __init__(
@@ -577,7 +611,7 @@ class BaseArrayEditorWidget(QWidget):
         ylabels=None,
         variable_size=False,
         current_slice: Sequence[slice | int] | None = None,
-    ):
+    ) -> None:
         QWidget.__init__(self, parent)
 
         self._variable_size = variable_size and not readonly
@@ -619,6 +653,11 @@ class BaseArrayEditorWidget(QWidget):
     def _init_handler(
         self, data: AnySupportedArray | BaseArrayHandler[AnySupportedArray]
     ) -> None:
+        """Initializes and set the instance handler to use
+
+        Args:
+            data: Numpy's ndarray or BaseArrayHandler to use.
+        """
         if isinstance(data, np.ndarray):
             self._data = BaseArrayHandler[AnySupportedArray](data, self._variable_size)
         elif isinstance(data, BaseArrayHandler):
@@ -631,19 +670,18 @@ class BaseArrayEditorWidget(QWidget):
 
     def _init_model(
         self,
-        xlabels,
-        ylabels,
+        xlabels: Sequence[str] | None,
+        ylabels: Sequence[str] | None,
         readonly: bool,
         current_slice: Sequence[slice | int] | None = None,
-    ):
+    ) -> None:
         """Initializes and set the instance model to use
 
         Args:
-            xlabels: TODO
-            ylabels: TODO
-            readonly: Flag for readonly mode
+            xlabels: labels for the columns (header). Defaults to None.
+            ylabels: labels for the rows (header). Defaults to None.
+            readonly: Flag for readonly mode. Defaults to False.
             current_slice: slice of the same dimension as the Numpy ndarray that will.
-            Defaults to None
         """
         self.model = BaseArrayModel(
             self._data,
@@ -685,11 +723,29 @@ class BaseArrayEditorWidget(QWidget):
 
 class MaskedArrayEditorWidget(BaseArrayEditorWidget):
     """Same as BaseArrayWidgetEditorWidget but specifically handles MaskedArrayHandler
-    and MaskedArrayModel. Specifically the masked data."""
+    and MaskedArrayModel. Specifically the masked data.
+
+    Args:
+        parent: parent QObject
+        data: Numpy's ndarray or BaseArrayHandler to use.
+        readonly: Flag for readonly mode. Defaults to False.
+        xlabels: labels for the columns (header). Defaults to None.
+        ylabels: labels for the rows (header). Defaults to None.
+        variable_size: Flag to indicate if the array dimensions can be modified.
+         If a BaseArrayHandler is given as input, the handler should also be in
+         readonly mode Defaults to False.
+        current_slice: slice of the same dimension as the Numpy ndarray that will.
+         Defaults to None
+    """
 
     # _data: MaskedArrayHandler
 
     def _init_handler(self, data: np.ma.MaskedArray | MaskedArrayHandler) -> None:
+        """Initializes and set the instance handler to use
+
+        Args:
+            data: Numpy's MaskedArray or MaskedArrayHandler to use.
+        """
         if isinstance(data, np.ma.MaskedArray):
             self._data = MaskedArrayHandler(data, self._variable_size)
         elif isinstance(data, MaskedArrayHandler):
@@ -702,11 +758,19 @@ class MaskedArrayEditorWidget(BaseArrayEditorWidget):
 
     def _init_model(
         self,
-        xlabels,
-        ylabels,
+        xlabels: Sequence[str] | None,
+        ylabels: Sequence[str] | None,
         readonly: bool,
         current_slice: Sequence[slice | int] | None = None,
     ) -> None:
+        """Initializes and set the instance model to use
+
+        Args:
+            xlabels: labels for the columns (header). Defaults to None.
+            ylabels: labels for the rows (header). Defaults to None.
+            readonly: Flag for readonly mode. Defaults to False.
+            current_slice: slice of the same dimension as the Numpy ndarray that will.
+        """
         assert isinstance(self._data, MaskedArrayHandler)
         self.model = MaskedArrayModel(
             self._data,
@@ -720,17 +784,38 @@ class MaskedArrayEditorWidget(BaseArrayEditorWidget):
 
 class MaskArrayEditorWidget(MaskedArrayEditorWidget):
     """Same as BaseArrayWidgetEditorWidget but specifically handles MaskedArrayHandler
-    and MaskArrayModel. Specifically the boolean mask."""
+    and MaskArrayModel. Specifically the boolean mask.
+
+    Args:
+        parent: parent QObject
+        data: Numpy's ndarray or BaseArrayHandler to use.
+        readonly: Flag for readonly mode. Defaults to False.
+        xlabels: labels for the columns (header). Defaults to None.
+        ylabels: labels for the rows (header). Defaults to None.
+        variable_size: Flag to indicate if the array dimensions can be modified.
+         If a BaseArrayHandler is given as input, the handler should also be in
+         readonly mode Defaults to False.
+        current_slice: slice of the same dimension as the Numpy ndarray that will.
+         Defaults to None
+    """
 
     # _data: MaskedArrayHandler
 
     def _init_model(
         self,
-        xlabels,
-        ylabels,
+        xlabels: Sequence[str] | None,
+        ylabels: Sequence[str] | None,
         readonly: bool,
         current_slice: Sequence[slice | int] | None = None,
     ) -> None:
+        """Initializes and set the instance model to use
+
+        Args:
+            xlabels: labels for the columns (header). Defaults to None.
+            ylabels: labels for the rows (header). Defaults to None.
+            readonly: Flag for readonly mode. Defaults to False.
+            current_slice: slice of the same dimension as the Numpy ndarray that will.
+        """
         assert isinstance(self._data, MaskedArrayHandler)
         self.model = MaskArrayModel(
             self._data,
@@ -744,13 +829,26 @@ class MaskArrayEditorWidget(MaskedArrayEditorWidget):
 
 class DataArrayEditorWidget(MaskedArrayEditorWidget):
     """Same as BaseArrayWidgetEditorWidget but specifically handles MaskedArrayHandler
-    and DataArrayModel. Specifically the raw unmasked data."""
+    and DataArrayModel. Specifically the raw unmasked data.
+
+    Args:
+        parent: parent QObject
+        data: Numpy's ndarray or BaseArrayHandler to use.
+        readonly: Flag for readonly mode. Defaults to False.
+        xlabels: labels for the columns (header). Defaults to None.
+        ylabels: labels for the rows (header). Defaults to None.
+        variable_size: Flag to indicate if the array dimensions can be modified.
+         If a BaseArrayHandler is given as input, the handler should also be in
+         readonly mode Defaults to False.
+        current_slice: slice of the same dimension as the Numpy ndarray that will.
+         Defaults to None
+    """
 
     # _data: MaskedArrayHandler
 
     def __init__(
         self,
-        parent,
+        parent: QWidget,
         data: np.ma.MaskedArray | MaskedArrayHandler,
         readonly=False,
         xlabels=None,
@@ -764,11 +862,19 @@ class DataArrayEditorWidget(MaskedArrayEditorWidget):
 
     def _init_model(
         self,
-        xlabels,
-        ylabels,
+        xlabels: Sequence[str] | None,
+        ylabels: Sequence[str] | None,
         readonly: bool,
         current_slice: Sequence[slice | int] | None = None,
     ) -> None:
+        """Initializes and set the instance model to use
+
+        Args:
+            xlabels: labels for the columns (header). Defaults to None.
+            ylabels: labels for the rows (header). Defaults to None.
+            readonly: Flag for readonly mode. Defaults to False.
+            current_slice: slice of the same dimension as the Numpy ndarray that will.
+        """
         assert isinstance(self._data, MaskedArrayHandler)
         self.model = DataArrayModel(
             self._data,
@@ -782,7 +888,20 @@ class DataArrayEditorWidget(MaskedArrayEditorWidget):
 
 class RecordArrayEditorWidget(BaseArrayEditorWidget):
     """Same as BaseArrayWidgetEditorWidget but specifically handles RecordArrayHandler
-    and RecordArrayModel which are made to wrap Numpy's structured arrays."""
+    and RecordArrayModel which are made to wrap Numpy's structured arrays.
+
+    Args:
+        parent: parent QObject
+        data: Numpy's ndarray or BaseArrayHandler to use.
+        readonly: Flag for readonly mode. Defaults to False.
+        xlabels: labels for the columns (header). Defaults to None.
+        ylabels: labels for the rows (header). Defaults to None.
+        variable_size: Flag to indicate if the array dimensions can be modified.
+         If a BaseArrayHandler is given as input, the handler should also be in
+         readonly mode Defaults to False.
+        current_slice: slice of the same dimension as the Numpy ndarray that will.
+         Defaults to None
+    """
 
     def __init__(
         self,
@@ -801,6 +920,11 @@ class RecordArrayEditorWidget(BaseArrayEditorWidget):
         )
 
     def _init_handler(self, data: np.ndarray | RecordArrayHandler) -> None:
+        """Initializes and set the instance handler to use
+
+        Args:
+            data: Numpy's ndarray or BaseArrayHandler to use.
+        """
         if isinstance(data, np.ma.MaskedArray):
             self._data = RecordArrayHandler(data, self._variable_size)
         elif isinstance(data, RecordArrayHandler):
@@ -812,11 +936,19 @@ class RecordArrayEditorWidget(BaseArrayEditorWidget):
 
     def _init_model(
         self,
-        xlabels,
-        ylabels,
+        xlabels: Sequence[str] | None,
+        ylabels: Sequence[str] | None,
         readonly: bool,
         current_slice: Sequence[slice | int] | None = None,
     ) -> None:
+        """Initializes and set the instance model to use
+
+        Args:
+            xlabels: labels for the columns (header). Defaults to None.
+            ylabels: labels for the rows (header). Defaults to None.
+            readonly: Flag for readonly mode. Defaults to False.
+            current_slice: slice of the same dimension as the Numpy ndarray that will.
+        """
         assert isinstance(self._data, RecordArrayHandler)
         self.model = RecordArrayModel(
             self._data,

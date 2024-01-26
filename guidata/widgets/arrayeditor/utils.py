@@ -9,8 +9,9 @@
 
 # Note: string and unicode data types will be formatted with '%s' (see below)
 
-
 """Basic utilitarian functions and variables for the various array editor classes"""
+
+import numpy as np
 
 SUPPORTED_FORMATS = {
     "single": "%.6g",
@@ -64,13 +65,27 @@ LARGE_COLS = 60
 # ==============================================================================
 # Utility functions
 # ==============================================================================
-def is_float(dtype):
-    """Return True if datatype dtype is a float kind"""
+def is_float(dtype: np.dtype) -> bool:
+    """Return True if datatype dtype is a float kind
+
+    Args:
+        dtype: numpy datatype
+
+    Returns:
+        True if dtype is a float kind
+    """
     return ("float" in dtype.name) or dtype.name in ["single", "double"]
 
 
-def is_number(dtype):
-    """Return True is datatype dtype is a number kind"""
+def is_number(dtype: np.dtype) -> bool:
+    """Return True is datatype dtype is a number kind
+
+    Args:
+        dtype: numpy datatype
+
+    Returns:
+        True if dtype is a number kind
+    """
     return (
         is_float(dtype)
         or ("int" in dtype.name)
@@ -79,7 +94,14 @@ def is_number(dtype):
     )
 
 
-def get_idx_rect(index_list):
-    """Extract the boundaries from a list of indexes"""
+def get_idx_rect(index_list: list) -> tuple:
+    """Extract the boundaries from a list of indexes
+
+    Args:
+        index_list: list of indexes
+
+    Returns:
+        tuple: (min_row, max_row, min_col, max_col)
+    """
     rows, cols = list(zip(*[(i.row(), i.column()) for i in index_list]))
     return (min(rows), max(rows), min(cols), max(cols))

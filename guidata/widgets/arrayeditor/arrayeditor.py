@@ -12,8 +12,8 @@
 # pylint: disable=R0911
 # pylint: disable=R0201
 
-"""Module that provides array editor dialog boxes to edit various types of numpy
-array.
+"""
+Module that provides array editor dialog boxes to edit various types of NumPy arrays
 """
 
 from __future__ import annotations
@@ -32,6 +32,7 @@ from qtpy.QtWidgets import (
     QPushButton,
     QSpinBox,
     QStackedWidget,
+    QWidget,
 )
 
 from guidata.config import _
@@ -54,7 +55,11 @@ from guidata.widgets.arrayeditor.edirotwidget import (
 
 
 class ArrayEditor(QDialog, Generic[AnySupportedArray]):
-    """Array Editor Dialog"""
+    """Array Editor Dialog
+
+    Args:
+        parent: Parent widget (default: None)
+    """
 
     __slots__ = (
         "data",
@@ -78,7 +83,7 @@ class ArrayEditor(QDialog, Generic[AnySupportedArray]):
     )
     layout: QGridLayout
 
-    def __init__(self, parent=None):
+    def __init__(self, parent: QWidget = None) -> None:
         QDialog.__init__(self, parent)
         win32_fix_title_bar_background(self)
 
@@ -106,9 +111,20 @@ class ArrayEditor(QDialog, Generic[AnySupportedArray]):
         xlabels=None,
         ylabels=None,
         variable_size=False,
-    ):
-        """Setup ArrayEditor:
-        return False if data is not supported, True otherwise
+    ) -> bool:
+        """
+        Setup the array editor dialog box and check if the array is supported.
+
+        Args:
+            data: Array to edit
+            title: Dialog box title
+            readonly: Flag indicating if the array is read only
+            xlabels: List of x labels
+            ylabels: List of y labels
+            variable_size: Flag indicating if the array is variable size
+
+        Returns:
+            True if the array is supported, False otherwise
         """
         readonly = readonly or not data.flags.writeable
         self._variable_size = (
@@ -316,7 +332,7 @@ class ArrayEditor(QDialog, Generic[AnySupportedArray]):
         return True
 
     @Slot(bool, bool)
-    def update_all_tables_on_size_change(self, rows: bool, cols: bool):
+    def update_all_tables_on_size_change(self, rows: bool, cols: bool) -> None:
         """Updates all array editor widgets when rows and/or columns count changes.
 
         Args:
@@ -330,22 +346,31 @@ class ArrayEditor(QDialog, Generic[AnySupportedArray]):
             self.current_dim_changed(self.last_dim)
 
     @Slot(QModelIndex, QModelIndex)
-    def save_and_close_enable(self, _left_top, _bottom_right):
+    def save_and_close_enable(
+        self, _left_top: QModelIndex, _bottom_right: QModelIndex
+    ) -> None:
         """Handle the data change event to enable the save and close button."""
         if self.btn_save_and_close:
             self.btn_save_and_close.setEnabled(True)
             self.btn_save_and_close.setAutoDefault(True)
             self.btn_save_and_close.setDefault(True)
 
-    def current_widget_changed(self, index):
-        """:param index:"""
+    def current_widget_changed(self, index: int) -> None:
+        """Handle the current widget change event to connect the dataChanged signal
+
+        Args:
+            index: Index of the current widget
+        """
         if self.stack is not None:
             self.arraywidget = self.stack.widget(index)
             self.arraywidget.model.dataChanged.connect(self.save_and_close_enable)
 
-    def change_active_widget(self, index):
+    def change_active_widget(self, index: int) -> None:
         """This is implemented for handling negative values in index for
         3d arrays, to give the same behavior as slicing
+
+        Args:
+            index: Index of the current widget
         """
         string_index = [":"] * 3
         string_index[self.last_dim] = "<font color=red>%i</font>"
@@ -383,9 +408,12 @@ class ArrayEditor(QDialog, Generic[AnySupportedArray]):
             self.stack.update()
             self.stack.setCurrentIndex(stack_index)
 
-    def current_dim_changed(self, index):
+    def current_dim_changed(self, index: int) -> None:
         """This change the active axis the array editor is plotting over
         in 3D
+
+        Args:
+            index: Index of the current widget
         """
         self.last_dim = index
         string_size = ["%i"] * 3
@@ -402,7 +430,7 @@ class ArrayEditor(QDialog, Generic[AnySupportedArray]):
         self.index_spin.setRange(-self._data.shape[index], self._data.shape[index] - 1)
 
     @Slot()
-    def accept(self):
+    def accept(self) -> None:
         """Reimplement Qt method"""
         self._data.apply_changes()
         QDialog.accept(self)
@@ -410,20 +438,27 @@ class ArrayEditor(QDialog, Generic[AnySupportedArray]):
     def get_value(self) -> AnySupportedArray:
         """Return modified array -- the returned array is a copy if variable size is
         True and readonly is False
+
+        Returns:
+            Modified array
         """
         # It is import to avoid accessing Qt C++ object as it has probably
         # already been destroyed, due to the Qt.WA_DeleteOnClose attribute
         self._data.reset_shape_if_changed()
         return self._data.get_array()
 
-    def error(self, message):
-        """An error occured, closing the dialog box"""
+    def error(self, message: str) -> None:
+        """An error occured, closing the dialog box
+
+        Args:
+            message: Error message
+        """
         QMessageBox.critical(self, _("Array editor"), message)
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
         self.reject()
 
     @Slot()
-    def reject(self):
+    def reject(self) -> None:
         """Reimplement Qt method"""
         self._data.clear_changes()
         QDialog.reject(self)
