@@ -72,15 +72,6 @@ class TypeConverter:
         return self._from_type(value)
 
 
-try:
-    unicode_hdf = TypeConverter(
-        lambda x: x.encode("utf-8"), lambda x: str(x, encoding="utf-8")
-    )
-except Exception:
-    unicode_hdf = TypeConverter(lambda x: x.encode("utf-8"), lambda x: x)
-int_hdf = TypeConverter(int)
-
-
 class Attr:
     """Helper class representing class attribute for HDF5 serialization.
 
