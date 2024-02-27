@@ -15,7 +15,7 @@ from guidata.userconfig import UserConfig
 
 APP_NAME = "guidata"
 APP_PATH = osp.dirname(__file__)
-add_image_module_path("guidata", "images")
+add_image_module_path("guidata", "data/icons")
 _ = get_translation("guidata")
 
 
