@@ -762,7 +762,7 @@ class ColorWidget(HLayoutMixin, LineEditWidget):
             bitmap.fill(color)
             icon = QIcon(bitmap)
         else:
-            icon = get_icon("not_found")
+            icon = get_icon("not_found.png")
         self.button.setIcon(icon)
 
     def select_color(self) -> None:
