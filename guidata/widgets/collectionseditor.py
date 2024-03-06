@@ -14,6 +14,8 @@ This package provides a Collections (i.e. dictionary, list and tuple) editor wid
 and dialog.
 
 .. autoclass:: CollectionsEditor
+    :show-inheritance:
+    :members:
 
 """
 
