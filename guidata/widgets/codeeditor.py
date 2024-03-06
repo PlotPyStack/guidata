@@ -98,7 +98,7 @@ class CodeEditor(QPlainTextEdit):
     # To have these attrs when early viewportEvent's are triggered
     linenumberarea = None
 
-    #: Signal emited when text changes and the user stops typing for some time
+    #: Signal emitted when text changes and the user stops typing for some time
     SIG_EDIT_STOPPED = Signal()
 
     LANGUAGES = {
