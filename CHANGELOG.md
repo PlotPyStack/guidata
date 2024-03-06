@@ -1,5 +1,21 @@
 # Changelog #
 
+## Version 3.4.0 ##
+
+💥 New features:
+  * `dataset.io.h5fmt.HDF5Reader.read` method: added new `default` argument to set
+    default value for missing data in the HDF5 file (backward compatible). The default
+    value of `default` is `NoDefault` (a special value to indicate that no default value
+    should be used, and that an exception should be raised if the data is missing).
+  * `widgets.codeeditor.CodeEditor`: added new `inactivity_timeout` argument to set
+    the time (in milliseconds) to wait after the user has stopped typing before
+    emitting the `CodeEditor.SIG_EDIT_STOPPED` signal.
+
+Documentation:
+
+  * Added missing `DataSetEditDialog` and `DataSetEditLayout` classes
+  * Added missing inheritance/member details on some classes
+
 ## Version 3.3.0 ##
 
 💥 New features:

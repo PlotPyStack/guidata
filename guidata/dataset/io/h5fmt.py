@@ -17,9 +17,7 @@ from uuid import uuid1
 
 import h5py
 import numpy as np
-
 from guidata.dataset.io.base import BaseIOHandler, WriterMixin
-
 
 class TypeConverter:
     """Handles conversion between types for HDF5 serialization.
@@ -583,6 +581,12 @@ class HDF5Writer(HDF5Handler, WriterMixin):
                     self.write_list(ids)
 
 
+class NoDefault:
+    """Class to represent the absence of a default value."""
+
+    pass
+
+
 class HDF5Reader(HDF5Handler):
     """
     Reader for HDF5 files. Inherits from HDF5Handler.
@@ -600,36 +604,43 @@ class HDF5Reader(HDF5Handler):
         group_name: str | None = None,
         func: Callable[[], Any] | None = None,
         instance: Any | None = None,
+        default: Any | NoDefault = NoDefault,
     ) -> Any:
         """
         Read a value from the current group or specified group_name.
 
         Args:
-            group_name (str): The name of the group to read from.
-                Defaults to None.
-            func (Callable[[], Any]): The function to use for reading
-                the value. Defaults to None.
-            instance (Any): An object that implements the DataSet-like
-                `deserialize` method. Defaults to None.
+            group_name: The name of the group to read from. Defaults to None.
+            func: The function to use for reading the value. Defaults to None.
+            instance: An object that implements the DataSet-like `deserialize` method.
+             Defaults to None.
+            default: The default value to return if the value is not found.
+             Defaults to `NoDefault` (no default value: raises an exception if the
+             value is not found).
 
         Returns:
-            Any: The read value.
+            The read value.
         """
         if group_name:
             self.begin(group_name)
-        if instance is None:
-            if func is None:
-                func = self.read_any
-            val = func()
-        else:
-            group = self.get_parent_group()
-            if group_name in group.attrs:
-                # This is an attribute (not a group), meaning that
-                # the object was None when deserializing it
-                val = None
+        try:
+            if instance is None:
+                if func is None:
+                    func = self.read_any
+                val = func()
             else:
-                instance.deserialize(self)
-                val = instance
+                group = self.get_parent_group()
+                if group_name in group.attrs:
+                    # This is an attribute (not a group), meaning that
+                    # the object was None when deserializing it
+                    val = None
+                else:
+                    instance.deserialize(self)
+                    val = instance
+        except Exception:  # pylint:disable=broad-except
+            if default is NoDefault:
+                raise
+            val = default
         if group_name:
             self.end(group_name)
         return val
@@ -645,6 +656,10 @@ class HDF5Reader(HDF5Handler):
         try:
             value = group.attrs[self.option[-1]]
         except KeyError:
+            if self.read(SEQUENCE_NAME, func=self.read_int, default=None) is None:
+                # No sequence found, this means that the data we are trying to read
+                # is not here (e.g. compatibility issue), so we raise an error
+                raise
             value = self.read_sequence()
         if isinstance(value, bytes):
             return value.decode("utf-8")
