@@ -134,6 +134,7 @@ class CodeEditor(QPlainTextEdit):
         self.setup(language=language, font=font, columns=columns, rows=rows)
 
     def restart_text_changed_timer(self):
+        """Restart the timer for the SIG_EDIT_STOPPED signal to be emitted"""
         self.timer.stop()
         self.timer.start(self.delay_ms)
 
