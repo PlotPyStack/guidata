@@ -61,7 +61,7 @@ import sys
 import time
 from contextlib import contextmanager
 from datetime import datetime
-from typing import TYPE_CHECKING, Iterable
+from typing import TYPE_CHECKING, Generator, Iterable
 
 from qtpy import QtCore as QC
 from qtpy import QtGui as QG
@@ -478,7 +478,7 @@ QAPP_INSTANCE = None
 
 
 @contextmanager
-def qt_app_context(exec_loop: bool = False) -> None:
+def qt_app_context(exec_loop: bool = False) -> Generator[QW.QApplication, None, None]:
     """Context manager handling Qt application creation and persistance
 
     Args:
@@ -580,7 +580,7 @@ def click_on_widget(widget: QW.QWidget) -> None:
 
 
 @contextmanager
-def block_signals(widget: QW.QWidget, enable: bool) -> None:
+def block_signals(widget: QW.QWidget, enable: bool) -> Generator[None, None, None]:
     """Eventually block/unblock widget Qt signals before/after doing some things
     (enable: True if feature is enabled)
 
@@ -650,7 +650,7 @@ def qt_wait(
 
 
 @contextmanager
-def save_restore_stds() -> None:
+def save_restore_stds() -> Generator[None, None, None]:
     """Save/restore standard I/O before/after doing some things
     (e.g. calling Qt open/save dialogs)"""
     saved_in, saved_out, saved_err = sys.stdin, sys.stdout, sys.stderr
