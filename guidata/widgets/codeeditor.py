@@ -20,7 +20,7 @@ This package provides an Editor widget based on QtGui.QPlainTextEdit.
 # pylint: disable=R0911
 # pylint: disable=R0201
 
-from qtpy.QtCore import QRect, QSize, Qt
+from qtpy.QtCore import QRect, QSize, Qt, QTimer, Signal
 from qtpy.QtGui import QColor, QFont, QPainter
 from qtpy.QtWidgets import QPlainTextEdit, QWidget
 
@@ -78,6 +78,9 @@ class CodeEditor(QPlainTextEdit):
     # To have these attrs when early viewportEvent's are triggered
     linenumberarea = None
 
+    # Signal emited when text changes and the user stops typing for some time
+    SIG_EDIT_STOPPED = Signal()
+
     LANGUAGES = {
         "python": sh.PythonSH,
         "cython": sh.CythonSH,
@@ -96,7 +99,15 @@ class CodeEditor(QPlainTextEdit):
         None: sh.TextSH,
     }
 
-    def __init__(self, parent=None, language=None, font=None, columns=None, rows=None):
+    def __init__(
+        self,
+        parent=None,
+        language=None,
+        font=None,
+        columns=None,
+        rows=None,
+        delay_ms=1000,
+    ):
         QPlainTextEdit.__init__(self, parent)
 
         win32_fix_title_bar_background(self)
@@ -113,8 +124,18 @@ class CodeEditor(QPlainTextEdit):
         self.linenumberarea_pressed = None
         self.linenumberarea_released = None
 
+        self.delay_ms = delay_ms
+        self.timer = QTimer()
+        self.timer.setSingleShot(True)
+        self.timer.timeout.connect(self.SIG_EDIT_STOPPED.emit)
+        self.textChanged.connect(self.restart_text_changed_timer)
+
         self.setFocusPolicy(Qt.StrongFocus)
         self.setup(language=language, font=font, columns=columns, rows=rows)
+
+    def restart_text_changed_timer(self):
+        self.timer.stop()
+        self.timer.start(self.delay_ms)
 
     def contextMenuEvent(self, event):
         """Override Qt method"""
