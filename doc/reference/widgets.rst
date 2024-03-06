@@ -1,3 +1,5 @@
+:tocdepth: 3
+
 Widgets and Qt helpers
 ======================
 
