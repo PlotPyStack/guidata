@@ -11,6 +11,8 @@ guidata.widgets.codeeditor
 This package provides an Editor widget based on QtGui.QPlainTextEdit.
 
 .. autoclass:: CodeEditor
+    :show-inheritance:
+    :members:
 
 """
 
@@ -19,6 +21,8 @@ This package provides an Editor widget based on QtGui.QPlainTextEdit.
 # pylint: disable=R0903
 # pylint: disable=R0911
 # pylint: disable=R0201
+
+from __future__ import annotations
 
 from qtpy.QtCore import QRect, QSize, Qt, QTimer, Signal
 from qtpy.QtGui import QColor, QFont, QPainter
@@ -38,9 +42,13 @@ from guidata.widgets import about
 
 
 class LineNumberArea(QWidget):
-    """Line number area (on the left side of the text editor widget)"""
+    """Line number area (on the left side of the text editor widget)
 
-    def __init__(self, editor):
+    Args:
+        editor: CodeEditor widget
+    """
+
+    def __init__(self, editor: CodeEditor) -> None:
         QWidget.__init__(self, editor)
         self.code_editor = editor
         self.setMouseTracking(True)
@@ -75,10 +83,22 @@ class LineNumberArea(QWidget):
 
 
 class CodeEditor(QPlainTextEdit):
+    """Code editor widget
+
+    Args:
+        parent: Parent widget
+        language: Language used for syntax highlighting
+        font: Font used for the text
+        columns: Number of columns
+        rows: Number of rows
+        inactivity_timeout: after this delay of inactivity (in milliseconds), the
+         :py:attr:`CodeEditor.SIG_EDIT_STOPPED` signal is emitted
+    """
+
     # To have these attrs when early viewportEvent's are triggered
     linenumberarea = None
 
-    # Signal emited when text changes and the user stops typing for some time
+    #: Signal emited when text changes and the user stops typing for some time
     SIG_EDIT_STOPPED = Signal()
 
     LANGUAGES = {
@@ -101,13 +121,13 @@ class CodeEditor(QPlainTextEdit):
 
     def __init__(
         self,
-        parent=None,
-        language=None,
-        font=None,
-        columns=None,
-        rows=None,
-        delay_ms=1000,
-    ):
+        parent: QWidget = None,
+        language: str | None = None,
+        font: QFont | None = None,
+        columns: int | None = None,
+        rows: int | None = None,
+        inactivity_timeout: int = 1000,
+    ) -> None:
         QPlainTextEdit.__init__(self, parent)
 
         win32_fix_title_bar_background(self)
@@ -124,7 +144,7 @@ class CodeEditor(QPlainTextEdit):
         self.linenumberarea_pressed = None
         self.linenumberarea_released = None
 
-        self.delay_ms = delay_ms
+        self.inactivity_timeout = inactivity_timeout
         self.timer = QTimer()
         self.timer.setSingleShot(True)
         self.timer.timeout.connect(self.SIG_EDIT_STOPPED.emit)
@@ -133,9 +153,10 @@ class CodeEditor(QPlainTextEdit):
         self.setFocusPolicy(Qt.StrongFocus)
         self.setup(language=language, font=font, columns=columns, rows=rows)
 
-    def restart_text_changed_timer(self):
+    def restart_text_changed_timer(self) -> None:
+        """Restart the timer to emit SIG_EDIT_STOPPED after a delay"""
         self.timer.stop()
-        self.timer.start(self.delay_ms)
+        self.timer.start(self.inactivity_timeout)
 
     def contextMenuEvent(self, event):
         """Override Qt method"""
