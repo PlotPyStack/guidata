@@ -10,6 +10,7 @@ Source code :
 
 .. literalinclude:: basic_example.py
 
+.. image:: images/basic_example.png
 
 Other examples
 --------------
