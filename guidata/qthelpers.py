@@ -73,7 +73,7 @@ from guidata.configtools import get_icon, get_module_data_path
 from guidata.env import execenv
 from guidata.external import darkdetect
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from collections.abc import Callable
 
 

@@ -68,7 +68,7 @@ from guidata.widgets.arrayeditor import ArrayEditor
 
 # XXX: consider providing an interface here...
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from guidata.dataset.qtwidgets import DataSetEditLayout
 
 

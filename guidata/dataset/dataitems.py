@@ -101,7 +101,7 @@ from typing import TYPE_CHECKING, Any
 from guidata.config import _
 from guidata.dataset.datatypes import DataItem, DataSet, ItemProperty
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from numpy import ndarray
 
     from guidata.dataset.io import (

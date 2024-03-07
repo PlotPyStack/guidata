@@ -30,7 +30,7 @@ from typing import TYPE_CHECKING, Any
 import guidata.dataset.dataitems as gdi
 import guidata.dataset.datatypes as gdt
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     import guidata.dataset.datatypes as gdt
 
 # ==============================================================================

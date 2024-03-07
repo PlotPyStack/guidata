@@ -45,7 +45,7 @@ from typing import TYPE_CHECKING
 
 from guidata.utils.misc import decode_fs_string, get_module_path, get_system_lang
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from qtpy import QtCore as QC
     from qtpy import QtGui as QG
     from qtpy import QtWidgets as QW

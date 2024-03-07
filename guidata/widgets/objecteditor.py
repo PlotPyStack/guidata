@@ -36,7 +36,7 @@ except ImportError:
     DataFrameEditor = FakeObject()
 
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     import numpy as np
     from qtpy import QtWidgets as QW
 

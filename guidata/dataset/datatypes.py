@@ -72,7 +72,7 @@ from guidata.userconfig import UserConfig
 
 DEBUG_DESERIALIZE = False
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from qtpy.QtCore import QSize
     from qtpy.QtWidgets import QDialog, QWidget
 
@@ -273,9 +273,9 @@ class DataItem(ABC):
         self._name: str | None = None
         self._default = default
         self._help = help
-        self._props: dict[
-            Any, Any
-        ] = {}  # a dict realm->dict containing realm-specific properties
+        self._props: dict[Any, Any] = (
+            {}
+        )  # a dict realm->dict containing realm-specific properties
         self.set_prop("display", col=0, colspan=None, row=None, label=label)
         self.set_prop("data", check_value=check)
 
@@ -1377,8 +1377,7 @@ class ActivableDataSet(DataSet):
 
     @property
     @abstractmethod
-    def enable(self) -> DataItem:
-        ...
+    def enable(self) -> DataItem: ...
 
     def __init__(
         self,
