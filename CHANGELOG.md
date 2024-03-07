@@ -2,7 +2,7 @@
 
 ## Version 3.4.0 ##
 
-In this release, test coverage is 74%.
+In this release, test coverage is 76%.
 
 💥 New features:
   * `dataset.io.h5fmt.HDF5Reader.read` method: added new `default` argument to set
@@ -16,6 +16,11 @@ In this release, test coverage is 74%.
     automatically accepted or not (default is `None`, meaning no automatic acceptance):
     this allows more coverage of the test suite. For now, this attribute has only been
     proven useful in `tests/dataset/test_all_features.py`.
+  * Added unit tests for HDF5 and JSON serialization/deserialization:
+    * Testing an arbitrary data model saved/loaded to/from HDF5 and JSON files,
+      with various data sets and other data types.
+    * Testing for backward compatibility with previous versions of the data model
+      (e.g. new attributes, removed attributes, etc.)
 
 API breaking changes:
   * `guidata.dataset.io` module is now deprecated and will be removed in a future

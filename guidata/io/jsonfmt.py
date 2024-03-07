@@ -12,8 +12,12 @@ JSON files (.json)
 
 # pylint: disable=invalid-name  # Allows short reference names like x, y, ...
 
+from __future__ import annotations
+
 import json
 import os
+from collections.abc import Callable, Sequence
+from typing import Any
 from uuid import uuid1
 
 import numpy as np
@@ -24,7 +28,7 @@ from guidata.io.base import BaseIOHandler, WriterMixin
 class CustomJSONEncoder(json.JSONEncoder):
     """Custom JSON Encoder"""
 
-    def default(self, o):
+    def default(self, o: Any) -> Any:
         """Override JSONEncoder method"""
         if isinstance(o, np.ndarray):
             olist = o.tolist()
@@ -46,10 +50,10 @@ class CustomJSONEncoder(json.JSONEncoder):
 class CustomJSONDecoder(json.JSONDecoder):
     """Custom JSON Decoder"""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         json.JSONDecoder.__init__(self, object_hook=self.object_hook, *args, **kwargs)
 
-    def __iterate_dict(self, obj):
+    def __iterate_dict(self, obj: Any) -> Any:
         """Iterate dictionaries"""
         if isinstance(obj, list) and len(obj) == 3:
             family, data, dtypestr = obj
@@ -68,7 +72,7 @@ class CustomJSONDecoder(json.JSONDecoder):
                 obj[key] = self.__iterate_dict(value)
         return obj
 
-    def object_hook(self, obj: dict):  # pylint: disable=E0202
+    def object_hook(self, obj: dict) -> dict:  # pylint: disable=E0202
         """Object hook"""
         for key, value in list(obj.items()):
             obj[key] = self.__iterate_dict(value)
@@ -82,42 +86,57 @@ class JSONHandler(BaseIOHandler):
         filename: JSON filename (if None, use `jsontext` attribute)
     """
 
-    def __init__(self, filename=None):
+    def __init__(self, filename: str | None = None) -> None:
         super().__init__()
         self.jsondata = {}
-        self.jsontext = None
+        self.jsontext: str | None = None
         self.filename = filename
 
-    def get_parent_group(self):
+    def get_parent_group(self) -> dict:
         """Get parent group"""
         parent = self.jsondata
         for option in self.option[:-1]:
             parent = parent.setdefault(option, {})
         return parent
 
-    def set_json_dict(self, jsondata: dict):
-        """Set JSON data dictionary"""
+    def set_json_dict(self, jsondata: dict) -> None:
+        """Set JSON data dictionary
+
+        Args:
+            jsondata: JSON data dictionary
+        """
         self.jsondata = jsondata
 
     def get_json_dict(self) -> dict:
         """Return JSON data dictionary"""
         return self.jsondata
 
-    def get_json(self, indent=None):
-        """Get JSON string"""
+    def get_json(self, indent: int | None = None) -> str | None:
+        """Get JSON string
+
+        Args:
+            indent: Indentation level
+
+        Returns:
+            JSON string
+        """
         if self.jsondata is not None:
             return json.dumps(self.jsondata, indent=indent, cls=CustomJSONEncoder)
         return None
 
-    def load(self):
+    def load(self) -> None:
         """Load JSON file"""
         if self.filename is not None:
             with open(self.filename, mode="rb") as fdesc:
                 self.jsontext = fdesc.read().decode()
         self.jsondata = json.loads(self.jsontext, cls=CustomJSONDecoder)
 
-    def save(self, path=None):
-        """Save JSON file"""
+    def save(self, path: str | None = None) -> None:
+        """Save JSON file
+
+        Args:
+            path: Path to save the JSON file (if None, implies current directory)
+        """
         if self.filename is not None:
             filepath = self.filename
             if path:
@@ -125,19 +144,19 @@ class JSONHandler(BaseIOHandler):
             with open(filepath, mode="wb") as fdesc:
                 fdesc.write(self.get_json(indent=4).encode())
 
-    def close(self):
+    def close(self) -> None:
         """Expected close method: do nothing for JSON I/O handler classes"""
 
 
 class JSONWriter(JSONHandler, WriterMixin):
     """Class handling JSON serialization"""
 
-    def write_any(self, val):
+    def write_any(self, val) -> None:
         """Write any value type"""
         group = self.get_parent_group()
         group[self.option[-1]] = val
 
-    def write_none(self):
+    def write_none(self) -> None:
         """Write None"""
         self.write_any(None)
 
@@ -145,9 +164,15 @@ class JSONWriter(JSONHandler, WriterMixin):
         write_array
     ) = write_any
 
-    def write_object_list(self, seq, group_name):
-        """Write object sequence in group.
-        Objects must implement the DataSet-like `serialize` method"""
+    def write_object_list(self, seq: Sequence[Any] | None, group_name: str) -> None:
+        """
+        Write an object sequence to the HDF5 file in a group.
+        Objects must implement the DataSet-like `serialize` method.
+
+        Args:
+            seq: The object sequence to write. Defaults to None.
+            group_name: The name of the group in which to write the objects.
+        """
         with self.group(group_name):
             if seq is None:
                 self.write_none()
@@ -164,6 +189,12 @@ class JSONWriter(JSONHandler, WriterMixin):
                 self.write(ids, "IDs")
 
 
+class NoDefault:
+    """Class to represent the absence of a default value."""
+
+    pass
+
+
 class JSONReader(JSONHandler):
     """Class handling JSON deserialization
 
@@ -171,7 +202,7 @@ class JSONReader(JSONHandler):
         fname_or_jsontext: JSON filename or JSON text
     """
 
-    def __init__(self, fname_or_jsontext):
+    def __init__(self, fname_or_jsontext: str) -> None:
         """JSONReader constructor"""
         JSONHandler.__init__(self, fname_or_jsontext)
         if fname_or_jsontext is not None and not os.path.isfile(fname_or_jsontext):
@@ -179,44 +210,74 @@ class JSONReader(JSONHandler):
             self.jsontext = fname_or_jsontext
         self.load()
 
-    def read(self, group_name=None, func=None, instance=None):
-        """Read value within current group or group_name.
+    def read(
+        self,
+        group_name: str | None = None,
+        func: Callable[[], Any] | None = None,
+        instance: Any | None = None,
+        default: Any | NoDefault = NoDefault,
+    ) -> Any:
+        """
+        Read a value from the current group or specified group_name.
 
-        Optional argument `instance` is an object which
-        implements the DataSet-like `deserialize` method."""
+        Args:
+            group_name: The name of the group to read from. Defaults to None.
+            func: The function to use for reading the value. Defaults to None.
+            instance: An object that implements the DataSet-like `deserialize` method.
+             Defaults to None.
+            default: The default value to return if the value is not found.
+             Defaults to `NoDefault` (no default value: raises an exception if the
+             value is not found).
+
+        Returns:
+            The read value.
+        """
         if group_name:
             self.begin(group_name)
-        if instance is None:
-            if func is None:
-                func = self.read_any
-            val = func()
-        else:
-            group = self.get_parent_group()
-            if group_name not in group:
-                # This is an attribute (not a group), meaning that
-                # the object was None when deserializing it
-                val = None
+        try:
+            if instance is None:
+                if func is None:
+                    func = self.read_any
+                val = func()
             else:
-                instance.deserialize(self)
-                val = instance
+                group = self.get_parent_group()
+                if group_name not in group:
+                    # This is an attribute (not a group), meaning that
+                    # the object was None when deserializing it
+                    val = None
+                else:
+                    instance.deserialize(self)
+                    val = instance
+        except Exception:  # pylint:disable=broad-except
+            if default is NoDefault:
+                raise
+            val = default
         if group_name:
             self.end(group_name)
         return val
 
-    def read_any(self):
+    def read_any(self) -> Any:
         """Read any value type"""
         group = self.get_parent_group()
         return group[self.option[-1]]
 
-    def read_object_list(self, group_name, klass, progress_callback=None):
-        """Read object sequence in group.
+    def read_object_list(
+        self,
+        group_name: str,
+        klass: type[Any],
+        progress_callback: Callable[[int], bool] | None = None,
+    ) -> list[Any]:
+        """Read an object sequence from a group.
+
         Objects must implement the DataSet-like `deserialize` method.
         `klass` is the object class which constructor requires no argument.
 
-        progress_callback: if not None, this function is called with
-        an integer argument (progress: 0 --> 100). Function returns the
-        `cancel` state (True: progress dialog has been canceled, False
-        otherwise)
+        Args:
+            group_name: The name of the group to read the object sequence from.
+            klass: The object class which constructor requires no argument.
+            progress_callback: A function to call with an integer argument (progress:
+             0 --> 100). The function returns the `cancel` state (True: progress
+             dialog has been canceled, False otherwise).
         """
         with self.group(group_name):
             try:
