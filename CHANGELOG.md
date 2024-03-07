@@ -17,6 +17,14 @@ In this release, test coverage is 74%.
     this allows more coverage of the test suite. For now, this attribute has only been
     proven useful in `tests/dataset/test_all_features.py`.
 
+API breaking changes:
+  * `guidata.dataset.io` module is now deprecated and will be removed in a future
+    release. Please use `guidata.io` instead. This change is backward compatible
+    (the old module is still available and will be removed in a future release).
+    The motivation for this change is to simplify the module structure and to help
+    understand that the scope of the `io` module is not limited to `dataset.DataSet`
+    objects, but may be used for any kind of data serialization/deserialization.
+
 Documentation:
 
   * Added missing `DataSetEditDialog` and `DataSetEditLayout` classes

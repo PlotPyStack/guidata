@@ -18,7 +18,7 @@ from uuid import uuid1
 
 import numpy as np
 
-from guidata.dataset.io.base import BaseIOHandler, WriterMixin
+from guidata.io.base import BaseIOHandler, WriterMixin
 
 
 class CustomJSONEncoder(json.JSONEncoder):
@@ -141,9 +141,9 @@ class JSONWriter(JSONHandler, WriterMixin):
         """Write None"""
         self.write_any(None)
 
-    write_sequence = (
-        write_dict
-    ) = write_str = write_bool = write_int = write_float = write_array = write_any
+    write_sequence = write_dict = write_str = write_bool = write_int = write_float = (
+        write_array
+    ) = write_any
 
     def write_object_list(self, seq, group_name):
         """Write object sequence in group.
@@ -242,6 +242,6 @@ class JSONReader(JSONHandler):
                 seq.append(obj)
         return seq
 
-    read_unicode = (
-        read_sequence
-    ) = read_dict = read_float = read_int = read_str = read_bool = read_array = read_any
+    read_unicode = read_sequence = read_dict = read_float = read_int = read_str = (
+        read_bool
+    ) = read_array = read_any

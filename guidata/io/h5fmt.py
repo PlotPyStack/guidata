@@ -17,7 +17,9 @@ from uuid import uuid1
 
 import h5py
 import numpy as np
-from guidata.dataset.io.base import BaseIOHandler, WriterMixin
+
+from guidata.io.base import BaseIOHandler, WriterMixin
+
 
 class TypeConverter:
     """Handles conversion between types for HDF5 serialization.
@@ -832,5 +834,7 @@ class HDF5Reader(HDF5Handler):
                         break
                 seq.append(obj)
         return seq
+
+    read_none = read_any
 
     read_none = read_any

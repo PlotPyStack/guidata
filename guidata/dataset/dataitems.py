@@ -104,7 +104,7 @@ from guidata.dataset.datatypes import DataItem, DataSet, ItemProperty
 if TYPE_CHECKING:
     from numpy import ndarray
 
-    from guidata.dataset.io import (
+    from guidata.io import (
         HDF5Reader,
         HDF5Writer,
         INIReader,

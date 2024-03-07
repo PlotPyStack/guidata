@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from guidata.dataset.io.base import BaseIOHandler, GroupContext, WriterMixin
+from guidata.io.base import BaseIOHandler, GroupContext, WriterMixin
 
 
 class INIHandler(BaseIOHandler):
@@ -108,9 +108,9 @@ class INIWriter(INIHandler, WriterMixin):
 
     # Make write_bool, write_int, write_float, write_array, write_sequence,
     # alias to write_any
-    write_bool = (
-        write_int
-    ) = write_str = write_float = write_array = write_sequence = write_dict = write_any
+    write_bool = write_int = write_str = write_float = write_array = write_sequence = (
+        write_dict
+    ) = write_any
 
     def write_none(self) -> None:
         """
@@ -145,11 +145,9 @@ class INIReader(INIHandler):
 
     # Make read_bool, read_int, read_float, read_array, read_sequence, read_none
     # and read_str alias to read_any
-    read_bool = (
-        read_int
-    ) = (
-        read_float
-    ) = read_array = read_sequence = read_dict = read_none = read_str = read_any
+    read_bool = read_int = read_float = read_array = read_sequence = read_dict = (
+        read_none
+    ) = read_str = read_any
 
     def read_unicode(self) -> str | None:
         """

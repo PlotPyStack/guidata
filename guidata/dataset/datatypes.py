@@ -67,7 +67,7 @@ from collections.abc import Callable
 from copy import deepcopy
 from typing import TYPE_CHECKING, Any, TypeVar
 
-from guidata.dataset.io import INIReader, INIWriter
+from guidata.io import INIReader, INIWriter
 from guidata.userconfig import UserConfig
 
 DEBUG_DESERIALIZE = False
@@ -76,8 +76,8 @@ if TYPE_CHECKING:
     from qtpy.QtCore import QSize
     from qtpy.QtWidgets import QDialog, QWidget
 
-    from guidata.dataset.io import HDF5Reader, HDF5Writer, JSONReader, JSONWriter
     from guidata.dataset.qtwidgets import DataSetEditDialog
+    from guidata.io import HDF5Reader, HDF5Writer, JSONReader, JSONWriter
 
 
 class NoDefault:
@@ -1329,8 +1329,6 @@ class DataSet(metaclass=DataSetMeta):
             section (str): section name
             option (str): option name
         """
-        from guidata.dataset.io import INIReader
-
         reader = INIReader(conf, section, option)
         self.deserialize(reader)
 
@@ -1342,8 +1340,6 @@ class DataSet(metaclass=DataSetMeta):
             section (str): section name
             option (str): option name
         """
-        from guidata.dataset.io import INIWriter
-
         writer = INIWriter(conf, section, option)
         self.serialize(writer)
 

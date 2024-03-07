@@ -1,15 +1,15 @@
 Version 2,Version 3
-``.userconfigio.BaseIOHandler``,``.dataset.io.BaseIOHandler``
-``.userconfigio.WriterMixin``,``.dataset.io.WriterMixin``
-``.userconfigio.UserConfigIOHandler``,``.dataset.io.INIHandler``
-``.userconfigio.UserConfigWriter``,``.dataset.io.INIWriter``
-``.userconfigio.UserConfigReader``,``.dataset.io.INIReader``
-``.jsonio.JSONHandler``,``.dataset.io.JSONHandler``
-``.jsonio.JSONReader``,``.dataset.io.JSONReader``
-``.jsonio.JSONWriter``,``.dataset.io.JSONWriter``
-``.hdf5io.HDF5Handler``,``.dataset.io.HDF5Handler``
-``.hdf5io.HDF5Reader``,``.dataset.io.HDF5Reader``
-``.hdf5io.HDF5Writer``,``.dataset.io.HDF5Writer``
+``.userconfigio.BaseIOHandler``,``.io.BaseIOHandler``
+``.userconfigio.WriterMixin``,``.io.WriterMixin``
+``.userconfigio.UserConfigIOHandler``,``.io.INIHandler``
+``.userconfigio.UserConfigWriter``,``.io.INIWriter``
+``.userconfigio.UserConfigReader``,``.io.INIReader``
+``.jsonio.JSONHandler``,``.io.JSONHandler``
+``.jsonio.JSONReader``,``.io.JSONReader``
+``.jsonio.JSONWriter``,``.io.JSONWriter``
+``.hdf5io.HDF5Handler``,``.io.HDF5Handler``
+``.hdf5io.HDF5Reader``,``.io.HDF5Reader``
+``.hdf5io.HDF5Writer``,``.io.HDF5Writer``
 ``.gettext_helpers``,``.utils.gettext_helpers``
 ``.disthelpers``,*removed*
 ``.encoding``,``.utils.encoding``
