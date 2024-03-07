@@ -469,7 +469,10 @@ def close_dialog_and_quit(widget, screenshot: bool = False) -> None:
         wname = widget.objectName()
         if screenshot and wname and widget.isVisible():  # pragma: no cover
             grab_save_window(widget, wname.lower())
-        widget.done(QW.QDialog.Accepted)
+        if execenv.acceptdialogs:
+            widget.accept()
+        else:
+            widget.done(QW.QDialog.Accepted)
     except Exception:  # pylint: disable=broad-except
         pass
 

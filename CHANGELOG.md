@@ -2,6 +2,8 @@
 
 ## Version 3.4.0 ##
 
+In this release, test coverage is 74%.
+
 💥 New features:
   * `dataset.io.h5fmt.HDF5Reader.read` method: added new `default` argument to set
     default value for missing data in the HDF5 file (backward compatible). The default
@@ -10,6 +12,10 @@
   * `widgets.codeeditor.CodeEditor`: added new `inactivity_timeout` argument to set
     the time (in milliseconds) to wait after the user has stopped typing before
     emitting the `CodeEditor.SIG_EDIT_STOPPED` signal.
+  * Added `execenv.acceptdialogs` attribute to control whether dialogs should be
+    automatically accepted or not (default is `None`, meaning no automatic acceptance):
+    this allows more coverage of the test suite. For now, this attribute has only been
+    proven useful in `tests/dataset/test_all_features.py`.
 
 Documentation:
 

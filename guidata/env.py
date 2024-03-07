@@ -30,10 +30,12 @@ class ExecEnv:
     """Object representing execution environment"""
 
     UNATTENDED_ARG = "unattended"
+    ACCEPTDIALOGS_ARG = "acceptdialogs"
     VERBOSE_ARG = "verbose"
     SCREENSHOT_ARG = "screenshot"
     DELAY_ARG = "delay"
     UNATTENDED_ENV = "GUIDATA_UNATTENDED_TESTS"
+    ACCEPTDIALOGS_ENV = "GUIDATA_ACCEPT_DIALOGS"
     VERBOSE_ENV = "GUIDATA_VERBOSITY_LEVEL"
     SCREENSHOT_ENV = "GUIDATA_TAKE_SCREENSHOT"
     DELAY_ENV = "GUIDATA_DELAY_BEFORE_QUIT"
@@ -47,6 +49,7 @@ class ExecEnv:
         # Return textual representation of object attributes and properties
         props = [
             "unattended",
+            "acceptdialogs",
             "screenshot",
             "verbose",
             "delay",
@@ -82,6 +85,16 @@ class ExecEnv:
     def unattended(self, value):
         """Set unattended value"""
         self.__set_mode(self.UNATTENDED_ENV, value)
+
+    @property
+    def acceptdialogs(self):
+        """Whether to accept dialogs in unattended mode"""
+        return self.__get_mode(self.ACCEPTDIALOGS_ENV)
+
+    @acceptdialogs.setter
+    def acceptdialogs(self, value):
+        """Set whether to accept dialogs in unattended mode"""
+        self.__set_mode(self.ACCEPTDIALOGS_ENV, value)
 
     @property
     def screenshot(self):
@@ -129,6 +142,12 @@ class ExecEnv:
             default=None,
         )
         parser.add_argument(
+            "--" + self.ACCEPTDIALOGS_ARG,
+            action="store_true",
+            help="accept dialogs in unattended mode",
+            default=None,
+        )
+        parser.add_argument(
             "--" + self.SCREENSHOT_ARG,
             action="store_true",
             help="automatic screenshots",
@@ -154,6 +173,7 @@ class ExecEnv:
         """Set appropriate environment variables"""
         for argname in (
             self.UNATTENDED_ARG,
+            self.ACCEPTDIALOGS_ARG,
             self.SCREENSHOT_ARG,
             self.VERBOSE_ARG,
             self.DELAY_ARG,
