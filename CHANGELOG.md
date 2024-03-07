@@ -37,6 +37,8 @@ Documentation:
 
 ## Version 3.3.0 ##
 
+In this release, test coverage is 72%.
+
 💥 New features:
   * Array editor now supports row/column insertion/deletion:
     * Added `variable_size` argument to `setup_and_check` method
