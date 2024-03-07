@@ -7,12 +7,15 @@
 Execution environmnent utilities
 """
 
+from __future__ import annotations
+
 import argparse
 import enum
 import os
 import pprint
 import sys
-from typing import Any
+from contextlib import contextmanager
+from typing import Any, Generator
 
 DEBUG = os.environ.get("DEBUG", "").lower() in ("1", "true")
 PARSE = os.environ.get("GUIDATA_PARSE_ARGS", "").lower() in ("1", "true")
@@ -95,6 +98,47 @@ class ExecEnv:
     def acceptdialogs(self, value):
         """Set whether to accept dialogs in unattended mode"""
         self.__set_mode(self.ACCEPTDIALOGS_ENV, value)
+
+    @contextmanager
+    def context(
+        self,
+        unattended=None,
+        acceptdialogs=None,
+        screenshot=None,
+        delay=None,
+        verbose=None,
+    ) -> Generator[None, None, None]:
+        """Return a context manager that sets some execenv properties at enter,
+        and restores them at exit. This is useful to run some code in a
+        controlled environment, for example to accept dialogs in unattended
+        mode, and restore the previous value at exit.
+
+        Args:
+            unattended: whether to run in unattended mode
+            acceptdialogs: whether to accept dialogs in unattended mode
+            screenshot: whether to take screenshots
+            delay: delay (seconds) before quitting application in unattended mode
+            verbose: verbosity level
+
+        .. note::
+            If a passed value is None, the corresponding property is not changed.
+        """
+        old_values = self.to_dict()
+        new_values = {
+            "unattended": unattended,
+            "acceptdialogs": acceptdialogs,
+            "screenshot": screenshot,
+            "delay": delay,
+            "verbose": verbose,
+        }
+        for key, value in new_values.items():
+            if value is not None:
+                setattr(self, key, value)
+        try:
+            yield
+        finally:
+            for key, value in old_values.items():
+                setattr(self, key, value)
 
     @property
     def screenshot(self):
