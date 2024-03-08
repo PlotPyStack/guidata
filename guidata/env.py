@@ -33,12 +33,12 @@ class ExecEnv:
     """Object representing execution environment"""
 
     UNATTENDED_ARG = "unattended"
-    ACCEPTDIALOGS_ARG = "accept_dialogs"
+    ACCEPT_DIALOGS_ARG = "accept_dialogs"
     VERBOSE_ARG = "verbose"
     SCREENSHOT_ARG = "screenshot"
     DELAY_ARG = "delay"
     UNATTENDED_ENV = "GUIDATA_UNATTENDED"
-    ACCEPTDIALOGS_ENV = "GUIDATA_ACCEPT_DIALOGS"
+    ACCEPT_DIALOGS_ENV = "GUIDATA_ACCEPT_DIALOGS"
     VERBOSE_ENV = "GUIDATA_VERBOSE"
     SCREENSHOT_ENV = "GUIDATA_SCREENSHOT"
     DELAY_ENV = "GUIDATA_DELAY"
@@ -50,15 +50,23 @@ class ExecEnv:
             # Check that calling `to_dict` do not raise any exception
             self.to_dict()
 
+    def iterate_over_attrs_envvars(self) -> Generator[tuple[str, str], None, None]:
+        """Iterate over CDL environment variables
+
+        Yields:
+            A tuple (attribute name, environment variable name)
+        """
+        for name in dir(self):
+            if name.endswith("_ENV"):
+                envvar: str = getattr(self, name)
+                attrname = "_".join(name.split("_")[:-1]).lower()
+                yield attrname, envvar
+
     def to_dict(self):
         """Return a dictionary representation of the object"""
-        # The list of properties match the list of environment variable names, modulo
-        # the "GUIDATA_" prefix for environment variables:
-        props = [
-            "_".join(getattr(self, attrname).split("_")[1:]).lower()
-            for attrname in dir(self)
-            if attrname.endswith("_ENV")
-        ]
+        # The list of properties match the list of environment variable attribute names,
+        # modulo the "_ENV" suffix:
+        props = [attrname for attrname, _envvar in self.iterate_over_attrs_envvars()]
 
         # Check that all properties are defined in the class and that they are
         # really properties:
@@ -106,12 +114,12 @@ class ExecEnv:
     @property
     def accept_dialogs(self):
         """Whether to accept dialogs in unattended mode"""
-        return self.__get_mode(self.ACCEPTDIALOGS_ENV)
+        return self.__get_mode(self.ACCEPT_DIALOGS_ENV)
 
     @accept_dialogs.setter
     def accept_dialogs(self, value):
         """Set whether to accept dialogs in unattended mode"""
-        self.__set_mode(self.ACCEPTDIALOGS_ENV, value)
+        self.__set_mode(self.ACCEPT_DIALOGS_ENV, value)
 
     @property
     def screenshot(self):
@@ -159,7 +167,7 @@ class ExecEnv:
             default=None,
         )
         parser.add_argument(
-            "--" + self.ACCEPTDIALOGS_ARG,
+            "--" + self.ACCEPT_DIALOGS_ARG,
             action="store_true",
             help="accept dialogs in unattended mode",
             default=None,
@@ -190,7 +198,7 @@ class ExecEnv:
         """Set appropriate environment variables"""
         for argname in (
             self.UNATTENDED_ARG,
-            self.ACCEPTDIALOGS_ARG,
+            self.ACCEPT_DIALOGS_ARG,
             self.SCREENSHOT_ARG,
             self.VERBOSE_ARG,
             self.DELAY_ARG,
