@@ -41,13 +41,14 @@ class ExecEnv:
     ACCEPTDIALOGS_ENV = "GUIDATA_ACCEPT_DIALOGS"
     VERBOSE_ENV = "GUIDATA_VERBOSE"
     SCREENSHOT_ENV = "GUIDATA_SCREENSHOT"
-    DELAY_ENV = "GUIDATA_DELAY_BEFORE_QUIT"
+    DELAY_ENV = "GUIDATA_DELAY"
 
     def __init__(self):
         if PARSE:
             self.parse_args()
-        # Check that calling `to_dict` do not raise any exception
-        self.to_dict()
+        if self.unattended:  # Do not execute this code in production
+            # Check that calling `to_dict` do not raise any exception
+            self.to_dict()
 
     def to_dict(self):
         """Return a dictionary representation of the object"""
@@ -136,15 +137,15 @@ class ExecEnv:
         os.environ[self.VERBOSE_ENV] = value
 
     @property
-    def delay_before_quit(self):
+    def delay(self):
         """Delay (seconds) before quitting application in unattended mode"""
         try:
             return int(os.environ.get(self.DELAY_ENV))
         except (TypeError, ValueError):
             return 0
 
-    @delay_before_quit.setter
-    def delay_before_quit(self, value: int):
+    @delay.setter
+    def delay(self, value: int):
         """Set delay (seconds) before quitting application in unattended mode"""
         os.environ[self.DELAY_ENV] = str(value)
 
@@ -211,7 +212,7 @@ class ExecEnv:
     def print(self, *objects, sep=" ", end="\n", file=sys.stdout, flush=False):
         """Print in file, depending on verbosity level"""
         # print(f"unattended={self.unattended} ; verbose={self.verbose} ; ")
-        # print(f"screenshot={self.screenshot}; delay_before_quit={self.delay_before_quit}")
+        # print(f"screenshot={self.screenshot}; delay={self.delay}")
         if self.verbose != VerbosityLevels.QUIET.value or DEBUG:
             print(*objects, sep=sep, end=end, file=file, flush=flush)
 
@@ -243,7 +244,7 @@ class ExecEnv:
         unattended=None,
         accept_dialogs=None,
         screenshot=None,
-        delay_before_quit=None,
+        delay=None,
         verbose=None,
     ) -> Generator[None, None, None]:
         """Return a context manager that sets some execenv properties at enter,
@@ -255,7 +256,7 @@ class ExecEnv:
             unattended: whether to run in unattended mode
             accept_dialogs: whether to accept dialogs in unattended mode
             screenshot: whether to take screenshots
-            delay_before_quit: delay (seconds) before quitting application in unattended mode
+            delay: delay (seconds) before quitting application in unattended mode
             verbose: verbosity level
 
         .. note::
@@ -266,7 +267,7 @@ class ExecEnv:
             "unattended": unattended,
             "accept_dialogs": accept_dialogs,
             "screenshot": screenshot,
-            "delay_before_quit": delay_before_quit,
+            "delay": delay,
             "verbose": verbose,
         }
         for key, value in new_values.items():

@@ -505,15 +505,15 @@ def qt_app_context(exec_loop: bool = False) -> Generator[QW.QApplication, None, 
         exception_occured = True
     finally:
         if execenv.unattended:  # pragma: no cover
-            if execenv.delay_before_quit > 0:
+            if execenv.delay > 0:
                 mode = "Screenshot" if execenv.screenshot else "Unattended"
-                message = f"{mode} mode (delay: {execenv.delay_before_quit}s)"
-                msec = execenv.delay_before_quit * 1000 - 200
+                message = f"{mode} mode (delay: {execenv.delay}s)"
+                msec = execenv.delay * 1000 - 200
                 for widget in QW.QApplication.instance().topLevelWidgets():
                     if isinstance(widget, QW.QMainWindow):
                         widget.statusBar().showMessage(message, msec)
             QC.QTimer.singleShot(
-                execenv.delay_before_quit * 1000,
+                execenv.delay * 1000,
                 lambda: close_widgets_and_quit(screenshot=execenv.screenshot),
             )
         if exec_loop and not exception_occured:
@@ -534,7 +534,7 @@ def exec_dialog(dlg: QW.QDialog) -> int:
     """
     if execenv.unattended:
         QC.QTimer.singleShot(
-            execenv.delay_before_quit * 1000,
+            execenv.delay * 1000,
             lambda: close_dialog_and_quit(dlg, screenshot=execenv.screenshot),
         )
     delete_later = not dlg.testAttribute(QC.Qt.WA_DeleteOnClose)
