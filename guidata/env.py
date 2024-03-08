@@ -33,30 +33,43 @@ class ExecEnv:
     """Object representing execution environment"""
 
     UNATTENDED_ARG = "unattended"
-    ACCEPTDIALOGS_ARG = "acceptdialogs"
+    ACCEPTDIALOGS_ARG = "accept_dialogs"
     VERBOSE_ARG = "verbose"
     SCREENSHOT_ARG = "screenshot"
     DELAY_ARG = "delay"
-    UNATTENDED_ENV = "GUIDATA_UNATTENDED_TESTS"
+    UNATTENDED_ENV = "GUIDATA_UNATTENDED"
     ACCEPTDIALOGS_ENV = "GUIDATA_ACCEPT_DIALOGS"
-    VERBOSE_ENV = "GUIDATA_VERBOSITY_LEVEL"
-    SCREENSHOT_ENV = "GUIDATA_TAKE_SCREENSHOT"
+    VERBOSE_ENV = "GUIDATA_VERBOSE"
+    SCREENSHOT_ENV = "GUIDATA_SCREENSHOT"
     DELAY_ENV = "GUIDATA_DELAY_BEFORE_QUIT"
 
     def __init__(self):
         if PARSE:
             self.parse_args()
+        # Check that calling `to_dict` do not raise any exception
+        self.to_dict()
 
     def to_dict(self):
         """Return a dictionary representation of the object"""
-        # Return textual representation of object attributes and properties
+        # The list of properties match the list of environment variable names, modulo
+        # the "GUIDATA_" prefix for environment variables:
         props = [
-            "unattended",
-            "acceptdialogs",
-            "screenshot",
-            "verbose",
-            "delay",
+            "_".join(getattr(self, attrname).split("_")[1:]).lower()
+            for attrname in dir(self)
+            if attrname.endswith("_ENV")
         ]
+
+        # Check that all properties are defined in the class and that they are
+        # really properties:
+        for prop in props:
+            assert hasattr(
+                self, prop
+            ), f"Property {prop} is not defined in class {self.__class__.__name__}"
+            assert isinstance(
+                getattr(self.__class__, prop), property
+            ), f"Attribute {prop} is not a property in class {self.__class__.__name__}"
+
+        # Return a dictionary with the properties as keys and their values as values:
         return {p: getattr(self, p) for p in props}
 
     def __str__(self):
@@ -90,55 +103,14 @@ class ExecEnv:
         self.__set_mode(self.UNATTENDED_ENV, value)
 
     @property
-    def acceptdialogs(self):
+    def accept_dialogs(self):
         """Whether to accept dialogs in unattended mode"""
         return self.__get_mode(self.ACCEPTDIALOGS_ENV)
 
-    @acceptdialogs.setter
-    def acceptdialogs(self, value):
+    @accept_dialogs.setter
+    def accept_dialogs(self, value):
         """Set whether to accept dialogs in unattended mode"""
         self.__set_mode(self.ACCEPTDIALOGS_ENV, value)
-
-    @contextmanager
-    def context(
-        self,
-        unattended=None,
-        acceptdialogs=None,
-        screenshot=None,
-        delay=None,
-        verbose=None,
-    ) -> Generator[None, None, None]:
-        """Return a context manager that sets some execenv properties at enter,
-        and restores them at exit. This is useful to run some code in a
-        controlled environment, for example to accept dialogs in unattended
-        mode, and restore the previous value at exit.
-
-        Args:
-            unattended: whether to run in unattended mode
-            acceptdialogs: whether to accept dialogs in unattended mode
-            screenshot: whether to take screenshots
-            delay: delay (seconds) before quitting application in unattended mode
-            verbose: verbosity level
-
-        .. note::
-            If a passed value is None, the corresponding property is not changed.
-        """
-        old_values = self.to_dict()
-        new_values = {
-            "unattended": unattended,
-            "acceptdialogs": acceptdialogs,
-            "screenshot": screenshot,
-            "delay": delay,
-            "verbose": verbose,
-        }
-        for key, value in new_values.items():
-            if value is not None:
-                setattr(self, key, value)
-        try:
-            yield
-        finally:
-            for key, value in old_values.items():
-                setattr(self, key, value)
 
     @property
     def screenshot(self):
@@ -164,15 +136,15 @@ class ExecEnv:
         os.environ[self.VERBOSE_ENV] = value
 
     @property
-    def delay(self):
+    def delay_before_quit(self):
         """Delay (seconds) before quitting application in unattended mode"""
         try:
             return int(os.environ.get(self.DELAY_ENV))
         except (TypeError, ValueError):
             return 0
 
-    @delay.setter
-    def delay(self, value: int):
+    @delay_before_quit.setter
+    def delay_before_quit(self, value: int):
         """Set delay (seconds) before quitting application in unattended mode"""
         os.environ[self.DELAY_ENV] = str(value)
 
@@ -239,7 +211,7 @@ class ExecEnv:
     def print(self, *objects, sep=" ", end="\n", file=sys.stdout, flush=False):
         """Print in file, depending on verbosity level"""
         # print(f"unattended={self.unattended} ; verbose={self.verbose} ; ")
-        # print(f"screenshot={self.screenshot}; delay={self.delay}")
+        # print(f"screenshot={self.screenshot}; delay_before_quit={self.delay_before_quit}")
         if self.verbose != VerbosityLevels.QUIET.value or DEBUG:
             print(*objects, sep=sep, end=end, file=file, flush=flush)
 
@@ -264,6 +236,47 @@ class ExecEnv:
                 compact=compact,
                 sort_dicts=sort_dicts,
             )
+
+    @contextmanager
+    def context(
+        self,
+        unattended=None,
+        accept_dialogs=None,
+        screenshot=None,
+        delay_before_quit=None,
+        verbose=None,
+    ) -> Generator[None, None, None]:
+        """Return a context manager that sets some execenv properties at enter,
+        and restores them at exit. This is useful to run some code in a
+        controlled environment, for example to accept dialogs in unattended
+        mode, and restore the previous value at exit.
+
+        Args:
+            unattended: whether to run in unattended mode
+            accept_dialogs: whether to accept dialogs in unattended mode
+            screenshot: whether to take screenshots
+            delay_before_quit: delay (seconds) before quitting application in unattended mode
+            verbose: verbosity level
+
+        .. note::
+            If a passed value is None, the corresponding property is not changed.
+        """
+        old_values = self.to_dict()
+        new_values = {
+            "unattended": unattended,
+            "accept_dialogs": accept_dialogs,
+            "screenshot": screenshot,
+            "delay_before_quit": delay_before_quit,
+            "verbose": verbose,
+        }
+        for key, value in new_values.items():
+            if value is not None:
+                setattr(self, key, value)
+        try:
+            yield
+        finally:
+            for key, value in old_values.items():
+                setattr(self, key, value)
 
 
 execenv = ExecEnv()

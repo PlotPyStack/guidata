@@ -123,7 +123,7 @@ class Parameters(gds.DataSet):
 
 def test_all_features():
     """Test all guidata item/group features"""
-    with execenv.context(acceptdialogs=True):
+    with execenv.context(accept_dialogs=True):
         with qt_app_context():
             prm1 = Parameters()
             prm1.floatarray[:, 0] = np.linspace(-5, 5, 50)

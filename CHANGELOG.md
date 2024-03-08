@@ -12,7 +12,7 @@ In this release, test coverage is 76%.
   * `widgets.codeeditor.CodeEditor`: added new `inactivity_timeout` argument to set
     the time (in milliseconds) to wait after the user has stopped typing before
     emitting the `CodeEditor.SIG_EDIT_STOPPED` signal.
-  * Added `execenv.acceptdialogs` attribute to control whether dialogs should be
+  * Added `execenv.accept_dialogs` attribute to control whether dialogs should be
     automatically accepted or not (default is `None`, meaning no automatic acceptance):
     this allows more coverage of the test suite. For now, this attribute has only been
     proven useful in `tests/dataset/test_all_features.py`.
