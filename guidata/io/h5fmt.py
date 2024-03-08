@@ -446,6 +446,7 @@ class HDF5Writer(HDF5Handler, WriterMixin):
     def write(self, val: Any, group_name: str | None = None) -> None:
         """
         Write a value depending on its type, optionally within a named group.
+
         Args:
             val: The value to be written.
             group_name: The name of the group. If provided, the group
