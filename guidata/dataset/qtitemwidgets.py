@@ -940,7 +940,7 @@ class FileWidget(HLayoutMixin, LineEditWidget):
         """Update the visual status of the widget and disbales/enables it if
         necessary"""
         super().set_state()
-        self.button.setEnabled(not self.is_readonly())
+        self.button.setEnabled(not self.is_readonly() and self.is_active())
 
 
 class DirectoryWidget(HLayoutMixin, LineEditWidget):
@@ -970,7 +970,7 @@ class DirectoryWidget(HLayoutMixin, LineEditWidget):
         """Update the visual status of the widget and disbales/enables it if
         necessary"""
         super().set_state()
-        self.button.setEnabled(not self.is_readonly())
+        self.button.setEnabled(not self.is_readonly() and self.is_active())
 
 
 class ChoiceWidget(AbstractDataSetWidget):
