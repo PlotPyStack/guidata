@@ -9,7 +9,6 @@ pandas
 pillow
 pylint
 pytest
-pytest-cov
 pytest-xvfb
 python-docs-theme
 requests

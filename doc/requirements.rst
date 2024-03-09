@@ -97,9 +97,6 @@ Optional modules for running test suite:
     * - pytest
       - 
       - pytest: simple powerful testing with Python
-    * - pytest-cov
-      - 
-      - Pytest plugin for measuring coverage.
     * - pytest-xvfb
       - 
       - A pytest plugin to run Xvfb (or Xephyr/Xvnc) for tests.
