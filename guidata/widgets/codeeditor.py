@@ -144,19 +144,38 @@ class CodeEditor(QPlainTextEdit):
         self.linenumberarea_pressed = None
         self.linenumberarea_released = None
 
-        self.inactivity_timeout = inactivity_timeout
         self.timer = QTimer()
         self.timer.setSingleShot(True)
-        self.timer.timeout.connect(self.SIG_EDIT_STOPPED.emit)
-        self.textChanged.connect(self.restart_text_changed_timer)
+        self.timer.setInterval(inactivity_timeout)
+        # When the editor is destroyed, the timer is destroyed as well, so we do
+        # not need to disconnect the timer from the SIG_EDIT_STOPPED signal.
+
+        # But... we connect the timer to the SIG_EDIT_STOPPED signal directly:
+        # we do not connect it to the `emit` method for two reasons.
+        #
+        # 1. The documented way to connect a signal to another signal is the
+        #    following: `signal1.connect(signal2)`.
+        #
+        # 2. When the editor is destroyed, if the timer is connected to the `emit`
+        #    method, the timer will try to call the `emit` method which is still bound
+        #    to the destroyed editor. This will cause a crash, eventually (there is a
+        #    time window between the destruction of the editor and the destruction of
+        #    the timer, so the crash is not guaranteed to happen, but it is possible).
+        #    On the other hand, if the timer is connected to the SIG_EDIT_STOPPED
+        #    signal, when the timeout is reached, the connection will be handled by
+        #    Qt and the `emit` method will not be called, so there will be no crash.
+        self.timer.timeout.connect(self.SIG_EDIT_STOPPED)
+
+        self.textChanged.connect(self.text_has_changed)
 
         self.setFocusPolicy(Qt.StrongFocus)
         self.setup(language=language, font=font, columns=columns, rows=rows)
 
-    def restart_text_changed_timer(self) -> None:
-        """Restart the timer to emit SIG_EDIT_STOPPED after a delay"""
-        self.timer.stop()
-        self.timer.start(self.inactivity_timeout)
+    def text_has_changed(self) -> None:
+        """Text has changed: restart the timer to emit SIG_EDIT_STOPPED after a delay"""
+        if self.timer.isActive():
+            self.timer.stop()
+        self.timer.start()
 
     def contextMenuEvent(self, event):
         """Override Qt method"""
@@ -413,11 +432,9 @@ class CodeEditor(QPlainTextEdit):
 
 
 if __name__ == "__main__":
-    from guidata import qapplication
+    from guidata.qthelpers import qt_app_context
 
-    app = qapplication()
-
-    widget = CodeEditor(columns=80, rows=40)
-    widget.set_text_from_file(__file__)
-    widget.show()
-    app.exec()
+    with qt_app_context(exec_loop=True):
+        widget = CodeEditor(columns=80, rows=40)
+        widget.set_text_from_file(__file__)
+        widget.show()
