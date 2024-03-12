@@ -6,6 +6,7 @@ In this release, test coverage is 76%.
 
 🛠️ Bug fixes:
 
+* [Issue #71](https://github.com/PlotPyStack/guidata/issues/71) - Random segmentation faults with applications embedding `CodeEditor`
 * [Issue #70](https://github.com/PlotPyStack/guidata/issues/70) - PermissionError: [Errno 13] Permission denied: '/usr/lib/python3/dist-packages/guidata/tests/data/genreqs/requirements.rst'
 
 
