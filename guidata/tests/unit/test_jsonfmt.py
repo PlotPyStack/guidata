@@ -14,6 +14,8 @@ Testing various use cases of JSON I/O:
 
 from __future__ import annotations
 
+import atexit
+import os
 import os.path as osp
 
 from guidata.env import execenv
@@ -115,6 +117,7 @@ class MyDataModelV11(MyDataModelV10):
 def test_json_datamodel_compatiblity():
     """Test JSON I/O with data model compatibility"""
     path = osp.abspath("test.json")
+    atexit.register(os.unlink, path)
     # atexit.register(lambda: os.unlink(path))
     # Serialize the first version of the data model
     model_v10 = MyDataModelV10()

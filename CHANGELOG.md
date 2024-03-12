@@ -1,5 +1,12 @@
 # Changelog #
 
+## Version 3.4.2 ##
+
+In this release, test coverage is 76%.
+
+* [Issue #72](https://github.com/PlotPyStack/guidata/issues/72) - unit test leave files during the build usr/lib/python3/dist-packages/test.json
+
+
 ## Version 3.4.1 ##
 
 In this release, test coverage is 76%.

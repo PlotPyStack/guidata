@@ -175,7 +175,7 @@ class MyDataModelV11(MyDataModelV10):
 def test_hdf5_datamodel_compatiblity():
     """Test HDF5 I/O with data model compatibility"""
     path = osp.abspath("test.h5")
-    atexit.register(lambda: os.unlink(path))
+    atexit.register(os.unlink, path)
     # Serialize the first version of the data model
     model_v10 = MyDataModelV10()
     model_v10.save(path)
