@@ -22,7 +22,7 @@ In this release, test coverage is 76%.
     * Testing for backward compatibility with previous versions of the data model
       (e.g. new attributes, removed attributes, etc.)
 
-API breaking changes:
+⚠️ API breaking changes:
   * `guidata.dataset.io` module is now deprecated and will be removed in a future
     release. Please use `guidata.io` instead. This change is backward compatible
     (the old module is still available and will be removed in a future release).
@@ -30,10 +30,11 @@ API breaking changes:
     understand that the scope of the `io` module is not limited to `dataset.DataSet`
     objects, but may be used for any kind of data serialization/deserialization.
 
-Documentation:
+📖 Documentation:
 
   * Added missing `DataSetEditDialog` and `DataSetEditLayout` classes
   * Added missing inheritance/member details on some classes
+  * Reduced table of contents depth in left sidebar for better readability
 
 ## Version 3.3.0 ##
 
