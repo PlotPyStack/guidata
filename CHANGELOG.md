@@ -1,5 +1,14 @@
 # Changelog #
 
+## Version 3.4.1 ##
+
+In this release, test coverage is 76%.
+
+🛠️ Bug fixes:
+
+* [Issue #70](https://github.com/PlotPyStack/guidata/issues/70) - PermissionError: [Errno 13] Permission denied: '/usr/lib/python3/dist-packages/guidata/tests/data/genreqs/requirements.rst'
+
+
 ## Version 3.4.0 ##
 
 In this release, test coverage is 76%.
