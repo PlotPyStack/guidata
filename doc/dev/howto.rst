@@ -23,7 +23,7 @@ To run the unittests, you need:
 
 Then run the following command::
 
-    pytest guidata
+    pytest
 
 To run test with coverage support, use the following command::
 
