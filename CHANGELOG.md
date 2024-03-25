@@ -1,5 +1,14 @@
 # Changelog #
 
+## Version 3.4.3 ##
+
+In this release, test coverage is 76%.
+
+🛠️ Bug fixes:
+
+* Documentation generation: automatic requirement table generation feature was failing
+  when using version conditions in the `pyproject.toml` file (e.g. `pyqt5 >= 5.15`).
+
 ## Version 3.4.2 ##
 
 In this release, test coverage is 76%.
