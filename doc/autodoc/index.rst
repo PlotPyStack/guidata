@@ -10,3 +10,5 @@ Generated documentation
 -----------------------
 
 .. autodataset:: autodoc_example1.ProcessingParameters
+
+.. datasetnote:: autodoc_example1.ProcessingParameters

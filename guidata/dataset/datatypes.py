@@ -60,6 +60,7 @@ Handling item properties
 
 from __future__ import annotations
 
+import pprint
 import re
 import sys
 from abc import ABC, abstractmethod
@@ -259,6 +260,7 @@ class DataItem(ABC):
         check (bool): check value (default: True)
     """
 
+    type = type
     count = 0
 
     def __init__(
@@ -993,7 +995,30 @@ class DataSetMeta(type):
                 items[attrname] = value
         items_list = list(items.values())
         items_list.sort(key=lambda x: x._order)
+
+        # doc_lines = ["\n", "Args:"]
+        # for item in items_list:
+        #     doc_lines.append(
+        #         f"\t{item._name} ({item.type.__name__}): {item.get_prop('display', 'label')} {item._help}. Default: {item._default}"
+        #     )
+        # if items_list:
+        #     dct["create"] = DataSet.create
+        #     dct["create"].__doc__ += "\n".join(doc_lines)
+        #     print(dct["create"].__doc__)
+        # print(cls, name, items_list)
         dct["_items"] = items_list
+        # print(items)
+        # print(dct)
+        # if (create_method := dct.get("create")) is not None:
+        #     create_docstring: list[str] = ["Test issou", "", "Args:"]
+        #     for name, ditem in items.items():
+        #         create_docstring.append(
+        #             f"    {name} ({ditem.__class__.__name__}): {ditem.get_help()}"
+        #         )
+        #     create_docstring.extend(("", "Returns:", "    DataSet instance"))
+        #     create_method.__doc__ = "\n".join(create_docstring)
+        # print(create_method.__name__)
+        # print(create_method.__doc__)
         return type.__new__(cls, name, bases, dct)
 
 
@@ -1012,7 +1037,7 @@ class DataSet(metaclass=DataSetMeta):
         icon (str): icon filename as in image search paths
     """
 
-    _items: list[DataItem]
+    _items: list[DataItem] = []
     __metaclass__ = DataSetMeta  # keep it even with Python 3 (see DataSetMeta)
 
     def __init__(
@@ -1052,7 +1077,7 @@ class DataSet(metaclass=DataSetMeta):
         return list(filter(lambda s: not s.get_name().startswith("_"), result_items))
 
     @classmethod
-    def create(cls, **kwargs) -> DataSet:
+    def create(cls: type[AnyDataSet], **kwargs) -> AnyDataSet:
         """Create a new instance of the DataSet class
 
         Args:
