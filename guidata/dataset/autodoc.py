@@ -2,6 +2,7 @@
 sphinx.ext.autodoc extension for :class:`guidata.dataset.DataSet` and related classes.
 """
 
+import logging
 from typing import Any, Type
 
 from docutils import nodes
@@ -22,6 +23,16 @@ from sphinx.util.nodes import nested_parse_with_titles
 import guidata.dataset as gds
 from guidata import __version__ as guidata_version
 from guidata.dataset.autodoc_method import CreateMethodDocumenter
+from guidata.dataset.note_directive import DatasetNoteDirective
+
+
+def datasetnote_option(arg: str) -> tuple[bool, int | None]:
+    if arg is None:
+        return True, None
+    try:
+        return True, int(arg)
+    except ValueError:
+        return True, None
 
 
 class DataSetDocumenter(ClassDocumenter):
@@ -38,6 +49,7 @@ class DataSetDocumenter(ClassDocumenter):
             "showattr": bool_option,
             "hidecreate": bool_option,
             "showsig": bool_option,
+            "datasetnote": datasetnote_option,
         }
     )
     object: Type[gds.DataSet]
@@ -74,11 +86,11 @@ class DataSetDocumenter(ClassDocumenter):
                     type_ = Any
 
                 label = item.get_prop("display", "label")
-                if not label.endswith("."):
+                if len(label) > 0 and not label.endswith("."):
                     label += "."
-                help_ = item.get_help(instance)
 
-                if not help_.endswith("."):
+                help_ = item.get_help(instance)
+                if len(help_) > 0 and not help_.endswith("."):
                     help_ += "."
 
                 docstring_lines.append(
@@ -104,6 +116,14 @@ class DataSetDocumenter(ClassDocumenter):
                 self.directive, fullname, indent=self.content_indent
             )
             method_documenter.generate(more_content=more_content)
+
+        show_note, example_lines = self.options.get("datasetnote", (False, None))
+        if show_note:
+            # logging.warning("Note option is deprecated. Use datasetnote instead.")
+            self.add_line(
+                f".. datasetnote:: {self.object.__module__ + '.' + self.object.__qualname__} {example_lines or ''}",
+                self.get_sourcename(),
+            )
 
 
 def setup(app: Sphinx) -> None:

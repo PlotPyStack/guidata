@@ -42,11 +42,11 @@ class CreateMethodDocumenter(MethodDocumenter):
                 type_ = Any
 
             label = item.get_prop("display", "label")
-            if not label.endswith("."):
+            if len(label) > 0 and not label.endswith("."):
                 label += "."
             help_ = item._help
 
-            if not help_.endswith("."):
+            if len(help_) > 0 and not help_.endswith("."):
                 help_ += "."
 
             docstring_lines.append(
