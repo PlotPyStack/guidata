@@ -41,7 +41,7 @@ Documentation = "https://guidata.readthedocs.io/en/latest/"
 [project.scripts]
 
 [project.optional-dependencies]
-dev = ["black", "isort", "pylint", "Coverage"]
+dev = ["ruff", "pylint", "Coverage"]
 doc = [
     "PyQt5",
     "pillow",

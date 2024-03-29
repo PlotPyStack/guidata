@@ -49,7 +49,7 @@ Documentation = "https://guidata.readthedocs.io/en/latest/"
 guidata-tests = "guidata.tests:run"
 
 [project.optional-dependencies]
-dev = ["black", "isort", "pylint", "Coverage"]
+dev = ["ruff", "pylint", "Coverage"]
 doc = [
     "PyQt5",
     "pillow",
@@ -70,3 +70,25 @@ include = ["guidata*"]
 
 [tool.setuptools.dynamic]
 version = { attr = "guidata.__version__" }
+
+[tool.ruff]
+exclude = [".git", ".vscode", "build", "dist"]
+line-length = 88                               # Same as Black.
+indent-width = 4                               # Same as Black.
+target-version = "py38"                        # Assume Python 3.8
+
+[tool.ruff.lint]
+# all rules can be found here: https://beta.ruff.rs/docs/rules/
+select = ["E", "F", "W", "I"]
+ignore = [
+    "E203", # space before : (needed for how black formats slicing)
+]
+
+[tool.ruff.format]
+quote-style = "double"            # Like Black, use double quotes for strings.
+indent-style = "space"            # Like Black, indent with spaces, rather than tabs.
+skip-magic-trailing-comma = false # Like Black, respect magic trailing commas.
+line-ending = "auto"              # Like Black, automatically detect the appropriate line ending.
+
+[tool.ruff.lint.per-file-ignores]
+"doc/*" = ["E402"]

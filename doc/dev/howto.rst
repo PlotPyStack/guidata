@@ -33,8 +33,7 @@ To run test with coverage support, use the following command::
 Code formatting
 ^^^^^^^^^^^^^^^
 
-The code is formatted with `black <https://black.readthedocs.io/en/stable/>`_
-and `isort <https://isort.readthedocs.io/en/stable/>`_.
+The code is formatted with `ruff <https://pypi.org/project/ruff/>`_.
 
 If you are using `Visual Studio Code <https://code.visualstudio.com/>`_,
 the formatting is done automatically when you save a file, thanks to the

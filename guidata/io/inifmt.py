@@ -62,11 +62,12 @@ class INIHandler(BaseIOHandler):
             section (str): The name of the section to end.
         """
         sect = self.option.pop(-1)
-        assert (
-            sect == section
-        ), "Ending section does not match the current section: %s != %s" % (
-            sect,
-            section,
+        assert sect == section, (
+            "Ending section does not match the current section: %s != %s"
+            % (
+                sect,
+                section,
+            )
         )
 
     def group(self, option: str) -> GroupContext:
@@ -147,24 +148,4 @@ class INIReader(INIHandler):
     # and read_str alias to read_any
     read_bool = read_int = read_float = read_array = read_sequence = read_dict = (
         read_none
-    ) = read_str = read_any
-
-    def read_unicode(self) -> str | None:
-        """
-        Read a unicode string from the configuration.
-
-        This method reads a unicode string from the configuration. If the value
-        read is a string or None, it returns it as is. Otherwise, it delegates
-        the read to read_str method.
-
-        Returns:
-            Union[str, None]: The unicode string read from the configuration.
-        """
-        val = self.read_any()
-        if isinstance(val, str) or val is None:
-            return val
-        else:
-            return self.read_str()
-
-    # Make read_unicode alias to read_str
-    read_unicode = read_str
+    ) = read_str = read_unicode = read_any
