@@ -2,13 +2,37 @@
 sphinx.ext.autodoc extension for :class:`guidata.dataset.DataSet` and related classes.
 """
 
+import logging
+from typing import Any, Type
+
+from docutils import nodes
+from docutils.nodes import note, paragraph
+from docutils.parsers.rst.roles import set_classes
+from docutils.statemachine import StringList, ViewList
 from sphinx.application import Sphinx
-from sphinx.ext.autodoc import ClassDocumenter, ObjectMember
+from sphinx.ext.autodoc import (
+    ClassDocumenter,
+    MethodDocumenter,
+    ObjectMember,
+    bool_option,
+)
+from sphinx.util.docstrings import prepare_docstring
+from sphinx.util.inspect import getdoc
+from sphinx.util.nodes import nested_parse_with_titles
 
 import guidata.dataset as gds
 from guidata import __version__ as guidata_version
+from guidata.dataset.autodoc_method import CreateMethodDocumenter
+from guidata.dataset.note_directive import DatasetNoteDirective
 
-__version__ = guidata_version
+
+def datasetnote_option(arg: str) -> tuple[bool, int | None]:
+    if arg is None:
+        return True, None
+    try:
+        return True, int(arg)
+    except ValueError:
+        return True, None
 
 
 class DataSetDocumenter(ClassDocumenter):
@@ -20,6 +44,15 @@ class DataSetDocumenter(ClassDocumenter):
     directivetype = ClassDocumenter.objtype
     priority = 10 + ClassDocumenter.priority
     option_spec = dict(ClassDocumenter.option_spec)
+    option_spec.update(
+        {
+            "showattr": bool_option,
+            "hidecreate": bool_option,
+            "showsig": bool_option,
+            "datasetnote": datasetnote_option,
+        }
+    )
+    object: Type[gds.DataSet]
 
     @classmethod
     def can_document_member(cls, member, membername, isattr, parent):
@@ -28,35 +61,69 @@ class DataSetDocumenter(ClassDocumenter):
         except TypeError:
             return False
 
-    def get_object_members(self, want_all):
-        check, members = super().get_object_members(want_all)
-        existing_member_names = {m.__name__ for m in members}
-        instance: gds.DataSet = self.object()
-        print(f"Inspecting {self.object_name} members")
-        for item in instance.get_items():
-            if item.get_name() not in existing_member_names:
-                existing_member_names.add(item.get_name())
-                print(f"Adding {item.get_name()} to {self.object_name}")
-                members.append(ObjectMember(item.get_name(), item))
-        return check, members
+    def format_signature(self, **kwargs) -> str:
+        if self.options.get("showsig", False):
+            return super().format_signature(**kwargs)
+        return ""
 
-    def add_content(
-        self,
-        more_content,
-    ) -> None:
+    def get_doc(self):
+        first_line = getdoc(
+            self.object,
+            self.get_attr,
+            self.config.autodoc_inherit_docstrings,
+            self.object,
+        )
+
+        docstring_lines = [
+            first_line or "",
+        ]
+        if self.options.get("showattr", False):
+            docstring_lines.extend(("", "Attributes:"))
+            instance = self.object()
+            for item in instance.get_items():
+                type_ = item.type
+                if not type_:
+                    type_ = Any
+
+                label = item.get_prop("display", "label")
+                if len(label) > 0 and not label.endswith("."):
+                    label += "."
+
+                help_ = item.get_help(instance)
+                if len(help_) > 0 and not help_.endswith("."):
+                    help_ += "."
+
+                docstring_lines.append(
+                    f"\t{item.get_name()} ({type(item)}): {label} {help_} "
+                    f"Default: {item._default}"
+                )
+
+        return [
+            prepare_docstring(
+                "\n".join(docstring_lines),
+                tabsize=self.directive.state.document.settings.tab_width,
+            )
+        ]
+
+    def add_content(self, more_content: Any | None) -> None:
         super().add_content(more_content)
-        source_name = self.get_sourcename()
-        instance: gds.DataSet = self.object()
-        self.add_line("", source_name)
-        for item in instance.get_items():
-            name = item.get_name()
-            helptxt = item.get_help(instance)
-            default = item.get_string_value(instance)
-            typetxt = "Any"
-            if hasattr(item, "type"):
-                typetxt = item.type.__name__
-            self.add_line(f"**{name}**: {typetxt}={default} ({helptxt})", source_name)
-            self.add_line("", source_name)
+
+        if not self.options.get("hidecreate", False):
+            fullname = (
+                self.object.__module__ + "." + self.object.__qualname__ + ".create"
+            )
+            method_documenter = CreateMethodDocumenter(
+                self.directive, fullname, indent=self.content_indent
+            )
+            method_documenter.generate(more_content=more_content)
+
+        show_note, example_lines = self.options.get("datasetnote", (False, None))
+        if show_note:
+            # logging.warning("Note option is deprecated. Use datasetnote instead.")
+            self.add_line(
+                f".. datasetnote:: {self.object.__module__ + '.' + self.object.__qualname__} {example_lines or ''}",
+                self.get_sourcename(),
+            )
 
 
 def setup(app: Sphinx) -> None:

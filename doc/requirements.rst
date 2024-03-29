@@ -9,7 +9,7 @@ The :mod:`guidata` package requires the following Python modules:
       - Summary
     * - Python
       - >=3.8, <4
-      - 
+      - Python programming language
     * - h5py
       - >=3.0
       - Read and write HDF5 files from Python
