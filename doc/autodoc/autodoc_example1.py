@@ -1,51 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import guidata.dataset as gds
-
-
-class ProcessingParameters1(gds.DataSet):
-    """Example of a simple dataset"""
-
-    a = gds.FloatItem("Parameter #1", default=2.3)
-    b = gds.IntItem("Parameter #2", min=0, max=10, default=5)
-    c = gds.StringItem("Parameter #3", default="default value")
-    type = gds.ChoiceItem("Processing algorithm", ("type 1", "type 2", "type 3"))
-
-    def doc_test(self, a: int, b: float, c: str) -> None:
-        """Test method for autodoc."""
-        pass
-
-
-class ProcessingParameters2(gds.DataSet):
-    """Example of a simple dataset"""
-
-    a = gds.FloatItem("Parameter #1", default=2.3)
-    b = gds.IntItem("Parameter #2", min=0, max=10, default=5)
-    c = gds.StringItem("Parameter #3", default="default value")
-    type = gds.ChoiceItem("Processing algorithm", ("type 1", "type 2", "type 3"))
-
-    def doc_test(self, a: int, b: float, c: str) -> None:
-        """Test method for autodoc."""
-        pass
-
-
-# -*- coding: utf-8 -*-
-#
-# Licensed under the terms of the BSD 3-Clause
-# (see guidata/LICENSE for details)
-
-"""
-All guidata DataItem objects demo
-
-A DataSet object is a set of parameters of various types (integer, float,
-boolean, string, etc.) which may be edited in a dialog box thanks to the
-'edit' method. Parameters are defined by assigning DataItem objects to a
-DataSet class definition: each parameter type has its own DataItem class
-(IntItem for integers, FloatItem for floats, StringItem for strings, etc.)
-"""
-
-# guitest: show
-
 import atexit
 import datetime
 import shutil
@@ -66,15 +20,15 @@ FILE_CSV = tempfile.NamedTemporaryFile(suffix=".csv", dir=TEMPDIR)
 atexit.register(FILE_CSV.close)
 
 
-class Parameters(gds.DataSet):
-    """
-    DataSet test
-    The following text is the DataSet 'comment': <br>Plain text or
-    <b>rich text<sup>2</sup></b> are both supported,
-    as well as special characters (α, β, γ, δ, ...)
-    """
+class ProcessingParameters1(gds.DataSet):
+    """Example of a complete dataset with all possible items. Used as an autodoc
+    example."""
 
     dir = gds.DirectoryItem("Directory", TEMPDIR)
+    a = gds.FloatItem("Parameter #1", default=2.3)
+    b = gds.IntItem("Parameter #2", min=0, max=10, default=5)
+    c = gds.StringItem("Parameter #3", default="default value")
+    type = gds.ChoiceItem("Processing algorithm", ("type 1", "type 2", "type 3"))
     fname = gds.FileOpenItem("Open file", ("csv", "eta"), FILE_CSV.name)
     fnames = gds.FilesOpenItem("Open files", "csv", FILE_CSV.name)
     fname_s = gds.FileSaveItem("Save file", "eta", FILE_ETA.name)
@@ -105,9 +59,7 @@ class Parameters(gds.DataSet):
         ],
     )
     _eg = gds.EndGroup("A sub group")
-    floatarray = gds.FloatArrayItem(
-        "Float array", default=np.ones((50, 5), float), format=" %.2e "
-    ).set_pos(col=1)
+    floatarray = gds.FloatArrayItem("Float array", format=" %.2e ").set_pos(col=1)
     mchoice3 = gds.MultipleChoiceItem(
         "MC type 1", [str(i) for i in range(12)]
     ).horizontal(4)
@@ -120,30 +72,22 @@ class Parameters(gds.DataSet):
     )
     dictionary = gds.DictItem(
         "Dictionary",
-        default={
-            "lkl": 2,
-            "tototo": 3,
-            "zzzz": "lklk",
-            "bool": True,
-            "float": 1.234,
-            "list": [1, 2.5, 3, "str", False, 5, {"lkl": 2, "l": [1, 2, 3]}],
-        },
         help="This is a dictionary",
     )
 
+    def doc_test(self, a: int, b: float, c: str) -> str:
+        """Test method for autodoc.
 
-def test_all_items():
-    """Test all DataItem objects"""
-    with qt_app_context():
-        prm = Parameters()
+        Args:
+            a: first parameter.
+            b: second parameter.
+            c: third parameter.
 
-        prm.floatarray[:, 0] = np.linspace(-5, 5, 50)
-        execenv.print(prm)
-        if prm.edit():
-            execenv.print(prm)
-        prm.view()
-        execenv.print("OK")
+        Returns:
+            Concatenation of c and (a + b).
+        """
+        return c + str(a + b)
 
 
-if __name__ == "__main__":
-    test_all_items()
+class ProcessingParameters2(ProcessingParameters1):
+    pass

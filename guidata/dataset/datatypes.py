@@ -66,7 +66,7 @@ import sys
 from abc import ABC, abstractmethod
 from collections.abc import Callable
 from copy import deepcopy
-from typing import TYPE_CHECKING, Any, TypeVar
+from typing import TYPE_CHECKING, Any, Generic, TypeVar, Union
 
 from guidata.io import INIReader, INIWriter
 from guidata.userconfig import UserConfig
@@ -79,6 +79,10 @@ if TYPE_CHECKING:
 
     from guidata.dataset.qtwidgets import DataSetEditDialog
     from guidata.io import HDF5Reader, HDF5Writer, JSONReader, JSONWriter
+
+
+AnyDataType = TypeVar("AnyDataType")
+AnyDataItem = TypeVar("AnyDataItem", bound="DataItem")
 
 
 class NoDefault:
@@ -250,7 +254,7 @@ class FuncProp(ItemProperty):
         self.property.set(instance, item, self.inverse_function(value))
 
 
-class DataItem(ABC):
+class DataItem(Generic[AnyDataType], ABC):
     """DataSet data item
 
     Args:
@@ -266,7 +270,7 @@ class DataItem(ABC):
     def __init__(
         self,
         label: str,
-        default: Any | None = None,
+        default: AnyDataType | None = None,
         help: str | None = "",
         check: bool | None = True,
     ) -> None:
@@ -483,16 +487,20 @@ class DataItem(ABC):
         func = getattr(visitor, funcname)
         func(self)
 
-    def __set__(self, instance: Any, value: Any):
+    def __set__(self, instance: DataSet, value: AnyDataType):
         setattr(instance, "_%s" % (self._name), value)
 
-    def __get__(self, instance: Any, klass: type) -> Any | None:
+    def __get__(
+        self: AnyDataItem, instance: DataSet, klass: type
+    ) -> AnyDataType | AnyDataItem:
         if instance is not None:
             return getattr(instance, "_%s" % (self._name), self._default)
         else:
             return self
 
-    def get_value(self, instance: Any) -> Any:
+    def get_value(
+        self: AnyDataItem, instance: DataSet | AnyDataItem
+    ) -> AnyDataType | AnyDataItem:
         """Return data item's value
 
         Args:
@@ -503,7 +511,7 @@ class DataItem(ABC):
         """
         return self.__get__(instance, instance.__class__)
 
-    def check_item(self, instance: Any) -> Any:
+    def check_item(self, instance: DataSet | AnyDataItem) -> bool:
         """Check data item's current value (calling method check_value)
 
         Args:
@@ -515,7 +523,7 @@ class DataItem(ABC):
         value = getattr(instance, "_%s" % (self._name))
         return self.check_value(value)
 
-    def check_value(self, value: Any) -> bool:
+    def check_value(self, value: AnyDataType) -> bool:
         """Check if `value` is valid for this data item
 
         Args:
@@ -526,7 +534,7 @@ class DataItem(ABC):
         """
         raise NotImplementedError()
 
-    def from_string(self, string_value: str) -> Any:
+    def from_string(self, string_value: str) -> AnyDataType:
         """Transform string into valid data item's value
 
         Args:
@@ -605,9 +613,6 @@ class DataItem(ABC):
             self.set_default(instance)
             return
         self.__set__(instance, value)
-
-    def additional_doc(self) -> str:
-        return ""
 
 
 class Obj:
@@ -999,29 +1004,7 @@ class DataSetMeta(type):
         items_list = list(items.values())
         items_list.sort(key=lambda x: x._order)
 
-        # doc_lines = ["\n", "Args:"]
-        # for item in items_list:
-        #     doc_lines.append(
-        #         f"\t{item._name} ({item.type.__name__}): {item.get_prop('display', 'label')} {item._help}. Default: {item._default}"
-        #     )
-        # if items_list:
-        #     dct["create"] = DataSet.create
-        #     dct["create"].__doc__ += "\n".join(doc_lines)
-        #     print(dct["create"].__doc__)
-        # print(cls, name, items_list)
         dct["_items"] = items_list
-        # print(items)
-        # print(dct)
-        # if (create_method := dct.get("create")) is not None:
-        #     create_docstring: list[str] = ["Test issou", "", "Args:"]
-        #     for name, ditem in items.items():
-        #         create_docstring.append(
-        #             f"    {name} ({ditem.__class__.__name__}): {ditem.get_help()}"
-        #         )
-        #     create_docstring.extend(("", "Returns:", "    DataSet instance"))
-        #     create_method.__doc__ = "\n".join(create_docstring)
-        # print(create_method.__name__)
-        # print(create_method.__doc__)
         return type.__new__(cls, name, bases, dct)
 
 

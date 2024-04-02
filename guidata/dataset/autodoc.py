@@ -4,27 +4,28 @@ sphinx.ext.autodoc extension for :class:`guidata.dataset.DataSet` and related cl
 
 import logging
 from inspect import Parameter, Signature
-from typing import Any, Type
+from typing import Any, Hashable, Type, Union
 
 from docutils import nodes
 from sphinx.application import Sphinx
-from sphinx.ext.autodoc import (
-    ClassDocumenter,
-    MethodDocumenter,
-    bool_option,
-    stringify_signature,
-    object_description,
-)
+from sphinx.ext.autodoc import ClassDocumenter, MethodDocumenter, bool_option
 from sphinx.util.docstrings import prepare_docstring
 from sphinx.util.docutils import SphinxDirective
-from sphinx.util.inspect import getdoc
+from sphinx.util.inspect import getdoc, object_description, stringify_signature
+from sphinx.util.typing import stringify_annotation
 
 import guidata.dataset as gds
+from guidata.config import _
 
-logger = logging.getLogger(__name__)
+# _ = lambda x: x
 
-# These item types must not have a default value other than None whild documenting
-DATAITEMS_NONE_DEFAULT = (gds.DictItem, gds.FloatArrayItem, gds.DateItem)
+DATAITEMS_NONE_DEFAULT: tuple[type[gds.DataItem], ...] = (
+    gds.DictItem,
+    gds.FloatArrayItem,
+    gds.DateItem,
+    gds.FileSaveItem,
+    gds.FilesOpenItem,
+)
 
 
 def datasetnote_option(arg: str) -> tuple[bool, int | None]:
@@ -36,41 +37,124 @@ def datasetnote_option(arg: str) -> tuple[bool, int | None]:
         return True, None
 
 
-def check_item_can_be_documented(instance: gds.DataSet, item: gds.DataItem) -> None:
-    value = item.get_value(instance)
-    if isinstance(item, DATAITEMS_NONE_DEFAULT) and value is not None:
+def check_item_can_be_documented(dataset: gds.DataSet, item: gds.DataItem) -> None:
+    """Checks if an item can be documented depending on its value.
+
+    Args:
+        dataset: DataSet instance.
+        item: DataItem instance.
+
+    Raises:
+        ValueError: If the item has a default value that is not allowed (not hashable).
+    """
+    value = item.get_value(dataset)
+
+    if isinstance(item, DATAITEMS_NONE_DEFAULT) and not isinstance(value, Hashable):
         raise ValueError(
-            f"Item {item.get_name()} has a default value of {value} which is not None."
+            f"Item '{item.get_name()}' from {dataset.__class__.__name__} has a "
+            f"default value of type {type(value)} = {value} which is not allowed. "
+            "Default value should be an immutable type."
         )
 
 
-def document_items(cls: Type[gds.DataSet]) -> str:
-    docstring_lines = []
-    instance = cls()
-    for item in instance.get_items():
-        # check_item_can_be_documented(instance, item)
+def document_choice_item(item: gds.ChoiceItem) -> str:
+    """Additional documentation for ChoiceItem containing the available choices.
+
+    Args:
+        item: ChoiceItem to document.
+
+    Returns:
+        Additional choice documentation.
+    """
+    available_choices = item.get_prop("data", "choices")
+    str_choices = ", ".join(object_description(key) for key, *_ in available_choices)
+    doc = _("Single choice from: %s.") % str_choices
+    return doc
+
+
+def document_multiple_choice_item(item: gds.MultipleChoiceItem) -> str:
+    """Additional documentation for MultipleChoiceItem containing the available choices.
+
+    Args:
+        item: ChoiceItem to document.
+
+    Returns:
+        Additional choice documentation.
+    """
+    available_choices = item.get_prop("data", "choices")
+    str_choices = ", ".join(object_description(key) for key, *_ in available_choices)
+    doc = _("Multiple choice from: %s.") % str_choices
+    return doc
+
+
+class ItemDoc:
+    """Wrapper class around a DataItem used to document it."""
+
+    def __init__(self, dataset: gds.DataSet, item: gds.DataItem) -> None:
+        self.item = item
+
+        check_item_can_be_documented(dataset, item)
 
         type_ = item.type
         if not type_:
             type_ = Any
+        if isinstance(item, gds.ChoiceItem):
+            types = set(type(key) for key, *_ in item.get_prop("data", "choices"))
+            if types:
+                if len(types) == 1:
+                    type_ = types.pop()
+                else:
+                    type_ = f"Union[{', '.join(t.__name__ for t in types)}]"
+            else:
+                type_ = Any
+
+        self.type_ = stringify_annotation(type_)
 
         label = item.get_prop("display", "label")
         if len(label) > 0 and not label.endswith("."):
             label += "."
+        self.label = label
 
-        help_ = item.get_help(instance)
-        if len(help_) > 0 and not help_.endswith("."):
-            help_ += "."
+        help_ = item.get_help(dataset).capitalize()
 
-        docstring_lines.append(
-            f"\t{item.get_name()} ({type_.__name__}): {label} {help_} "
-            f"Default: {object_description(item.get_value(instance))}."
-        )
-    return "\n".join(docstring_lines)
+        if isinstance(item, gds.MultipleChoiceItem):
+            help_ += document_multiple_choice_item(item)
+        elif isinstance(item, gds.ChoiceItem):
+            help_ += document_choice_item(item)
+
+        self.help_ = help_
+
+        self.name = item.get_name()
+
+        self.default = object_description(item.get_value(dataset))
+
+    def to_function_parameter(self) -> str:
+        """Convert the item to a parameter docstring (e.g. used for Dataset.create()).
+
+        Returns:
+            Formated docstring of the item.
+        """
+        return (
+            f"\t{self.name} ({self.type_}): {self.label} "
+            f"{self.help_} " + _("Default: %s.") % self.default
+        ).replace("*", "\\*")
+
+    def to_attribute(self) -> str:
+        """Convert the item to an attribute used in the DataSet docstring.
+
+        Returns:
+            Formated docstring of the item.
+        """
+        return (
+            f"\t{self.name} ({type(self.item)}): {self.label} {self.help_} "
+            + _("Default: %s.") % self.default
+        ).replace("*", "\\*")
 
 
 class CreateMethodDocumenter(MethodDocumenter):
-    objtype = "_create_method"
+    """Custom MethodDocumented specific to DataSet.create() method."""
+
+    objtype = "_dataset_create"
     directivetype = MethodDocumenter.objtype
     priority = 10 + MethodDocumenter.priority
     option_spec = dict(MethodDocumenter.option_spec)
@@ -78,45 +162,58 @@ class CreateMethodDocumenter(MethodDocumenter):
 
     @classmethod
     def can_document_member(cls, member, membername, isattr, parent):
+        """Override the parent method to only document the DataSet.create() method."""
         try:
             return issubclass(parent, gds.DataSet) and membername == "create"
         except TypeError:
             return False
 
     def format_signature(self, **kwargs: Any) -> str:
+        """Override the parent method to dynamically generate a signature for the parent
+        DataSet.create() method depending on the DataItem of the DatSet."""
         instance = self.parent()
         params = [
             Parameter(
                 item.get_name(),
                 Parameter.POSITIONAL_OR_KEYWORD,
-                annotation=item.type,
-                # default=item.get_string_value(instance),
+                annotation=ItemDoc(instance, item).type_,
             )
             for item in instance.get_items()
         ]
         sig = Signature(parameters=params, return_annotation=self.parent)
         return stringify_signature(sig, **kwargs)
 
-    def get_doc(self):
+    def get_doc(self) -> list[list[str]]:
+        """Override the parent method to dynamically generate a docstring for the create
+        method depending on the DataItem of the DatSet.
+
+        Returns:
+            list of docstring lines.
+        """
         self.object.__annotations__["return"] = self.parent
         docstring_lines = [
-            f"Returns a new instance of {self.parent.__name__} with the fields set to "
-            "the given values.",
+            _(
+                "Returns a new instance of %s with the fields set to "
+                "the given values."
+            )
+            % self.parent.__name__,
             "",
             "Args:",
         ]
 
-        docstring_lines.append(document_items(self.parent))
+        dataset = self.parent()
+        for item in dataset.get_items():
+            docstring_lines.append(ItemDoc(dataset, item).to_function_parameter())
 
         docstring_lines.extend(
-            ("Returns:", "", f"\tNew instance of {self.parent.__name__}")
+            ("", "Returns:", _("\tNew instance of %s") % self.parent.__name__)
         )
-        return [
-            prepare_docstring(
-                "\n".join(docstring_lines),
-                tabsize=self.directive.state.document.settings.tab_width,
-            )
-        ]
+        docstring = prepare_docstring(
+            "\n".join(docstring_lines),
+            tabsize=self.directive.state.document.settings.tab_width,
+        )
+        docstring += ""
+        return [docstring]
 
 
 class DataSetDocumenter(ClassDocumenter):
@@ -133,24 +230,39 @@ class DataSetDocumenter(ClassDocumenter):
             "showattr": bool_option,
             "hidecreate": bool_option,
             "showsig": bool_option,
-            "datasetnote": datasetnote_option,
+            "shownote": datasetnote_option,
         }
     )
     object: Type[gds.DataSet]
 
     @classmethod
-    def can_document_member(cls, member, membername, isattr, parent):
+    def can_document_member(cls, member, membername, isattr, parent) -> bool:
+        """Override the parent method to only document DataSet classes."""
         try:
             return issubclass(member, gds.DataSet)
         except TypeError:
             return False
 
     def format_signature(self, **kwargs) -> str:
+        """Override the parent method to dynamically generate a signature for the
+        DataSet class depending on the DataItem of the DatSet and if the 'showsig'
+        option is set.
+
+        Returns:
+            Formated signature of the DataSet class.
+        """
         if self.options.get("showsig", False):
             return super().format_signature(**kwargs)
         return ""
 
-    def get_doc(self):
+    def get_doc(self) -> list[list[str]]:
+        """Override the parent method to dynamically generate a docstring for the
+        DataSet class depending on the DataItem of the DatSet. DataSet attributes
+        (DataItems) are documented in the docstring if the 'showattr' option is used.
+
+        Returns:
+            Docstring lines.
+        """
         first_line = getdoc(
             self.object,
             self.get_attr,
@@ -163,24 +275,9 @@ class DataSetDocumenter(ClassDocumenter):
         ]
         if self.options.get("showattr", False):
             docstring_lines.extend(("", "Attributes:"))
-            instance = self.object()
-            for item in instance.get_items():
-                type_ = item.type
-                if not type_:
-                    type_ = Any
-
-                label = item.get_prop("display", "label")
-                if len(label) > 0 and not label.endswith("."):
-                    label += "."
-
-                help_ = item.get_help(instance)
-                if len(help_) > 0 and not help_.endswith("."):
-                    help_ += "."
-
-                docstring_lines.append(
-                    f"\t{item.get_name()} ({type(item)}): {label} {help_} "
-                    f"Default: {item._default}"
-                )
+            dataset = self.object()
+            for item in dataset.get_items():
+                docstring_lines.append(ItemDoc(dataset, item).to_attribute())
 
         return [
             prepare_docstring(
@@ -190,6 +287,13 @@ class DataSetDocumenter(ClassDocumenter):
         ]
 
     def add_content(self, more_content: Any | None) -> None:
+        """Override the parent method to hide the create method documentation if the
+        'hidecreate' option is used. Also add a datasetnote directive if the
+        'shownote' option is used.
+
+        Args:
+            more_content: Additional content to show/hide.
+        """
         super().add_content(more_content)
 
         if not self.options.get("hidecreate", False):
@@ -201,9 +305,8 @@ class DataSetDocumenter(ClassDocumenter):
             )
             method_documenter.generate(more_content=more_content)
 
-        show_note, example_lines = self.options.get("datasetnote", (False, None))
+        show_note, example_lines = self.options.get("shownote", (False, None))
         if show_note:
-            # logging.warning("Note option is deprecated. Use datasetnote instead.")
             self.add_line(
                 ".. datasetnote:: "
                 f"{self.object.__module__ + '.' + self.object.__qualname__} "
@@ -213,12 +316,20 @@ class DataSetDocumenter(ClassDocumenter):
 
 
 class DatasetNoteDirective(SphinxDirective):
+    """Custom directive to add a note about how to instanciate and modify a DataSet
+    class."""
+
     required_arguments = 1  # the class name is a required argument
     optional_arguments = 1  # the number of example lines to display is optional
     final_argument_whitespace = True
     has_content = True
 
     def run(self):
+        """Run the directive.
+
+        Returns:
+            list of returned nodes.
+        """
         class_name = self.arguments[0]
 
         example_lines: int | None
@@ -235,8 +346,8 @@ class DatasetNoteDirective(SphinxDirective):
             cls = getattr(module, class_name)
 
         except Exception as e:
-            logger.warning(f"Failed to import class {class_name}: {e}")
-            instance_str = f"Failed to import class {class_name}"
+            logging.error(f"Failed to import class {class_name}: {e}")
+            instance_str = _("Failed to import class %s") % class_name
             note_node = nodes.error(instance_str)
             return [note_node]
 
@@ -246,29 +357,33 @@ class DatasetNoteDirective(SphinxDirective):
         items = instance.get_items()
 
         formated_args = ", ".join(
-            f"{item.get_name()}={item.get_string_value(instance)}"
+            f"{item.get_name()}={object_description(item.get_value(instance))}"
             for item in instance.get_items()
         )
         note_node = nodes.note()
         paragraph1 = nodes.paragraph()
-        paragraph1 += nodes.Text("To instanciate a new ")
-        paragraph1 += nodes.literal(text=f"{cls.__name__}")
-        paragraph1 += nodes.Text(" , you can use the create classmethod like this:")
+        paragraph1 += nodes.Text(_("To instanciate a new "))
+        paragraph1 += nodes.literal(text=cls.__name__)
+        paragraph1 += nodes.Text(
+            _(" , you can use the create() classmethod like this:")
+        )
         paragraph1 += nodes.literal_block(
             text=f"{cls.__name__}.create({formated_args})", language="python"
         )
+
         note_node += paragraph1
 
         paragraph2 = nodes.paragraph()
-        paragraph2 += nodes.Text("You can also first instanciate a default ")
-        paragraph2 += nodes.literal(text=f" {cls.__name__}")
-        paragraph2 += nodes.Text(" and then set the fields like this:")
+        paragraph2 += nodes.Text(_("You can also first instanciate a default "))
+        paragraph2 += nodes.literal(text=cls.__name__)
+        paragraph2 += nodes.Text(_(" and then set the fields like this:"))
 
         example_lines = min(len(items), example_lines) if example_lines else len(items)
         code_lines = [
             f"dataset = {cls.__name__}()",
             *(
-                f"dataset.{items[i].get_name()} = {items[i].get_string_value(instance)}"
+                f"dataset.{items[i].get_name()} = "
+                f"{object_description(items[i].get_value(instance))}"
                 for i in range(example_lines)
             ),
         ]

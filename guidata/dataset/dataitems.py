@@ -102,10 +102,9 @@ import numpy as np
 
 from guidata.config import _
 from guidata.dataset.datatypes import DataItem, DataSet, ItemProperty
-from numpy.typing import NDArray
 
 if TYPE_CHECKING:
-    from numpy import ndarray
+    from numpy.typing import NDArray
 
     from guidata.io import (
         HDF5Reader,
@@ -118,8 +117,10 @@ if TYPE_CHECKING:
 
 _T = TypeVar("_T")
 
+NumericDataType = TypeVar("NumericDataType", bound=Union[float, int])
 
-class NumericTypeItem(DataItem):
+
+class NumericTypeItem(DataItem[NumericDataType]):
     """Numeric data item
 
     Args:
@@ -137,14 +138,14 @@ class NumericTypeItem(DataItem):
         check: if False, value is not checked (optional, default=True)
     """
 
-    type = int | float
+    type: type[NumericDataType]
 
     def __init__(
         self,
         label: str,
-        default: float | int | None = None,
-        min: float | int | None = None,
-        max: float | int | None = None,
+        default: NumericDataType | None = None,
+        min: NumericDataType | None = None,
+        max: NumericDataType | None = None,
         nonzero: bool | None = None,
         unit: str = "",
         help: str = "",
@@ -214,24 +215,8 @@ class NumericTypeItem(DataItem):
                 pass
         return None
 
-    def additional_doc(self) -> str:
-        min_ = self.get_prop("data", "min")
-        max_ = self.get_prop("data", "max")
-        unit = self.get_prop("display", "unit")
 
-        doc = []
-        doc.append(_("minimum %s") % min_ if min_ is not None else _("no minimum"))
-        doc.append(_("maximum %s") % max_ if max_ is not None else _("no maximum"))
-        doc.append(_("in %s") % unit if unit else _("no unit"))
-        doc.append(
-            _("must be non-zero.")
-            if self.get_prop("data", "nonzero")
-            else _("zero value allowed.")
-        )
-        return _("*Additional information: ") + ", ".join(doc) + "*"
-
-
-class FloatItem(NumericTypeItem):
+class FloatItem(NumericTypeItem[float]):
     """Construct a float data item
 
     Args:
@@ -285,7 +270,7 @@ class FloatItem(NumericTypeItem):
         return reader.read_float()
 
 
-class IntItem(NumericTypeItem):
+class IntItem(NumericTypeItem[int]):
     """Construct an integer data item
 
     Args:
@@ -362,7 +347,7 @@ class IntItem(NumericTypeItem):
         return reader.read_int()
 
 
-class StringItem(DataItem):
+class StringItem(DataItem[str]):
     """Construct a string data item
 
     Args:
@@ -430,18 +415,6 @@ class StringItem(DataItem):
         statement defined in the base item `deserialize` method"""
         return reader.read_unicode()
 
-    def additional_doc(self) -> str:
-        regexp = self.get_prop("data", "regexp")
-        noempty = self.get_prop("data", "notempty")
-
-        doc = []
-        if regexp:
-            doc.append(_("must match the regular expression:"))
-            doc.append(regexp)
-
-        doc.append(_("must not be empty") if noempty else _("empty string allowed"))
-        return _("*Additional information: ") + ", ".join(doc) + ".*"
-
 
 class TextItem(StringItem):
     """Construct a text data item (multiline string)
@@ -471,7 +444,7 @@ class TextItem(StringItem):
         )
 
 
-class BoolItem(DataItem):
+class BoolItem(DataItem[bool]):
     """Construct a boolean data item
 
     Args:
@@ -503,7 +476,7 @@ class BoolItem(DataItem):
         return reader.read_bool()
 
 
-class DateItem(DataItem):
+class DateItem(DataItem[datetime.date]):
     """DataSet data item
 
     Args:
@@ -539,7 +512,17 @@ class DateTimeItem(DateItem):
         check: check value (default: True)
     """
 
-    pass
+    type = datetime.datetime
+
+    def __init__(
+        self,
+        label: str,
+        default: datetime.datetime | None = None,
+        format: str | None = None,
+        help: str | None = "",
+        check: bool | None = True,
+    ) -> None:
+        super().__init__(label, default, format, help, check)
 
 
 class ColorItem(StringItem):
@@ -570,11 +553,6 @@ class ColorItem(StringItem):
         # when passing the string to a QColor Qt object, any numpy.string_ will
         # be interpreted as no color (black)
         return reader.read_str()
-
-    def additional_doc(self) -> str:
-        return _(
-            "*Additional information: color name (e.g. 'red') or hexadecimal code.*"
-        )
 
 
 class FileSaveItem(StringItem):
@@ -645,18 +623,6 @@ class FileSaveItem(StringItem):
         ):
             return value + "." + formats[0]
         return value
-
-    def additional_doc(self) -> str:
-        doc = []
-        formats = self.get_prop("data", "formats")
-        if formats != ["*"]:
-            doc.append(_("supported file types %s" % str(formats)))
-        basedir = self.get_prop("data", "basedir")
-        if basedir:
-            doc.append(_("default directory '%s'" % basedir))
-        if regexp := self.get_prop("data", "regexp"):
-            doc.append(_("must match the regular expression %s" % regexp))
-        return _("*Additional information: ") + ", ".join(doc) + ".*"
 
 
 class FileOpenItem(FileSaveItem):
@@ -807,12 +773,12 @@ class ChoiceItem(DataItem, Generic[_T]):
         size: size (optional) of the combo box or button widget (for radio buttons)
     """
 
-    type = Union[tuple[()], Type["FirstChoice"], int, None]
+    type = Any
 
     def __init__(
         self,
         label: str,
-        choices: Iterable[_T],
+        choices: Iterable[_T] | Callable,
         default: tuple[()] | type[FirstChoice] | int | None = FirstChoice,
         help: str = "",
         check: bool = True,
@@ -878,7 +844,7 @@ class MultipleChoiceItem(ChoiceItem):
         super().__init__(label, choices, default, help, check=check)
         self.set_prop("display", shape=(1, -1))
 
-    def horizontal(self, row_nb: int = 1) -> "MultipleChoiceItem":
+    def horizontal(self, row_nb: int = 1) -> MultipleChoiceItem:
         """
         Method to arange choice list horizontally on `n` rows
 
@@ -888,7 +854,7 @@ class MultipleChoiceItem(ChoiceItem):
         self.set_prop("display", shape=(row_nb, -1))
         return self
 
-    def vertical(self, col_nb: int = 1) -> "MultipleChoiceItem":
+    def vertical(self, col_nb: int = 1) -> MultipleChoiceItem:
         """
         Method to arange choice list vertically on `n` columns
 
@@ -973,12 +939,12 @@ class FloatArrayItem(DataItem):
         variable_size: if True, allows to add/remove row/columns on all axis
     """
 
-    type = NDArray[np.float64 | np.float32]
+    type = np.ndarray
 
     def __init__(
         self,
         label: str,
-        default: ndarray | None = None,
+        default: NDArray | None = None,
         help: str = "",
         format: str = "%.3f",
         transpose: bool = False,
@@ -1036,8 +1002,10 @@ class DictItem(DataItem):
         check: if False, value is not checked (optional, default=True)
     """
 
+    type = dict
+
     # pylint: disable=redefined-builtin,abstract-method
-    def __init__(self, label, default=None, help="", check=True):
+    def __init__(self, label, default: dict | None = None, help="", check=True):
         super().__init__(label, default=default, help=help, check=check)
         self.set_prop("display", callback=self.__dictedit)
         self.set_prop("display", icon="dictedit.png")
