@@ -23,8 +23,6 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx_qt_documentation",
     "guidata.dataset.autodoc",
-    "guidata.dataset.autodoc_method",
-    "guidata.dataset.note_directive",
 ]
 if "htmlhelp" in sys.argv:
     extensions += ["sphinx.ext.imgmath"]

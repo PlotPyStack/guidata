@@ -38,12 +38,9 @@ Optional modules for development:
     * - Name
       - Version
       - Summary
-    * - black
+    * - ruff
       - 
-      - The uncompromising code formatter.
-    * - isort
-      - 
-      - A Python utility / library to sort Python imports.
+      - An extremely fast Python linter and code formatter, written in Rust.
     * - pylint
       - 
       - python code static checker

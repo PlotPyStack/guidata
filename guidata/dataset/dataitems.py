@@ -96,10 +96,13 @@ import datetime
 import os
 import re
 from collections.abc import Callable
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Generic, Iterable, Type, TypeVar, Union
+
+import numpy as np
 
 from guidata.config import _
 from guidata.dataset.datatypes import DataItem, DataSet, ItemProperty
+from numpy.typing import NDArray
 
 if TYPE_CHECKING:
     from numpy import ndarray
@@ -112,6 +115,8 @@ if TYPE_CHECKING:
         JSONReader,
         JSONWriter,
     )
+
+_T = TypeVar("_T")
 
 
 class NumericTypeItem(DataItem):
@@ -132,7 +137,7 @@ class NumericTypeItem(DataItem):
         check: if False, value is not checked (optional, default=True)
     """
 
-    type: type[int | float]
+    type = int | float
 
     def __init__(
         self,
@@ -208,6 +213,22 @@ class NumericTypeItem(DataItem):
             except:  # noqa
                 pass
         return None
+
+    def additional_doc(self) -> str:
+        min_ = self.get_prop("data", "min")
+        max_ = self.get_prop("data", "max")
+        unit = self.get_prop("display", "unit")
+
+        doc = []
+        doc.append(_("minimum %s") % min_ if min_ is not None else _("no minimum"))
+        doc.append(_("maximum %s") % max_ if max_ is not None else _("no maximum"))
+        doc.append(_("in %s") % unit if unit else _("no unit"))
+        doc.append(
+            _("must be non-zero.")
+            if self.get_prop("data", "nonzero")
+            else _("zero value allowed.")
+        )
+        return _("*Additional information: ") + ", ".join(doc) + "*"
 
 
 class FloatItem(NumericTypeItem):
@@ -409,6 +430,18 @@ class StringItem(DataItem):
         statement defined in the base item `deserialize` method"""
         return reader.read_unicode()
 
+    def additional_doc(self) -> str:
+        regexp = self.get_prop("data", "regexp")
+        noempty = self.get_prop("data", "notempty")
+
+        doc = []
+        if regexp:
+            doc.append(_("must match the regular expression:"))
+            doc.append(regexp)
+
+        doc.append(_("must not be empty") if noempty else _("empty string allowed"))
+        return _("*Additional information: ") + ", ".join(doc) + ".*"
+
 
 class TextItem(StringItem):
     """Construct a text data item (multiline string)
@@ -538,6 +571,11 @@ class ColorItem(StringItem):
         # be interpreted as no color (black)
         return reader.read_str()
 
+    def additional_doc(self) -> str:
+        return _(
+            "*Additional information: color name (e.g. 'red') or hexadecimal code.*"
+        )
+
 
 class FileSaveItem(StringItem):
     """Construct a path data item for a file to be saved
@@ -607,6 +645,18 @@ class FileSaveItem(StringItem):
         ):
             return value + "." + formats[0]
         return value
+
+    def additional_doc(self) -> str:
+        doc = []
+        formats = self.get_prop("data", "formats")
+        if formats != ["*"]:
+            doc.append(_("supported file types %s" % str(formats)))
+        basedir = self.get_prop("data", "basedir")
+        if basedir:
+            doc.append(_("default directory '%s'" % basedir))
+        if regexp := self.get_prop("data", "regexp"):
+            doc.append(_("must match the regular expression %s" % regexp))
+        return _("*Additional information: ") + ", ".join(doc) + ".*"
 
 
 class FileOpenItem(FileSaveItem):
@@ -740,7 +790,7 @@ class FirstChoice:
     pass
 
 
-class ChoiceItem(DataItem):
+class ChoiceItem(DataItem, Generic[_T]):
     """Construct a data item for a list of choices.
 
     Args:
@@ -757,10 +807,12 @@ class ChoiceItem(DataItem):
         size: size (optional) of the combo box or button widget (for radio buttons)
     """
 
+    type = Union[tuple[()], Type["FirstChoice"], int, None]
+
     def __init__(
         self,
         label: str,
-        choices: Any,
+        choices: Iterable[_T],
         default: tuple[()] | type[FirstChoice] | int | None = FirstChoice,
         help: str = "",
         check: bool = True,
@@ -920,6 +972,8 @@ class FloatArrayItem(DataItem):
         check: if False, value is not checked (optional, default=True)
         variable_size: if True, allows to add/remove row/columns on all axis
     """
+
+    type = NDArray[np.float64 | np.float32]
 
     def __init__(
         self,

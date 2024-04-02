@@ -9,13 +9,14 @@ Source code example
 Generated documentation
 -----------------------
 
-.. autodataset:: autodoc_example1.ProcessingParameters
+.. autodataset:: autodoc_example1.ProcessingParameters1
     :datasetnote:
 
-.. autodataset:: autodoc_example1.ProcessingParameters
+.. autodataset:: autodoc_example1.ProcessingParameters2
+    :showsig:
+    :showattr:
     :datasetnote: 2
+    :members:
 
-.. autodataset:: autodoc_example1.ProcessingParameters
-    :datasetnote: 10
-
-.. datasetnote:: autodoc_example1.ProcessingParameters
+.. autodataset:: autodoc_example1.Parameters
+    :datasetnote: 200

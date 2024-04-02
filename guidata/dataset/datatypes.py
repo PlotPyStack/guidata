@@ -275,9 +275,9 @@ class DataItem(ABC):
         self._name: str | None = None
         self._default = default
         self._help = help
-        self._props: dict[Any, Any] = (
-            {}
-        )  # a dict realm->dict containing realm-specific properties
+        self._props: dict[
+            Any, Any
+        ] = {}  # a dict realm->dict containing realm-specific properties
         self.set_prop("display", col=0, colspan=None, row=None, label=label)
         self.set_prop("data", check_value=check)
 
@@ -605,6 +605,9 @@ class DataItem(ABC):
             self.set_default(instance)
             return
         self.__set__(instance, value)
+
+    def additional_doc(self) -> str:
+        return ""
 
 
 class Obj:

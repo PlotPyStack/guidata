@@ -1,14 +1,9 @@
-import importlib
+from inspect import Parameter, Signature
 from typing import Any
 
-from docutils import nodes
-from docutils.parsers.rst import Directive
-from docutils.statemachine import ViewList
 from sphinx.application import Sphinx
-from sphinx.ext.autodoc import MethodDocumenter
+from sphinx.ext.autodoc import MethodDocumenter, stringify_signature
 from sphinx.util.docstrings import prepare_docstring
-from sphinx.util.inspect import getdoc
-from sphinx.util.nodes import nested_parse_with_titles
 
 import guidata.dataset as gds
 
@@ -18,13 +13,28 @@ class CreateMethodDocumenter(MethodDocumenter):
     directivetype = MethodDocumenter.objtype
     priority = 10 + MethodDocumenter.priority
     option_spec = dict(MethodDocumenter.option_spec)
+    parent: type[gds.DataSet]
 
     @classmethod
     def can_document_member(cls, member, membername, isattr, parent):
         try:
-            return issubclass(member, gds.DataSet)
+            return issubclass(parent, gds.DataSet) and membername == "create"
         except TypeError:
             return False
+
+    def format_signature(self, **kwargs: Any) -> str:
+        instance = self.parent()
+        params = [
+            Parameter(
+                item.get_name(),
+                Parameter.POSITIONAL_OR_KEYWORD,
+                annotation=item.type,
+                default=item._default,
+            )
+            for item in instance.get_items()
+        ]
+        sig = Signature(parameters=params, return_annotation=self.parent)
+        return stringify_signature(sig, **kwargs)
 
     def get_doc(self):
         self.object.__annotations__["return"] = self.parent
@@ -44,8 +54,8 @@ class CreateMethodDocumenter(MethodDocumenter):
             label = item.get_prop("display", "label")
             if len(label) > 0 and not label.endswith("."):
                 label += "."
-            help_ = item._help
 
+            help_ = item.get_help(instance)
             if len(help_) > 0 and not help_.endswith("."):
                 help_ += "."
 
