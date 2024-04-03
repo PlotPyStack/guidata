@@ -7,6 +7,7 @@ from inspect import Parameter, Signature
 from typing import Any, Hashable, Type, Union
 
 from docutils import nodes
+from docutils.core import publish_parts
 from sphinx.application import Sphinx
 from sphinx.ext.autodoc import ClassDocumenter, MethodDocumenter, bool_option
 from sphinx.util.docstrings import prepare_docstring
@@ -87,6 +88,32 @@ def document_multiple_choice_item(item: gds.MultipleChoiceItem) -> str:
     return doc
 
 
+def escape_docline(line: str) -> str:
+    """Escape a line of documentation.
+
+    Args:
+        line: Line of documentation.
+
+    Returns:
+        Escaped line of documentation.
+    """
+    return line.replace("*", "\\*").replace("\n", "").replace("\r", "")
+
+
+def is_label_redundant(label: str, item_name: str) -> bool:
+    """Check if the label is redundant with the item name.
+
+    Args:
+        label: Label to check.
+        item_name: Item name to check against.
+
+    Returns:
+        True if the label is redundant with the item name, False otherwise.
+    """
+    item_name = item_name.lower()
+    return any(word not in item_name for word in label.split())
+
+
 class ItemDoc:
     """Wrapper class around a DataItem used to document it."""
 
@@ -111,8 +138,10 @@ class ItemDoc:
         self.type_ = stringify_annotation(type_)
 
         label = item.get_prop("display", "label")
+        if is_label_redundant(label, item.get_name()):
+            label = ""
         if len(label) > 0 and not label.endswith("."):
-            label += "."
+            label += "\\."
         self.label = label
 
         help_ = item.get_help(dataset).capitalize()
@@ -122,6 +151,8 @@ class ItemDoc:
         elif isinstance(item, gds.ChoiceItem):
             help_ += document_choice_item(item)
 
+        elif len(help_) > 0 and not help_.endswith("."):
+            help_ += "\\."
         self.help_ = help_
 
         self.name = item.get_name()
@@ -134,10 +165,10 @@ class ItemDoc:
         Returns:
             Formated docstring of the item.
         """
-        return (
+        return escape_docline(
             f"\t{self.name} ({self.type_}): {self.label} "
             f"{self.help_} " + _("Default: %s.") % self.default
-        ).replace("*", "\\*")
+        )
 
     def to_attribute(self) -> str:
         """Convert the item to an attribute used in the DataSet docstring.
@@ -145,10 +176,10 @@ class ItemDoc:
         Returns:
             Formated docstring of the item.
         """
-        return (
+        return escape_docline(
             f"\t{self.name} ({type(self.item)}): {self.label} {self.help_} "
             + _("Default: %s.") % self.default
-        ).replace("*", "\\*")
+        )
 
 
 class CreateMethodDocumenter(MethodDocumenter):
@@ -206,13 +237,12 @@ class CreateMethodDocumenter(MethodDocumenter):
             docstring_lines.append(ItemDoc(dataset, item).to_function_parameter())
 
         docstring_lines.extend(
-            ("", "Returns:", _("\tNew instance of %s") % self.parent.__name__)
+            ("", "Returns:", _("\tNew instance of %s.") % self.parent.__name__)
         )
         docstring = prepare_docstring(
             "\n".join(docstring_lines),
             tabsize=self.directive.state.document.settings.tab_width,
         )
-        docstring += ""
         return [docstring]
 
 
