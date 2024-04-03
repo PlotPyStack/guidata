@@ -117,10 +117,8 @@ if TYPE_CHECKING:
 
 _T = TypeVar("_T")
 
-NumericDataType = TypeVar("NumericDataType", bound=Union[float, int])
 
-
-class NumericTypeItem(DataItem[NumericDataType]):
+class NumericTypeItem(DataItem):
     """Numeric data item
 
     Args:
@@ -138,14 +136,14 @@ class NumericTypeItem(DataItem[NumericDataType]):
         check: if False, value is not checked (optional, default=True)
     """
 
-    type: type[NumericDataType]
+    type: type[int | float]
 
     def __init__(
         self,
         label: str,
-        default: NumericDataType | None = None,
-        min: NumericDataType | None = None,
-        max: NumericDataType | None = None,
+        default: float | int | None = None,
+        min: float | int | None = None,
+        max: float | int | None = None,
         nonzero: bool | None = None,
         unit: str = "",
         help: str = "",
@@ -216,7 +214,7 @@ class NumericTypeItem(DataItem[NumericDataType]):
         return None
 
 
-class FloatItem(NumericTypeItem[float]):
+class FloatItem(NumericTypeItem):
     """Construct a float data item
 
     Args:
@@ -270,7 +268,7 @@ class FloatItem(NumericTypeItem[float]):
         return reader.read_float()
 
 
-class IntItem(NumericTypeItem[int]):
+class IntItem(NumericTypeItem):
     """Construct an integer data item
 
     Args:
@@ -347,7 +345,7 @@ class IntItem(NumericTypeItem[int]):
         return reader.read_int()
 
 
-class StringItem(DataItem[str]):
+class StringItem(DataItem):
     """Construct a string data item
 
     Args:
@@ -444,7 +442,7 @@ class TextItem(StringItem):
         )
 
 
-class BoolItem(DataItem[bool]):
+class BoolItem(DataItem):
     """Construct a boolean data item
 
     Args:
@@ -476,7 +474,7 @@ class BoolItem(DataItem[bool]):
         return reader.read_bool()
 
 
-class DateItem(DataItem[datetime.date]):
+class DateItem(DataItem):
     """DataSet data item
 
     Args:
@@ -778,8 +776,8 @@ class ChoiceItem(DataItem, Generic[_T]):
     def __init__(
         self,
         label: str,
-        choices: Iterable[_T] | Callable,
-        default: tuple[()] | type[FirstChoice] | int | None = FirstChoice,
+        choices: Iterable[_T] | Callable[[Any], Iterable[_T]],
+        default: tuple[()] | type[FirstChoice] | int | _T | None = FirstChoice,
         help: str = "",
         check: bool = True,
         radio: bool = False,
@@ -1002,7 +1000,7 @@ class DictItem(DataItem):
         check: if False, value is not checked (optional, default=True)
     """
 
-    type = dict
+    type: type[dict[str, Any]] = dict
 
     # pylint: disable=redefined-builtin,abstract-method
     def __init__(self, label, default: dict | None = None, help="", check=True):

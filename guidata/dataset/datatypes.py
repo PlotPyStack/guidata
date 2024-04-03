@@ -81,10 +81,6 @@ if TYPE_CHECKING:
     from guidata.io import HDF5Reader, HDF5Writer, JSONReader, JSONWriter
 
 
-AnyDataType = TypeVar("AnyDataType")
-AnyDataItem = TypeVar("AnyDataItem", bound="DataItem")
-
-
 class NoDefault:
     pass
 
@@ -254,7 +250,7 @@ class FuncProp(ItemProperty):
         self.property.set(instance, item, self.inverse_function(value))
 
 
-class DataItem(Generic[AnyDataType], ABC):
+class DataItem(ABC):
     """DataSet data item
 
     Args:
@@ -270,7 +266,7 @@ class DataItem(Generic[AnyDataType], ABC):
     def __init__(
         self,
         label: str,
-        default: AnyDataType | None = None,
+        default: Any | None = None,
         help: str | None = "",
         check: bool | None = True,
     ) -> None:
@@ -487,20 +483,16 @@ class DataItem(Generic[AnyDataType], ABC):
         func = getattr(visitor, funcname)
         func(self)
 
-    def __set__(self, instance: DataSet, value: AnyDataType):
+    def __set__(self, instance: Any, value: Any):
         setattr(instance, "_%s" % (self._name), value)
 
-    def __get__(
-        self: AnyDataItem, instance: DataSet, klass: type
-    ) -> AnyDataType | AnyDataItem:
+    def __get__(self, instance: Any, klass: type) -> Any | None:
         if instance is not None:
             return getattr(instance, "_%s" % (self._name), self._default)
         else:
             return self
 
-    def get_value(
-        self: AnyDataItem, instance: DataSet | AnyDataItem
-    ) -> AnyDataType | AnyDataItem:
+    def get_value(self, instance: Any) -> Any:
         """Return data item's value
 
         Args:
@@ -511,7 +503,7 @@ class DataItem(Generic[AnyDataType], ABC):
         """
         return self.__get__(instance, instance.__class__)
 
-    def check_item(self, instance: DataSet | AnyDataItem) -> bool:
+    def check_item(self, instance: Any) -> Any:
         """Check data item's current value (calling method check_value)
 
         Args:
@@ -523,7 +515,7 @@ class DataItem(Generic[AnyDataType], ABC):
         value = getattr(instance, "_%s" % (self._name))
         return self.check_value(value)
 
-    def check_value(self, value: AnyDataType) -> bool:
+    def check_value(self, value: Any) -> bool:
         """Check if `value` is valid for this data item
 
         Args:
@@ -534,7 +526,7 @@ class DataItem(Generic[AnyDataType], ABC):
         """
         raise NotImplementedError()
 
-    def from_string(self, string_value: str) -> AnyDataType:
+    def from_string(self, string_value: str) -> Any:
         """Transform string into valid data item's value
 
         Args:
