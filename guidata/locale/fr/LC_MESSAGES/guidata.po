@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2024-04-02 17:25+0200\n"
+"POT-Creation-Date: 2024-04-03 13:52+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,113 +16,109 @@ msgstr ""
 "Content-Transfer-Encoding: utf-8\n"
 "Generated-By: pygettext.py 1.5\n"
 
-#: guidata\dataset\autodoc.py:70
+#: guidata\dataset\autodoc.py:72
 msgid "Single choice from: %s."
 msgstr "Sélection unique parmi : %s."
 
-#: guidata\dataset\autodoc.py:85
+#: guidata\dataset\autodoc.py:87
 msgid "Multiple choice from: %s."
 msgstr "Sélection multiple parmi : %s."
 
-#: guidata\dataset\autodoc.py:128 guidata\dataset\autodoc.py:139
+#: guidata\dataset\autodoc.py:170 guidata\dataset\autodoc.py:181
 msgid "Default: %s."
 msgstr "Par défaut : %s."
 
-#: guidata\dataset\autodoc.py:184
+#: guidata\dataset\autodoc.py:226
 msgid "Returns a new instance of %s with the fields set to the given values."
 msgstr ""
 "Renvoie une nouvelle instance de %s avec les champs initialisés aux valeurs "
 "données."
 
-#: guidata\dataset\autodoc.py:190
-msgid "Args:"
-msgstr "Paramètres:"
+#: guidata\dataset\autodoc.py:240
+msgid "\tNew instance of %s."
+msgstr "\tNouvelle instance de %s."
 
-#: guidata\dataset\autodoc.py:198
-msgid "\tNew instance of %s"
-msgstr "\tNouvelle instance de %s"
-
-#: guidata\dataset\autodoc.py:198
-msgid "Returns:"
-msgstr "Renvoie:"
-
-#: guidata\dataset\autodoc.py:338
+#: guidata\dataset\autodoc.py:380
 msgid "Failed to import class %s"
 msgstr "Impossible d'importer la classe %s"
 
-#: guidata\dataset\autodoc.py:353
+#: guidata\dataset\autodoc.py:395
 msgid "To instanciate a new "
 msgstr "Pour instancier un nouvel "
 
-#: guidata\dataset\autodoc.py:356
-msgid " , you can use the create() classmethod like this:"
-msgstr ", vous pouvez utiliser la méthode de classe create() comme ceci :"
+#: guidata\dataset\autodoc.py:397
+msgid " , you can use the classmethod"
+msgstr " , vous pouvez utiliser la méthode de classe "
 
-#: guidata\dataset\autodoc.py:365
+#: guidata\dataset\autodoc.py:399
+msgid " like this:"
+msgstr " comme ceci :"
+
+#: guidata\dataset\autodoc.py:407
 msgid "You can also first instanciate a default "
-msgstr "Vous pouvez également instancier un"
+msgstr "Vous pouvez également instancier un "
 
-#: guidata\dataset\autodoc.py:367
+#: guidata\dataset\autodoc.py:409
 msgid " and then set the fields like this:"
 msgstr " par défaut et ensuite initialiser les champs comme ceci :"
 
-#: guidata\dataset\dataitems.py:160
+#: guidata\dataset\dataitems.py:158
 msgid "float"
 msgstr "flottant"
 
-#: guidata\dataset\dataitems.py:160
+#: guidata\dataset\dataitems.py:158
 msgid "integer"
 msgstr "entier"
 
-#: guidata\dataset\dataitems.py:166
+#: guidata\dataset\dataitems.py:164
 msgid " and "
 msgstr " et "
 
-#: guidata\dataset\dataitems.py:166
+#: guidata\dataset\dataitems.py:164
 msgid " between "
 msgstr " compris entre "
 
-#: guidata\dataset\dataitems.py:168
+#: guidata\dataset\dataitems.py:166
 msgid " higher than "
 msgstr " supérieur à "
 
-#: guidata\dataset\dataitems.py:170
+#: guidata\dataset\dataitems.py:168
 msgid " lower than "
 msgstr " inférieur à "
 
-#: guidata\dataset\dataitems.py:172
+#: guidata\dataset\dataitems.py:170
 msgid "non zero"
 msgstr "non nul"
 
-#: guidata\dataset\dataitems.py:174
+#: guidata\dataset\dataitems.py:172
 msgid "unit:"
 msgstr "unité :"
 
-#: guidata\dataset\dataitems.py:325
+#: guidata\dataset\dataitems.py:323
 msgid "even"
 msgstr "pair"
 
-#: guidata\dataset\dataitems.py:327
+#: guidata\dataset\dataitems.py:325
 msgid "odd"
 msgstr "impair"
 
-#: guidata\dataset\dataitems.py:383
+#: guidata\dataset\dataitems.py:381
 msgid "string"
 msgstr "chaîne"
 
-#: guidata\dataset\dataitems.py:386
+#: guidata\dataset\dataitems.py:384
 msgid "not empty"
 msgstr "non vide"
 
-#: guidata\dataset\dataitems.py:389
+#: guidata\dataset\dataitems.py:387
 msgid "regexp:"
 msgstr "expr. rég. :"
 
-#: guidata\dataset\dataitems.py:596
+#: guidata\dataset\dataitems.py:594
 msgid "all file types"
 msgstr "tout type de fichier"
 
-#: guidata\dataset\dataitems.py:598
+#: guidata\dataset\dataitems.py:596
 msgid "supported file types:"
 msgstr "types de fichiers pris en charge : "
 

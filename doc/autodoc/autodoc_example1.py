@@ -24,7 +24,7 @@ class ProcessingParameters1(gds.DataSet):
     """Example of a complete dataset with all possible items. Used as an autodoc
     example."""
 
-    dir = gds.DirectoryItem("Directory", TEMPDIR)
+    dir = gds.DirectoryItem("<strong>Directory</strong>", TEMPDIR)
     a = gds.FloatItem("Parameter #1", default=2.3)
     b = gds.IntItem("Parameter #2", min=0, max=10, default=5)
     c = gds.StringItem("Parameter #3", default="default value")

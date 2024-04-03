@@ -2,12 +2,13 @@
 sphinx.ext.autodoc extension for :class:`guidata.dataset.DataSet` and related classes.
 """
 
+import html
 import logging
+import re
 from inspect import Parameter, Signature
-from typing import Any, Hashable, Type, Union
+from typing import Any, Hashable, Iterator, Type
 
 from docutils import nodes
-from docutils.core import publish_parts
 from sphinx.application import Sphinx
 from sphinx.ext.autodoc import ClassDocumenter, MethodDocumenter, bool_option
 from sphinx.util.docstrings import prepare_docstring
@@ -18,8 +19,6 @@ from sphinx.util.typing import stringify_annotation
 import guidata.dataset as gds
 from guidata.config import _
 
-# _ = lambda x: x
-
 DATAITEMS_NONE_DEFAULT: tuple[type[gds.DataItem], ...] = (
     gds.DictItem,
     gds.FloatArrayItem,
@@ -27,6 +26,28 @@ DATAITEMS_NONE_DEFAULT: tuple[type[gds.DataItem], ...] = (
     gds.FileSaveItem,
     gds.FilesOpenItem,
 )
+
+IGNORED_AUTO_HELP: tuple[str, ...] = (_("integer"), _("float"), _("string"))
+
+
+def replace_with_dict(match):
+    # Get the full match and the group inside the tags
+    tag = match.group(1)
+    value = match.group(2)
+    new_string = REPLACE_HTML_TAGS.get(tag, "{}").format(value)
+
+    return new_string
+
+
+# Create a combined regex pattern of all keys in the dictionary
+REPLACE_HTML_TAGS = {
+    "strong": "\\ :strong:`{}`",
+    "b": "\\ :strong:`{}`",
+    "em": "\\ :emphasis:`{}`",
+    "sub": "\\ :subscript:`{}`",
+    "sup": "\\ :superscript:`{}`",
+}
+HTML_TAG_PATTERN = re.compile("<(.+?)>(.*?)</\\1>")
 
 
 def datasetnote_option(arg: str) -> tuple[bool, int | None]:
@@ -88,6 +109,30 @@ def document_multiple_choice_item(item: gds.MultipleChoiceItem) -> str:
     return doc
 
 
+def get_auto_help(item: gds.DataItem, dataset: gds.DataSet) -> str:
+    """Get the auto-generated help for a DataItem.
+
+    Args:
+        item: DataItem to get the help from.
+
+    Returns:
+        Auto-generated help for the DataItem.
+    """
+    auto_help = item.get_auto_help(dataset).rstrip(" .")
+    if not auto_help or auto_help in IGNORED_AUTO_HELP:
+        return ""
+    return auto_help.capitalize() + "\\."
+
+
+def get_choice_help(item: gds.DataItem, dataset: gds.DataSet) -> str:
+    choice_help = ""
+    if isinstance(item, gds.MultipleChoiceItem):
+        choice_help = document_multiple_choice_item(item)
+    elif isinstance(item, gds.ChoiceItem):
+        choice_help = document_choice_item(item)
+    return choice_help
+
+
 def escape_docline(line: str) -> str:
     """Escape a line of documentation.
 
@@ -97,7 +142,7 @@ def escape_docline(line: str) -> str:
     Returns:
         Escaped line of documentation.
     """
-    return line.replace("*", "\\*").replace("\n", "").replace("\r", "")
+    return line.replace("*", "\\*").replace("\n", " ")
 
 
 def is_label_redundant(label: str, item_name: str) -> bool:
@@ -111,7 +156,7 @@ def is_label_redundant(label: str, item_name: str) -> bool:
         True if the label is redundant with the item name, False otherwise.
     """
     item_name = item_name.lower()
-    return any(word not in item_name for word in label.split())
+    return not any(word.strip() not in item_name for word in label.lower().split())
 
 
 class ItemDoc:
@@ -142,16 +187,22 @@ class ItemDoc:
             label = ""
         if len(label) > 0 and not label.endswith("."):
             label += "\\."
+
+        label = re.sub(HTML_TAG_PATTERN, replace_with_dict, label)
         self.label = label
 
-        help_ = item.get_help(dataset).capitalize()
+        help_ = item._help or ""
+        help_ = help_.capitalize().rstrip(".")
 
-        if isinstance(item, gds.MultipleChoiceItem):
-            help_ += document_multiple_choice_item(item)
-        elif isinstance(item, gds.ChoiceItem):
-            help_ += document_choice_item(item)
+        auto_help = get_auto_help(item, dataset)
+        if auto_help:
+            help_ += " " + auto_help
 
-        elif len(help_) > 0 and not help_.endswith("."):
+        choice_help = get_choice_help(item, dataset)
+        if choice_help:
+            help_ += " " + choice_help
+
+        if len(help_) > 0 and not help_.endswith("."):
             help_ += "\\."
         self.help_ = help_
 
@@ -243,6 +294,8 @@ class CreateMethodDocumenter(MethodDocumenter):
             "\n".join(docstring_lines),
             tabsize=self.directive.state.document.settings.tab_width,
         )
+
+        # return [[html.unescape(s) for s in docstring]]
         return [docstring]
 
 
@@ -394,9 +447,9 @@ class DatasetNoteDirective(SphinxDirective):
         paragraph1 = nodes.paragraph()
         paragraph1 += nodes.Text(_("To instanciate a new "))
         paragraph1 += nodes.literal(text=cls.__name__)
-        paragraph1 += nodes.Text(
-            _(" , you can use the create() classmethod like this:")
-        )
+        paragraph1 += nodes.Text(_(" , you can use the classmethod"))
+        paragraph1 += nodes.literal(text=f"{cls.__name__}.create()")
+        paragraph1 += nodes.Text(_(" like this:"))
         paragraph1 += nodes.literal_block(
             text=f"{cls.__name__}.create({formated_args})", language="python"
         )
