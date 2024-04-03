@@ -48,7 +48,12 @@ class ProcessingParameters1(gds.DataSet):
     color = gds.ColorItem("Color", default="red")
     choice = gds.ChoiceItem(
         "Single choice 1",
-        [("16", "first choice"), ("32", "second choice"), ("64", "third choice")],
+        [
+            ("16", "first choice"),
+            ("32", "second choice"),
+            ("64", "third choice"),
+            (128, "fourth choice"),
+        ],
     )
     mchoice2 = gds.ImageChoiceItem(
         "Single choice 2",
