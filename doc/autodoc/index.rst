@@ -15,5 +15,5 @@ Generated documentation
 .. autodataset:: autodoc_example1.ProcessingParameters2
     :showsig:
     :showattr:
-    :shownote: 15
+    :shownote:
     :members:
