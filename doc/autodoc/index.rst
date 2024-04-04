@@ -8,7 +8,7 @@ Guidata provides a Sphinx extension to automatically document guidata datasets.
 This extension is based on the Sphinx autodoc extension.
 Three directive are provided:
 
-    * :code:`.. autodataset_create:: [module.dataset.create]` to document a dataset classmethod :code:`create()` using the dataset items.
+    * :code:`.. autodataset_create:: [module.dataset].create` to document a dataset classmethod :code:`create()` using the dataset items.
     * :code:`.. datasetnote:: [module.dataset] [n]` to provide a note on how to instanciate a dataset. Optional parameter :code:`n` is the number of items to show.
     * :code:`.. autodataset_create:: [module.dataset]` used to document a dataset class. It is based on the :code:`.. autoclass::` directive and therefore can have the same options. By default, it will document a dataset without it's constructor signature nor its attributes but will document the :code:`create()` method using the :code:`autodataset_create` directive. Several additional options are available to more finely control the documentation (see examples below).
 
