@@ -1,6 +1,9 @@
 Sphinx autodoc extension
 ========================
 
+Extension
+---------
+
 Guidata provides a Sphinx extension to automatically document guidata datasets.
 This extension is based on the Sphinx autodoc extension.
 Three directive are provided:
