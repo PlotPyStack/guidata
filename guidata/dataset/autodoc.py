@@ -9,11 +9,14 @@ from inspect import Parameter, Signature
 from typing import Any, Hashable, Iterator, Type
 
 from docutils import nodes
+from docutils.parsers.rst.states import RSTState, RSTStateMachine
+from docutils.statemachine import StringList, ViewList
 from sphinx.application import Sphinx
 from sphinx.ext.autodoc import ClassDocumenter, MethodDocumenter, bool_option
 from sphinx.util.docstrings import prepare_docstring
 from sphinx.util.docutils import SphinxDirective
 from sphinx.util.inspect import getdoc, object_description, stringify_signature
+from sphinx.util.nodes import nested_parse_with_titles
 from sphinx.util.typing import stringify_annotation
 
 import guidata.dataset as gds
@@ -30,27 +33,53 @@ DATAITEMS_NONE_DEFAULT: tuple[type[gds.DataItem], ...] = (
 IGNORED_AUTO_HELP: tuple[str, ...] = (_("integer"), _("float"), _("string"))
 
 
-def replace_with_dict(match):
-    # Get the full match and the group inside the tags
-    tag = match.group(1)
-    value = match.group(2)
-    new_string = REPLACE_HTML_TAGS.get(tag, "{}").format(value)
-
-    return new_string
-
-
 # Create a combined regex pattern of all keys in the dictionary
-REPLACE_HTML_TAGS = {
+REPLACABLE_HTML_TAGS = {
     "strong": "\\ :strong:`{}`",
     "b": "\\ :strong:`{}`",
     "em": "\\ :emphasis:`{}`",
     "sub": "\\ :subscript:`{}`",
     "sup": "\\ :superscript:`{}`",
+    "span": "{}",
 }
-HTML_TAG_PATTERN = re.compile("<(.+?)>(.*?)</\\1>")
+
+# Case of self-closing tags can be handled by adding a group "(<.+/>)" to the regex
+# and handling the cases in the replace_with_dict function or by adding a new dictionary
+# entry for specific tags if needed. This could be useful for tags like "<br/>" or
+# "<hr/>" or "<a .../>". The current does not handle tag attributes.
+# The regex pattern can only match specified tag but could be made generic using the
+# following pattern: "<(.+?)>(.*?)</\\1>" and then using rhe dict.get() method in
+# replace_with_dict function with an empty pattern.
+_tags = "|".join(REPLACABLE_HTML_TAGS.keys())
+HTML_TAG_PATTERN = re.compile(f"<({_tags})>(.*?)</\\1>")
+
+
+def replace_with_dict(match: re.Match):
+    """Replace HTML tags with reST directives.
+
+    Args:
+        match: Match object.
+
+    Returns:
+        New string with reST directives.
+    """
+    tag = match.group(1)
+    value = match.group(2)
+    new_string = REPLACABLE_HTML_TAGS[tag].format(value)
+
+    return new_string
 
 
 def datasetnote_option(arg: str) -> tuple[bool, int | None]:
+    """Handles the datasetnote option for the datasetnote directive.
+
+    Args:
+        arg: Argument to parse (set after the directive).
+
+    Returns:
+        Returns True to signal the option exists and the number of example note_lines to
+         display if set else None.
+    """
     if arg is None:
         return True, None
     try:
@@ -192,7 +221,9 @@ class ItemDoc:
         self.label = label
 
         help_ = item._help or ""
-        help_ = help_.capitalize().rstrip(".")
+        help_ = help_.capitalize()
+        if len(help_) > 0 and not help_.endswith("."):
+            help_ += "\\."
 
         auto_help = get_auto_help(item, dataset)
         if auto_help:
@@ -202,8 +233,6 @@ class ItemDoc:
         if choice_help:
             help_ += " " + choice_help
 
-        if len(help_) > 0 and not help_.endswith("."):
-            help_ += "\\."
         self.help_ = help_
 
         self.name = item.get_name()
@@ -270,12 +299,12 @@ class CreateMethodDocumenter(MethodDocumenter):
         method depending on the DataItem of the DatSet.
 
         Returns:
-            list of docstring lines.
+            list of docstring note_lines.
         """
         self.object.__annotations__["return"] = self.parent
         docstring_lines = [
             _(
-                "Returns a new instance of %s with the fields set to "
+                "Returns a new instance of :class:`%s` with the fields set to "
                 "the given values."
             )
             % self.parent.__name__,
@@ -288,7 +317,7 @@ class CreateMethodDocumenter(MethodDocumenter):
             docstring_lines.append(ItemDoc(dataset, item).to_function_parameter())
 
         docstring_lines.extend(
-            ("", "Returns:", _("\tNew instance of %s.") % self.parent.__name__)
+            ("", "Returns:", _("\tNew instance of :class:`%s`.") % self.parent.__name__)
         )
         docstring = prepare_docstring(
             "\n".join(docstring_lines),
@@ -344,7 +373,7 @@ class DataSetDocumenter(ClassDocumenter):
         (DataItems) are documented in the docstring if the 'showattr' option is used.
 
         Returns:
-            Docstring lines.
+            Docstring note_lines.
         """
         first_line = getdoc(
             self.object,
@@ -403,9 +432,61 @@ class DatasetNoteDirective(SphinxDirective):
     class."""
 
     required_arguments = 1  # the class name is a required argument
-    optional_arguments = 1  # the number of example lines to display is optional
+    optional_arguments = 1  # the number of example note_lines to display is optional
     final_argument_whitespace = True
     has_content = True
+
+    def __init__(
+        self,
+        name: str,
+        arguments: list[str],
+        options: dict[str, Any],
+        content: StringList,
+        lineno: int,
+        content_offset: int,
+        block_text: str,
+        state: RSTState,
+        state_machine: RSTStateMachine,
+    ) -> None:
+        super().__init__(
+            name,
+            arguments,
+            options,
+            content,
+            lineno,
+            content_offset,
+            block_text,
+            state,
+            state_machine,
+        )
+        self.current_line_offset = self.content_offset
+
+    def add_lines(self, stringlist: StringList, *lines: str) -> None:
+        source = self.get_source_info()[0]
+        new_offset = self.current_line_offset + 1
+        i = new_offset
+        for i, line in enumerate(lines, start=new_offset):
+            stringlist.append(line, source=source, offset=i)
+        new_offset = i
+        self.current_line_offset += new_offset
+
+    def add_code_lines(self, stringlist: StringList, *lines: str) -> None:
+        source = self.get_source_info()[0]
+        new_offset = self.current_line_offset + 1
+        tab = " " * self.state.document.settings.tab_width
+
+        stringlist.append("", source=source, offset=new_offset)
+        stringlist.append(
+            ".. code-block:: python", source=source, offset=new_offset + 2
+        )
+        stringlist.append("", source=source, offset=new_offset + 3)
+        new_offset += 4
+        i = new_offset
+        for i, line in enumerate(lines, start=new_offset):
+            stringlist.append(tab + line, source=source, offset=i)
+        new_offset = i + 1
+        stringlist.append("", source=source, offset=new_offset)
+        self.current_line_offset += new_offset
 
     def run(self):
         """Run the directive.
@@ -443,23 +524,37 @@ class DatasetNoteDirective(SphinxDirective):
             f"{item.get_name()}={object_description(item.get_value(instance))}"
             for item in instance.get_items()
         )
-        note_node = nodes.note()
-        paragraph1 = nodes.paragraph()
-        paragraph1 += nodes.Text(_("To instanciate a new "))
-        paragraph1 += nodes.literal(text=cls.__name__)
-        paragraph1 += nodes.Text(_(" , you can use the classmethod"))
-        paragraph1 += nodes.literal(text=f"{cls.__name__}.create()")
-        paragraph1 += nodes.Text(_(" like this:"))
-        paragraph1 += nodes.literal_block(
-            text=f"{cls.__name__}.create({formated_args})", language="python"
+
+        node = nodes.note()
+
+        # Create a new ViewList instance and add your rst text to it
+        source, lineno = self.get_source_info()
+        self.current_line_offset = self.content_offset
+
+        note_lines = StringList()
+        self.add_lines(
+            note_lines,
+            _(
+                "To instanciate a new :class:`%s`, you can use the classmethod "
+                ":class:`%s.create()` like this:"
+            )
+            % (cls.__name__, cls.__name__),
+            "",
         )
 
-        note_node += paragraph1
+        self.add_code_lines(
+            note_lines,
+            f"{cls.__name__}.create({formated_args})",
+        )
 
-        paragraph2 = nodes.paragraph()
-        paragraph2 += nodes.Text(_("You can also first instanciate a default "))
-        paragraph2 += nodes.literal(text=cls.__name__)
-        paragraph2 += nodes.Text(_(" and then set the fields like this:"))
+        self.add_lines(
+            note_lines,
+            _(
+                "You can also first instanciate a default :class:`%s` "
+                "and then set the fields like this:"
+            )
+            % cls.__name__,
+        )
 
         example_lines = min(len(items), example_lines) if example_lines else len(items)
         code_lines = [
@@ -470,18 +565,72 @@ class DatasetNoteDirective(SphinxDirective):
                 for i in range(example_lines)
             ),
         ]
+
         if len(items) > example_lines:
             code_lines.append("...")
+        self.add_code_lines(note_lines, *code_lines)
 
-        paragraph2 += nodes.literal_block(
-            text="\n".join(code_lines),
-            language="python",
-        )
-        note_node += paragraph2
+        # Parse the rst text
+        nested_parse_with_titles(self.state, note_lines, node)
 
-        # Create a note node
+        return [node]
 
-        return [note_node]
+        # note_node = nodes.note()
+        # paragraph1 = nodes.paragraph()
+        # paragraph1 += nodes.Text(_("To instanciate a new "))
+        # paragraph1 += nodes.literal(text=cls.__name__)
+        # paragraph1 += nodes.Text(_(", you can use the classmethod"))
+        # paragraph1 += nodes.literal(text=cls.__name__)
+        # paragraph1 += nodes.Text(_(", you can use the classmethod "))
+        # paragraph1 += nodes.literal(text=f"{cls.__name__}.create()")
+        # paragraph1 += nodes.Text(_(" like this:"))
+        # paragraph1 += nodes.literal_block(
+        #     text=f"{cls.__name__}.create({formated_args})", language="python"
+        # )
+
+        # note_node += paragraph1
+
+        # paragraph2 = nodes.paragraph()
+        # paragraph2 += nodes.Text(_("You can also first instanciate a default "))
+        # paragraph2 += nodes.literal(text=cls.__name__)
+        # paragraph2 += nodes.Text(_(" and then set the fields like this:"))
+
+        # example_lines = min(len(items), example_lines) if example_lines else len(items)
+        # code_lines = [
+        #     f"dataset = {cls.__name__}()",
+        #     *(
+        #         f"dataset.{items[i].get_name()} = "
+        #         f"{object_description(items[i].get_value(instance))}"
+        #         for i in range(example_lines)
+        #     ),
+        # ]
+        # if len(items) > example_lines:
+        #     code_lines.append("...")
+
+        # paragraph2 += nodes.literal_block(
+        #     text="\n".join(code_lines),
+        #     language="python",
+        # )
+        # note_node += paragraph2
+
+        # return [note_node]
+        # offset = self.content_offset
+        # rst = StringList()
+        # # Add the content one line at a time.
+        # # Second argument is the filename to report in any warnings
+        # # or errors, third argument is the line number.
+        # rst.append("**adad**", "fakefile.rst", 10)
+        # rst.append("", "fakefile.rst", 11)
+        # rst.append(".. code-block:: python", "fakefile.rst", 12)
+        # rst.append("", "fakefile.rst", 13)
+        # rst.append("   print('Hello, World!')", "fakefile.rst", 14)
+        # # Create a node.
+        # node = nodes.section()
+        # node.document = self.state.document
+        # Parse the rst.
+        # nested_parse_with_titles(self.state, rst, node)
+        # And return the result.
+        # return [node]
 
 
 def setup(app: Sphinx) -> None:

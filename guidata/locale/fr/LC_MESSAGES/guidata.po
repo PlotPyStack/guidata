@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2024-04-03 13:52+0200\n"
+"POT-Creation-Date: 2024-04-04 14:59+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,59 +16,61 @@ msgstr ""
 "Content-Transfer-Encoding: utf-8\n"
 "Generated-By: pygettext.py 1.5\n"
 
-#: guidata\dataset\autodoc.py:72
-msgid "Single choice from: %s."
-msgstr "Sélection unique parmi : %s."
-
-#: guidata\dataset\autodoc.py:87
-msgid "Multiple choice from: %s."
-msgstr "Sélection multiple parmi : %s."
-
-#: guidata\dataset\autodoc.py:170 guidata\dataset\autodoc.py:181
-msgid "Default: %s."
-msgstr "Par défaut : %s."
-
-#: guidata\dataset\autodoc.py:226
-msgid "Returns a new instance of %s with the fields set to the given values."
-msgstr ""
-"Renvoie une nouvelle instance de %s avec les champs initialisés aux valeurs "
-"données."
-
-#: guidata\dataset\autodoc.py:240
-msgid "\tNew instance of %s."
-msgstr "\tNouvelle instance de %s."
-
-#: guidata\dataset\autodoc.py:380
-msgid "Failed to import class %s"
-msgstr "Impossible d'importer la classe %s"
-
-#: guidata\dataset\autodoc.py:395
-msgid "To instanciate a new "
-msgstr "Pour instancier un nouvel "
-
-#: guidata\dataset\autodoc.py:397
-msgid " , you can use the classmethod"
-msgstr " , vous pouvez utiliser la méthode de classe "
-
-#: guidata\dataset\autodoc.py:399
-msgid " like this:"
-msgstr " comme ceci :"
-
-#: guidata\dataset\autodoc.py:407
-msgid "You can also first instanciate a default "
-msgstr "Vous pouvez également instancier un "
-
-#: guidata\dataset\autodoc.py:409
-msgid " and then set the fields like this:"
-msgstr " par défaut et ensuite initialiser les champs comme ceci :"
-
-#: guidata\dataset\dataitems.py:158
+#: guidata\dataset\autodoc.py:33 guidata\dataset\dataitems.py:158
 msgid "float"
 msgstr "flottant"
 
-#: guidata\dataset\dataitems.py:158
+#: guidata\dataset\autodoc.py:33 guidata\dataset\dataitems.py:158
 msgid "integer"
 msgstr "entier"
+
+#: guidata\dataset\autodoc.py:33 guidata\dataset\dataitems.py:381
+msgid "string"
+msgstr "chaîne"
+
+#: guidata\dataset\autodoc.py:122
+msgid "Single choice from: %s."
+msgstr "Sélection unique parmi : %s."
+
+#: guidata\dataset\autodoc.py:137
+msgid "Multiple choice from: %s."
+msgstr "Sélection multiple parmi : %s."
+
+#: guidata\dataset\autodoc.py:250 guidata\dataset\autodoc.py:261
+msgid "Default: %s."
+msgstr "Par défaut : %s."
+
+#: guidata\dataset\autodoc.py:306
+msgid ""
+"Returns a new instance of :class:`%s` with the fields set to the given "
+"values."
+msgstr ""
+"Renvoie une nouvelle instance de :class:`%s` avec les champs initialisés aux valeurs "
+"données."
+
+#: guidata\dataset\autodoc.py:320
+msgid "\tNew instance of :class:`%s`."
+msgstr "\tNouvelle instance de :class:`%s`."
+
+#: guidata\dataset\autodoc.py:514
+msgid "Failed to import class %s"
+msgstr "Impossible d'importer la classe %s"
+
+#: guidata\dataset\autodoc.py:537
+msgid ""
+"To instanciate a new :class:`%s`, you can use the classmethod :class:`%s."
+"create()` like this:"
+msgstr ""
+"Pour instancier un nouveau :class:`%s`, vous pouvez utiliser la méthode de "
+"classe :class:`%s.create()` comme ceci :"
+
+#: guidata\dataset\autodoc.py:552
+msgid ""
+"You can also first instanciate a default :class:`%s` and then set the fields "
+"like this:"
+msgstr ""
+"Vous pouvez également instancier un :class:`%s` par défaut puis initialiser "
+"les champs comme ceci :"
 
 #: guidata\dataset\dataitems.py:164
 msgid " and "
@@ -101,10 +103,6 @@ msgstr "pair"
 #: guidata\dataset\dataitems.py:325
 msgid "odd"
 msgstr "impair"
-
-#: guidata\dataset\dataitems.py:381
-msgid "string"
-msgstr "chaîne"
 
 #: guidata\dataset\dataitems.py:384
 msgid "not empty"
@@ -986,6 +984,18 @@ msgstr "Instance :"
 #: guidata\widgets\texteditor.py:90
 msgid "Text editor"
 msgstr "Éditeur de texte"
+
+#~ msgid "To instanciate a new "
+#~ msgstr "Pour instancier un nouvel "
+
+#~ msgid ", you can use the classmethod "
+#~ msgstr ", vous pouvez utiliser la méthode de classe "
+
+#~ msgid " like this:"
+#~ msgstr " comme ceci :"
+
+#~ msgid " and then set the fields like this:"
+#~ msgstr " par défaut et ensuite initialiser les champs comme ceci :"
 
 #~ msgid "GUI-based editor:"
 #~ msgstr "Éditeur graphique"
