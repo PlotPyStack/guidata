@@ -69,7 +69,7 @@ msgid ""
 "You can also first instanciate a default :py:class:`%s` and then set the fields "
 "like this:"
 msgstr ""
-"Vous pouvez également instancier un :py:class:`%s` par défaut puis initialiser "
+"Vous pouvez également instancier un jeu de données :py:class:`%s` par défaut puis initialiser "
 "les champs comme ceci :"
 
 #: guidata\dataset\dataitems.py:164
