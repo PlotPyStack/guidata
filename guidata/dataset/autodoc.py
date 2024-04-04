@@ -151,10 +151,10 @@ def get_auto_help(item: gds.DataItem, dataset: gds.DataSet) -> str:
     auto_help = item.get_auto_help(dataset).rstrip(" .")
     if not auto_help or auto_help in IGNORED_AUTO_HELP:
         return ""
-    return auto_help.capitalize() + "\\."
+    return capitalize_sentences(auto_help) + "\\."
 
 
-def get_choice_help(item: gds.DataItem, dataset: gds.DataSet) -> str:
+def get_choice_help(item: gds.DataItem) -> str:
     choice_help = ""
     if isinstance(item, gds.MultipleChoiceItem):
         choice_help = document_multiple_choice_item(item)
@@ -187,6 +187,21 @@ def is_label_redundant(label: str, item_name: str) -> bool:
     """
     item_name = item_name.lower()
     return not any(word.strip() not in item_name for word in label.lower().split())
+
+
+def capitalize_sentences(text: str) -> str:
+    """Capitalize each sentence in a text.
+
+    Args:
+        text: Text to capitalize.
+
+    Returns:
+        Capitalized text.
+    """
+    sentences = re.split("(?<=[.!?]) +", text)
+    capitalized_sentences = [sentence.capitalize() for sentence in sentences]
+
+    return " ".join(capitalized_sentences)
 
 
 class ItemDoc:
@@ -222,7 +237,7 @@ class ItemDoc:
         self.label = label
 
         help_ = item._help or ""
-        help_ = help_.capitalize()
+        help_ = capitalize_sentences(help_)
         if len(help_) > 0 and not help_.endswith("."):
             help_ += "\\."
 
@@ -230,7 +245,7 @@ class ItemDoc:
         if auto_help:
             help_ += " " + auto_help
 
-        choice_help = get_choice_help(item, dataset)
+        choice_help = get_choice_help(item)
         if choice_help:
             help_ += " " + choice_help
 
