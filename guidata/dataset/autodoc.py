@@ -3,15 +3,15 @@ sphinx.ext.autodoc extension for :py:class:`guidata.dataset.DataSet` and related
 classes.
 """
 
+from __future__ import annotations
+
 import logging
 import re
 from inspect import Parameter, Signature
-from typing import Any, Hashable, Type
+from typing import TYPE_CHECKING, Any, Hashable, Type
 
 from docutils import nodes
-from docutils.parsers.rst.states import RSTState, RSTStateMachine
 from docutils.statemachine import StringList
-from sphinx.application import Sphinx
 from sphinx.ext.autodoc import ClassDocumenter, MethodDocumenter, bool_option
 from sphinx.util.docstrings import prepare_docstring
 from sphinx.util.docutils import SphinxDirective
@@ -21,6 +21,10 @@ from sphinx.util.typing import stringify_annotation
 
 import guidata.dataset as gds
 from guidata.config import _
+
+if TYPE_CHECKING:
+    from docutils.parsers.rst.states import RSTState, RSTStateMachine
+    from sphinx.application import Sphinx
 
 DATAITEMS_NONE_DEFAULT: tuple[type[gds.DataItem], ...] = (
     gds.DictItem,
