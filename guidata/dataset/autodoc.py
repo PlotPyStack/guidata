@@ -265,7 +265,7 @@ class ItemDoc:
 class CreateMethodDocumenter(MethodDocumenter):
     """Custom MethodDocumented specific to DataSet.create() method."""
 
-    objtype = "_dataset_create"
+    objtype = "dataset_create"
     directivetype = MethodDocumenter.objtype
     priority = 10 + MethodDocumenter.priority
     option_spec = dict(MethodDocumenter.option_spec)
@@ -536,7 +536,7 @@ class DatasetNoteDirective(SphinxDirective):
             note_lines,
             _(
                 "To instanciate a new :class:`%s`, you can use the classmethod "
-                ":class:`%s.create()` like this:"
+                ":py:meth:`%s.create()` like this:"
             )
             % (cls.__name__, cls.__name__),
             "",

@@ -20,7 +20,7 @@ FILE_CSV = tempfile.NamedTemporaryFile(suffix=".csv", dir=TEMPDIR)
 atexit.register(FILE_CSV.close)
 
 
-class ProcessingParameters1(gds.DataSet):
+class AutodocExampleParam1(gds.DataSet):
     """Example of a complete dataset with all possible items. Used as an autodoc
     example."""
 
@@ -94,5 +94,5 @@ class ProcessingParameters1(gds.DataSet):
         return c + str(a + b)
 
 
-class ProcessingParameters2(ProcessingParameters1):
+class AutodocExampleParam2(AutodocExampleParam1):
     pass
