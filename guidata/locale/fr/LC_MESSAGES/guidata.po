@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2024-04-04 14:59+0200\n"
+"POT-Creation-Date: 2024-04-04 16:33+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -42,15 +42,15 @@ msgstr "Par défaut : %s."
 
 #: guidata\dataset\autodoc.py:306
 msgid ""
-"Returns a new instance of :class:`%s` with the fields set to the given "
+"Returns a new instance of :py:class:`%s` with the fields set to the given "
 "values."
 msgstr ""
-"Renvoie une nouvelle instance de :class:`%s` avec les champs initialisés aux valeurs "
-"données."
+"Renvoie une nouvelle instance de :py:class:`%s` avec les champs initialisés aux "
+"valeurs données."
 
 #: guidata\dataset\autodoc.py:320
-msgid "\tNew instance of :class:`%s`."
-msgstr "\tNouvelle instance de :class:`%s`."
+msgid "\tNew instance of :py:class:`%s`."
+msgstr "\tNouvelle instance de :py:class:`%s`."
 
 #: guidata\dataset\autodoc.py:514
 msgid "Failed to import class %s"
@@ -58,18 +58,18 @@ msgstr "Impossible d'importer la classe %s"
 
 #: guidata\dataset\autodoc.py:537
 msgid ""
-"To instanciate a new :class:`%s`, you can use the classmethod :class:`%s."
+"To instanciate a new :py:class:`%s` dataset, you can use the classmethod :py:meth:`%s."
 "create()` like this:"
 msgstr ""
-"Pour instancier un nouveau :class:`%s`, vous pouvez utiliser la méthode de "
-"classe :class:`%s.create()` comme ceci :"
+"Pour instancier un nouveau jeu de données :py:class:`%s`, vous pouvez utiliser la méthode de "
+"classe :py:class:`%s.create()` comme ceci :"
 
 #: guidata\dataset\autodoc.py:552
 msgid ""
-"You can also first instanciate a default :class:`%s` and then set the fields "
+"You can also first instanciate a default :py:class:`%s` and then set the fields "
 "like this:"
 msgstr ""
-"Vous pouvez également instancier un :class:`%s` par défaut puis initialiser "
+"Vous pouvez également instancier un :py:class:`%s` par défaut puis initialiser "
 "les champs comme ceci :"
 
 #: guidata\dataset\dataitems.py:164
