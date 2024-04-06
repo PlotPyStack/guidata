@@ -38,6 +38,9 @@ class Parameters(gds.DataSet):
     x1 = gds.FloatItem("x1").set_prop("display", callback=update_x1plusx2)
     x2 = gds.FloatItem("x2").set_prop("display", callback=update_x1plusx2)
     x1plusx2 = gds.FloatItem("x1+x2").set_prop("display", active=False)
+    boolean = gds.BoolItem("Boolean", default=True).set_prop(
+        "display", callback=cb_example
+    )
     color = gds.ColorItem("Color", default="red").set_prop(
         "display", callback=cb_example
     )
@@ -66,7 +69,7 @@ class Parameters(gds.DataSet):
         .set_pos(col=1, colspan=2)
         .set_prop("display", callback=cb_example)
     )
-    results = gds.TextItem("Results")
+    results = gds.TextItem("Results").set_prop("display", callback=cb_example)
 
 
 def test_callbacks():

@@ -462,6 +462,7 @@ class TextEditWidget(AbstractDataSetWidget):
         else:
             self.edit.setStyleSheet("")
         self.update(value)
+        _display_callback(self, value)
         self.notify_value_change()
 
     def update(self, value: Any) -> Any:
@@ -552,6 +553,7 @@ class CheckBoxWidget(AbstractDataSetWidget):
         layout.addWidget(self.group, row, widget_column, row_span, column_span)
 
     def state_changed(self, state: bool) -> None:
+        _display_callback(self, state)
         self.notify_value_change()
         if self.store:
             self.do_store(state)
