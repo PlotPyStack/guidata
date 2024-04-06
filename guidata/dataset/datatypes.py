@@ -66,7 +66,7 @@ import sys
 from abc import ABC, abstractmethod
 from collections.abc import Callable
 from copy import deepcopy
-from typing import TYPE_CHECKING, Any, TypeVar
+from typing import TYPE_CHECKING, Any, Generic, TypeVar, Union
 
 from guidata.io import INIReader, INIWriter
 from guidata.userconfig import UserConfig
@@ -606,9 +606,6 @@ class DataItem(ABC):
             return
         self.__set__(instance, value)
 
-    def additional_doc(self) -> str:
-        return ""
-
 
 class Obj:
     """An object that helps build default instances for
@@ -999,29 +996,7 @@ class DataSetMeta(type):
         items_list = list(items.values())
         items_list.sort(key=lambda x: x._order)
 
-        # doc_lines = ["\n", "Args:"]
-        # for item in items_list:
-        #     doc_lines.append(
-        #         f"\t{item._name} ({item.type.__name__}): {item.get_prop('display', 'label')} {item._help}. Default: {item._default}"
-        #     )
-        # if items_list:
-        #     dct["create"] = DataSet.create
-        #     dct["create"].__doc__ += "\n".join(doc_lines)
-        #     print(dct["create"].__doc__)
-        # print(cls, name, items_list)
         dct["_items"] = items_list
-        # print(items)
-        # print(dct)
-        # if (create_method := dct.get("create")) is not None:
-        #     create_docstring: list[str] = ["Test issou", "", "Args:"]
-        #     for name, ditem in items.items():
-        #         create_docstring.append(
-        #             f"    {name} ({ditem.__class__.__name__}): {ditem.get_help()}"
-        #         )
-        #     create_docstring.extend(("", "Returns:", "    DataSet instance"))
-        #     create_method.__doc__ = "\n".join(create_docstring)
-        # print(create_method.__name__)
-        # print(create_method.__doc__)
         return type.__new__(cls, name, bases, dct)
 
 

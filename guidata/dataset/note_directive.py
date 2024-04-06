@@ -51,7 +51,7 @@ class DatasetNoteDirective(SphinxDirective):
         paragraph1 = nodes.paragraph()
         paragraph1 += nodes.Text("To instanciate a new ")
         paragraph1 += nodes.literal(text=f"{cls.__name__}")
-        paragraph1 += nodes.Text(" , you can use the create classmethod like this:")
+        paragraph1 += nodes.Text(" , you can use the create() classmethod like this:")
         paragraph1 += nodes.literal_block(
             text=f"{cls.__name__}.create({formated_args})", language="python"
         )
