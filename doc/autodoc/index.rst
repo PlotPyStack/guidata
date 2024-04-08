@@ -23,7 +23,7 @@ Generated documentation
 Basic usage
 ~~~~~~~~~~~
 
-The basic usage of the :code:`.. autodataset::` directive is to document a class or a function. In most cases, using this raw directive is enough to document a dataset. However, another common case would be to show the user how to instanciate the documented dataset. This can be done using the :code:`:datasetnote:` option as shown below.
+The basic usage of the :code:`.. autodataset::` directive is to document a class or a function. In most cases, using this raw directive is enough to document a dataset. However, another common case would be to show the user how to instanciate the documented dataset. This can be done using the :code:`:shownote:` option as shown below.
 
 .. code-block:: rst
 
