@@ -1020,6 +1020,7 @@ class ChoiceWidget(AbstractDataSetWidget):
         """
         if self.is_radio:
             for button in self._buttons:
+                button.hide()
                 button.toggled.disconnect(self.index_changed)  # type:ignore
                 self.vbox.removeWidget(button)
                 button.deleteLater()

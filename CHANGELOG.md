@@ -9,6 +9,7 @@ In this release, test coverage is 76%.
 * Documentation generation: automatic requirement table generation feature was failing
   when using version conditions in the `pyproject.toml` file (e.g. `pyqt5 >= 5.15`).
 * [Issue #72](https://github.com/PlotPyStack/guidata/issues/72) - unit test leave files during the build usr/lib/python3/dist-packages/test.json
+* [Issue #73](https://github.com/PlotPyStack/guidata/issues/73) - `ChoiceItem` radio buttons are duplicated when using callbacks
 
 
 ## Version 3.4.1 ##
