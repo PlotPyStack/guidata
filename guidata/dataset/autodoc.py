@@ -41,6 +41,8 @@ IGNORED_AUTO_HELP: tuple[str, ...] = (_("integer"), _("float"), _("string"))
 REPLACABLE_HTML_TAGS = {
     "strong": "\\ :strong:`{}`",
     "b": "\\ :strong:`{}`",
+    "u": "\\ :underline:`{}`",
+    "i": "\\ :emphasis:`{}`",
     "em": "\\ :emphasis:`{}`",
     "sub": "\\ :subscript:`{}`",
     "sup": "\\ :superscript:`{}`",
@@ -49,17 +51,17 @@ REPLACABLE_HTML_TAGS = {
 }
 
 # Case of self-closing tags can be handled by adding a group "(<.+/>)" to the regex
-# and handling the cases in the replace_with_dict function or by adding a new dictionary
+# and handling the cases in the replace_html_tags function or by adding a new dictionary
 # entry for specific tags if needed. This could be useful for tags like "<br/>" or
 # "<hr/>" or "<a .../>". The current does not handle tag attributes.
 # The regex pattern can only match specified tag but could be made generic using the
 # following pattern: "<(.+?)>(.*?)</\\1>" and then using rhe dict.get() method in
-# replace_with_dict function with an empty pattern.
+# replace_html_tags function with an empty pattern.
 _tags = "|".join(REPLACABLE_HTML_TAGS.keys())
 HTML_TAG_PATTERN = re.compile(f"<({_tags})>(.*?)</\\1>")
 
 
-def replace_with_dict(match: re.Match):
+def replace_html_tags(match: re.Match):
     """Replace HTML tags with reST directives.
 
     Args:
@@ -159,6 +161,15 @@ def get_auto_help(item: gds.DataItem, dataset: gds.DataSet) -> str:
 
 
 def get_choice_help(item: gds.DataItem) -> str:
+    """Get the choice help for a DataItem if it is a ChoiceItem or MultipleChoiceItem.
+
+    Args:
+        item: DataItem to get the choice help from.
+
+    Returns:
+        Choice help for the DataItem. If the DataItem is not a ChoiceItem or
+        MultipleChoiceItem, an empty string is returned.
+    """
     choice_help = ""
     if isinstance(item, gds.MultipleChoiceItem):
         choice_help = document_multiple_choice_item(item)
@@ -237,7 +248,7 @@ class ItemDoc:
         if len(label) > 0 and not label.endswith("."):
             label += "\\."
 
-        label = re.sub(HTML_TAG_PATTERN, replace_with_dict, label)
+        label = re.sub(HTML_TAG_PATTERN, replace_html_tags, label)
         self.label = label
 
         help_ = item._help or ""
