@@ -4,6 +4,17 @@
 
 In this release, test coverage is 76%.
 
+💥 New features:
+
+* New Sphinx autodoc extension:
+  * Allows to document dataset classes and functions using Sphinx directives, thus generating a comprehensive documentation for datasets with labels, descriptions, default values, etc.
+  * The extension is available in the `guidata.dataset.autodoc` module
+  * Directives:
+    * `autodataset`: document a dataset class
+    * `autodataset_create`: document a dataset creation function
+    * `datasetnote`: add a note explaining how to use a dataset
+* `BoolItem`/`TextItem`: add support for callbacks when the item value changes
+
 🛠️ Bug fixes:
 
 * Documentation generation: automatic requirement table generation feature was failing
