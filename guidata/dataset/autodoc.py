@@ -595,7 +595,7 @@ class DatasetNoteDirective(SphinxDirective):
         code_lines = [
             f"dataset = {cls.__name__}()",
             *(
-                f"dataset.{items[i].get_name()} = "
+                f"param.{items[i].get_name()} = "
                 f"{object_description(items[i].get_value(instance))}"
                 for i in range(example_lines)
             ),
