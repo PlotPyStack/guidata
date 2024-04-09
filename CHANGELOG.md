@@ -1,6 +1,6 @@
 # Changelog #
 
-## Version 3.4.2 ##
+## Version 3.5.0 ##
 
 In this release, test coverage is 76%.
 
