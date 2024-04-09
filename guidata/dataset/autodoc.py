@@ -268,7 +268,7 @@ class ItemDoc:
 
         self.name = item.get_name()
 
-        self.default = object_description(item.get_value(dataset))
+        self.default = object_description(item.get_default())
 
     def to_function_parameter(self) -> str:
         """Convert the item to a parameter docstring (e.g. used for Dataset.create()).

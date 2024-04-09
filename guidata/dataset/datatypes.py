@@ -458,6 +458,14 @@ class DataItem(ABC):
         value = self.from_string(string_value)
         self.__set__(instance, value)
 
+    def get_default(self) -> Any:
+        """Return data item's default value
+
+        Returns:
+            Any: default value
+        """
+        return self._default
+
     def set_default(self, instance: DataSet) -> None:
         """Set data item's value to default
 
