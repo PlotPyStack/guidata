@@ -1,2 +1,5 @@
 graft doc
 include *.desktop
+include conftest.py
+include CHANGELOG.md
+include requirements.txt
