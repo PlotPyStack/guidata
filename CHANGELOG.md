@@ -2,7 +2,7 @@
 
 ## Version 3.5.0 ##
 
-In this release, test coverage is 76%.
+In this release, test coverage is 74%.
 
 💥 New features:
 
