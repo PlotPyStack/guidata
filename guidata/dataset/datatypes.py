@@ -60,13 +60,12 @@ Handling item properties
 
 from __future__ import annotations
 
-import pprint
 import re
 import sys
 from abc import ABC, abstractmethod
 from collections.abc import Callable
 from copy import deepcopy
-from typing import TYPE_CHECKING, Any, Generic, TypeVar, Union
+from typing import TYPE_CHECKING, Any, TypeVar
 
 from guidata.io import INIReader, INIWriter
 from guidata.userconfig import UserConfig
