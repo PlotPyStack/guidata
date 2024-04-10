@@ -8,7 +8,7 @@ from __future__ import annotations
 import logging
 import re
 from inspect import Parameter, Signature
-from typing import TYPE_CHECKING, Any, Hashable, Type
+from typing import TYPE_CHECKING, Any, Type
 
 from docutils import nodes
 from docutils.statemachine import StringList
@@ -25,14 +25,6 @@ from guidata.config import _
 if TYPE_CHECKING:
     from docutils.parsers.rst.states import RSTState, RSTStateMachine
     from sphinx.application import Sphinx
-
-DATAITEMS_NONE_DEFAULT: tuple[type[gds.DataItem], ...] = (
-    gds.DictItem,
-    gds.FloatArrayItem,
-    gds.DateItem,
-    gds.FileSaveItem,
-    gds.FilesOpenItem,
-)
 
 IGNORED_AUTO_HELP: tuple[str, ...] = (_("integer"), _("float"), _("string"))
 
@@ -93,26 +85,6 @@ def datasetnote_option(arg: str) -> tuple[bool, int | None]:
         return True, int(arg)
     except ValueError:
         return True, None
-
-
-def check_item_can_be_documented(dataset: gds.DataSet, item: gds.DataItem) -> None:
-    """Checks if an item can be documented depending on its value.
-
-    Args:
-        dataset: DataSet instance.
-        item: DataItem instance.
-
-    Raises:
-        ValueError: If the item has a default value that is not allowed (not hashable).
-    """
-    value = item.get_value(dataset)
-
-    if isinstance(item, DATAITEMS_NONE_DEFAULT) and not isinstance(value, Hashable):
-        raise ValueError(
-            f"Item '{item.get_name()}' from {dataset.__class__.__name__} has a "
-            f"default value of type {type(value)} = {value} which is not allowed. "
-            "Default value should be an immutable type."
-        )
 
 
 def document_choice_item(item: gds.ChoiceItem) -> str:
@@ -224,8 +196,7 @@ class ItemDoc:
 
     def __init__(self, dataset: gds.DataSet, item: gds.DataItem) -> None:
         self.item = item
-
-        check_item_can_be_documented(dataset, item)
+        self.item_type = stringify_annotation(type(item))
 
         type_ = item.type
         if not type_:
@@ -288,7 +259,7 @@ class ItemDoc:
             Formated docstring of the item.
         """
         return escape_docline(
-            f"\t{self.name} ({type(self.item)}): {self.label} {self.help_} "
+            f"\t{self.name} ({self.item_type}): {self.label} {self.help_} "
             + _("Default: %s.") % self.default
         )
 
@@ -305,10 +276,13 @@ class CreateMethodDocumenter(MethodDocumenter):
     @classmethod
     def can_document_member(cls, member, membername, isattr, parent):
         """Override the parent method to only document the DataSet.create() method."""
-        try:
-            return issubclass(parent, gds.DataSet) and membername == "create"
-        except TypeError:
-            return False
+        is_create_method = (
+            membername == "create"
+            and isinstance(member, classmethod)
+            and issubclass(member.__class__, gds.DataSet)
+        )
+
+        return is_create_method
 
     def format_signature(self, **kwargs: Any) -> str:
         """Override the parent method to dynamically generate a signature for the parent
@@ -374,7 +348,7 @@ class DataSetDocumenter(ClassDocumenter):
     option_spec = dict(ClassDocumenter.option_spec)
     option_spec.update(
         {
-            "showattr": bool_option,
+            "hideattr": bool_option,
             "hidecreate": bool_option,
             "showsig": bool_option,
             "shownote": datasetnote_option,
@@ -404,8 +378,8 @@ class DataSetDocumenter(ClassDocumenter):
 
     def get_doc(self) -> list[list[str]]:
         """Override the parent method to dynamically generate a docstring for the
-        DataSet class depending on the DataItem of the DatSet. DataSet attributes
-        (DataItems) are documented in the docstring if the 'showattr' option is used.
+        DataSet class depending on the DataItem of the DatSet. By default the dataset
+        attributes are documented but can be hidden using the 'hideattr' option.
 
         Returns:
             Docstring note_lines.
@@ -420,7 +394,7 @@ class DataSetDocumenter(ClassDocumenter):
         docstring_lines = [
             first_line or "",
         ]
-        if self.options.get("showattr", False):
+        if not self.options.get("hideattr", False):
             docstring_lines.extend(("", "Attributes:"))
             dataset = self.object()
             for item in dataset.get_items():
@@ -441,12 +415,20 @@ class DataSetDocumenter(ClassDocumenter):
         Args:
             more_content: Additional content to show/hide.
         """
-        super().add_content(more_content)
+        source = self.get_sourcename()
+        hide_create: bool = self.options.get("hidecreate", False)
+        create_method_overwritten = "create" in self.object.__dict__
 
-        if not self.options.get("hidecreate", False):
-            fullname = (
-                self.object.__module__ + "." + self.object.__qualname__ + ".create"
-            )
+        if hide_create or self.options.inherited_members and not hide_create:
+            if self.options.exclude_members is None:
+                self.options["exclude-members"] = set(("create",))
+            else:
+                self.options["exclude-members"].add("create")
+
+        super().add_content(more_content=more_content)
+
+        if not hide_create and not create_method_overwritten:
+            fullname = self.fullname + ".create"
             method_documenter = CreateMethodDocumenter(
                 self.directive, fullname, indent=self.content_indent
             )
@@ -458,7 +440,7 @@ class DataSetDocumenter(ClassDocumenter):
                 ".. datasetnote:: "
                 f"{self.object.__module__ + '.' + self.object.__qualname__} "
                 f"{example_lines or ''}",
-                self.get_sourcename(),
+                source,
             )
 
 
@@ -593,7 +575,7 @@ class DatasetNoteDirective(SphinxDirective):
 
         example_lines = min(len(items), example_lines) if example_lines else len(items)
         code_lines = [
-            f"dataset = {cls.__name__}()",
+            f"param = {cls.__name__}()",
             *(
                 f"param.{items[i].get_name()} = "
                 f"{object_description(items[i].get_value(instance))}"
