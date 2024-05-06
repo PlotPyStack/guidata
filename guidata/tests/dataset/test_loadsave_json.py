@@ -14,8 +14,8 @@ This script shows how to save in and then reload data from a JSON file.
 
 import os
 
-from guidata.dataset.io import JSONReader, JSONWriter
 from guidata.env import execenv
+from guidata.io import JSONReader, JSONWriter
 from guidata.qthelpers import qt_app_context
 from guidata.tests.dataset.test_all_items import Parameters
 

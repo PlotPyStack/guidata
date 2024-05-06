@@ -11,24 +11,17 @@ guidata.widgets.texteditor
 This package provides a text editor widget based on QtGui.QPlainTextEdit.
 
 .. autoclass:: TextEditor
+    :show-inheritance:
+    :members:
 
 """
 
 
-from qtpy.QtWidgets import (
-    QDialog,
-    QHBoxLayout,
-    QPushButton,
-    QTextEdit,
-    QVBoxLayout,
-)
-from qtpy.QtCore import (
-    Qt,
-    Slot,
-)
+from qtpy.QtCore import Qt, Slot
+from qtpy.QtWidgets import QDialog, QHBoxLayout, QPushButton, QTextEdit, QVBoxLayout
 
-from guidata.configtools import get_font, get_icon
 from guidata.config import CONF, _
+from guidata.configtools import get_font, get_icon
 from guidata.qthelpers import win32_fix_title_bar_background
 
 

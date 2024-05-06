@@ -1,1 +1,3 @@
-.. automodule:: guidata.dataset.io
+:tocdepth: 3
+
+.. automodule:: guidata.io

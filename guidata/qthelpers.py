@@ -61,7 +61,7 @@ import sys
 import time
 from contextlib import contextmanager
 from datetime import datetime
-from typing import TYPE_CHECKING, Iterable
+from typing import TYPE_CHECKING, Generator, Iterable
 
 from qtpy import QtCore as QC
 from qtpy import QtGui as QG
@@ -73,7 +73,7 @@ from guidata.configtools import get_icon, get_module_data_path
 from guidata.env import execenv
 from guidata.external import darkdetect
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from collections.abc import Callable
 
 
@@ -469,7 +469,10 @@ def close_dialog_and_quit(widget, screenshot: bool = False) -> None:
         wname = widget.objectName()
         if screenshot and wname and widget.isVisible():  # pragma: no cover
             grab_save_window(widget, wname.lower())
-        widget.done(QW.QDialog.Accepted)
+        if execenv.accept_dialogs:
+            widget.accept()
+        else:
+            widget.done(QW.QDialog.Accepted)
     except Exception:  # pylint: disable=broad-except
         pass
 
@@ -478,7 +481,7 @@ QAPP_INSTANCE = None
 
 
 @contextmanager
-def qt_app_context(exec_loop: bool = False) -> None:
+def qt_app_context(exec_loop: bool = False) -> Generator[QW.QApplication, None, None]:
     """Context manager handling Qt application creation and persistance
 
     Args:
@@ -580,7 +583,7 @@ def click_on_widget(widget: QW.QWidget) -> None:
 
 
 @contextmanager
-def block_signals(widget: QW.QWidget, enable: bool) -> None:
+def block_signals(widget: QW.QWidget, enable: bool) -> Generator[None, None, None]:
     """Eventually block/unblock widget Qt signals before/after doing some things
     (enable: True if feature is enabled)
 
@@ -650,7 +653,7 @@ def qt_wait(
 
 
 @contextmanager
-def save_restore_stds() -> None:
+def save_restore_stds() -> Generator[None, None, None]:
     """Save/restore standard I/O before/after doing some things
     (e.g. calling Qt open/save dialogs)"""
     saved_in, saved_out, saved_err = sys.stdin, sys.stdout, sys.stderr

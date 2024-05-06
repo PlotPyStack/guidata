@@ -39,6 +39,7 @@ Table of contents
    installation
    examples
    widgets
+   autodoc/index
    dev/index
    reference/index
    changelog

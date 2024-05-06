@@ -46,7 +46,7 @@ That's it, you can now run the tests using the following command:
 
 .. code-block:: bash
 
-    pytest guidata
+    pytest
 
 If you want to rely on Visual Studio Code for editing and take advantage of the
 project settings and tasks, you will need to set the following environment variable:
@@ -127,4 +127,4 @@ That's it, you can now run the tests using the following command:
 
 .. code-block:: bash
 
-    pytest guidata
+    pytest

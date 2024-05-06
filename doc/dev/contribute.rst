@@ -72,7 +72,7 @@ Before submitting a patch, please check the following points:
 
     .. code-block:: bash
 
-        pytest guidata
+        pytest
 
 Pull request
 ~~~~~~~~~~~~

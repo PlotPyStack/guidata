@@ -96,15 +96,17 @@ import datetime
 import os
 import re
 from collections.abc import Callable
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Generic, Iterable, Type, TypeVar, Union
+
+import numpy as np
 
 from guidata.config import _
 from guidata.dataset.datatypes import DataItem, DataSet, ItemProperty
 
-if TYPE_CHECKING:  # pragma: no cover
-    from numpy import ndarray
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
 
-    from guidata.dataset.io import (
+    from guidata.io import (
         HDF5Reader,
         HDF5Writer,
         INIReader,
@@ -112,6 +114,8 @@ if TYPE_CHECKING:  # pragma: no cover
         JSONReader,
         JSONWriter,
     )
+
+_T = TypeVar("_T")
 
 
 class NumericTypeItem(DataItem):
@@ -506,7 +510,17 @@ class DateTimeItem(DateItem):
         check: check value (default: True)
     """
 
-    pass
+    type = datetime.datetime
+
+    def __init__(
+        self,
+        label: str,
+        default: datetime.datetime | None = None,
+        format: str | None = None,
+        help: str | None = "",
+        check: bool | None = True,
+    ) -> None:
+        super().__init__(label, default, format, help, check)
 
 
 class ColorItem(StringItem):
@@ -740,7 +754,7 @@ class FirstChoice:
     pass
 
 
-class ChoiceItem(DataItem):
+class ChoiceItem(DataItem, Generic[_T]):
     """Construct a data item for a list of choices.
 
     Args:
@@ -757,11 +771,13 @@ class ChoiceItem(DataItem):
         size: size (optional) of the combo box or button widget (for radio buttons)
     """
 
+    type = Any
+
     def __init__(
         self,
         label: str,
-        choices: Any,
-        default: tuple[()] | type[FirstChoice] | int | None = FirstChoice,
+        choices: Iterable[_T] | Callable[[Any], Iterable[_T]],
+        default: tuple[()] | type[FirstChoice] | int | _T | None = FirstChoice,
         help: str = "",
         check: bool = True,
         radio: bool = False,
@@ -826,7 +842,7 @@ class MultipleChoiceItem(ChoiceItem):
         super().__init__(label, choices, default, help, check=check)
         self.set_prop("display", shape=(1, -1))
 
-    def horizontal(self, row_nb: int = 1) -> "MultipleChoiceItem":
+    def horizontal(self, row_nb: int = 1) -> MultipleChoiceItem:
         """
         Method to arange choice list horizontally on `n` rows
 
@@ -836,7 +852,7 @@ class MultipleChoiceItem(ChoiceItem):
         self.set_prop("display", shape=(row_nb, -1))
         return self
 
-    def vertical(self, col_nb: int = 1) -> "MultipleChoiceItem":
+    def vertical(self, col_nb: int = 1) -> MultipleChoiceItem:
         """
         Method to arange choice list vertically on `n` columns
 
@@ -921,10 +937,12 @@ class FloatArrayItem(DataItem):
         variable_size: if True, allows to add/remove row/columns on all axis
     """
 
+    type = np.ndarray
+
     def __init__(
         self,
         label: str,
-        default: ndarray | None = None,
+        default: NDArray | None = None,
         help: str = "",
         format: str = "%.3f",
         transpose: bool = False,
@@ -982,8 +1000,10 @@ class DictItem(DataItem):
         check: if False, value is not checked (optional, default=True)
     """
 
+    type: type[dict[str, Any]] = dict
+
     # pylint: disable=redefined-builtin,abstract-method
-    def __init__(self, label, default=None, help="", check=True):
+    def __init__(self, label, default: dict | None = None, help="", check=True):
         super().__init__(label, default=default, help=help, check=check)
         self.set_prop("display", callback=self.__dictedit)
         self.set_prop("display", icon="dictedit.png")

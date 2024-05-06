@@ -67,17 +67,17 @@ from collections.abc import Callable
 from copy import deepcopy
 from typing import TYPE_CHECKING, Any, TypeVar
 
-from guidata.dataset.io import INIReader, INIWriter
+from guidata.io import INIReader, INIWriter
 from guidata.userconfig import UserConfig
 
 DEBUG_DESERIALIZE = False
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from qtpy.QtCore import QSize
     from qtpy.QtWidgets import QDialog, QWidget
 
-    from guidata.dataset.io import HDF5Reader, HDF5Writer, JSONReader, JSONWriter
     from guidata.dataset.qtwidgets import DataSetEditDialog
+    from guidata.io import HDF5Reader, HDF5Writer, JSONReader, JSONWriter
 
 
 class NoDefault:
@@ -259,6 +259,7 @@ class DataItem(ABC):
         check (bool): check value (default: True)
     """
 
+    type = type
     count = 0
 
     def __init__(
@@ -455,6 +456,14 @@ class DataItem(ABC):
         """
         value = self.from_string(string_value)
         self.__set__(instance, value)
+
+    def get_default(self) -> Any:
+        """Return data item's default value
+
+        Returns:
+            Any: default value
+        """
+        return self._default
 
     def set_default(self, instance: DataSet) -> None:
         """Set data item's value to default
@@ -993,6 +1002,7 @@ class DataSetMeta(type):
                 items[attrname] = value
         items_list = list(items.values())
         items_list.sort(key=lambda x: x._order)
+
         dct["_items"] = items_list
         return type.__new__(cls, name, bases, dct)
 
@@ -1012,7 +1022,7 @@ class DataSet(metaclass=DataSetMeta):
         icon (str): icon filename as in image search paths
     """
 
-    _items: list[DataItem]
+    _items: list[DataItem] = []
     __metaclass__ = DataSetMeta  # keep it even with Python 3 (see DataSetMeta)
 
     def __init__(
@@ -1052,7 +1062,7 @@ class DataSet(metaclass=DataSetMeta):
         return list(filter(lambda s: not s.get_name().startswith("_"), result_items))
 
     @classmethod
-    def create(cls, **kwargs) -> DataSet:
+    def create(cls: type[AnyDataSet], **kwargs) -> AnyDataSet:
         """Create a new instance of the DataSet class
 
         Args:
@@ -1329,8 +1339,6 @@ class DataSet(metaclass=DataSetMeta):
             section (str): section name
             option (str): option name
         """
-        from guidata.dataset.io import INIReader
-
         reader = INIReader(conf, section, option)
         self.deserialize(reader)
 
@@ -1342,8 +1350,6 @@ class DataSet(metaclass=DataSetMeta):
             section (str): section name
             option (str): option name
         """
-        from guidata.dataset.io import INIWriter
-
         writer = INIWriter(conf, section, option)
         self.serialize(writer)
 
@@ -1377,8 +1383,7 @@ class ActivableDataSet(DataSet):
 
     @property
     @abstractmethod
-    def enable(self) -> DataItem:
-        ...
+    def enable(self) -> DataItem: ...
 
     def __init__(
         self,

@@ -68,7 +68,7 @@ from guidata.widgets.arrayeditor import ArrayEditor
 
 # XXX: consider providing an interface here...
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from guidata.dataset.qtwidgets import DataSetEditLayout
 
 
@@ -462,6 +462,7 @@ class TextEditWidget(AbstractDataSetWidget):
         else:
             self.edit.setStyleSheet("")
         self.update(value)
+        _display_callback(self, value)
         self.notify_value_change()
 
     def update(self, value: Any) -> Any:
@@ -552,6 +553,7 @@ class CheckBoxWidget(AbstractDataSetWidget):
         layout.addWidget(self.group, row, widget_column, row_span, column_span)
 
     def state_changed(self, state: bool) -> None:
+        _display_callback(self, state)
         self.notify_value_change()
         if self.store:
             self.do_store(state)
@@ -940,7 +942,7 @@ class FileWidget(HLayoutMixin, LineEditWidget):
         """Update the visual status of the widget and disbales/enables it if
         necessary"""
         super().set_state()
-        self.button.setEnabled(not self.is_readonly())
+        self.button.setEnabled(not self.is_readonly() and self.is_active())
 
 
 class DirectoryWidget(HLayoutMixin, LineEditWidget):
@@ -970,7 +972,7 @@ class DirectoryWidget(HLayoutMixin, LineEditWidget):
         """Update the visual status of the widget and disbales/enables it if
         necessary"""
         super().set_state()
-        self.button.setEnabled(not self.is_readonly())
+        self.button.setEnabled(not self.is_readonly() and self.is_active())
 
 
 class ChoiceWidget(AbstractDataSetWidget):
@@ -1018,6 +1020,7 @@ class ChoiceWidget(AbstractDataSetWidget):
         """
         if self.is_radio:
             for button in self._buttons:
+                button.hide()
                 button.toggled.disconnect(self.index_changed)  # type:ignore
                 self.vbox.removeWidget(button)
                 button.deleteLater()

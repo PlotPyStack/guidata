@@ -13,6 +13,8 @@
 This package provides a NumPy Array Editor Dialog based on Qt.
 
 .. autoclass:: ArrayEditor
+    :show-inheritance:
+    :members:
 
 """
 

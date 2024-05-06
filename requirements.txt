@@ -2,15 +2,12 @@ Coverage
 NumPy>=1.21
 PyQt5
 QtPy>=1.9
-black
 h5py>=3.0
-isort
 pandas
 pillow
 pylint
+ruff
 pytest
-pytest-cov
-pytest-qt
 pytest-xvfb
 python-docs-theme
 requests

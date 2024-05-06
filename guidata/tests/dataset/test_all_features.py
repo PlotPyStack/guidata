@@ -123,20 +123,21 @@ class Parameters(gds.DataSet):
 
 def test_all_features():
     """Test all guidata item/group features"""
-    with qt_app_context():
-        prm1 = Parameters()
-        prm1.floatarray[:, 0] = np.linspace(-5, 5, 50)
-        execenv.print(prm1)
-
-        if prm1.edit():
-            prm1.edit()
+    with execenv.context(accept_dialogs=True):
+        with qt_app_context():
+            prm1 = Parameters()
+            prm1.floatarray[:, 0] = np.linspace(-5, 5, 50)
             execenv.print(prm1)
-        prm1.view()
 
-        prm2 = Parameters.create(integer=10101010, string="Using create class method")
-        print(prm2)
+            if prm1.edit():
+                prm1.edit()
+                execenv.print(prm1)
+            prm1.view()
 
-        execenv.print("OK")
+            prm2 = Parameters.create(integer=10101010, string="Using `create`")
+            print(prm2)
+
+            execenv.print("OK")
 
 
 if __name__ == "__main__":

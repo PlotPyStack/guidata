@@ -6,8 +6,11 @@
 Qt widgets for data sets
 ------------------------
 
-Dialog boxes for DataSet editing and showing
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+This module provides a set of widgets to edit and show data sets, using ready-to-use
+dialog boxes, layouts and group boxes.
+
+Dialog boxes
+^^^^^^^^^^^^
 
 .. autoclass:: DataSetEditDialog
     :show-inheritance:
@@ -21,14 +24,25 @@ Dialog boxes for DataSet editing and showing
     :show-inheritance:
     :members:
 
-Layouts for DataSet editing and showing
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Layouts
+^^^^^^^
 
 .. autoclass:: DataSetEditLayout
     :show-inheritance:
     :members:
 
 .. autoclass:: DataSetShowLayout
+    :show-inheritance:
+    :members:
+
+Group boxes
+^^^^^^^^^^^
+
+.. autoclass:: DataSetShowGroupBox
+    :show-inheritance:
+    :members:
+
+.. autoclass:: DataSetEditGroupBox
     :show-inheritance:
     :members:
 """
@@ -795,6 +809,9 @@ class DataSetEditGroupBox(DataSetShowGroupBox[AnyDataSet]):
         show_button: if True, show apply button (default: True)
         wordwrap: if True, comment text is wordwrapped
         kwargs: keyword arguments passed to DataSet constructor
+
+    When the "Apply" button is clicked, the :py:attr:`SIG_APPLY_BUTTON_CLICKED` signal
+    is emitted.
     """
 
     #: Signal emitted when Apply button is clicked

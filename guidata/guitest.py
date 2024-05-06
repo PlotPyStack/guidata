@@ -44,8 +44,8 @@ from qtpy import QtCore as QC
 from qtpy import QtGui as QG
 from qtpy import QtWidgets as QW
 
-from guidata.config import CONF, _
-from guidata.configtools import get_font, get_icon
+from guidata.config import _
+from guidata.configtools import MONOSPACE, get_family, get_icon
 from guidata.qthelpers import get_std_icon, win32_fix_title_bar_background
 from guidata.widgets.codeeditor import CodeEditor
 
@@ -210,8 +210,7 @@ class TestPropertiesWidget(QW.QWidget):
             layout.addWidget(label)
         group_desc.setLayout(layout)
 
-        font = get_font(CONF, "codeeditor")
-        font.setPointSize(9)
+        font = QG.QFont(get_family(MONOSPACE), 9, QG.QFont.Normal)
         self.editor = CodeEditor(
             self, columns=85, rows=30, language="python", font=font
         )

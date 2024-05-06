@@ -4,11 +4,12 @@
 # (see guidata/LICENSE for details)
 
 """
-Data set serialization and deserialization
-------------------------------------------
+Data serialization and deserialization
+--------------------------------------
 
-The ``guidata.dataset.io`` package provides the core features for data set
-serialization and deserialization.
+The ``guidata.io`` package provides the core features for data
+(:py:class:`guidata.dataset.DataSet` or other objects) serialization and
+deserialization.
 
 Base classes for I/O handlers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

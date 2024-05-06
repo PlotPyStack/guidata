@@ -17,6 +17,8 @@ and the class DataFrameModel from the pandas project.
 Present in pandas.sandbox.qtpandas in v0.13.1.
 
 .. autoclass:: DataFrameEditor
+    :show-inheritance:
+    :members:
 
 Originally based on pandas/sandbox/qtpandas.py of the
 `pandas project <https://github.com/pandas-dev/pandas>`_.
@@ -28,18 +30,8 @@ import io
 
 import numpy as np
 from pandas import DataFrame, DatetimeIndex, Series
-from qtpy.QtCore import (
-    QAbstractTableModel,
-    QModelIndex,
-    Qt,
-    Signal,
-    Slot,
-)
-from qtpy.QtGui import (
-    QColor,
-    QCursor,
-    QKeySequence,
-)
+from qtpy.QtCore import QAbstractTableModel, QModelIndex, Qt, Signal, Slot
+from qtpy.QtGui import QColor, QCursor, QKeySequence
 from qtpy.QtWidgets import (
     QAbstractItemView,
     QApplication,

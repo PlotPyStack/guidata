@@ -102,6 +102,8 @@ def get_package_summary_from_pypi(package: str) -> str:
     Returns:
         str: Package summary or empty string if package not found on PyPI
     """
+    if package == "Python":
+        return "Python programming language"
     try:
         response = requests.get(f"https://pypi.org/pypi/{package}/json")
     except requests.exceptions.ConnectionError:
@@ -132,7 +134,7 @@ def reqlist_to_table(reqs: list[str]) -> str:
     modlist = []
     for req in reqs:
         try:
-            mod = re.split("(>=|<=|=|<|>)", req)[0]
+            mod = re.split(" ?(>=|<=|=|<|>)", req)[0]
             ver = req[len(mod) :]
         except ValueError:
             mod, ver = req, ""

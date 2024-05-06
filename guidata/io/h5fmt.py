@@ -18,18 +18,18 @@ from uuid import uuid1
 import h5py
 import numpy as np
 
-from guidata.dataset.io.base import BaseIOHandler, WriterMixin
+from guidata.io.base import BaseIOHandler, WriterMixin
 
 
 class TypeConverter:
     """Handles conversion between types for HDF5 serialization.
 
     Args:
-        to_type (Any): The target type for the HDF5 representation.
-        from_type (Any | None): The original type from the HDF5 representation.
-                                Defaults to `to_type` if not specified.
+        to_type: The target type for the HDF5 representation.
+        from_type: The original type from the HDF5 representation.
+         Defaults to `to_type` if not specified.
 
-    Note:
+    .. note::
         Instances of this class are used to ensure data consistency when
         serializing and deserializing data to and from HDF5 format.
     """
@@ -46,10 +46,10 @@ class TypeConverter:
         """Converts the value to the target type for HDF5 serialization.
 
         Args:
-            value (Any): The value to be converted.
+            value: The value to be converted.
 
         Returns:
-            Any: The converted value in the target type.
+            The converted value in the target type.
 
         Raises:
             Exception: If the conversion to the target type fails.
@@ -64,10 +64,10 @@ class TypeConverter:
         """Converts the value from the HDF5 representation to target type.
 
         Args:
-            value (Any): The HDF5 value to be converted.
+            value: The HDF5 value to be converted.
 
         Returns:
-            Any: The converted value in the original type.
+            The converted value in the original type.
         """
         return self._from_type(value)
 
@@ -76,13 +76,13 @@ class Attr:
     """Helper class representing class attribute for HDF5 serialization.
 
     Args:
-        hdf_name (str): Name of the attribute in the HDF5 file.
-        struct_name (str | None): Name of the attribute in the object.
-                                  Defaults to `hdf_name` if not specified.
-        type (TypeConverter | None): Attribute type. If None, type is guessed.
-        optional (bool): If True, attribute absence will not raise error.
+        hdf_name: Name of the attribute in the HDF5 file.
+        struct_name: Name of the attribute in the object.
+         Defaults to `hdf_name` if not specified.
+        type: Attribute type. If None, type is guessed.
+        optional: If True, attribute absence will not raise error.
 
-    Note:
+    .. note::
         This class manages serialization and deserialization of the object's
         attributes to and from HDF5 format.
     """
@@ -103,10 +103,10 @@ class Attr:
         """Get the value of the attribute from the object.
 
         Args:
-            struct (Any): The object to extract the attribute from.
+            struct: The object to extract the attribute from.
 
         Returns:
-            Any: The value of the attribute.
+            The value of the attribute.
         """
         if self.optional:
             return getattr(struct, self.struct_name, None)
@@ -116,8 +116,8 @@ class Attr:
         """Set the value of the attribute in the object.
 
         Args:
-            struct (Any): The object to set the attribute value in.
-            value (Any): The value to set.
+            struct: The object to set the attribute value in.
+            value: The value to set.
         """
         setattr(struct, self.struct_name, value)
 
@@ -125,8 +125,8 @@ class Attr:
         """Save the attribute to an HDF5 group.
 
         Args:
-            group (h5py.Group): The HDF5 group to save the attribute to.
-            struct (Any): The object to save the attribute from.
+            group: The HDF5 group to save the attribute to.
+            struct: The object to save the attribute from.
 
         Raises:
             Exception: If an error occurs while saving the attribute.
@@ -148,8 +148,8 @@ class Attr:
         """Load the attribute from an HDF5 group into an object.
 
         Args:
-            group (h5py.Group): The HDF5 group to load the attribute from.
-            struct (Any): The object to load the attribute into.
+            group: The HDF5 group to load the attribute from.
+            struct: The object to load the attribute into.
 
         Raises:
             KeyError: If the attribute is not found in the HDF5 group.
@@ -171,9 +171,9 @@ def createdset(group: h5py.Group, name: str, value: np.ndarray | list) -> None:
     Creates a dataset in the provided HDF5 group.
 
     Args:
-        group (h5py.Group): The group in the HDF5 file to add the dataset to.
-        name (str): The name of the dataset.
-        value (np.ndarray or list): The data to be stored in the dataset.
+        group: The group in the HDF5 file to add the dataset to.
+        name: The name of the dataset.
+        value: The data to be stored in the dataset.
 
     Returns:
         None
@@ -187,13 +187,11 @@ class Dset(Attr):
     Handles the conversion of the scalar value, if any.
 
     Args:
-        hdf_name (str): The name of the HDF5 attribute.
-        struct_name (str): The name of the structure. Defaults to None.
-        type (type): The expected data type of the attribute.
-            Defaults to None.
-        scalar (Callable): Function to convert the scalar value, if any.
-            Defaults to None.
-        optional (bool): Whether the attribute is optional. Defaults to False.
+        hdf_name: The name of the HDF5 attribute.
+        struct_name: The name of the structure. Defaults to None.
+        type: The expected data type of the attribute. Defaults to None.
+        scalar: Function to convert the scalar value, if any. Defaults to None.
+        optional: Whether the attribute is optional. Defaults to False.
     """
 
     def __init__(
@@ -212,8 +210,8 @@ class Dset(Attr):
         Save the attribute to the given HDF5 group.
 
         Args:
-            group (h5py.Group): The group in the HDF5 file to save the attribute to.
-            struct (Any): The structure containing the attribute.
+            group: The group in the HDF5 file to save the attribute to.
+            struct: The structure containing the attribute.
         """
         value = self.get_value(struct)
         if isinstance(value, float):
@@ -238,8 +236,8 @@ class Dset(Attr):
         Load the attribute from the given HDF5 group.
 
         Args:
-            group (h5py.Group): The group in the HDF5 file to load the attribute from.
-            struct (Any): The structure to load the attribute into.
+            group: The group in the HDF5 file to load the attribute from.
+            struct: The structure to load the attribute into.
 
         Raises:
             KeyError: If the attribute cannot be found in the HDF5 group.
@@ -265,13 +263,11 @@ class Dlist(Dset):
     handle lists specifically.
 
     Args:
-        hdf_name (str): The name of the HDF5 attribute.
-        struct_name (str): The name of the structure. Defaults to None.
-        type (type): The expected data type of the attribute.
-            Defaults to None.
-        scalar (Callable): Function to convert the scalar value, if any.
-            Defaults to None.
-        optional (bool): Whether the attribute is optional. Defaults to False.
+        hdf_name: The name of the HDF5 attribute.
+        struct_name: The name of the structure. Defaults to None.
+        type: The expected data type of the attribute. Defaults to None.
+        scalar: Function to convert the scalar value, if any. Defaults to None.
+        optional: Whether the attribute is optional. Defaults to False.
     """
 
     def get_value(self, struct: Any) -> np.ndarray:
@@ -279,11 +275,10 @@ class Dlist(Dset):
         Returns the value of the attribute in the given structure as a numpy array.
 
         Args:
-            struct (Any): The structure containing the attribute.
+            struct: The structure containing the attribute.
 
         Returns:
-            np.ndarray: The value of the attribute in the given structure as a
-                numpy array.
+            The value of the attribute in the given structure as a numpy array.
         """
         return np.array(getattr(struct, self.struct_name))
 
@@ -293,9 +288,8 @@ class Dlist(Dset):
         the values of the given numpy array.
 
         Args:
-            struct (Any): The structure in which to set the attribute.
-            value (np.ndarray): A numpy array containing the values to set the
-                attribute to.
+            struct: The structure in which to set the attribute.
+            value: A numpy array containing the values to set the attribute to.
         """
         setattr(struct, self.struct_name, list(value))
 
@@ -309,7 +303,7 @@ class H5Store:
     Class for managing HDF5 files.
 
     Args:
-        filename (str): The name of the HDF5 file.
+        filename: The name of the HDF5 file.
     """
 
     def __init__(self, filename: str) -> None:
@@ -321,10 +315,10 @@ class H5Store:
         Opens an HDF5 file in the given mode.
 
         Args:
-            mode (str): The mode in which to open the file. Defaults to "a".
+            mode: The mode in which to open the file. Defaults to "a".
 
         Returns:
-            h5py._hl.files.File: The opened HDF5 file.
+            The opened HDF5 file.
 
         Raises:
             Exception: If there is an error while trying to open the file.
@@ -357,7 +351,7 @@ class H5Store:
         Support for 'with' statement.
 
         Returns:
-            H5Store: The instance of the class itself.
+            The instance of the class itself.
         """
         return self
 
@@ -372,11 +366,11 @@ class H5Store:
         Saves the data from source into the file using 'structure' as a descriptor.
 
         Args:
-            parent (Any): The parent HDF5 group.
-            source (Any): The source of the data to save.
-            structure (List[Attr]): A list of attribute descriptors (Attr, Dset,
-                Dlist, etc.) that describe the conversion of data and the names
-                of the attributes in the source and in the file.
+            parent: The parent HDF5 group.
+            source: The source of the data to save.
+            structure: A list of attribute descriptors (Attr, Dset, Dlist, etc.) that
+             describes the conversion of data and the names of the attributes in the
+             source and in the file.
         """
         for instr in structure:
             instr.save(parent, source)
@@ -386,11 +380,11 @@ class H5Store:
         Loads the data from the file into 'dest' using 'structure' as a descriptor.
 
         Args:
-            parent (Any): The parent HDF5 group.
-            dest (Any): The destination to load the data into.
-            structure (List[Attr]): A list of attribute descriptors (Attr, Dset,
-                Dlist, etc.) that describe the conversion of data and the names
-                of the attributes in the file and in the destination.
+            parent: The parent HDF5 group.
+            dest: The destination to load the data into.
+            structure: A list of attribute descriptors (Attr, Dset, Dlist, etc.) that
+             describes the conversion of data and the names of the attributes in the
+             file and in the destination.
 
         Raises:
             Exception: If there is an error while trying to load an item.
@@ -413,7 +407,7 @@ class HDF5Handler(H5Store, BaseIOHandler):
     Base HDF5 I/O Handler object. Inherits from H5Store and BaseIOHandler.
 
     Args:
-        filename (str): The name of the HDF5 file.
+        filename: The name of the HDF5 file.
     """
 
     def __init__(self, filename: str) -> None:
@@ -425,7 +419,7 @@ class HDF5Handler(H5Store, BaseIOHandler):
         Returns the parent group in the HDF5 file based on the current option.
 
         Returns:
-            h5py._hl.group.Group: The parent group in the HDF5 file.
+            The parent group in the HDF5 file.
         """
         parent = self.h5
         for option in self.option[:-1]:
@@ -442,7 +436,7 @@ class HDF5Writer(HDF5Handler, WriterMixin):
     Writer for HDF5 files. Inherits from HDF5Handler and WriterMixin.
 
     Args:
-        filename (str): The name of the HDF5 file.
+        filename: The name of the HDF5 file.
     """
 
     def __init__(self, filename: str) -> None:
@@ -452,10 +446,11 @@ class HDF5Writer(HDF5Handler, WriterMixin):
     def write(self, val: Any, group_name: str | None = None) -> None:
         """
         Write a value depending on its type, optionally within a named group.
+
         Args:
-            val (Any): The value to be written.
-            group_name (Optional[str]): The name of the group. If provided, the group
-            context will be used for writing the value.
+            val: The value to be written.
+            group_name: The name of the group. If provided, the group
+             context will be used for writing the value.
         """
         if group_name:
             self.begin(group_name)
@@ -492,7 +487,7 @@ class HDF5Writer(HDF5Handler, WriterMixin):
         Write the value to the HDF5 file as an attribute.
 
         Args:
-            val (Any): The value to write.
+            val: The value to write.
         """
         group = self.get_parent_group()
         group.attrs[self.option[-1]] = val
@@ -504,7 +499,7 @@ class HDF5Writer(HDF5Handler, WriterMixin):
         Write the boolean value to the HDF5 file as an attribute.
 
         Args:
-            val (bool): The boolean value to write.
+            val: The boolean value to write.
         """
         self.write_int(int(val))
 
@@ -513,7 +508,7 @@ class HDF5Writer(HDF5Handler, WriterMixin):
         Write the numpy array value to the HDF5 file.
 
         Args:
-            val (np.ndarray): The numpy array value to write.
+            val: The numpy array value to write.
         """
         group = self.get_parent_group()
         group[self.option[-1]] = val
@@ -544,7 +539,7 @@ class HDF5Writer(HDF5Handler, WriterMixin):
         """Write dictionary to h5 file
 
         Args:
-            val (dict[str, Any]): dictionary to write
+            val: dictionary to write
         """
         # Check if keys are all strings, raise an error if not
         if not all(isinstance(key, str) for key in val.keys()):
@@ -562,9 +557,8 @@ class HDF5Writer(HDF5Handler, WriterMixin):
         Objects must implement the DataSet-like `serialize` method.
 
         Args:
-            seq (Sequence[Any]): The object sequence to write.
-                Defaults to None.
-            group_name (str): The name of the group in which to write the objects.
+            seq: The object sequence to write. Defaults to None.
+            group_name: The name of the group in which to write the objects.
         """
         with self.group(group_name):
             if seq is None:
@@ -583,12 +577,18 @@ class HDF5Writer(HDF5Handler, WriterMixin):
                     self.write_list(ids)
 
 
+class NoDefault:
+    """Class to represent the absence of a default value."""
+
+    pass
+
+
 class HDF5Reader(HDF5Handler):
     """
     Reader for HDF5 files. Inherits from HDF5Handler.
 
     Args:
-        filename (str): The name of the HDF5 file.
+        filename: The name of the HDF5 file.
     """
 
     def __init__(self, filename: str):
@@ -600,36 +600,43 @@ class HDF5Reader(HDF5Handler):
         group_name: str | None = None,
         func: Callable[[], Any] | None = None,
         instance: Any | None = None,
+        default: Any | NoDefault = NoDefault,
     ) -> Any:
         """
         Read a value from the current group or specified group_name.
 
         Args:
-            group_name (str): The name of the group to read from.
-                Defaults to None.
-            func (Callable[[], Any]): The function to use for reading
-                the value. Defaults to None.
-            instance (Any): An object that implements the DataSet-like
-                `deserialize` method. Defaults to None.
+            group_name: The name of the group to read from. Defaults to None.
+            func: The function to use for reading the value. Defaults to None.
+            instance: An object that implements the DataSet-like `deserialize` method.
+             Defaults to None.
+            default: The default value to return if the value is not found.
+             Defaults to `NoDefault` (no default value: raises an exception if the
+             value is not found).
 
         Returns:
-            Any: The read value.
+            The read value.
         """
         if group_name:
             self.begin(group_name)
-        if instance is None:
-            if func is None:
-                func = self.read_any
-            val = func()
-        else:
-            group = self.get_parent_group()
-            if group_name in group.attrs:
-                # This is an attribute (not a group), meaning that
-                # the object was None when deserializing it
-                val = None
+        try:
+            if instance is None:
+                if func is None:
+                    func = self.read_any
+                val = func()
             else:
-                instance.deserialize(self)
-                val = instance
+                group = self.get_parent_group()
+                if group_name in group.attrs:
+                    # This is an attribute (not a group), meaning that
+                    # the object was None when deserializing it
+                    val = None
+                else:
+                    instance.deserialize(self)
+                    val = instance
+        except Exception:  # pylint:disable=broad-except
+            if default is NoDefault:
+                raise
+            val = default
         if group_name:
             self.end(group_name)
         return val
@@ -639,12 +646,16 @@ class HDF5Reader(HDF5Handler):
         Read a value from the current group as a generic type.
 
         Returns:
-            Union[str, bytes]: The read value.
+            The read value.
         """
         group = self.get_parent_group()
         try:
             value = group.attrs[self.option[-1]]
         except KeyError:
+            if self.read(SEQUENCE_NAME, func=self.read_int, default=None) is None:
+                # No sequence found, this means that the data we are trying to read
+                # is not here (e.g. compatibility issue), so we raise an error
+                raise
             value = self.read_sequence()
         if isinstance(value, bytes):
             return value.decode("utf-8")
@@ -656,7 +667,7 @@ class HDF5Reader(HDF5Handler):
         Read a boolean value from the current group.
 
         Returns:
-            Optional[bool]: The read boolean value.
+            The read boolean value, or None if the value is not found.
         """
         val = self.read_any()
         if val != "":
@@ -667,7 +678,7 @@ class HDF5Reader(HDF5Handler):
         Read an integer value from the current group.
 
         Returns:
-            Optional[int]: The read integer value.
+            The read integer value, or None if the value is not found.
         """
         val = self.read_any()
         if val != "":
@@ -678,7 +689,7 @@ class HDF5Reader(HDF5Handler):
         Read a float value from the current group.
 
         Returns:
-            Optional[float]: The read float value.
+            The read float value, or None if the value is not found.
         """
         val = self.read_any()
         if val != "":
@@ -691,7 +702,7 @@ class HDF5Reader(HDF5Handler):
         Read a numpy array from the current group.
 
         Returns:
-            np.ndarray: The read numpy array.
+            The read numpy array.
         """
         group = self.get_parent_group()
         return group[self.option[-1]][...]
@@ -737,7 +748,7 @@ class HDF5Reader(HDF5Handler):
         """Read dictionary from h5 file
 
         Returns:
-            dict[str, Any]: dictionary read from h5 file
+            Dictionary read from h5 file
         """
         group = self.get_parent_group()
         dict_group = group[self.option[-1]]
@@ -779,16 +790,17 @@ class HDF5Reader(HDF5Handler):
         klass: type[Any],
         progress_callback: Callable[[int], bool] | None = None,
     ) -> list[Any]:
-        """
-        Read an object sequence from a group.
+        """Read an object sequence from a group.
 
         Objects must implement the DataSet-like `deserialize` method.
         `klass` is the object class which constructor requires no argument.
 
-        progress_callback: if not None, this function is called with
-        an integer argument (progress: 0 --> 100). Function returns the
-        `cancel` state (True: progress dialog has been canceled, False
-        otherwise)
+        Args:
+            group_name: The name of the group to read the object sequence from.
+            klass: The object class which constructor requires no argument.
+            progress_callback: A function to call with an integer argument (progress:
+             0 --> 100). The function returns the `cancel` state (True: progress
+             dialog has been canceled, False otherwise).
         """
         with self.group(group_name):
             try:
@@ -817,5 +829,7 @@ class HDF5Reader(HDF5Handler):
                         break
                 seq.append(obj)
         return seq
+
+    read_none = read_any
 
     read_none = read_any

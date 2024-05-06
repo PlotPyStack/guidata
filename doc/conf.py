@@ -4,6 +4,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.abspath(".."))
+sys.path.insert(0, os.path.abspath("autodoc"))
 
 import guidata  # noqa: E402
 
@@ -21,6 +22,7 @@ extensions = [
     "sphinx_copybutton",
     "sphinx.ext.napoleon",
     "sphinx_qt_documentation",
+    "guidata.dataset.autodoc",
 ]
 if "htmlhelp" in sys.argv:
     extensions += ["sphinx.ext.imgmath"]

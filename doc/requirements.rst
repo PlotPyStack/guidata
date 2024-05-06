@@ -9,7 +9,7 @@ The :mod:`guidata` package requires the following Python modules:
       - Summary
     * - Python
       - >=3.8, <4
-      - 
+      - Python programming language
     * - h5py
       - >=3.0
       - Read and write HDF5 files from Python
@@ -38,12 +38,9 @@ Optional modules for development:
     * - Name
       - Version
       - Summary
-    * - black
+    * - ruff
       - 
-      - The uncompromising code formatter.
-    * - isort
-      - 
-      - A Python utility / library to sort Python imports.
+      - An extremely fast Python linter and code formatter, written in Rust.
     * - pylint
       - 
       - python code static checker
@@ -97,12 +94,6 @@ Optional modules for running test suite:
     * - pytest
       - 
       - pytest: simple powerful testing with Python
-    * - pytest-cov
-      - 
-      - Pytest plugin for measuring coverage.
-    * - pytest-qt
-      - 
-      - pytest support for PyQt and PySide applications
     * - pytest-xvfb
       - 
       - A pytest plugin to run Xvfb (or Xephyr/Xvnc) for tests.
