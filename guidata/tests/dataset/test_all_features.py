@@ -135,7 +135,16 @@ def test_all_features():
             prm1.view()
 
             prm2 = Parameters.create(integer=10101010, string="Using `create`")
+            assert prm2.integer == 10101010
             print(prm2)
+
+            try:
+                # Try to set an unknown attribute using the `create` method:
+                Parameters.create(unknown_attribute=42)
+            except AttributeError:
+                pass
+            else:
+                raise AssertionError("AttributeError not raised")
 
             execenv.print("OK")
 

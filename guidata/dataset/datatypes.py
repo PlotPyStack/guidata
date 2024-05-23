@@ -1072,10 +1072,13 @@ class DataSet(metaclass=DataSetMeta):
             DataSet instance
         """  # noqa
         instance = cls()
-        for item in instance._items:
-            name = item._name
-            if name in kwargs:
-                setattr(instance, name, kwargs[name])
+        for name in kwargs:
+            for item in instance._items:
+                if item._name == name:
+                    setattr(instance, name, kwargs[name])
+                    break
+            else:
+                raise AttributeError(f"Unknown attribute {name}")
         return instance
 
     def _get_translation(self):

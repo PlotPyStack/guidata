@@ -1,5 +1,15 @@
 # Changelog #
 
+## Version 3.5.1 ##
+
+In this release, test coverage is 74%.
+
+🛠️ Bug fixes:
+
+* Creating a dataset using the `create` class method:
+  * Before, passing unknown keyword arguments failed silently (e.g. `MyParameters.create(unknown=42)`).
+  * Now, an `AttributeError` exception is raised when passing unknown keyword arguments, as expected.
+
 ## Version 3.5.0 ##
 
 In this release, test coverage is 74%.
