@@ -10,6 +10,10 @@ In this release, test coverage is 74%.
   * Before, passing unknown keyword arguments failed silently (e.g. `MyParameters.create(unknown=42)`).
   * Now, an `AttributeError` exception is raised when passing unknown keyword arguments, as expected.
 
+ℹ️ Other changes:
+
+* Internal package reorganization: moved icons to `guidata/data/icons` folder
+
 ## Version 3.5.0 ##
 
 In this release, test coverage is 74%.
