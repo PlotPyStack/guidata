@@ -469,6 +469,8 @@ def close_dialog_and_quit(widget, screenshot: bool = False) -> None:
         wname = widget.objectName()
         if screenshot and wname and widget.isVisible():  # pragma: no cover
             grab_save_window(widget, wname.lower())
+        else:
+            QW.QApplication.processEvents()
         if execenv.accept_dialogs:
             widget.accept()
         else:

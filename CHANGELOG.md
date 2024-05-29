@@ -9,6 +9,12 @@ In this release, test coverage is 74%.
 * Creating a dataset using the `create` class method:
   * Before, passing unknown keyword arguments failed silently (e.g. `MyParameters.create(unknown=42)`).
   * Now, an `AttributeError` exception is raised when passing unknown keyword arguments, as expected.
+* Processing Qt event loop in unattended mode before closing widgets and quitting the
+  application, so that all pending events are processed before quitting: this includes
+  for instance the drawing events of widgets, which may be necessary to avoid a crash
+  when closing the application (e.g. if drawing the widget is required for some
+  reason before closing it) or at least to ensure that test coverage includes all
+  possible code paths.
 
 ℹ️ Other changes:
 
