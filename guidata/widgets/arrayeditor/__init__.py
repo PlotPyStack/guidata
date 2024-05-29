@@ -18,4 +18,4 @@ This package provides a NumPy Array Editor Dialog based on Qt.
 
 """
 
-from .arrayeditor import ArrayEditor
+from .arrayeditor import ArrayEditor  # noqa: F401

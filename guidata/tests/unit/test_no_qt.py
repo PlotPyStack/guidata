@@ -17,8 +17,8 @@ def test_imports_without_qt():
     try:
         # pylint: disable=unused-import
         # pylint: disable=import-outside-toplevel
-        import guidata.dataset.dataitems
-        import guidata.dataset.datatypes
+        import guidata.dataset.dataitems  # noqa: F401
+        import guidata.dataset.datatypes  # noqa: F401
     except ValueError as exc:
         raise AssertionError("guidata imports failed without Qt") from exc
 

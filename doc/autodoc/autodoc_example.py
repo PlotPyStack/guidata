@@ -5,11 +5,7 @@ import datetime
 import shutil
 import tempfile
 
-import numpy as np
-
 import guidata.dataset as gds
-from guidata.env import execenv
-from guidata.qthelpers import qt_app_context
 
 # Creating temporary files and registering cleanup functions
 TEMPDIR = tempfile.mkdtemp(prefix="test_")

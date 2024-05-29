@@ -72,10 +72,10 @@ include = ["guidata*"]
 version = { attr = "guidata.__version__" }
 
 [tool.ruff]
-exclude = [".git", ".vscode", "build", "dist"]
-line-length = 88                               # Same as Black.
-indent-width = 4                               # Same as Black.
-target-version = "py38"                        # Assume Python 3.8
+exclude = [".git", ".vscode", "build", "dist", "guidata/external"]
+line-length = 88                                                   # Same as Black.
+indent-width = 4                                                   # Same as Black.
+target-version = "py38"                                            # Assume Python 3.8
 
 [tool.ruff.lint]
 # all rules can be found here: https://beta.ruff.rs/docs/rules/

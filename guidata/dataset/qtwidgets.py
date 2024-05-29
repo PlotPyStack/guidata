@@ -502,9 +502,9 @@ class DataSetEditLayout(Generic[AnyDataSet]):
             self.change_callback()
 
 
-from guidata.dataset.dataitems import ButtonItem  # noqa: E402
-from guidata.dataset.dataitems import (
+from guidata.dataset.dataitems import (  # noqa: E402
     BoolItem,
+    ButtonItem,
     ChoiceItem,
     ColorItem,
     DateItem,
@@ -523,8 +523,8 @@ from guidata.dataset.dataitems import (
     TextItem,
 )
 
-# Enregistrement des correspondances avec les widgets  # noqa: E402
-from guidata.dataset.qtitemwidgets import (
+# Enregistrement des correspondances avec les widgets
+from guidata.dataset.qtitemwidgets import (  # noqa: E402
     AbstractDataSetWidget,
     ButtonWidget,
     CheckBoxWidget,
@@ -839,7 +839,12 @@ class DataSetEditGroupBox(DataSetShowGroupBox[AnyDataSet]):
             applyb.clicked.connect(self.set)  # type:ignore
             layout = self.edit.layout
             layout.addWidget(
-                applyb, layout.rowCount(), 0, 1, -1, Qt.AlignRight  # type:ignore
+                applyb,
+                layout.rowCount(),
+                0,
+                1,
+                -1,
+                Qt.AlignRight,  # type:ignore
             )
 
     def get_edit_layout(self) -> DataSetEditLayout[AnyDataSet]:

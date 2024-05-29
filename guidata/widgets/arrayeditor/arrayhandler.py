@@ -41,9 +41,10 @@ class BaseArrayHandler(Generic[AnySupportedArray]):
         array: Numpy array to wrap
         variable_size: Flag to indicate if the size of the array can be modified (i.e.
          that data can be inserted on any axis). This flag changes the underlying
-         data management strategy. If True, the original array will be copied and changes
-         will be done inplace in the copy, else changes are stored in a dictionnary
-         and applied inplace when the appropriate method is called. Defaults to False.
+         data management strategy. If True, the original array will be copied and
+         changes will be done inplace in the copy, else changes are stored in a
+         dictionnary and applied inplace when the appropriate method is called.
+         Defaults to False.
     """
 
     __slots__ = (

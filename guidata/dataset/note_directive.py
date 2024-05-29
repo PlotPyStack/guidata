@@ -1,17 +1,29 @@
+#
+# Licensed under the terms of the BSD 3-Clause
+# (see guidata/LICENSE for details)
+
+"""Sphinx directive to display a note about how to instanciate a dataset class"""
+
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Type
+
 from docutils import nodes
-from docutils.parsers.rst import Directive
 from sphinx.util import logging
 from sphinx.util.docutils import SphinxDirective
-
-logger = logging.getLogger(__name__)
-
-from typing import Type
 
 import guidata.dataset as gds
 from guidata import __version__
 
+if TYPE_CHECKING:
+    import sphinx.application
+
+logger = logging.getLogger(__name__)
+
 
 class DatasetNoteDirective(SphinxDirective):
+    """Directive to display a note about how to instanciate a dataset class"""
+
     required_arguments = 1  # the class name is a required argument
     optional_arguments = 1  # the number of example lines to display is optional
     final_argument_whitespace = True
@@ -84,7 +96,8 @@ class DatasetNoteDirective(SphinxDirective):
         return [note_node]
 
 
-def setup(app):
+def setup(app: sphinx.application.Sphinx) -> dict[str, object]:
+    """Initialize the Sphinx extension"""
     app.add_directive("datasetnote", DatasetNoteDirective)
 
     return {

@@ -825,7 +825,7 @@ class HDF5Reader(HDF5Handler):
                         else:
                             obj = klass()
                             obj.deserialize(self)
-                    except ValueError as err:
+                    except ValueError:
                         break
                 seq.append(obj)
         return seq

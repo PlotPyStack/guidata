@@ -96,7 +96,7 @@ import datetime
 import os
 import re
 from collections.abc import Callable
-from typing import TYPE_CHECKING, Any, Generic, Iterable, Type, TypeVar, Union
+from typing import TYPE_CHECKING, Any, Generic, Iterable, TypeVar
 
 import numpy as np
 
