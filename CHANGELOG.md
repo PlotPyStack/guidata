@@ -19,6 +19,8 @@ In this release, test coverage is 74%.
 ℹ️ Other changes:
 
 * Internal package reorganization: moved icons to `guidata/data/icons` folder
+* The `delay` command line option for environment execution object `execenv` is now
+  expressed in milliseconds (before it was in seconds), for practical reasons
 
 ## Version 3.5.0 ##
 

@@ -146,7 +146,7 @@ class ExecEnv:
 
     @property
     def delay(self):
-        """Delay (seconds) before quitting application in unattended mode"""
+        """Delay (ms) before quitting application in unattended mode"""
         try:
             return int(os.environ.get(self.DELAY_ENV))
         except (TypeError, ValueError):
@@ -154,7 +154,7 @@ class ExecEnv:
 
     @delay.setter
     def delay(self, value: int):
-        """Set delay (seconds) before quitting application in unattended mode"""
+        """Set delay (ms) before quitting application in unattended mode"""
         os.environ[self.DELAY_ENV] = str(value)
 
     def parse_args(self):
@@ -182,7 +182,7 @@ class ExecEnv:
             "--" + self.DELAY_ARG,
             type=int,
             default=0,
-            help="delay (seconds) before quitting application in unattended mode",
+            help="delay (ms) before quitting application in unattended mode",
         )
         parser.add_argument(
             "--" + self.VERBOSE_ARG,
@@ -264,7 +264,7 @@ class ExecEnv:
             unattended: whether to run in unattended mode
             accept_dialogs: whether to accept dialogs in unattended mode
             screenshot: whether to take screenshots
-            delay: delay (seconds) before quitting application in unattended mode
+            delay: delay (ms) before quitting application in unattended mode
             verbose: verbosity level
 
         .. note::
