@@ -6,6 +6,7 @@ In this release, test coverage is 74%.
 
 🛠️ Bug fixes:
 
+* [PR #74](https://github.com/PlotPyStack/guidata/pull/74) - `configtools.font_is_installed`: fix PySide2 compat. issue (thanks to @xiaodaxia-2008)
 * Creating a dataset using the `create` class method:
   * Before, passing unknown keyword arguments failed silently (e.g. `MyParameters.create(unknown=42)`).
   * Now, an `AttributeError` exception is raised when passing unknown keyword arguments, as expected.
