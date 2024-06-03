@@ -38,7 +38,7 @@ classifiers = [
     "Topic :: Utilities",
 ]
 requires-python = ">=3.8, <4"
-dependencies = ["h5py>=3.0", "NumPy>=1.21", "QtPy>=1.9", "requests", "tomli"]
+dependencies = ["h5py>=3.0", "NumPy>=1.21 <2", "QtPy>=1.9", "requests", "tomli"]
 dynamic = ["version"]
 
 [project.urls]
@@ -79,7 +79,7 @@ target-version = "py38"                                            # Assume Pyth
 
 [tool.ruff.lint]
 # all rules can be found here: https://beta.ruff.rs/docs/rules/
-select = ["E", "F", "W", "I"]
+select = ["E", "F", "W", "I", "NPY201"]
 ignore = [
     "E203", # space before : (needed for how black formats slicing)
 ]

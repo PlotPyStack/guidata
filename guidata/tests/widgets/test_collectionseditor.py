@@ -102,7 +102,6 @@ def get_test_data():
         "ddataframe": test_df,
         "None": None,
         "unsupported1": np.arccos,
-        "unsupported2": np.cast,
         # Test for Issue #3518
         "big_struct_array": np.zeros(
             1000, dtype=[("ID", "f8"), ("param1", "f8", 5000)]
