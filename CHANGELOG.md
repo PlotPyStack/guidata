@@ -22,6 +22,7 @@ In this release, test coverage is 74%.
 * Internal package reorganization: moved icons to `guidata/data/icons` folder
 * The `delay` command line option for environment execution object `execenv` is now
   expressed in milliseconds (before it was in seconds), for practical reasons
+* Explicitely exclude NumPy V2 from the dependencies (not compatible yet)
 
 ## Version 3.5.0 ##
 
