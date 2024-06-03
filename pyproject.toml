@@ -38,7 +38,7 @@ classifiers = [
     "Topic :: Utilities",
 ]
 requires-python = ">=3.8, <4"
-dependencies = ["h5py>=3.0", "NumPy>=1.21 <2", "QtPy>=1.9", "requests", "tomli"]
+dependencies = ["h5py>=3.0", "NumPy>=1.21,<2", "QtPy>=1.9", "requests", "tomli"]
 dynamic = ["version"]
 
 [project.urls]
