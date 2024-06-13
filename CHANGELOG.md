@@ -19,6 +19,8 @@ In this release, test coverage is 74%.
 
 ℹ️ Other changes:
 
+* Preparing for NumPy V2 compatibility: this is a work in progress, as NumPy V2 is not
+  yet released. In the meantime, requirements have been updated to exclude NumPy V2.
 * Internal package reorganization: moved icons to `guidata/data/icons` folder
 * The `delay` command line option for environment execution object `execenv` is now
   expressed in milliseconds (before it was in seconds), for practical reasons
