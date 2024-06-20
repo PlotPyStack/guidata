@@ -1,5 +1,13 @@
 # Changelog #
 
+## Version 3.5.2 ##
+
+In this release, test coverage is 74%.
+
+🛠️ Bug fixes:
+
+* guidata is now compatible with NumPy 2.0
+
 ## Version 3.5.1 ##
 
 In this release, test coverage is 74%.

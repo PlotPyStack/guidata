@@ -18,11 +18,12 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import numpy as np
+
 try:
     from PIL import Image as PILImage
 except ImportError:
     PILImage = None
-from numpy.core.multiarray import ndarray
 
 from guidata.qthelpers import exec_dialog
 from guidata.widgets.arrayeditor import ArrayEditor
@@ -37,7 +38,6 @@ except ImportError:
 
 
 if TYPE_CHECKING:
-    import numpy as np
     from qtpy import QtWidgets as QW
 
 
@@ -56,13 +56,12 @@ def create_dialog(obj, title, parent=None):
         return data
 
     readonly = not is_known_type(obj)
-    if isinstance(obj, ndarray):
+    if isinstance(obj, np.ndarray):
         dialog = ArrayEditor(parent)
         if not dialog.setup_and_check(obj, title=title, readonly=readonly):
             return
     elif PILImage is not None and isinstance(obj, PILImage.Image):
         dialog = ArrayEditor(parent)
-        import numpy as np
 
         data = np.array(obj)
         if not dialog.setup_and_check(data, title=title, readonly=readonly):
