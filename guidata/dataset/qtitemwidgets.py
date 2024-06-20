@@ -25,7 +25,7 @@ from abc import abstractmethod
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Any, Protocol
 
-import numpy
+import numpy as np
 from qtpy.compat import getexistingdirectory
 from qtpy.QtCore import QSize, Qt
 from qtpy.QtGui import QColor, QIcon, QPixmap
@@ -1249,7 +1249,7 @@ class FloatArrayWidget(AbstractDataSetWidget):
         self.layout.addLayout(self.max_line, 2, 0)
 
         edit_button.clicked.connect(self.edit_array)  # type:ignore
-        self.arr = numpy.array([])  # le tableau si il a été modifié
+        self.arr = np.array([])  # le tableau si il a été modifié
         self.instance = None
 
         self.dtype_line, self.dtype_label = get_image_layout("dtype.png", "")
@@ -1276,12 +1276,12 @@ class FloatArrayWidget(AbstractDataSetWidget):
 
     def get(self) -> None:
         """Update widget contents from data item value"""
-        self.arr = numpy.array(self.item.get(), copy=False)
+        self.arr = np.asarray(self.item.get())
         if self.item.get_prop_value("display", "transpose"):
             self.arr = self.arr.T
         self.update(self.arr)
 
-    def update(self, arr: numpy.ndarray) -> None:
+    def update(self, arr: np.ndarray) -> None:
         shape = arr.shape
         if len(shape) == 1:
             shape = (1,) + shape
@@ -1290,7 +1290,7 @@ class FloatArrayWidget(AbstractDataSetWidget):
 
         format = self.item.get_prop_value("display", "format")
         minmax = self.item.get_prop_value("display", "minmax")
-        real_arr = numpy.real(arr)
+        real_arr = np.real(arr)
         try:
             if minmax == "all":
                 mint = format % real_arr.min()
@@ -1324,7 +1324,7 @@ class FloatArrayWidget(AbstractDataSetWidget):
             value = self.value()
         self.item.set(value)
 
-    def value(self) -> numpy.ndarray:
+    def value(self) -> np.ndarray:
         """Returns the widget's current value
 
         Returns:
