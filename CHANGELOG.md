@@ -6,7 +6,9 @@ In this release, test coverage is 74%.
 
 🛠️ Bug fixes:
 
-* guidata is now compatible with NumPy 2.0
+* Add support for NumPy 2.0:
+  * Use `numpy.asarray` instead of `numpy.array(..., copy=False)`
+  * Remove deprecated `numpy.core.multiarray` module import
 
 ## Version 3.5.1 ##
 
