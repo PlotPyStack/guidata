@@ -71,6 +71,9 @@ include = ["guidata*"]
 [tool.setuptools.dynamic]
 version = { attr = "guidata.__version__" }
 
+[tool.pytest.ini_options]
+addopts = "guidata"
+
 [tool.ruff]
 exclude = [".git", ".vscode", "build", "dist", "guidata/external"]
 line-length = 88                                                   # Same as Black.
