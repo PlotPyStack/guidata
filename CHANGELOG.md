@@ -10,6 +10,8 @@ In this release, test coverage is 74%.
   * For various reasons, a `PermissionError` exception may be raised when trying to remove the configuration file on Windows, just after having created it for the first time. This is due to the fact that the file is still locked by the file system, even if the file has been closed. This is a known issue with Windows file system, and the solution is to wait a little bit before trying to remove the file.
   * To fix this issue, a new `try_remove_file` function has been added to the `userconfig` module, which tries multiple times to remove the file before raising an exception.
 
+* Moved back `conftest.py` to the `tests` folder (was in the root folder), so that `pytest` can be executed with proper configuration when running the test suite from the installed package
+
 ## Version 3.5.2 ##
 
 In this release, test coverage is 74%.
