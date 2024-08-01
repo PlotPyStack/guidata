@@ -37,12 +37,9 @@ import subprocess
 import sys
 from typing import Any, Type
 
-# Local imports
 from guidata.userconfig import get_home_dir
 
-# ==============================================================================
-# Strings, Locale
-# ==============================================================================
+# MARK: Strings, Locale ----------------------------------------------------------------
 
 
 def to_string(obj: Any) -> str:
@@ -105,9 +102,7 @@ def get_system_lang() -> str | None:
     return lang
 
 
-# ==============================================================================
-# Interface checking
-# ==============================================================================
+# MARK: Interface checking -------------------------------------------------------------
 
 
 def assert_interface_supported(klass: Type, iface: Type) -> None:
@@ -161,9 +156,7 @@ def assert_interfaces_valid(klass: Type) -> None:
             )
 
 
-# ==============================================================================
-# Module, scripts, programs
-# ==============================================================================
+# MARK: Module, scripts, programs ------------------------------------------------------
 
 
 def get_module_path(modname: str) -> str:
@@ -284,9 +277,7 @@ def run_shell_command(cmdstr, **subprocess_kwargs):
     return subprocess.Popen(cmdstr, **subprocess_kwargs)
 
 
-# ==============================================================================
-# Path utils
-# ==============================================================================
+# MARK: Path utils ---------------------------------------------------------------------
 
 
 def getcwd_or_home():
@@ -323,6 +314,9 @@ def remove_backslashes(path):
         path = path.replace("\\", "/")
         path = path.replace("/'", "\\'")
     return path
+
+
+# MARK: Date utils ---------------------------------------------------------------------
 
 
 def convert_date_format(format_string: str) -> str:
@@ -380,5 +374,4 @@ def convert_date_format(format_string: str) -> str:
             qt_format += format_string[i]
             i += 1
 
-    return qt_format
     return qt_format
