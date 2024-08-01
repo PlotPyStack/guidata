@@ -1,5 +1,15 @@
 # Changelog #
 
+## Version 3.5.3 ##
+
+In this release, test coverage is 74%.
+
+🛠️ Bug fixes:
+
+* Configuration initialization on Windows:
+  * For various reasons, a `PermissionError` exception may be raised when trying to remove the configuration file on Windows, just after having created it for the first time. This is due to the fact that the file is still locked by the file system, even if the file has been closed. This is a known issue with Windows file system, and the solution is to wait a little bit before trying to remove the file.
+  * To fix this issue, a new `try_remove_file` function has been added to the `userconfig` module, which tries multiple times to remove the file before raising an exception.
+
 ## Version 3.5.2 ##
 
 In this release, test coverage is 74%.
@@ -58,7 +68,6 @@ In this release, test coverage is 74%.
 * [Issue #72](https://github.com/PlotPyStack/guidata/issues/72) - unit test leave files during the build usr/lib/python3/dist-packages/test.json
 * [Issue #73](https://github.com/PlotPyStack/guidata/issues/73) - `ChoiceItem` radio buttons are duplicated when using callbacks
 
-
 ## Version 3.4.1 ##
 
 In this release, test coverage is 76%.
@@ -68,31 +77,32 @@ In this release, test coverage is 76%.
 * [Issue #71](https://github.com/PlotPyStack/guidata/issues/71) - Random segmentation faults with applications embedding `CodeEditor`
 * [Issue #70](https://github.com/PlotPyStack/guidata/issues/70) - PermissionError: [Errno 13] Permission denied: '/usr/lib/python3/dist-packages/guidata/tests/data/genreqs/requirements.rst'
 
-
 ## Version 3.4.0 ##
 
 In this release, test coverage is 76%.
 
 💥 New features:
-  * `dataset.io.h5fmt.HDF5Reader.read` method: added new `default` argument to set
+
+* `dataset.io.h5fmt.HDF5Reader.read` method: added new `default` argument to set
     default value for missing data in the HDF5 file (backward compatible). The default
     value of `default` is `NoDefault` (a special value to indicate that no default value
     should be used, and that an exception should be raised if the data is missing).
-  * `widgets.codeeditor.CodeEditor`: added new `inactivity_timeout` argument to set
+* `widgets.codeeditor.CodeEditor`: added new `inactivity_timeout` argument to set
     the time (in milliseconds) to wait after the user has stopped typing before
     emitting the `CodeEditor.SIG_EDIT_STOPPED` signal.
-  * Added `execenv.accept_dialogs` attribute to control whether dialogs should be
+* Added `execenv.accept_dialogs` attribute to control whether dialogs should be
     automatically accepted or not (default is `None`, meaning no automatic acceptance):
     this allows more coverage of the test suite. For now, this attribute has only been
     proven useful in `tests/dataset/test_all_features.py`.
-  * Added unit tests for HDF5 and JSON serialization/deserialization:
-    * Testing an arbitrary data model saved/loaded to/from HDF5 and JSON files,
+* Added unit tests for HDF5 and JSON serialization/deserialization:
+  * Testing an arbitrary data model saved/loaded to/from HDF5 and JSON files,
       with various data sets and other data types.
-    * Testing for backward compatibility with previous versions of the data model
+  * Testing for backward compatibility with previous versions of the data model
       (e.g. new attributes, removed attributes, etc.)
 
 ⚠️ API breaking changes:
-  * `guidata.dataset.io` module is now deprecated and will be removed in a future
+
+* `guidata.dataset.io` module is now deprecated and will be removed in a future
     release. Please use `guidata.io` instead. This change is backward compatible
     (the old module is still available and will be removed in a future release).
     The motivation for this change is to simplify the module structure and to help
@@ -101,32 +111,33 @@ In this release, test coverage is 76%.
 
 📖 Documentation:
 
-  * Added missing `DataSetEditDialog` and `DataSetEditLayout` classes
-  * Added missing inheritance/member details on some classes
-  * Reduced table of contents depth in left sidebar for better readability
+* Added missing `DataSetEditDialog` and `DataSetEditLayout` classes
+* Added missing inheritance/member details on some classes
+* Reduced table of contents depth in left sidebar for better readability
 
 ## Version 3.3.0 ##
 
 In this release, test coverage is 72%.
 
 💥 New features:
-  * Array editor now supports row/column insertion/deletion:
-    * Added `variable_size` argument to `setup_and_check` method
-    * The feature is disabled by default (backward compatible)
-    * It supports standard arrays, masked arrays, record arrays and N-dimensional arrays
-  * New dataset read-only mode:
-    * Added `readonly` argument to `DataSet` constructor
-    * This is useful to create a dataset that will be displayed in read-only mode
+
+* Array editor now supports row/column insertion/deletion:
+  * Added `variable_size` argument to `setup_and_check` method
+  * The feature is disabled by default (backward compatible)
+  * It supports standard arrays, masked arrays, record arrays and N-dimensional arrays
+* New dataset read-only mode:
+  * Added `readonly` argument to `DataSet` constructor
+  * This is useful to create a dataset that will be displayed in read-only mode
       (e.g. string editing widgets will be in read-only mode: text will be selectable
       but not editable)
-    * The items remain modifiable programmatically (e.g. `dataset.item = 42`)
-  * New dataset group edit mode:
-    * Added `mode` argument to `DataSetGroup.edit` method, with the following options:
-      * `mode='tabs'` (default): each dataset is displayed in a separate tab
-      * `mode='table'`: all datasets are displayed in a single table
-    * In the new table mode, the datasets are displayed in a single table with
+  * The items remain modifiable programmatically (e.g. `dataset.item = 42`)
+* New dataset group edit mode:
+  * Added `mode` argument to `DataSetGroup.edit` method, with the following options:
+    * `mode='tabs'` (default): each dataset is displayed in a separate tab
+    * `mode='table'`: all datasets are displayed in a single table
+  * In the new table mode, the datasets are displayed in a single table with
       one row per dataset and one column per item
-    * Clicking on a row will display the corresponding dataset in a modal dialog box
+  * Clicking on a row will display the corresponding dataset in a modal dialog box
 
 🛠️ Bug fixes:
 

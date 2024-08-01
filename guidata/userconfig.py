@@ -56,7 +56,31 @@ import os
 import os.path as osp
 import re
 import sys
+import time
 from typing import Any
+
+
+def try_remove_file(path: str, wait_time: float = 0.05, retries: int = 20) -> None:
+    """Try to remove a file, waiting if necessary.
+
+    Args:
+        path: The path of the file to remove.
+        wait_time: The time in seconds to wait between checks.
+        retries: The number of times to retry before giving up.
+
+    Raises:
+        IOError: If the file cannot be removed.
+    """
+    if os.path.isfile(path):
+        attempt = 0
+        while attempt < retries:
+            try:
+                os.remove(path)
+                return
+            except IOError:
+                time.sleep(wait_time)
+                attempt += 1
+        raise IOError(f"Unable to remove file {path} due to file lock")
 
 
 def get_home_dir() -> str:
@@ -245,7 +269,7 @@ class UserConfig(cp.ConfigParser):
         """
         fname = self.filename()
         if osp.isfile(fname):
-            os.remove(fname)
+            try_remove_file(fname, wait_time=0.05, retries=20)
         os.makedirs(osp.dirname(fname), mode=0o700, exist_ok=True)
         with open(fname, "w", encoding="utf-8") as configfile:
             self.write(configfile)
