@@ -1,10 +1,10 @@
 # Changelog #
 
-## Version 3.5.4 ##
+## Version 3.6.0 ##
 
 In this release, test coverage is 74%.
 
-🛠️ Bug fixes:
+💥 New features:
 
 * Improved dark/light mode theme update:
   * The theme mode may be changed during the application lifetime
