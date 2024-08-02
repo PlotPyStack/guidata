@@ -20,7 +20,6 @@ from qtpy.QtCore import QEvent, QEventLoop, QPoint, Qt, Signal, Slot
 from qtpy.QtGui import (
     QClipboard,
     QColor,
-    QFont,
     QMouseEvent,
     QPalette,
     QTextCharFormat,
@@ -653,7 +652,7 @@ class TextEditBaseWidget(QPlainTextEdit, BaseEditMixin):
 
         :param event:
         """
-        text, key = event.text(), event.key()
+        _text, key = event.text(), event.key()
         ctrl = event.modifiers() & Qt.ControlModifier
         meta = event.modifiers() & Qt.MetaModifier
         # Use our own copy method for {Ctrl,Cmd}+C to avoid Qt
