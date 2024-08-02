@@ -1455,9 +1455,7 @@ class ConsoleFontStyle(object):
         if not light_background and is_default:
             inverse_color(foreground)
         self.format.setForeground(foreground)
-        background = QColor(self.backgroundcolor)
-        if not light_background:
-            inverse_color(background)
+        background = QApplication.instance().palette().color(QPalette.Base)
         self.format.setBackground(background)
         font = self.format.font()
         font.setBold(self.bold)
