@@ -11,7 +11,6 @@
 # pylint: disable=R0911
 # pylint: disable=R0201
 
-
 import os
 import re
 import sys
@@ -42,6 +41,7 @@ from qtpy.QtWidgets import (
 
 from guidata.config import CONF
 from guidata.configtools import get_font, get_icon
+from guidata.qthelpers import is_dark_mode
 from guidata.widgets.console.calltip import CallTipWidget
 from guidata.widgets.console.mixins import BaseEditMixin
 from guidata.widgets.console.terminal import ANSIEscapeCodeHandler
@@ -367,8 +367,9 @@ class TextEditBaseWidget(QPlainTextEdit, BaseEditMixin):
         background color and caret (text cursor) color
         """
         palette = QPalette()
-        palette.setColor(QPalette.Base, background)
+        # palette.setColor(QPalette.Base, background)
         palette.setColor(QPalette.Text, foreground)
+        palette.setColor(QPalette.Background, background)
         self.setPalette(palette)
 
         # Set the right background color when changing color schemes
@@ -1528,6 +1529,11 @@ class ConsoleBaseWidget(TextEditBaseWidget):
         self.set_pythonshell_font()
         self.setMouseTracking(True)
 
+    def update_color_mode(self):
+        """Update color mode according to the current theme"""
+        light_background = not is_dark_mode()
+        self.set_light_background(light_background)
+
     def set_light_background(self, state):
         """
 
@@ -1540,7 +1546,7 @@ class ConsoleBaseWidget(TextEditBaseWidget):
             )
         else:
             self.set_palette(
-                background=QColor(Qt.black), foreground=QColor(Qt.lightGray)
+                background=QColor(50, 50, 50), foreground=QColor(Qt.lightGray)
             )
         self.ansi_handler.set_light_background(state)
         self.set_pythonshell_font()
@@ -1624,7 +1630,7 @@ class ConsoleBaseWidget(TextEditBaseWidget):
     def set_pythonshell_font(self, font=None):
         """Python Shell only"""
         if font is None:
-            font = QFont()
+            font = self.font()
         for style in self.font_styles:
             style.apply_style(
                 font=font,

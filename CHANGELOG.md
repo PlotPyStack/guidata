@@ -1,5 +1,15 @@
 # Changelog #
 
+## Version 3.5.4 ##
+
+In this release, test coverage is 74%.
+
+🛠️ Bug fixes:
+
+* Improved dark/light mode theme update:
+  * The theme mode may be changed during the application lifetime
+  * Added methods `update_color_mode` on `CodeEditor` and `ConsoleBaseWidget` widgets
+
 ## Version 3.5.3 ##
 
 In this release, test coverage is 74%.

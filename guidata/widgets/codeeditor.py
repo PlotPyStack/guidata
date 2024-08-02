@@ -130,13 +130,11 @@ class CodeEditor(QPlainTextEdit):
     ) -> None:
         QPlainTextEdit.__init__(self, parent)
 
-        win32_fix_title_bar_background(self)
-
         self.visible_blocks = []
         self.highlighter = None
         self.normal_color = None
         self.sideareas_color = None
-        self.linenumbers_color = QColor(Qt.lightGray if is_dark_mode() else Qt.darkGray)
+        self.linenumbers_color = None
 
         # Line number area management
         self.linenumbers_margin = True
@@ -170,6 +168,20 @@ class CodeEditor(QPlainTextEdit):
 
         self.setFocusPolicy(Qt.StrongFocus)
         self.setup(language=language, font=font, columns=columns, rows=rows)
+
+        self.update_color_mode()
+
+    def update_color_mode(self) -> None:
+        """Update color mode according to the current theme"""
+        win32_fix_title_bar_background(self)
+        suffix = "dark" if is_dark_mode() else "light"
+        color_scheme = CONF.get("color_schemes", "default/" + suffix)
+        self.highlighter.set_color_scheme(color_scheme)
+        self.highlighter.rehighlight()
+        self.linenumbers_color = QColor(Qt.lightGray if is_dark_mode() else Qt.darkGray)
+        self.normal_color = self.highlighter.get_foreground_color()
+        self.sideareas_color = self.highlighter.get_sideareas_color()
+        self.linenumberarea.update()
 
     def text_has_changed(self) -> None:
         """Text has changed: restart the timer to emit SIG_EDIT_STOPPED after a delay"""

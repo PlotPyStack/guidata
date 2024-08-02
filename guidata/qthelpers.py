@@ -77,6 +77,23 @@ if TYPE_CHECKING:
     from collections.abc import Callable
 
 
+def set_dark_mode(state: bool) -> None:
+    """Set dark mode for Qt application
+
+    Args:
+        state (bool): True to enable dark mode
+    """
+    if state:
+        os.environ["QT_COLOR_MODE"] = "dark"
+    else:
+        os.environ["QT_COLOR_MODE"] = "light"
+    set_color_mode()
+
+    # Iterate over all top-level widgets:
+    for widget in QW.QApplication.instance().topLevelWidgets():
+        win32_fix_title_bar_background(widget)
+
+
 def is_dark_mode() -> bool:
     """Return True if current color mode is dark mode
 
@@ -89,13 +106,60 @@ def is_dark_mode() -> bool:
         return darkdetect.isDark()
 
 
+DEFAULT_STYLES = None
+
+
+def set_color_mode():
+    """Set color mode (dark or light), depending on OS setting or on the
+    `QT_LIGHT_COLOR_MODE` environment variable."""
+    global DEFAULT_STYLES
+
+    app = QW.QApplication.instance()
+
+    if DEFAULT_STYLES is None:
+        # Store default palette to be able to restore it:
+        DEFAULT_STYLES = app.style().objectName(), app.palette(), app.styleSheet()
+
+    if is_dark_mode():
+        app.setStyle(QW.QStyleFactory.create("Fusion"))
+        dark_palette = QG.QPalette()
+        dark_color = QG.QColor(50, 50, 50)
+        disabled_color = QG.QColor(127, 127, 127)
+        dpsc = dark_palette.setColor
+        dpsc(QG.QPalette.Window, dark_color)
+        dpsc(QG.QPalette.WindowText, QC.Qt.white)
+        dpsc(QG.QPalette.Base, QG.QColor(31, 31, 31))
+        dpsc(QG.QPalette.AlternateBase, dark_color)
+        dpsc(QG.QPalette.ToolTipBase, QC.Qt.white)
+        dpsc(QG.QPalette.ToolTipText, QC.Qt.white)
+        dpsc(QG.QPalette.Text, QC.Qt.white)
+        dpsc(QG.QPalette.Disabled, QG.QPalette.Text, disabled_color)
+        dpsc(QG.QPalette.Button, dark_color)
+        dpsc(QG.QPalette.ButtonText, QC.Qt.white)
+        dpsc(QG.QPalette.Disabled, QG.QPalette.ButtonText, disabled_color)
+        dpsc(QG.QPalette.BrightText, QC.Qt.red)
+        dpsc(QG.QPalette.Link, QG.QColor(42, 130, 218))
+        dpsc(QG.QPalette.Highlight, QG.QColor(42, 130, 218))
+        dpsc(QG.QPalette.HighlightedText, QC.Qt.black)
+        dpsc(QG.QPalette.Disabled, QG.QPalette.HighlightedText, disabled_color)
+        app.setPalette(dark_palette)
+        app.setStyleSheet(
+            "QToolTip { color: #ffffff; background-color: #2a82da; border: 1px solid white; }"
+        )
+    elif DEFAULT_STYLES is not None:
+        style, palette, stylesheet = DEFAULT_STYLES
+        app.setStyle(QW.QStyleFactory.create(style))
+        app.setPalette(palette)
+        app.setStyleSheet(stylesheet)
+
+
 def win32_fix_title_bar_background(widget: QW.QWidget) -> None:
     """Fix window title bar background for Windows 10+ dark theme
 
     Args:
         widget (QW.QWidget): Widget to fix
     """
-    if os.name != "nt" or not is_dark_mode() or sys.maxsize == 2**31 - 1:
+    if os.name != "nt" or sys.maxsize == 2**31 - 1:
         return
 
     import ctypes
@@ -117,10 +181,18 @@ def win32_fix_title_bar_background(widget: QW.QWidget) -> None:
         ]
 
     accent = ACCENTPOLICY()
-    accent.AccentState = 1  # Default window Blur #ACCENT_ENABLE_BLURBEHIND
+    if is_dark_mode():
+        accent.AccentState = 1  # Default window Blur #ACCENT_ENABLE_BLURBEHIND
+    else:
+        # TODO: find a way to restore the default behavior
+        pass
 
     data = WINDOWCOMPOSITIONATTRIBDATA()
-    data.Attribute = 26  # WCA_USEDARKMODECOLORS
+    if is_dark_mode():
+        data.Attribute = 26  # WCA_USEDARKMODECOLORS
+    else:
+        # TODO: find a way to restore the default behavior
+        pass
     data.SizeOfData = ctypes.sizeof(accent)
     data.Data = ctypes.cast(ctypes.pointer(accent), ctypes.POINTER(ctypes.c_int))
 
