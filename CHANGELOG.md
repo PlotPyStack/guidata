@@ -1,5 +1,21 @@
 # Changelog #
 
+## Version 3.6.1 ##
+
+In this release, test coverage is 74%.
+
+🛠️ Bug fixes:
+
+* Light/dark theme support:
+  * Fixed issue with dark theme on Windows: the windows title bar background was not updated when the theme was changed from dark to light (the inverse was working) - this is now fixed in `guidata.qthelpers.win32_fix_title_bar_background` function
+  * Added `guidata.qthelpers.set_color_mode` function to set the color mode ('dark', 'light' or 'auto' for system default)
+  * Added `guidata.qthelpers.get_color_mode` function to get the current color mode ('dark', 'light' or 'auto' for system default)
+  * Added `guidata.qthelpers.get_color_theme` function to get the current color theme ('dark' or 'light')
+  * Added `guidata.qthelpers.get_background_color` function to get the current background `QColor` associated with the current color theme
+  * Added `guidata.qthelpers.get_foreground_color` function to get the current foreground `QColor` associated with the current color theme
+  * Added `guidata.qthelpers.is_dark_theme` function to check if the current theme is dark)
+  * As a consequence, `guidata.qthelpers.is_dark_mode` and `guidata.qthelpers.set_dark_mode` functions are deprecated, respectively in favor of `guidata.qthelpers.is_dark_theme` and `guidata.qthelpers.set_color_mode`
+
 ## Version 3.6.0 ##
 
 In this release, test coverage is 74%.

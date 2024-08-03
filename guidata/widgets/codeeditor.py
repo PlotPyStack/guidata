@@ -34,7 +34,7 @@ from guidata.configtools import get_font, get_icon
 from guidata.qthelpers import (
     add_actions,
     create_action,
-    is_dark_mode,
+    is_dark_theme,
     win32_fix_title_bar_background,
 )
 from guidata.utils import encoding
@@ -174,11 +174,13 @@ class CodeEditor(QPlainTextEdit):
     def update_color_mode(self) -> None:
         """Update color mode according to the current theme"""
         win32_fix_title_bar_background(self)
-        suffix = "dark" if is_dark_mode() else "light"
+        suffix = "dark" if is_dark_theme() else "light"
         color_scheme = CONF.get("color_schemes", "default/" + suffix)
         self.highlighter.set_color_scheme(color_scheme)
         self.highlighter.rehighlight()
-        self.linenumbers_color = QColor(Qt.lightGray if is_dark_mode() else Qt.darkGray)
+        self.linenumbers_color = QColor(
+            Qt.lightGray if is_dark_theme() else Qt.darkGray
+        )
         self.normal_color = self.highlighter.get_foreground_color()
         self.sideareas_color = self.highlighter.get_sideareas_color()
         self.linenumberarea.update()

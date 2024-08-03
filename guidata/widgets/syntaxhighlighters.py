@@ -9,27 +9,25 @@ Editor widget syntax highlighters based on QtGui.QSyntaxHighlighter
 (Python syntax highlighting rules are inspired from idlelib)
 """
 
-
 import builtins
 import keyword
 import re
 
-from guidata.config import CONF, _
-from qtpy.QtWidgets import (
-    QApplication,
-)
+from qtpy.QtCore import Qt
 from qtpy.QtGui import (
     QColor,
     QCursor,
     QFont,
+    QSyntaxHighlighter,
     QTextCharFormat,
     QTextOption,
-    QSyntaxHighlighter,
 )
-from qtpy.QtCore import Qt
+from qtpy.QtWidgets import (
+    QApplication,
+)
 
-from guidata.qthelpers import is_dark_mode
-
+from guidata.config import CONF, _
+from guidata.qthelpers import is_dark_theme
 
 # =============================================================================
 # Constants
@@ -92,7 +90,7 @@ class BaseSH(QSyntaxHighlighter):
 
         self.font = font
         if color_scheme is None:
-            suffix = "dark" if is_dark_mode() else "light"
+            suffix = "dark" if is_dark_theme() else "light"
             color_scheme = CONF.get("color_schemes", "default/" + suffix)
         if isinstance(color_scheme, str):
             self.color_scheme = get_color_scheme(color_scheme)

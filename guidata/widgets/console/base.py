@@ -38,9 +38,9 @@ from qtpy.QtWidgets import (
     QToolTip,
 )
 
+from guidata import qthelpers as qth
 from guidata.config import CONF
 from guidata.configtools import get_font, get_icon
-from guidata.qthelpers import is_dark_mode
 from guidata.widgets.console.calltip import CallTipWidget
 from guidata.widgets.console.mixins import BaseEditMixin
 from guidata.widgets.console.terminal import ANSIEscapeCodeHandler
@@ -1431,7 +1431,7 @@ def inverse_color(color):
 
 
 class ConsoleFontStyle(object):
-    """ """
+    """Console font style management"""
 
     def __init__(self, foregroundcolor, backgroundcolor, bold, italic, underline):
         self.foregroundcolor = foregroundcolor
@@ -1441,21 +1441,19 @@ class ConsoleFontStyle(object):
         self.underline = underline
         self.format = None
 
-    def apply_style(self, font, light_background, is_default):
-        """
+    def apply_style(self, font, is_default):
+        """Apply style to font
 
-        :param font:
-        :param light_background:
-        :param is_default:
+        Args:
+            font: QFont
+            is_default: Default is standard text (not error, link, etc.)
         """
         self.format = QTextCharFormat()
         self.format.setFont(font)
-        foreground = QColor(self.foregroundcolor)
-        if not light_background and is_default:
-            inverse_color(foreground)
-        self.format.setForeground(foreground)
-        background = QApplication.instance().palette().color(QPalette.Base)
-        self.format.setBackground(background)
+        self.format.setForeground(
+            qth.get_foreground_color() if is_default else QColor(self.foregroundcolor)
+        )
+        self.format.setBackground(qth.get_background_color())
         font = self.format.font()
         font.setBold(self.bold)
         font.setItalic(self.italic)
@@ -1528,23 +1526,28 @@ class ConsoleBaseWidget(TextEditBaseWidget):
 
     def update_color_mode(self):
         """Update color mode according to the current theme"""
-        light_background = not is_dark_mode()
-        self.set_light_background(light_background)
+        self.set_light_background(not qth.is_dark_theme())
 
     def set_light_background(self, state):
-        """
+        """Set light background state
 
-        :param state:
+        Args:
+            state: bool
         """
+        bg_color = qth.get_background_color()
+        fg_color = qth.get_foreground_color()
+        if self.light_background != state:
+            cursor = self.textCursor()
+            cursor.movePosition(QTextCursor.Start)
+            while not cursor.atEnd():
+                cursor.setPosition(cursor.block().position())
+                cursor.movePosition(QTextCursor.EndOfBlock, QTextCursor.KeepAnchor)
+                charformat = cursor.charFormat()
+                charformat.setBackground(bg_color)
+                cursor.setCharFormat(charformat)
+                cursor.movePosition(QTextCursor.NextBlock)
         self.light_background = state
-        if state:
-            self.set_palette(
-                background=QColor(Qt.white), foreground=QColor(Qt.darkGray)
-            )
-        else:
-            self.set_palette(
-                background=QColor(50, 50, 50), foreground=QColor(Qt.lightGray)
-            )
+        self.set_palette(background=bg_color, foreground=fg_color)
         self.ansi_handler.set_light_background(state)
         self.set_pythonshell_font()
 
@@ -1612,26 +1615,16 @@ class ConsoleBaseWidget(TextEditBaseWidget):
                     pass
                 self.default_style.format = self.ansi_handler.get_format()
             insert_text_to(cursor, text[last_end:], self.default_style.format)
-        #            # Slower alternative:
-        #            segments = self.COLOR_PATTERN.split(text)
-        #            cursor.insertText(segments.pop(0), self.default_style.format)
-        #            if segments:
-        #                for ansi_tags, text in zip(segments[::2], segments[1::2]):
-        #                    for ansi_tag in ansi_tags.split(';'):
-        #                        self.ansi_handler.set_code(int(ansi_tag))
-        #                    self.default_style.format = self.ansi_handler.get_format()
-        #                    cursor.insertText(text, self.default_style.format)
         self.set_cursor_position("eof")
         self.setCurrentCharFormat(self.default_style.format)
 
     def set_pythonshell_font(self, font=None):
         """Python Shell only"""
         if font is None:
-            font = self.font()
+            if self.default_style.format is None:
+                font = self.font()
+            else:
+                font = self.default_style.format.font()
         for style in self.font_styles:
-            style.apply_style(
-                font=font,
-                light_background=self.light_background,
-                is_default=style is self.default_style,
-            )
+            style.apply_style(font=font, is_default=style is self.default_style)
         self.ansi_handler.set_base_format(self.default_style.format)

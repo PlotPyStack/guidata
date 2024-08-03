@@ -13,7 +13,6 @@
 
 # FIXME: Internal shell MT: for i in range(100000): print i -> bug
 
-
 import builtins
 import os
 import platform
@@ -26,7 +25,7 @@ from qtpy.QtWidgets import QMessageBox
 
 from guidata.config import CONF, _
 from guidata.configtools import get_icon
-from guidata.qthelpers import add_actions, create_action, get_std_icon, is_dark_mode
+from guidata.qthelpers import add_actions, create_action, get_std_icon, is_dark_theme
 from guidata.utils.misc import getcwd_or_home, run_program
 from guidata.widgets import about
 from guidata.widgets.console.dochelpers import getargtxt, getdoc, getobjdir, getsource
@@ -171,7 +170,7 @@ class InternalShell(PythonShellWidget):
         exitfunc=None,
         profile=False,
         multithreaded=True,
-        light_background=not is_dark_mode(),
+        light_background=not is_dark_theme(),
         debug=False,
     ):
         PythonShellWidget.__init__(self, parent, profile)

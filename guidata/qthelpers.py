@@ -59,9 +59,10 @@ import os
 import os.path as osp
 import sys
 import time
+import warnings
 from contextlib import contextmanager
 from datetime import datetime
-from typing import TYPE_CHECKING, Generator, Iterable
+from typing import TYPE_CHECKING, Generator, Iterable, Literal
 
 from qtpy import QtCore as QC
 from qtpy import QtGui as QG
@@ -77,42 +78,102 @@ if TYPE_CHECKING:
     from collections.abc import Callable
 
 
+ENV_COLOR_MODE = "QT_COLOR_MODE"
+
+
 def set_dark_mode(state: bool) -> None:
     """Set dark mode for Qt application
+    (deprecated, use `set_color_mode` instead)
 
     Args:
-        state (bool): True to enable dark mode
+        state: True to enable dark mode
     """
-    if state:
-        os.environ["QT_COLOR_MODE"] = "dark"
-    else:
-        os.environ["QT_COLOR_MODE"] = "light"
-    set_color_mode()
-
-    # Iterate over all top-level widgets:
-    for widget in QW.QApplication.instance().topLevelWidgets():
-        win32_fix_title_bar_background(widget)
+    mode = "dark" if state else "light"
+    warnings.warn(
+        f"`set_dark_mode` is deprecated and will be removed in a future version. "
+        f"Use `set_color_mode('{mode}')` instead.",
+        DeprecationWarning,
+    )
+    set_color_mode(mode)
 
 
 def is_dark_mode() -> bool:
     """Return True if current color mode is dark mode
+    (deprecated, use `is_dark_theme` instead)
 
     Returns:
-        bool: True if dark mode is enabled
+        True if dark mode is enabled
+    """
+    warnings.warn(
+        "`is_dark_mode` is deprecated and will be removed in a future version. "
+        "Use `is_dark_theme` instead.",
+        DeprecationWarning,
+    )
+    return is_dark_theme()
+
+
+def is_dark_theme() -> bool:
+    """Return True if current color mode is dark mode
+
+    Returns:
+        True if dark mode is enabled
     """
     try:
-        return os.environ["QT_COLOR_MODE"].lower() == "dark"
+        mode = os.environ[ENV_COLOR_MODE].lower()
+        return mode == "dark" or (mode == "auto" and darkdetect.isDark())
     except KeyError:
         return darkdetect.isDark()
+
+
+def get_color_theme() -> Literal["light", "dark"]:
+    """Get color theme
+
+    Returns:
+        Color theme ('light' or 'dark')
+    """
+    return "dark" if is_dark_theme() else "light"
+
+
+def get_color_mode() -> Literal["light", "dark", "auto"]:
+    """Get color mode
+
+    Returns:
+        Color mode ('light', 'dark' or 'auto')
+    """
+    return os.environ.get(ENV_COLOR_MODE, "auto")
 
 
 DEFAULT_STYLES = None
 
 
-def set_color_mode():
-    """Set color mode (dark or light), depending on OS setting or on the
-    `QT_LIGHT_COLOR_MODE` environment variable."""
+def get_background_color() -> QG.QColor:
+    """Get current theme background color"""
+    return QW.QApplication.instance().palette().color(QG.QPalette.Base)
+
+
+def get_foreground_color() -> QG.QColor:
+    """Get current theme foreground color"""
+    return QW.QApplication.instance().palette().color(QG.QPalette.Text)
+
+
+def set_color_mode(mode: Literal["light", "dark", "auto"] | None = None):
+    """Set color mode.
+
+    Args:
+        mode: Color mode ('light', 'dark' or 'auto'). If 'auto', the system color mode
+        is used. If None, the `QT_LIGHT_COLOR_MODE` environment variable is used.
+    """
     global DEFAULT_STYLES
+
+    if mode is None:
+        mode = get_color_mode()
+    else:
+        assert mode in (
+            "light",
+            "dark",
+            "auto",
+        ), f"Invalid color mode: {mode} (expected 'light', 'dark' or 'auto')"
+        os.environ[ENV_COLOR_MODE] = mode
 
     app = QW.QApplication.instance()
 
@@ -120,7 +181,7 @@ def set_color_mode():
         # Store default palette to be able to restore it:
         DEFAULT_STYLES = app.style().objectName(), app.palette(), app.styleSheet()
 
-    if is_dark_mode():
+    if is_dark_theme():
         app.setStyle(QW.QStyleFactory.create("Fusion"))
         dark_palette = QG.QPalette()
         dark_color = QG.QColor(50, 50, 50)
@@ -152,6 +213,10 @@ def set_color_mode():
         app.setPalette(palette)
         app.setStyleSheet(stylesheet)
 
+    # Iterate over all top-level widgets:
+    for widget in QW.QApplication.instance().topLevelWidgets():
+        win32_fix_title_bar_background(widget)
+
 
 def win32_fix_title_bar_background(widget: QW.QWidget) -> None:
     """Fix window title bar background for Windows 10+ dark theme
@@ -181,18 +246,15 @@ def win32_fix_title_bar_background(widget: QW.QWidget) -> None:
         ]
 
     accent = ACCENTPOLICY()
-    if is_dark_mode():
-        accent.AccentState = 1  # Default window Blur #ACCENT_ENABLE_BLURBEHIND
-    else:
-        # TODO: find a way to restore the default behavior
-        pass
-
     data = WINDOWCOMPOSITIONATTRIBDATA()
-    if is_dark_mode():
+
+    if is_dark_theme():
+        accent.AccentState = 3  # ACCENT_ENABLE_ACRYLICBLURBEHIND
         data.Attribute = 26  # WCA_USEDARKMODECOLORS
     else:
-        # TODO: find a way to restore the default behavior
-        pass
+        accent.AccentState = 0  # ACCENT_DISABLED
+        data.Attribute = 19  # WCA_ACCENT_POLICY
+
     data.SizeOfData = ctypes.sizeof(accent)
     data.Data = ctypes.cast(ctypes.pointer(accent), ctypes.POINTER(ctypes.c_int))
 
@@ -200,6 +262,17 @@ def win32_fix_title_bar_background(widget: QW.QWidget) -> None:
     set_win_cpa.argtypes = (wintypes.HWND, WINDOWCOMPOSITIONATTRIBDATA)
     set_win_cpa.restype = ctypes.c_int
     set_win_cpa(int(widget.winId()), data)
+
+    if not is_dark_theme():
+        # Setting dark mode attribute to False (0) to ensure the default light mode
+        attribute_value = ctypes.c_int(0)
+        hwnd = wintypes.HWND(int(widget.winId()))
+        ctypes.windll.dwmapi.DwmSetWindowAttribute(
+            hwnd,
+            20,  # DWMWA_USE_IMMERSIVE_DARK_MODE, # Dark mode attribute
+            ctypes.byref(attribute_value),
+            ctypes.sizeof(attribute_value),
+        )
 
 
 def create_action(
