@@ -43,6 +43,7 @@ class TestWidget(QW.QWidget):
         self.add_info_to_codeeditor()
 
         self.change_theme()
+        self.console.execute_command("print('Console output')")
 
     def add_info_to_codeeditor(self):
         """Add current color mode and theme to the code editor, with a prefix with

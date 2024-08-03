@@ -161,7 +161,7 @@ def set_color_mode(mode: Literal["light", "dark", "auto"] | None = None):
 
     Args:
         mode: Color mode ('light', 'dark' or 'auto'). If 'auto', the system color mode
-        is used. If None, the `QT_LIGHT_COLOR_MODE` environment variable is used.
+        is used. If None, the `QT_COLOR_MODE` environment variable is used.
     """
     global DEFAULT_STYLES
 

@@ -1423,11 +1423,10 @@ class QtANSIEscapeCodeHandler(ANSIEscapeCodeHandler):
 
 
 def inverse_color(color):
-    """
-
-    :param color:
-    """
-    color.setHsv(color.hue(), color.saturation(), 255 - color.value())
+    """Inverse color"""
+    inv_color = QColor()
+    inv_color.setHsv(color.hue(), color.saturation(), 255 - color.value())
+    return inv_color
 
 
 class ConsoleFontStyle(object):
@@ -1450,9 +1449,13 @@ class ConsoleFontStyle(object):
         """
         self.format = QTextCharFormat()
         self.format.setFont(font)
-        self.format.setForeground(
-            qth.get_foreground_color() if is_default else QColor(self.foregroundcolor)
-        )
+        fg_color = QColor(self.foregroundcolor)
+        if is_default:
+            self.format.setForeground(
+                inverse_color(fg_color) if qth.is_dark_theme() else fg_color
+            )
+        else:
+            self.format.setForeground(fg_color)
         self.format.setBackground(qth.get_background_color())
         font = self.format.font()
         font.setBold(self.bold)
@@ -1472,9 +1475,6 @@ class ConsoleBaseWidget(TextEditBaseWidget):
 
     def __init__(self, parent=None):
         TextEditBaseWidget.__init__(self, parent)
-
-        self.light_background = True
-
         self.setMaximumBlockCount(300)
 
         # ANSI escape code handler
@@ -1534,20 +1534,28 @@ class ConsoleBaseWidget(TextEditBaseWidget):
         Args:
             state: bool
         """
+        default_fg_color = QColor(self.default_style.foregroundcolor)
+        if not state:
+            default_fg_color = inverse_color(default_fg_color)
         bg_color = qth.get_background_color()
-        fg_color = qth.get_foreground_color()
-        if self.light_background != state:
-            cursor = self.textCursor()
-            cursor.movePosition(QTextCursor.Start)
-            while not cursor.atEnd():
-                cursor.setPosition(cursor.block().position())
-                cursor.movePosition(QTextCursor.EndOfBlock, QTextCursor.KeepAnchor)
-                charformat = cursor.charFormat()
-                charformat.setBackground(bg_color)
-                cursor.setCharFormat(charformat)
-                cursor.movePosition(QTextCursor.NextBlock)
-        self.light_background = state
-        self.set_palette(background=bg_color, foreground=fg_color)
+
+        cursor = self.textCursor()
+        cursor.movePosition(QTextCursor.Start)
+        while not cursor.atEnd():
+            cursor.setPosition(cursor.block().position())
+            cursor.movePosition(QTextCursor.EndOfBlock, QTextCursor.KeepAnchor)
+            charformat = cursor.charFormat()
+            if charformat.background() == bg_color:
+                break
+            charformat.setBackground(bg_color)
+            col = charformat.foreground().color()
+            if col.red() == col.green() and col.green() == col.blue():
+                # Default style
+                charformat.setForeground(default_fg_color)
+            cursor.setCharFormat(charformat)
+            cursor.movePosition(QTextCursor.NextBlock)
+
+        self.set_palette(background=bg_color, foreground=qth.get_foreground_color())
         self.ansi_handler.set_light_background(state)
         self.set_pythonshell_font()
 
