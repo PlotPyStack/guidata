@@ -8,6 +8,7 @@ Test dark/light theme switching
 """
 
 import os
+from typing import Literal
 
 import pytest
 from qtpy import QtCore as QC
@@ -23,13 +24,14 @@ LIGHT, DARK, AUTO = "Light", "Dark", "Auto"
 class TestWidget(QW.QWidget):
     """Test widget for dark/light theme switching"""
 
-    def __init__(self):
+    def __init__(self, default: Literal["light", "dark", "auto"] = AUTO) -> None:
         super(TestWidget, self).__init__()
         self.setWindowTitle("Test dark/light theme switching")
         self.layout = QW.QVBoxLayout()
         self.setLayout(self.layout)
         self.combo = QW.QComboBox()
         self.combo.addItems([LIGHT, DARK, AUTO])
+        self.combo.setCurrentText(default.capitalize())
         self.combo.currentIndexChanged.connect(self.change_theme)
 
         self.editor = CodeEditor(self)
@@ -42,7 +44,8 @@ class TestWidget(QW.QWidget):
         self.editor.setPlainText("Change theme using the combo box above" + os.linesep)
         self.add_info_to_codeeditor()
 
-        self.change_theme()
+        if default != AUTO:
+            self.change_theme()
         self.console.execute_command("print('Console output')")
 
     def add_info_to_codeeditor(self):
@@ -78,7 +81,7 @@ class TestWidget(QW.QWidget):
 def test_dark_light_themes():
     """Test dark/light theme switching"""
     with qth.qt_app_context(exec_loop=True):
-        widget = TestWidget()
+        widget = TestWidget(default=AUTO)
         widget.resize(800, 600)
         widget.show()
 

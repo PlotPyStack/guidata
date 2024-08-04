@@ -1521,7 +1521,7 @@ class ConsoleBaseWidget(TextEditBaseWidget):
             self.traceback_link_style,
             self.prompt_style,
         )
-        self.set_pythonshell_font()
+        self.update_color_mode()
         self.setMouseTracking(True)
 
     def update_color_mode(self):
