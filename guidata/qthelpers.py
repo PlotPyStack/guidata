@@ -118,11 +118,10 @@ def is_dark_theme() -> bool:
     Returns:
         True if dark mode is enabled
     """
-    try:
-        mode = os.environ[ENV_COLOR_MODE].lower()
-        return mode == "dark" or (mode == "auto" and darkdetect.isDark())
-    except KeyError:
-        return darkdetect.isDark()
+    mode = os.environ.get(ENV_COLOR_MODE, "auto").lower()
+    if mode == "auto":
+        os.environ[ENV_COLOR_MODE] = mode = "dark" if darkdetect.isDark() else "light"
+    return mode == "dark"
 
 
 def get_color_theme() -> Literal["light", "dark"]:
