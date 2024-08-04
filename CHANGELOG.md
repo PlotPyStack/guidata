@@ -1,5 +1,15 @@
 # Changelog #
 
+## Version 3.6.2 ##
+
+In this release, test coverage is 74%.
+
+🛠️ Bug fixes:
+
+* Light/dark theme support:
+  * Auto light/dark theme: quering OS setting only once, or each time the `set_color_mode('auto')` function is called
+  * Fix console widget color theme: existing text in console widget was not updated when changing color theme
+
 ## Version 3.6.1 ##
 
 In this release, test coverage is 74%.
