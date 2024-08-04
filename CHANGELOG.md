@@ -1,6 +1,6 @@
 # Changelog #
 
-## Version 3.6.2 ##
+## Version 3.6.1 ##
 
 In this release, test coverage is 74%.
 
@@ -9,14 +9,6 @@ In this release, test coverage is 74%.
 * Light/dark theme support:
   * Auto light/dark theme: quering OS setting only once, or each time the `set_color_mode('auto')` function is called
   * Fix console widget color theme: existing text in console widget was not updated when changing color theme
-
-## Version 3.6.1 ##
-
-In this release, test coverage is 74%.
-
-🛠️ Bug fixes:
-
-* Light/dark theme support:
   * Fixed issue with dark theme on Windows: the windows title bar background was not updated when the theme was changed from dark to light (the inverse was working) - this is now fixed in `guidata.qthelpers.win32_fix_title_bar_background` function
   * Added `guidata.qthelpers.set_color_mode` function to set the color mode ('dark', 'light' or 'auto' for system default)
   * Added `guidata.qthelpers.get_color_mode` function to get the current color mode ('dark', 'light' or 'auto' for system default)
