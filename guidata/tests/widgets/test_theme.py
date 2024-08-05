@@ -47,6 +47,12 @@ class BaseTestWidget(QW.QWidget):
         self.combo.setCurrentText(self.default_theme)
         self.combo.currentTextChanged.connect(self.change_color_mode)
         self.combo.setSizePolicy(QW.QSizePolicy.Expanding, QW.QSizePolicy.Minimum)
+        self.combo.setToolTip(
+            "Select color mode:"
+            "<ul><li><b>auto</b>: follow system settings</li>"
+            "<li><b>light</b>: use light theme</li>"
+            "<li><b>dark</b>: use dark theme</li></ul>"
+        )
         hlayout = QW.QHBoxLayout()
         hlayout.addWidget(label)
         hlayout.addWidget(self.combo)

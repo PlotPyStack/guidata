@@ -225,7 +225,9 @@ def set_color_mode(mode: Literal["light", "dark", "auto"] | None = None):
         dpsc(QG.QPalette.Disabled, QG.QPalette.HighlightedText, disabled_color)
         app.setPalette(dark_palette)
         app.setStyleSheet(
-            "QToolTip { color: #ffffff; background-color: #2a82da; border: 1px solid white; }"
+            "QToolTip { "
+            "color: white; background-color: #2a82da; border: 1px solid white;"
+            " }"
         )
     elif DEFAULT_STYLES is not None:
         style, palette, stylesheet = DEFAULT_STYLES
