@@ -6,7 +6,7 @@
     "configurations": [
         {
             "name": "Run Test Launcher",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "${workspaceFolder}/guidata/tests/__init__.py",
             "console": "integratedTerminal",
@@ -19,19 +19,23 @@
         },
         {
             "name": "Run current file",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
             "envFile": "${workspaceFolder}/.env",
             "python": "${config:python.defaultInterpreterPath}",
+            "pythonArgs": [
+                "-W error::DeprecationWarning",
+                "-W error::RuntimeWarning",
+            ],
             "justMyCode": false,
             "args": [],
             "env": {}
         },
         {
             "name": "Run current file (unattended)",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
