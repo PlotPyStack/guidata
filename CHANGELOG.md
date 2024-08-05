@@ -1,5 +1,15 @@
 # Changelog #
 
+## Version 3.6.2 ##
+
+In this release, test coverage is 74%.
+
+🛠️ Bug fixes:
+
+* Light/dark theme support:
+  * Fix default color mode issues
+  * Color theme test: allow to derive from, so that the test may be completed by other widgets
+
 ## Version 3.6.1 ##
 
 In this release, test coverage is 74%.

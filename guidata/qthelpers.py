@@ -79,6 +79,8 @@ if TYPE_CHECKING:
 
 
 ENV_COLOR_MODE = "QT_COLOR_MODE"
+COLOR_MODES = LIGHT, DARK, AUTO = "light", "dark", "auto"
+CURRENT_THEME = None
 
 
 def set_dark_mode(state: bool) -> None:
@@ -88,7 +90,7 @@ def set_dark_mode(state: bool) -> None:
     Args:
         state: True to enable dark mode
     """
-    mode = "dark" if state else "light"
+    mode = DARK if state else LIGHT
     warnings.warn(
         f"`set_dark_mode` is deprecated and will be removed in a future version. "
         f"Use `set_color_mode('{mode}')` instead.",
@@ -112,25 +114,37 @@ def is_dark_mode() -> bool:
     return is_dark_theme()
 
 
-def is_dark_theme() -> bool:
-    """Return True if current color mode is dark mode
-
-    Returns:
-        True if dark mode is enabled
-    """
-    mode = os.environ.get(ENV_COLOR_MODE, "auto").lower()
-    if mode == "auto":
-        os.environ[ENV_COLOR_MODE] = mode = "dark" if darkdetect.isDark() else "light"
-    return mode == "dark"
-
-
 def get_color_theme() -> Literal["light", "dark"]:
-    """Get color theme
+    """Get color theme.
+
+    Color theme value is updated only once per session because the query to the system
+    may be expensive depending on the platform. It is updated when the color mode is
+    set to 'auto' using `set_color_mode('auto')`.
 
     Returns:
         Color theme ('light' or 'dark')
     """
-    return "dark" if is_dark_theme() else "light"
+    global CURRENT_THEME
+    mode = get_color_mode()
+    if mode == AUTO:
+        theme = DARK if darkdetect.isDark() else LIGHT
+    else:
+        theme = mode
+    CURRENT_THEME = theme
+    return theme
+
+
+def is_dark_theme() -> bool:
+    """Return True if current color mode is dark mode.
+
+    Color theme value is updated only once per session because the query to the system
+    may be expensive depending on the platform. It is updated when the color mode is
+    set to 'auto' using `set_color_mode('auto')`.
+
+    Returns:
+        True if dark mode is enabled
+    """
+    return get_color_theme() == DARK
 
 
 def get_color_mode() -> Literal["light", "dark", "auto"]:
@@ -139,7 +153,16 @@ def get_color_mode() -> Literal["light", "dark", "auto"]:
     Returns:
         Color mode ('light', 'dark' or 'auto')
     """
-    return os.environ.get(ENV_COLOR_MODE, "auto")
+    mode = os.environ.get(ENV_COLOR_MODE, AUTO).lower()
+    if mode not in COLOR_MODES:
+        # Just show a warning, the mode will be set to 'auto':
+        warnings.warn(
+            f"Invalid color mode: {mode} (expected {COLOR_MODES}). "
+            "Using 'auto' instead.",
+            UserWarning,
+        )
+        mode = AUTO
+    return mode
 
 
 DEFAULT_STYLES = None
@@ -162,16 +185,14 @@ def set_color_mode(mode: Literal["light", "dark", "auto"] | None = None):
         mode: Color mode ('light', 'dark' or 'auto'). If 'auto', the system color mode
         is used. If None, the `QT_COLOR_MODE` environment variable is used.
     """
-    global DEFAULT_STYLES
+    global DEFAULT_STYLES, CURRENT_THEME
 
-    if mode is None:
-        mode = get_color_mode()
-    else:
-        assert mode in (
-            "light",
-            "dark",
-            "auto",
-        ), f"Invalid color mode: {mode} (expected 'light', 'dark' or 'auto')"
+    CURRENT_THEME = None
+
+    if mode is not None:
+        assert (
+            mode in COLOR_MODES
+        ), f"Invalid color mode: {mode} (expected {COLOR_MODES})"
         os.environ[ENV_COLOR_MODE] = mode
 
     app = QW.QApplication.instance()
