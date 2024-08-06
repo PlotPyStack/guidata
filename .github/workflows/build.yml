@@ -1,0 +1,24 @@
+name: Build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build_wheels:
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # macos-13 is an intel runner, macos-14 is apple silicon
+        os: [ubuntu-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build wheels
+        run: pipx run cibuildwheel==2.20.0
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
+          path: ./wheelhouse/*.whl
