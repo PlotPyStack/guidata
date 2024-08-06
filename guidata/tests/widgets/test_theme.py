@@ -22,13 +22,13 @@ from guidata.widgets.codeeditor import CodeEditor
 from guidata.widgets.console import Console
 
 
-class BaseTestWidget(QW.QWidget):
+class BaseColorModeWidget(QW.QWidget):
     """Base class for testing dark/light theme switching"""
 
     SIZE = (1200, 600)
 
     def __init__(self, default: Literal["light", "dark", "auto"] = qth.AUTO) -> None:
-        super(BaseTestWidget, self).__init__()
+        super(BaseColorModeWidget, self).__init__()
         self.resize(*self.SIZE)
         self.default_theme = default
         self.combo: QW.QComboBox | None = None
@@ -68,7 +68,7 @@ class BaseTestWidget(QW.QWidget):
         event.accept()
 
 
-class TestWidget(BaseTestWidget):
+class ColorModeWidget(BaseColorModeWidget):
     """Testing color mode switching for guidata's widgets: code editor and console"""
 
     def __init__(self, default: Literal["light", "dark", "auto"] = qth.AUTO) -> None:
@@ -119,7 +119,7 @@ def test_dark_light_themes(
 ) -> None:
     """Test dark/light theme switching"""
     with qth.qt_app_context(exec_loop=True):
-        widget = TestWidget(default=qth.AUTO if default is None else default)
+        widget = ColorModeWidget(default=qth.AUTO if default is None else default)
         widget.show()
 
 
