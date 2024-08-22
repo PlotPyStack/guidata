@@ -40,6 +40,7 @@ import gettext
 import os
 import os.path as osp
 import sys
+import warnings
 from collections.abc import Callable
 from typing import TYPE_CHECKING
 
@@ -333,7 +334,7 @@ def get_family(families: str | list[str]) -> str:
         if font_is_installed(family):
             return family
     else:
-        print("Warning: None of the following fonts is installed: %r" % families)
+        warnings.warn("None of the following fonts is installed: %r" % families)
         return ""
 
 
