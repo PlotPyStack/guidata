@@ -307,6 +307,8 @@ MONOSPACE = [
     "Cascadia Code",
     "Cascadia Mono",
     "Consolas",
+    "Monospace",
+    "Menlo",
     "Courier New",
     "Bitstream Vera Sans Mono",
     "Andale Mono",
