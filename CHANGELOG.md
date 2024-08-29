@@ -7,6 +7,7 @@ In this release, test coverage is 74%.
 🛠️ Bug fixes:
 
 * MultipleChoiceItem: implemented `callback` property feature (was unexpectedly not supported)
+* Add 'Monospace' and 'Menlo' to the list of fixed-width supported fonts
 
 ## Version 3.6.2 ##
 
