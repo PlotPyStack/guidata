@@ -1150,7 +1150,7 @@ class MultipleChoiceWidget(AbstractDataSetWidget):
         _choices = item.get_prop_value("data", "choices")
         for _k, choice, _img in _choices:
             checkbox = QCheckBox(choice)
-            checkbox.stateChanged.connect(lambda: self.notify_value_change())
+            checkbox.stateChanged.connect(lambda: self.checkbox_clicked())
             layout.addWidget(checkbox, cx, cy)
             if nx < 0:
                 cy += 1
@@ -1213,6 +1213,11 @@ class MultipleChoiceWidget(AbstractDataSetWidget):
         necessary"""
         super().set_state()
         self.groupbox.setEnabled(not self.is_readonly())
+
+    def checkbox_clicked(self):
+        """Update the data item value when a checkbox is clicked"""
+        self.notify_value_change()
+        _display_callback(self, self.value())
 
 
 class FloatArrayWidget(AbstractDataSetWidget):

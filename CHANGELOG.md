@@ -1,5 +1,13 @@
 # Changelog #
 
+## Version 3.6.3 ##
+
+In this release, test coverage is 74%.
+
+🛠️ Bug fixes:
+
+* MultipleChoiceItem: implemented `callback` property feature (was unexpectedly not supported)
+
 ## Version 3.6.2 ##
 
 In this release, test coverage is 74%.
