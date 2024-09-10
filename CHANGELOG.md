@@ -4,10 +4,16 @@
 
 In this release, test coverage is 74%.
 
-🛠️ Bug fixes:
+💥 New features:
 
 * MultipleChoiceItem: implemented `callback` property feature (was unexpectedly not supported)
+
+🛠️ Bug fixes:
+
+* [Issue #78](https://github.com/PlotPyStack/guidata/issues/78) - PySide6 on Linux: `AttributeError: 'DataFrameView' object has no attribute 'MoveLeft'`
+* [Issue #77](https://github.com/PlotPyStack/guidata/issues/77) - PyQt6/PySide6 on Linux: `AttributeError: type object 'PySide6.QtGui.QPalette' has no attribute 'Background'`
 * Add 'Monospace' and 'Menlo' to the list of fixed-width supported fonts
+* Font warning message in *configtools.py*: replace `print` by `warnings.warn`
 
 ## Version 3.6.2 ##
 
