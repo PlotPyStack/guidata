@@ -608,7 +608,7 @@ class DataFrameView(QTableView):
         ) + self.frozen_table_view.columnWidth(1)
         topleft_x = self.visualRect(current).topLeft().x()
 
-        overflow = cursor_action.MoveLeft and current.column() > 1
+        overflow = cursor_action == QAbstractItemView.MoveLeft and current.column() > 1
         overflow = overflow and topleft_x < col_width
 
         if cursor_action == overflow:
