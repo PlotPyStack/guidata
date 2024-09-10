@@ -368,7 +368,7 @@ class TextEditBaseWidget(QPlainTextEdit, BaseEditMixin):
         palette = QPalette()
         # palette.setColor(QPalette.Base, background)
         palette.setColor(QPalette.Text, foreground)
-        palette.setColor(QPalette.Background, background)
+        palette.setColor(QPalette.Window, background)
         self.setPalette(palette)
 
         # Set the right background color when changing color schemes
