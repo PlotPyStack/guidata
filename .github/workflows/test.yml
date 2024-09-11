@@ -3,7 +3,7 @@
 
 # Inspired from https://pytest-qt.readthedocs.io/en/latest/troubleshooting.html#github-actions
 
-name: Python package
+name: Build, install and test
 
 on:
   push:
