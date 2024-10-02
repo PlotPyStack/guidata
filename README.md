@@ -53,5 +53,18 @@ Application development tools:
 
 ## Dependencies and installation
 
+### Supported Qt versions and bindings
+
+The whole PlotPyStack set of libraries relies on the [Qt](https://doc.qt.io/) GUI toolkit, thanks to [QtPy](https://pypi.org/project/QtPy/), an abstraction layer which allows to use the same API to interact with different Python-to-Qt bindings (PyQt5, PyQt6, PySide2, PySide6).
+
+Compatibility table:
+
+| guidata version | PyQt5 | PyQt6 | PySide2 | PySide6 |
+|----------------|-------|-------|---------|---------|
+| 3.0-3.5        | ✅    | ⚠️    | ❌     | ⚠️      |
+| Latest         | ✅    | ✅    | ❌     | ✅      |
+
+### Other dependencies and installation
+
 See [Installation](https://guidata.readthedocs.io/en/latest/installation.html)
 section in the documentation for more details.
