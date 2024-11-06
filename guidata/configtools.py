@@ -34,6 +34,8 @@ Add image paths
 .. autofunction:: add_image_module_path
 """
 
+from __future__ import annotations
+
 import gettext
 import os
 import os.path as osp

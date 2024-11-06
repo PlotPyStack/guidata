@@ -3,6 +3,8 @@ sphinx.ext.autodoc extension for :py:class:`guidata.dataset.DataSet` and related
 classes.
 """
 
+from __future__ import annotations
+
 import logging
 import re
 from inspect import Parameter, Signature

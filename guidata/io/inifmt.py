@@ -7,6 +7,8 @@
 Configuration files (.ini)
 """
 
+from __future__ import annotations
+
 from typing import Any
 
 from guidata.io.base import BaseIOHandler, GroupContext, WriterMixin

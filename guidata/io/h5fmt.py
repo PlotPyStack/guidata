@@ -7,6 +7,8 @@
 HDF5 files (.h5)
 """
 
+from __future__ import annotations
+
 import datetime
 import sys
 from collections.abc import Callable, Sequence

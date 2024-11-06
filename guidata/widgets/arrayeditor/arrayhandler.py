@@ -18,6 +18,8 @@ acts as a pointer to the original array and allows to share the same array in mu
 models/widgets and views. They handle data access and changes.
 """
 
+from __future__ import annotations
+
 import copy
 from typing import Any, Generic, TypeVar, Union, cast
 

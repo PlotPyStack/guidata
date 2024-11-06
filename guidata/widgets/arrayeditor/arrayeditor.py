@@ -16,6 +16,8 @@
 Module that provides array editor dialog boxes to edit various types of NumPy arrays
 """
 
+from __future__ import annotations
+
 from typing import Generic
 
 import numpy as np

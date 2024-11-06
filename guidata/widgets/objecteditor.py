@@ -14,6 +14,8 @@ This package provides a generic object editor widget.
 
 """
 
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 import numpy as np
