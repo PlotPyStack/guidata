@@ -25,11 +25,11 @@ classifiers = [
     "Operating System :: Microsoft :: Windows :: Windows 10",
     "Operating System :: Microsoft :: Windows :: Windows 11",
     "Operating System :: POSIX :: Linux",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Scientific/Engineering",
     "Topic :: Scientific/Engineering :: Human Machine Interfaces",
     "Topic :: Software Development :: Libraries :: Python Modules",
@@ -37,8 +37,8 @@ classifiers = [
     "Topic :: Software Development :: Widget Sets",
     "Topic :: Utilities",
 ]
-requires-python = ">=3.8, <4"
-dependencies = ["h5py>=3.0", "NumPy>=1.21", "QtPy>=1.9", "requests", "tomli"]
+requires-python = ">=3.9, <4"
+dependencies = ["h5py>=3.1", "NumPy>=1.19", "QtPy>=1.9", "requests", "tomli"]
 dynamic = ["version"]
 
 [project.urls]
@@ -78,7 +78,7 @@ addopts = "guidata"
 exclude = [".git", ".vscode", "build", "dist", "guidata/external"]
 line-length = 88                                                   # Same as Black.
 indent-width = 4                                                   # Same as Black.
-target-version = "py38"                                            # Assume Python 3.8
+target-version = "py39"                                            # Assume Python 3.9.
 
 [tool.ruff.lint]
 # all rules can be found here: https://beta.ruff.rs/docs/rules/

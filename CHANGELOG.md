@@ -1,5 +1,9 @@
 # Changelog #
 
+## Version 3.7.0 ##
+
+Drop support for Python 3.8.
+
 ## Version 3.6.3 ##
 
 In this release, test coverage is 74%.

@@ -23,7 +23,7 @@ def test_compare_cfg_toml():
 @pytest.mark.skip(reason="This test should be run manually (development only)")
 def test_generate_requirement_tables():
     """Test generate_requirement_tables."""
-    genreqs.gen_path_req_rst(GR_PATH, "guidata", ["Python>=3.8", "PyQt>=5.11"], GR_PATH)
+    genreqs.gen_path_req_rst(GR_PATH, "guidata", ["Python>=3.9", "PyQt>=5.11"], GR_PATH)
 
 
 if __name__ == "__main__":
