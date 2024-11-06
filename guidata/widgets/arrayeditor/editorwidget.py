@@ -14,8 +14,6 @@
 
 """Array editor widget"""
 
-from __future__ import annotations
-
 import io
 from typing import Any, Generic, Sequence, cast
 

@@ -15,8 +15,6 @@ There is one widget type for each data item type.
 Example: ChoiceWidget <--> ChoiceItem, ImageChoiceItem
 """
 
-from __future__ import annotations
-
 import datetime
 import os
 import os.path as osp

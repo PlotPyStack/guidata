@@ -4,8 +4,6 @@
 
 """Sphinx directive to display a note about how to instanciate a dataset class"""
 
-from __future__ import annotations
-
 from typing import TYPE_CHECKING, Type
 
 from docutils import nodes

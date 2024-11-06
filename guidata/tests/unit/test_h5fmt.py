@@ -12,8 +12,6 @@ Testing various use cases of HDF5 I/O:
 * Serialize and deserialize a data model, handling versioning and compatibility breaks.
 """
 
-from __future__ import annotations
-
 import atexit
 import os
 import os.path as osp

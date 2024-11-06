@@ -12,8 +12,6 @@ JSON files (.json)
 
 # pylint: disable=invalid-name  # Allows short reference names like x, y, ...
 
-from __future__ import annotations
-
 import json
 import os
 from collections.abc import Callable, Sequence

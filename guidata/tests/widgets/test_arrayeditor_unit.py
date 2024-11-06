@@ -10,8 +10,6 @@ Unit tests for arrayeditor.py and its rows/columns insertion/deletion features
 
 # guitest: show
 
-from __future__ import annotations
-
 from typing import Any
 
 import numpy as np

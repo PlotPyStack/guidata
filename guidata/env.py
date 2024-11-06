@@ -7,8 +7,6 @@
 Execution environmnent utilities
 """
 
-from __future__ import annotations
-
 import argparse
 import enum
 import os

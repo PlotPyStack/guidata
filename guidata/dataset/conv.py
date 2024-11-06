@@ -22,8 +22,6 @@ Create dataset classes
 .. autofunction:: guidata.dataset.create_dataset_from_dict
 """
 
-from __future__ import annotations
-
 import inspect
 from typing import TYPE_CHECKING, Any
 

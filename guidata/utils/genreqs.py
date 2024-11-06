@@ -12,8 +12,6 @@ Module for generating requirements tables in documentation.
 This module is derived from the `genreqs.py` module of the `DataLab` project.
 """
 
-from __future__ import annotations
-
 import configparser as cp
 import os
 import os.path as osp

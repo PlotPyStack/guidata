@@ -7,8 +7,6 @@
 Test dark/light theme switching
 """
 
-from __future__ import annotations
-
 import os
 import sys
 from typing import Literal

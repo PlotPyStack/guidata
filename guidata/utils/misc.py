@@ -26,8 +26,6 @@ Strings
 .. autofunction:: decode_fs_string
 """
 
-from __future__ import annotations
-
 import collections.abc
 import ctypes
 import locale

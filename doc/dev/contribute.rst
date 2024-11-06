@@ -19,8 +19,9 @@ Moreover, the following guidelines should be followed:
   should follow the `Google style <http://google-styleguide.googlecode.com/svn/trunk/pyguide.html?showone=Comments#Comments>`_.
 
 * Add typing annotations for all functions and methods. The annotations should
-  use the future syntax (``from __future__ import annotations``) and the
-  ``if TYPE_CHECKING`` pattern to avoid circular imports (see
+  use the future syntax ``from __future__ import annotations`` (see
+  `PEP 563 <https://www.python.org/dev/peps/pep-0563/>`_)
+  and the ``if TYPE_CHECKING`` pattern to avoid circular imports (see
   `PEP 484 <https://www.python.org/dev/peps/pep-0484/>`_).
 
 .. note::

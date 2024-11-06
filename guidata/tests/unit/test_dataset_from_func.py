@@ -12,8 +12,6 @@ type annotations. See the example below.
 
 # guitest: show
 
-from __future__ import annotations
-
 import numpy as np
 
 from guidata.dataset import create_dataset_from_func

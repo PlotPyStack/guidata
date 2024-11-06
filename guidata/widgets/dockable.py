@@ -11,8 +11,6 @@ The `dockable` module provides a mixin class for widgets that can be docked
 into a QMainWindow.
 """
 
-from __future__ import annotations
-
 from qtpy.QtCore import Qt
 from qtpy.QtWidgets import QDockWidget, QWidget
 
