@@ -173,7 +173,8 @@ def read(filename: str, encoding: str = "utf-8") -> tuple[str, str]:
     Read text from file ('filename')
     Return text and encoding
     """
-    text, encoding = decode(open(filename, "rb").read())
+    with open(filename, "rb") as file:
+        text, encoding = decode(file.read())
     return text, encoding
 
 
