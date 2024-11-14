@@ -1314,7 +1314,7 @@ class FloatArrayWidget(AbstractDataSetWidget):
                 maxt = ", ".join(
                     [format % real_arr[:, r].max() for r in range(arr.shape[1])]
                 )
-        except (TypeError, IndexError):
+        except (TypeError, IndexError, ValueError):
             mint, maxt = "-", "-"
         self.min_label.setText(mint)
         self.max_label.setText(maxt)

@@ -961,7 +961,9 @@ class FloatArrayItem(DataItem):
         larg = self.get_prop_value("display", instance, "large", False)
         fmt = self.get_prop_value("display", instance, "format", "%s")
         unit = self.get_prop_value("display", instance, "unit", "")
-        v = func(value)
+        v: np.ndarray = func(value)
+        if v.size == 0:
+            return "= []"
         if larg:
             text = "= ["
             for flt in v[:-1]:

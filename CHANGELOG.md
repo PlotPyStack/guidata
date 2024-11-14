@@ -1,5 +1,11 @@
 # Changelog #
 
+## Version 3.7.2 ##
+
+🛠️ Bug fixes:
+
+* [Issue #80](https://github.com/PlotPyStack/guidata/issues/80) - `ValueError` when trying to show/edit an empty array
+
 ## Version 3.7.1 ##
 
 ℹ️ Changes:

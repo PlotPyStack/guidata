@@ -94,6 +94,9 @@ class Parameters(gds.DataSet):
     floatarray = gds.FloatArrayItem(
         "Float array", default=np.ones((50, 5), float), format=" %.2e "
     ).set_pos(col=1)
+    floatarray2 = gds.FloatArrayItem(
+        "Empty array", default=np.array([], float)
+    ).set_pos(col=2)
     g0 = gds.BeginTabGroup("group")
     mchoice1 = gds.MultipleChoiceItem(
         "MC type 1", ["first choice", "second choice", "third choice"]
