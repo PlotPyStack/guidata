@@ -20,13 +20,12 @@ from sphinx.util.nodes import nested_parse_with_titles
 from sphinx.util.typing import stringify_annotation
 
 import guidata.dataset as gds
-from guidata.config import _
 
 if TYPE_CHECKING:
     from docutils.parsers.rst.states import RSTState, RSTStateMachine
     from sphinx.application import Sphinx
 
-IGNORED_AUTO_HELP: tuple[str, ...] = (_("integer"), _("float"), _("string"))
+IGNORED_AUTO_HELP: tuple[str, ...] = ("integer", "float", "string")
 
 
 # Create a combined regex pattern of all keys in the dictionary
@@ -98,7 +97,7 @@ def document_choice_item(item: gds.ChoiceItem) -> str:
     """
     available_choices = item.get_prop("data", "choices")
     str_choices = ", ".join(object_description(key) for key, *_ in available_choices)
-    doc = _("Single choice from: %s.") % str_choices
+    doc = f"Single choice from: {str_choices}."
     return doc
 
 
@@ -113,7 +112,7 @@ def document_multiple_choice_item(item: gds.MultipleChoiceItem) -> str:
     """
     available_choices = item.get_prop("data", "choices")
     str_choices = ", ".join(object_description(key) for key, *_ in available_choices)
-    doc = _("Multiple choice from: %s.") % str_choices
+    doc = f"Multiple choice from: {str_choices}."
     return doc
 
 
@@ -249,7 +248,7 @@ class ItemDoc:
         """
         return escape_docline(
             f"\t{self.name} ({self.type_}): {self.label} "
-            f"{self.help_} " + _("Default: %s.") % self.default
+            f"{self.help_} Default: {self.default}."
         )
 
     def to_attribute(self) -> str:
@@ -260,7 +259,7 @@ class ItemDoc:
         """
         return escape_docline(
             f"\t{self.name} ({self.item_type}): {self.label} {self.help_} "
-            + _("Default: %s.") % self.default
+            f"Default: {self.default}."
         )
 
 
@@ -308,11 +307,8 @@ class CreateMethodDocumenter(MethodDocumenter):
         """
         self.object.__annotations__["return"] = self.parent
         docstring_lines = [
-            _(
-                "Returns a new instance of :py:class:`%s` with the fields set to "
-                "the given values."
-            )
-            % self.parent.__name__,
+            f"Returns a new instance of :py:class:`{self.parent.__name__}` "
+            f"with the fields set to the given values.",
             "",
             "Args:",
         ]
@@ -325,7 +321,7 @@ class CreateMethodDocumenter(MethodDocumenter):
             (
                 "",
                 "Returns:",
-                _("\tNew instance of :py:class:`%s`.") % self.parent.__name__,
+                f"\tNew instance of :py:class:`{self.parent.__name__}`.",
             )
         )
         docstring = prepare_docstring(
@@ -479,6 +475,12 @@ class DatasetNoteDirective(SphinxDirective):
         self.current_line_offset = self.content_offset
 
     def add_lines(self, stringlist: StringList, *lines: str) -> None:
+        """Add lines to the stringlist.
+
+        Args:
+            stringlist: StringList to add the lines to.
+            lines: Lines to add.
+        """
         source = self.get_source_info()[0]
         new_offset = self.current_line_offset + 1
         i = new_offset
@@ -488,6 +490,12 @@ class DatasetNoteDirective(SphinxDirective):
         self.current_line_offset += new_offset
 
     def add_code_lines(self, stringlist: StringList, *lines: str) -> None:
+        """Add code lines to the stringlist.
+
+        Args:
+            stringlist: StringList to add the lines to.
+            lines: Lines to add.
+        """
         source = self.get_source_info()[0]
         new_offset = self.current_line_offset + 1
         tab = " " * self.state.document.settings.tab_width
@@ -526,9 +534,9 @@ class DatasetNoteDirective(SphinxDirective):
             module = __import__(module_name, fromlist=[class_name])
             cls = getattr(module, class_name)
 
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-except
             logging.error(f"Failed to import class {class_name}: {e}")
-            instance_str = _("Failed to import class %s") % class_name
+            instance_str = f"Failed to import class {class_name}"
             note_node = nodes.error(instance_str)
             return [note_node]
 
@@ -545,17 +553,13 @@ class DatasetNoteDirective(SphinxDirective):
         node = nodes.note()
 
         # Create a new ViewList instance and add your rst text to it
-        source, lineno = self.get_source_info()
         self.current_line_offset = self.content_offset
 
         note_lines = StringList()
         self.add_lines(
             note_lines,
-            _(
-                "To instanciate a new :py:class:`%s` dataset, you can use the "
-                "classmethod :py:meth:`%s.create()` like this:"
-            )
-            % (cls.__name__, cls.__name__),
+            f"To instanciate a new :py:class:`{cls.__name__}` dataset, you can use the "
+            f"classmethod :py:meth:`{cls.__name__}.create()` like this:",
             "",
         )
 
@@ -566,11 +570,8 @@ class DatasetNoteDirective(SphinxDirective):
 
         self.add_lines(
             note_lines,
-            _(
-                "You can also first instanciate a default :py:class:`%s` "
-                "and then set the fields like this:"
-            )
-            % cls.__name__,
+            f"You can also first instanciate a default :py:class:`{cls.__name__}` "
+            f"and then set the fields like this:",
         )
 
         example_lines = min(len(items), example_lines) if example_lines else len(items)
