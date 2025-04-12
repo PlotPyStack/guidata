@@ -4,6 +4,8 @@
 # Licensed under the terms of the MIT License
 # (see spyder/__init__.py for details)
 
+# ruff: noqa
+
 """
 Editor widget syntax highlighters based on QtGui.QSyntaxHighlighter
 (Python syntax highlighting rules are inspired from idlelib)

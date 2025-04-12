@@ -8,6 +8,8 @@
 # (BSD 3-clause; see NOTICE.txt in the Spyder root directory for details).
 # -----------------------------------------------------------------------------
 
+# ruff: noqa
+
 """
 guidata.widgets.dataframeeditor
 ===============================

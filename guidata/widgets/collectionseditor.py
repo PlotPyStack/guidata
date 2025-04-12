@@ -6,6 +6,8 @@
 # (see spyder/__init__.py for details)
 # ----------------------------------------------------------------------------
 
+# ruff: noqa
+
 """
 guidata.widgets.collectionseditor
 =================================
@@ -26,7 +28,6 @@ and dialog.
 # pylint: disable=R0903
 # pylint: disable=R0911
 # pylint: disable=R0201
-
 
 import datetime
 import io
@@ -1001,9 +1002,9 @@ class BaseTableView(QTableView):
             condition_imshow = condition_plot and self.get_array_ndim(key) == 2
             condition_imshow = condition_imshow or self.is_image(key)
         else:
-            is_array = (
-                condition_plot
-            ) = condition_imshow = is_list = condition_hist = False
+            is_array = condition_plot = condition_imshow = is_list = condition_hist = (
+                False
+            )
         self.plot_action.setVisible(condition_plot or is_list)
         self.hist_action.setVisible(condition_hist or is_list)
         self.imshow_action.setVisible(condition_imshow)

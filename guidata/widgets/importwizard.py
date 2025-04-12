@@ -4,6 +4,8 @@
 # Licensed under the terms of the MIT License
 # (see spyder/__init__.py for details)
 
+# ruff: noqa
+
 """
 Text data Importing Wizard based on Qt
 """
