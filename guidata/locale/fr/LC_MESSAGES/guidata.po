@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2025-04-26 10:25+0200\n"
+"POT-Creation-Date: 2025-04-26 11:12+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -270,6 +270,9 @@ msgstr "Suppression de colonne(s)"
 msgid "Copy"
 msgstr "Copier"
 
+msgid "Paste"
+msgstr "Coller"
+
 msgid "About..."
 msgstr "A propos..."
 
@@ -290,6 +293,9 @@ msgstr "Avertissement"
 
 msgid "It was not possible to copy values for this array"
 msgstr "Impossible de copier les valeurs pour ce tableau"
+
+msgid "It was not possible to paste values for this array"
+msgstr "Impossible de coller les valeurs pour ce tableau"
 
 msgid "Format"
 msgstr "Format"
@@ -378,9 +384,6 @@ msgstr ""
 
 msgid "Resize rows to contents"
 msgstr "Ajuster les colonnes au contenu"
-
-msgid "Paste"
-msgstr "Coller"
 
 msgid "Edit"
 msgstr "Modifier"

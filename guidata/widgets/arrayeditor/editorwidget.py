@@ -185,6 +185,7 @@ class ArrayView(QTableView, Generic[ArrayModelType]):
             total_width += self.columnWidth(k)
         self.viewport().resize(min(total_width, 1024), self.height())
         QShortcut(QKeySequence(QKeySequence.Copy), self, self.copy)
+        QShortcut(QKeySequence(QKeySequence.Paste), self, self.paste)
         self.horizontalScrollBar().valueChanged.connect(
             lambda val: self.load_more_data(val, columns=True)
         )
@@ -409,6 +410,15 @@ class ArrayView(QTableView, Generic[ArrayModelType]):
             triggered=self.copy,
             context=Qt.ShortcutContext.WidgetShortcut,
         )
+        self.paste_action = create_action(
+            self,
+            _("Paste"),
+            shortcut=keybinding("Paste"),
+            icon=get_icon("editpaste.png"),
+            triggered=self.paste,
+            context=Qt.ShortcutContext.WidgetShortcut,
+        )
+        self.paste_action.setDisabled(self.model().readonly)
         about_action = create_action(
             self,
             _("About..."),
@@ -442,6 +452,7 @@ class ArrayView(QTableView, Generic[ArrayModelType]):
             )
             actions = (
                 self.copy_action,
+                self.paste_action,
                 None,
                 insert_row_action,
                 insert_col_action,
@@ -454,6 +465,7 @@ class ArrayView(QTableView, Generic[ArrayModelType]):
         else:
             actions = (
                 self.copy_action,
+                self.paste_action,
                 None,
                 about_action,
             )
@@ -586,6 +598,47 @@ class ArrayView(QTableView, Generic[ArrayModelType]):
         cliptxt = self._sel_to_text(self.selectedIndexes())
         clipboard = QApplication.clipboard()
         clipboard.setText(cliptxt)
+
+    @Slot()
+    def paste(self) -> None:
+        """Paste text from clipboard"""
+        cliptxt = QApplication.clipboard().text()
+        if not cliptxt:
+            return
+        try:
+            data = np.genfromtxt(io.StringIO(cliptxt), delimiter="\t")
+        except ValueError:
+            data = np.array([])
+        if data.size == 0:
+            QMessageBox.warning(
+                self,
+                _("Warning"),
+                _("It was not possible to paste values for this array"),
+            )
+            return
+
+        model = self.model()
+
+        # Determine where to paste
+        start_row = self.currentIndex().row()
+        start_col = self.currentIndex().column()
+
+        # Iterate and paste each value
+        data = np.array(data, dtype=model.get_array().dtype)
+        if data.ndim in (0, 1):
+            data = data.reshape((-1, 1))
+        for i in range(data.shape[0]):
+            for j in range(data.shape[1]):
+                if (start_row + i < model.total_rows) and (
+                    start_col + j < model.total_cols
+                ):
+                    idx = model.index(start_row + i, start_col + j)
+                    model.setData(idx, str(data[i, j]))
+
+        model.dataChanged.emit(
+            model.index(start_row, start_col),
+            model.index(start_row + data.shape[0] - 1, start_col + data.shape[1] - 1),
+        )
 
 
 class BaseArrayEditorWidget(QWidget):
