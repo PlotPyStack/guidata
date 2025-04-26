@@ -634,12 +634,12 @@ class BaseArrayEditorWidget(QWidget):
 
         btn_layout = QHBoxLayout()
         btn_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        btn = QPushButton(_("Format"))
+        btn = QPushButton(get_icon("format.svg"), _("Format"), self)
         # disable format button for int type
         btn.setEnabled(utils.is_float(self._data.dtype))
         btn_layout.addWidget(btn)
         btn.clicked.connect(self.change_format)
-        btn = QPushButton(_("Resize"))
+        btn = QPushButton(get_icon("resize.svg"), _("Resize"), self)
         btn_layout.addWidget(btn)
         btn.clicked.connect(self.view.resize_to_contents)
         bgcolor = QCheckBox(_("Background color"))
