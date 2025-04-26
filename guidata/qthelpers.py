@@ -190,9 +190,9 @@ def set_color_mode(mode: Literal["light", "dark", "auto"] | None = None):
     CURRENT_THEME = None
 
     if mode is not None:
-        assert (
-            mode in COLOR_MODES
-        ), f"Invalid color mode: {mode} (expected {COLOR_MODES})"
+        assert mode in COLOR_MODES, (
+            f"Invalid color mode: {mode} (expected {COLOR_MODES})"
+        )
         os.environ[ENV_COLOR_MODE] = mode
 
     app = QW.QApplication.instance()
@@ -249,6 +249,19 @@ def win32_fix_title_bar_background(widget: QW.QWidget) -> None:
     if os.name != "nt" or sys.maxsize == 2**31 - 1:
         return
 
+    # See Issue #84: SetWindowCompositionAttribute() is incompatible with
+    # QGraphicsEffect (e.g. QGraphicsDropShadowEffect) applied on the widget or
+    # any of its parents.
+    # Qt performs its own offscreen rendering when a QGraphicsEffect is active,
+    # preventing Windows from properly applying composition effects and potentially
+    # causing rendering glitches or crashes.
+    # This check avoids applying system-level visual modifications in such cases.
+    obj = widget
+    while obj is not None:
+        if obj.graphicsEffect():
+            return
+        obj = obj.parent()
+
     import ctypes
     from ctypes import wintypes
 
@@ -270,7 +283,8 @@ def win32_fix_title_bar_background(widget: QW.QWidget) -> None:
     accent = ACCENTPOLICY()
     data = WINDOWCOMPOSITIONATTRIBDATA()
 
-    if is_dark_theme():
+    dark = is_dark_theme()
+    if dark:
         accent.AccentState = 3  # ACCENT_ENABLE_ACRYLICBLURBEHIND
         data.Attribute = 26  # WCA_USEDARKMODECOLORS
     else:
@@ -280,12 +294,16 @@ def win32_fix_title_bar_background(widget: QW.QWidget) -> None:
     data.SizeOfData = ctypes.sizeof(accent)
     data.Data = ctypes.cast(ctypes.pointer(accent), ctypes.POINTER(ctypes.c_int))
 
+    if not hasattr(ctypes.windll.user32, "SetWindowCompositionAttribute"):
+        # Windows 7 and 8 do not support this function, so we skip it
+        return
+
     set_win_cpa = ctypes.windll.user32.SetWindowCompositionAttribute
-    set_win_cpa.argtypes = (wintypes.HWND, WINDOWCOMPOSITIONATTRIBDATA)
+    set_win_cpa.argtypes = (wintypes.HWND, ctypes.POINTER(WINDOWCOMPOSITIONATTRIBDATA))
     set_win_cpa.restype = ctypes.c_int
     set_win_cpa(int(widget.winId()), data)
 
-    if not is_dark_theme():
+    if not dark:
         # Setting dark mode attribute to False (0) to ensure the default light mode
         attribute_value = ctypes.c_int(0)
         hwnd = wintypes.HWND(int(widget.winId()))

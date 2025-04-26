@@ -4,6 +4,7 @@
 
 🛠️ Bug fixes:
 
+* [Issue #84](https://github.com/PlotPyStack/guidata/issues/84  ) - Side effects of `win32_fix_title_bar_background` with `QGraphicsEffect` active
 * [Issue #82](https://github.com/PlotPyStack/guidata/issues/82) - Autodoc extension: translation of generic documentation text
   * Initially, the generic documentation text like "Returns a new instance of" was translated using the `gettext` function.
   * This was a mistake, as this text should be translated only after the documentation has been generated, i.e. by the `sphinx-intl` tool.
