@@ -177,8 +177,9 @@
             "args": [
                 "/c",
                 "run_pylint.bat",
+                "guidata/dataset/autodoc.py",
                 // "--disable=R0801,C0103,C0114,C0115,C0116,W0612,W0613",
-                "--disable=fixme,C,R,W",
+                // "--disable=fixme,C,R,W",
             ],
             "options": {
                 "cwd": "scripts",
