@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import io
 from typing import Any, Generic, Sequence, cast
+from qtpy.compat import getsavefilename
 
 import numpy as np
 from qtpy.QtCore import QItemSelection, QItemSelectionRange, QLocale, QPoint, Qt, Slot
@@ -651,6 +652,10 @@ class BaseArrayEditorWidget(QWidget):
         btn.setToolTip(_("Copy all array data to clipboard"))
         btn.clicked.connect(self.copy_all_to_clipboard)
         btn_layout.addWidget(btn)
+        btn = QPushButton(get_icon("export.svg"), _("Export"), self)
+        btn.setToolTip(_("Export array to a file"))
+        btn_layout.addWidget(btn)
+        btn.clicked.connect(self.export_array)
 
         layout = QVBoxLayout()
         layout.addWidget(self.view)
@@ -751,6 +756,41 @@ class BaseArrayEditorWidget(QWidget):
         if cliptxt:
             clipboard = QApplication.clipboard()
             clipboard.setText(cliptxt)
+
+    def export_array(self) -> None:
+        """Export the array to a CSV file with UTF-8 BOM."""
+        filename, _selfilter = getsavefilename(
+            self, _("Export array"), "", _("CSV Files") + " (*.csv)"
+        )
+        if not filename:
+            return
+
+        data = self.model.get_array()
+        xlabels = self.model.xlabels
+        ylabels = self.model.ylabels
+
+        with open(filename, "w", encoding="utf-8-sig") as file:
+            c0sep = "" if ylabels is None else "\t"
+
+            # Write column headers
+            if xlabels:
+                file.write(c0sep + "\t".join(xlabels) + "\n")
+
+            # Write rows
+            for i, row in enumerate(data):
+                label = ylabels[i] if ylabels else ""
+                file.write(label + c0sep + "\t".join(map(str, row)) + "\n")
+
+        if not (xlabels or ylabels):
+            # If no labels, overwrite file with simple array
+            np.savetxt(
+                filename,
+                data,
+                delimiter="\t",
+                fmt=self.model.get_format(),
+                encoding="utf-8-sig",
+            )
+
 
 class MaskedArrayEditorWidget(BaseArrayEditorWidget):
     """Same as BaseArrayWidgetEditorWidget but specifically handles MaskedArrayHandler

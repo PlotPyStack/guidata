@@ -4,6 +4,7 @@
 
 💥 New features:
 
+* [Issue #85](https://github.com/PlotPyStack/guidata/issues/85) - Array editor: add a button to export data as CSV
 * [Issue #86](https://github.com/PlotPyStack/guidata/issues/86) - Array editor: add "Copy all" feature for copying array and headers to clipboard
 
 ## Version 3.8.0 ##
