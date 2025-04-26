@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+<svg version="1.1" id="Uploaded to svgrepo.com" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+	 width="800px" height="800px" viewBox="0 0 32 32" xml:space="preserve">
+<style type="text/css">
+	.cubies_zeventien{fill:#EC9B5A;}
+	.cubies_achtien{fill:#EDB57E;}
+	.cubies_zevenentwintig{fill:#98D3BC;}
+	.cubies_achtentwintig{fill:#CCE2CD;}
+	.cubies_drie{fill:#837F79;}
+	.cubies_elf{fill:#E3D4C0;}
+	.cubies_twaalf{fill:#FFF2DF;}
+	.st0{fill:#C9483A;}
+	.st1{fill:#D97360;}
+	.st2{fill:#F9E0BD;}
+	.st3{fill:#F2C99E;}
+	.st4{fill:#65C3AB;}
+	.st5{fill:#4C4842;}
+	.st6{fill:#67625D;}
+	.st7{fill:#EDEAE5;}
+	.st8{fill:#C9C6C0;}
+	.st9{fill:#E69D8A;}
+	.st10{fill:#2EB39A;}
+	.st11{fill:#BCD269;}
+	.st12{fill:#D1DE8B;}
+	.st13{fill:#A5A29C;}
+	.st14{fill:#8E7866;}
+	.st15{fill:#725A48;}
+	.st16{fill:#F2C7B5;}
+	.st17{fill:#A4C83F;}
+</style>
+<g>
+	<path class="cubies_zeventien" d="M29,32H3c-1.657,0-3-1.343-3-3V3c0-1.657,1.343-3,3-3h26c1.657,0,3,1.343,3,3v26
+		C32,30.657,30.657,32,29,32z"/>
+	<path class="cubies_achtien" d="M27,32H3c-1.657,0-3-1.343-3-3V3c0-1.657,1.343-3,3-3h24c1.657,0,3,1.343,3,3v26
+		C30,30.657,28.657,32,27,32z"/>
+	<path class="cubies_elf" d="M25,28H5c-0.552,0-1-0.448-1-1V5c0-0.552,0.448-1,1-1h20c0.552,0,1,0.448,1,1v22
+		C26,27.552,25.552,28,25,28z"/>
+	<path class="cubies_twaalf" d="M24,28H5c-0.552,0-1-0.448-1-1V5c0-0.552,0.448-1,1-1h19c0.552,0,1,0.448,1,1v22
+		C25,27.552,24.552,28,24,28z"/>
+	<path class="cubies_zevenentwintig" d="M20,6H10C9.448,6,9,5.552,9,5V3c0-0.552,0.448-1,1-1h1l0.724-1.447
+		C11.893,0.214,12.239,0,12.618,0h4.764c0.379,0,0.725,0.214,0.894,0.553L19,2h1c0.552,0,1,0.448,1,1v2C21,5.552,20.552,6,20,6z"/>
+	<path class="cubies_achtentwintig" d="M19,6h-9C9.448,6,9,5.552,9,5V3c0-0.552,0.448-1,1-1h1l0.724-1.447
+		C11.893,0.214,12.239,0,12.618,0h3.764c0.379,0,0.725,0.214,0.894,0.553L18,2h1c0.552,0,1,0.448,1,1v2C20,5.552,19.552,6,19,6z"/>
+	<path class="cubies_drie" d="M19.5,12h-10C9.224,12,9,11.776,9,11.5S9.224,11,9.5,11h10c0.276,0,0.5,0.224,0.5,0.5
+		S19.776,12,19.5,12z M20,13.5c0-0.276-0.224-0.5-0.5-0.5h-10C9.224,13,9,13.224,9,13.5S9.224,14,9.5,14h10
+		C19.776,14,20,13.776,20,13.5z M20,15.5c0-0.276-0.224-0.5-0.5-0.5h-10C9.224,15,9,15.224,9,15.5S9.224,16,9.5,16h10
+		C19.776,16,20,15.776,20,15.5z M20,17.5c0-0.276-0.224-0.5-0.5-0.5h-10C9.224,17,9,17.224,9,17.5S9.224,18,9.5,18h10
+		C19.776,18,20,17.776,20,17.5z M17,19.5c0-0.276-0.224-0.5-0.5-0.5h-7C9.224,19,9,19.224,9,19.5S9.224,20,9.5,20h7
+		C16.776,20,17,19.776,17,19.5z"/>
+</g>
+</svg>

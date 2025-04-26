@@ -646,6 +646,11 @@ class BaseArrayEditorWidget(QWidget):
         bgcolor.setEnabled(self.model.bgcolor_enabled)
         bgcolor.stateChanged.connect(self.model.bgcolor)
         btn_layout.addWidget(bgcolor)
+        btn_layout.addStretch(1)
+        btn = QPushButton(get_icon("copy_all.svg"), _("Copy all"), self)
+        btn.setToolTip(_("Copy all array data to clipboard"))
+        btn.clicked.connect(self.copy_all_to_clipboard)
+        btn_layout.addWidget(btn)
 
         layout = QVBoxLayout()
         layout.addWidget(self.view)
@@ -722,6 +727,30 @@ class BaseArrayEditorWidget(QWidget):
                 return
             self.model.set_format(format)
 
+    def copy_all_to_clipboard(self) -> None:
+        """Copy all array data, including headers, to clipboard"""
+        data = self.model.get_array()
+        xlabels = self.model.xlabels
+        ylabels = self.model.ylabels
+
+        output = io.StringIO()
+        c0sep = "" if ylabels is None else "\t"
+
+        # Write column headers
+        if xlabels:
+            output.write(c0sep + "\t".join(xlabels) + "\n")
+
+        # Write rows with row headers
+        for i, row in enumerate(data):
+            label = ylabels[i] if ylabels else ""
+            output.write(label + c0sep + "\t".join(map(str, row)) + "\n")
+
+        cliptxt = output.getvalue()
+        output.close()
+
+        if cliptxt:
+            clipboard = QApplication.clipboard()
+            clipboard.setText(cliptxt)
 
 class MaskedArrayEditorWidget(BaseArrayEditorWidget):
     """Same as BaseArrayWidgetEditorWidget but specifically handles MaskedArrayHandler

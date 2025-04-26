@@ -1,5 +1,11 @@
 # Changelog #
 
+## Version 3.9.0 ##
+
+💥 New features:
+
+* [Issue #86](https://github.com/PlotPyStack/guidata/issues/86) - Array editor: add "Copy all" feature for copying array and headers to clipboard
+
 ## Version 3.8.0 ##
 
 ℹ️ Changes:
