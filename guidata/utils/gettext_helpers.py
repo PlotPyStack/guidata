@@ -60,6 +60,7 @@ def do_rescan_files(files, modname, dirname):
             potfile,  # Nom du fichier pot
             "-p",
             localedir,  # dest
+            "--no-location",
         ]
         + files
     )
@@ -81,7 +82,7 @@ def do_rescan_files(files, modname, dirname):
             outf.write(data)
         else:
             print("merge...")
-            subprocess.call(["msgmerge", "-o", pofilepath, pofilepath, potfilepath])
+            subprocess.call(["msgmerge", "--update", pofilepath, potfilepath])
 
 
 def do_compile(modname, dirname=None):
