@@ -13,6 +13,10 @@
 
 * [Issue #80](https://github.com/PlotPyStack/guidata/issues/80) - `ValueError` when trying to show/edit an empty array
 
+ℹ️ Changes:
+
+* Replace `flake8` with `ruff` for linting in GitHub Actions workflow
+
 ## Version 3.7.1 ##
 
 ℹ️ Changes:
