@@ -6,6 +6,8 @@
 # (see spyder_kernels/__init__.py for details)
 # -----------------------------------------------------------------------------
 
+# ruff: noqa
+
 """Utilities and wrappers around inspect module"""
 
 import builtins

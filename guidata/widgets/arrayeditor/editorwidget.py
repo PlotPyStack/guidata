@@ -12,6 +12,8 @@
 # pylint: disable=R0911
 # pylint: disable=R0201
 
+# ruff: noqa
+
 """Array editor widget"""
 
 from __future__ import annotations
