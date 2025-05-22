@@ -95,7 +95,7 @@ Some parameters are required to be set before using the project from within
 Visual Studio Code (used in `launch.json` and `tasks.json`). These are:
 
 * ``PPSTACK_PYTHONEXE``: The path to the Python interpreter to use. This is
-  used to launch the application from within Visual Studio Code. If not set,
+  used to run tasks from within Visual Studio Code. If not set,
   the default Python interpreter will be used.
 
 * `.env` file: This file is used to set environment variables for the
