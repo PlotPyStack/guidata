@@ -48,13 +48,6 @@ That's it, you can now run the tests using the following command:
 
     pytest
 
-If you want to rely on Visual Studio Code for editing and take advantage of the
-project settings and tasks, you will need to set the following environment variable:
-
-.. code-block:: bash
-
-    set PPSTACK_PYTHONEXE=C:\WPy64-31110\python-3.11.1.amd64\python.exe
-
 CentOS Stream 8.8
 ^^^^^^^^^^^^^^^^^
 

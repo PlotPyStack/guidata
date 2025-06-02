@@ -17,7 +17,7 @@
                 "env": {
                     "UNATTENDED": "1",
                     "PYTHONUTF8": "1",
-                    "PYTHON": "${env:PPSTACK_PYTHONEXE}"
+                    "PYTHON": "${command:python.interpreterPath}"
                 }
             },
             "group": {
@@ -46,7 +46,7 @@
                 "cwd": "scripts",
                 "env": {
                     "UNATTENDED": "1",
-                    "PYTHON": "${env:PPSTACK_PYTHONEXE}"
+                    "PYTHON": "${command:python.interpreterPath}"
                 }
             },
             "group": {
@@ -74,7 +74,7 @@
                 "cwd": "scripts",
                 "env": {
                     "UNATTENDED": "1",
-                    "PYTHON": "${env:PPSTACK_PYTHONEXE}"
+                    "PYTHON": "${command:python.interpreterPath}"
                 }
             },
             "group": {
@@ -102,7 +102,7 @@
                 "cwd": "scripts",
                 "env": {
                     "UNATTENDED": "1",
-                    "PYTHON": "${env:PPSTACK_PYTHONEXE}"
+                    "PYTHON": "${command:python.interpreterPath}"
                 }
             },
             "group": {
@@ -154,7 +154,7 @@
                 "cwd": "scripts",
                 "env": {
                     "UNATTENDED": "1",
-                    "PYTHON": "${env:PPSTACK_PYTHONEXE}"
+                    "PYTHON": "${command:python.interpreterPath}"
                 }
             },
             "group": {
@@ -185,7 +185,7 @@
                 "cwd": "scripts",
                 "env": {
                     "UNATTENDED": "1",
-                    "PYTHON": "${env:PPSTACK_PYTHONEXE}"
+                    "PYTHON": "${command:python.interpreterPath}"
                 }
             },
             "group": {
@@ -212,7 +212,7 @@
             "options": {
                 "cwd": "scripts",
                 "env": {
-                    "PYTHON": "${env:PPSTACK_PYTHONEXE}",
+                    "PYTHON": "${command:python.interpreterPath}",
                     "UNATTENDED": "1"
                 }
             },
@@ -236,7 +236,7 @@
             "options": {
                 "cwd": "scripts",
                 "env": {
-                    "PYTHON": "${env:PPSTACK_PYTHONEXE}",
+                    "PYTHON": "${command:python.interpreterPath}",
                     "UNATTENDED": "1"
                 }
             },
@@ -265,7 +265,7 @@
             "options": {
                 "cwd": "scripts",
                 "env": {
-                    "PYTHON": "${env:PPSTACK_PYTHONEXE}",
+                    "PYTHON": "${command:python.interpreterPath}",
                     "UNATTENDED": "1"
                 }
             },
