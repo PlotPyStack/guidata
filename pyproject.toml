@@ -49,7 +49,7 @@ Documentation = "https://guidata.readthedocs.io/en/latest/"
 guidata-tests = "guidata.tests:run"
 
 [project.optional-dependencies]
-dev = ["ruff", "pylint", "Coverage"]
+dev = ["ruff", "pylint", "Coverage", "toml-to-requirements==0.3.0"]
 doc = [
     "PyQt5",
     "pillow",

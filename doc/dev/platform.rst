@@ -17,12 +17,12 @@ which is the reference file for the project dependencies.
     Please note that the generation is not systematic and the ``requirements.txt``
     file may not be up-to-date.
 
-To update the ``requirements.txt`` file, you need to install the
-``toml-to-requirements`` and execute the following command:
+To update the ``requirements.txt`` file, use the Visual Studio task
+``Update requirements.txt`` or execute the following command:
 
 .. code-block:: bash
 
-    toml-to-req --toml-file .\pyproject.toml --include-optional
+    toml-to-req --toml-file pyproject.toml --include-optional-lists dev,doc,test
 
 
 Microsoft Windows 10
