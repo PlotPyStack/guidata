@@ -1,32 +1,33 @@
-# -*- coding: utf-8 -*-
-# guidata module translation file
-# Copyright (C) 2009 CEA
-# Pierre Raybaut <pierre.raybaut@cea.fr>, 2009.
+# French translations for guidata.
+# Copyright (C) 2025 CEA, Codra, Pierre Raybaut
+# This file is distributed under the same license as the guidata project.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2025-04-26 11:12+0200\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"Project-Id-Version: guidata 3.9.0\n"
+"Report-Msgid-Bugs-To: p.raybaut@codra.fr\n"
+"POT-Creation-Date: 2025-05-22 20:18+0200\n"
+"PO-Revision-Date: 2025-05-21 19:52+0200\n"
+"Last-Translator: Pierre Raybaut <p.raybaut@codra.fr>\n"
+"Language: fr\n"
+"Language-Team: fr <p.raybaut@codra.fr>\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: utf-8\n"
-"Generated-By: pygettext.py 1.5\n"
-
-msgid "float"
-msgstr "flottant"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
 
 msgid "integer"
 msgstr "entier"
 
-msgid " and "
-msgstr " et "
+msgid "float"
+msgstr "flottant"
 
 msgid " between "
 msgstr " compris entre "
+
+msgid " and "
+msgstr " et "
 
 msgid " higher than "
 msgstr " supérieur à "
@@ -61,6 +62,7 @@ msgstr "tout type de fichier"
 msgid "supported file types:"
 msgstr "types de fichiers pris en charge : "
 
+#, python-format
 msgid "%s files"
 msgstr "Fichiers %s"
 
@@ -97,6 +99,7 @@ msgstr "Description"
 msgid "Run this script"
 msgstr "Exécuter ce script"
 
+#, python-format
 msgid "Tests - %s module"
 msgstr "Tests - Module %s"
 
@@ -106,6 +109,7 @@ msgstr "Aucun test trouvé dans ce package."
 msgid "Error"
 msgstr "Erreur"
 
+#, python-format
 msgid "Waiting: %s s"
 msgstr "Attente : %s s"
 
@@ -115,19 +119,20 @@ msgstr "Site web du projet"
 msgid "Documentation"
 msgstr "Documentation"
 
+#, python-format
 msgid "More details about %s on %s or %s"
 msgstr "Plus de détails à propos de %s sur %s ou %s"
 
+#, python-format
 msgid "Created by %s in %d"
 msgstr "Créé par %s en %d"
 
+#, python-format
 msgid "Maintained by the %s organization"
 msgstr "Maintenu par l'organisation %s"
 
 msgid "Automatic GUI generation for easy dataset editing and display"
-msgstr ""
-"Génération automatique d'interfaces graphiques pour éditer et afficher des "
-"jeux de données"
+msgstr "Génération automatique d'interfaces graphiques pour éditer et afficher des jeux de données"
 
 msgid "About"
 msgstr "A propos"
@@ -136,9 +141,7 @@ msgid "Conflicing edition flags"
 msgstr "Modes d'éditions conflictuels"
 
 msgid "Array editor was initialized in both readonly and variable size mode."
-msgstr ""
-"L'éditeur de tableaux a été initialisé en mode lecture seule et taille "
-"variable."
+msgstr "L'éditeur de tableaux a été initialisé en mode lecture seule et taille variable."
 
 msgid "The array editor will remain in readonly mode."
 msgstr "L'éditeur de tableaux reste en mode lecture seule."
@@ -146,11 +149,8 @@ msgstr "L'éditeur de tableaux reste en mode lecture seule."
 msgid "Unsupported array format"
 msgstr "Type de tableau non pris en charge"
 
-msgid ""
-"Array editor does not support array with x/y labels in variable size mode."
-msgstr ""
-"L'editeur de tableau ne prend pas en charge les tableaux avec des labels x/y "
-"enmode taille variable."
+msgid "Array editor does not support array with x/y labels in variable size mode."
+msgstr "L'editeur de tableau ne prend pas en charge les tableaux avec des labels x/y en mode taille variable."
 
 msgid "You will not be able to add or remove rows/columns."
 msgstr "Vous ne pourrez pas insérer ou supprimer de lignes/colonnes"
@@ -159,18 +159,16 @@ msgid "Arrays with more than 3 dimensions are not supported"
 msgstr "Les tableaux ayant plus de trois dimensions ne sont pas pris en charge"
 
 msgid "The 'xlabels' argument length do no match array column number"
-msgstr ""
-"La taille de l'argument 'xlabels' ne correspond pas au nombre de colonnes du "
-"tableau"
+msgstr "La taille de l'argument 'xlabels' ne correspond pas au nombre de colonnes du tableau"
 
 msgid "The 'ylabels' argument length do no match array row number"
-msgstr ""
-"La taille de l'argument 'ylabels' ne correspond pas au nombre de lignes du "
-"tableau"
+msgstr "La taille de l'argument 'ylabels' ne correspond pas au nombre de lignes du tableau"
 
+#, python-format
 msgid "%s arrays"
 msgstr "les tableaux %s"
 
+#, python-format
 msgid "%s are currently not supported"
 msgstr "Attention: %s ne sont pas pris en charge"
 
@@ -186,14 +184,14 @@ msgstr "lecture seule"
 msgid "Record array fields:"
 msgstr "Champs:"
 
+msgid "Masked data"
+msgstr "Données masquées"
+
 msgid "Data"
 msgstr "Données"
 
 msgid "Mask"
 msgstr "Masque"
-
-msgid "Masked data"
-msgstr "Données masquées"
 
 msgid "Axis:"
 msgstr "Axe:"
@@ -204,18 +202,8 @@ msgstr "Indice:"
 msgid "<u>Warning</u>: changes are applied separately"
 msgstr "<u>Attention</u>: les changements sont appliqués séparément"
 
-msgid ""
-"For performance reasons, changes applied to masked array won't be reflected "
-"in array's data (and vice-versa)."
-msgstr ""
-"Pour des raisons de performance, les changements appliqués au masque ne sont "
-"pas reflétés dans le tableau associé (et vice-versa)."
-
-msgid "Save and Close"
-msgstr "Enregistrer et Fermer"
-
-msgid "Close"
-msgstr "Fermer"
+msgid "For performance reasons, changes applied to masked array won't be reflected in array's data (and vice-versa)."
+msgstr "Pour des raisons de performance, les changements appliqués au masque ne sont pas reflétés dans le tableau associé (et vice-versa)."
 
 msgid "Insert at row"
 msgstr "Insérer à la ligne"
@@ -229,9 +217,7 @@ msgstr "Nombre de lignes"
 msgid "Number of columns"
 msgstr "Nombre de colonnes"
 
-msgid "Value"
-msgstr "Valeur"
-
+#, python-format
 msgid "Unsupported type %s, defaults to: "
 msgstr "Type %s non pris en charge, valeur par défaut: "
 
@@ -241,19 +227,17 @@ msgstr "Supprimer à partir de la ligne"
 msgid "Delete from column"
 msgstr "Supprimer à partir de la colonne"
 
+#, python-format
 msgid "Value error: %s"
 msgstr "Erreur de valeur : %s"
 
+#, python-format
 msgid "Overflow error: %s"
 msgstr "Erreur de dépassement : %s"
 
-msgid ""
-"Slice %s is not valid. Expected an Iterable of slices and int like "
-"(slice(None), slice(None), n1, n2, ..., nX) with maximum two slices."
-msgstr ""
-"Slice %s incorrecte. Un itérable de slices et d'entiers au format "
-"(slice(None), slice(None), n1, n2, ..., nX) avec un maximum de deux slices "
-"était attendu."
+#, python-format
+msgid "Slice %s is not valid. Expected an Iterable of slices and int like (slice(None), slice(None), n1, n2, ..., nX) with maximum two slices."
+msgstr "Slice %s incorrecte. Un itérable de slices et d'entiers au format (slice(None), slice(None), n1, n2, ..., nX) avec un maximum de deux slices était attendu."
 
 msgid "Row(s) insertion"
 msgstr "Insertion de ligne(s)"
@@ -267,15 +251,6 @@ msgstr "Suppression de ligne(s)"
 msgid "Column(s) deletion"
 msgstr "Suppression de colonne(s)"
 
-msgid "Copy"
-msgstr "Copier"
-
-msgid "Paste"
-msgstr "Coller"
-
-msgid "About..."
-msgstr "A propos..."
-
 msgid "Insert row(s)"
 msgstr "Insertion de ligne(s)"
 
@@ -288,23 +263,11 @@ msgstr "Suppression de ligne(s)"
 msgid "Remove column(s)"
 msgstr "Suppression de colonne(s)"
 
-msgid "Warning"
-msgstr "Avertissement"
-
 msgid "It was not possible to copy values for this array"
 msgstr "Impossible de copier les valeurs pour ce tableau"
 
 msgid "It was not possible to paste values for this array"
 msgstr "Impossible de coller les valeurs pour ce tableau"
-
-msgid "Format"
-msgstr "Format"
-
-msgid "Resize"
-msgstr "Ajuster"
-
-msgid "Background color"
-msgstr "Couleur de fond"
 
 msgid "Copy all"
 msgstr "Copier tout"
@@ -318,17 +281,18 @@ msgstr "Exporter"
 msgid "Export array to a file"
 msgstr "Exporter le tableau vers un fichier"
 
-msgid "Float formatting"
-msgstr "Format de flottant"
-
+#, python-format
 msgid "Format (%s) is incorrect"
 msgstr "Le format (%s) est incorrect"
+
+msgid "Export array"
+msgstr "Exporter le tableau"
 
 msgid "CSV Files"
 msgstr "Fichiers CSV"
 
-msgid "Export array"
-msgstr "Exporter le tableau"
+msgid "About..."
+msgstr "A propos..."
 
 msgid "Index"
 msgstr "Indice"
@@ -354,11 +318,17 @@ msgstr "Attribut"
 msgid "elements"
 msgstr "éléments"
 
+msgid "Type"
+msgstr "Type"
+
 msgid "Size"
 msgstr "Taille"
 
-msgid "Type"
-msgstr "Type"
+msgid "Value"
+msgstr "Valeur"
+
+msgid "Warning"
+msgstr "Avertissement"
 
 msgid ""
 "Opening this variable can be slow\n"
@@ -368,22 +338,25 @@ msgstr ""
 "Editer cette variable sera vraisemblablement très long.\n"
 "Souhaitez-vous néanmoins continuer ?"
 
-msgid ""
-"Unable to retrieve the value of this variable from the console.<br><br>The "
-"error mesage was:<br><i>%s</i>"
-msgstr ""
-"Impossible de récupérer la valeur de cette variable.<br><br>Le message "
-"d'erreur est :<br><i>%s</i>"
+#, python-format
+msgid "Unable to retrieve the value of this variable from the console.<br><br>The error mesage was:<br><i>%s</i>"
+msgstr "Impossible de récupérer la valeur de cette variable.<br><br>Le message d'erreur est :<br><i>%s</i>"
 
 msgid "Edit item"
 msgstr "Modifier"
 
+#, python-format
 msgid "<b>Unable to assign data to item.</b><br><br>Error message:<br>%s"
-msgstr ""
-"<b>Impossible d'accéder aux données</b><br><br>Message d'erreur :<br>%s"
+msgstr "<b>Impossible d'accéder aux données</b><br><br>Message d'erreur :<br>%s"
 
 msgid "Resize rows to contents"
 msgstr "Ajuster les colonnes au contenu"
+
+msgid "Paste"
+msgstr "Coller"
+
+msgid "Copy"
+msgstr "Copier"
 
 msgid "Edit"
 msgstr "Modifier"
@@ -439,19 +412,20 @@ msgstr "Erreur d'import"
 msgid "Please install <b>PlotPy</b> or <b>matplotlib</b>."
 msgstr "Merci d'installer <b>PlotPy</b> ou <b>matplotlib</b>."
 
+#, python-format
 msgid "<b>Unable to plot data.</b><br><br>Error message:<br>%s"
-msgstr ""
-"<b>Impossible d'afficher les données</b><br><br>Message d'erreur :<br>%s"
+msgstr "<b>Impossible d'afficher les données</b><br><br>Message d'erreur :<br>%s"
 
+#, python-format
 msgid "<b>Unable to show image.</b><br><br>Error message:<br>%s"
 msgstr "<b>Impossible d'afficher l'image</b><br><br>Message d'erreur :<br>%s"
 
 msgid "NumPy arrays"
 msgstr "Tableaux NumPy"
 
+#, python-format
 msgid "<b>Unable to save array</b><br><br>Error message:<br>%s"
-msgstr ""
-"<b>Impossible d'enregistrer le tableau</b><br><br>Message d'erreur :<br>%s"
+msgstr "<b>Impossible d'enregistrer le tableau</b><br><br>Message d'erreur :<br>%s"
 
 msgid "It was not possible to copy this array"
 msgstr "Impossible de copier ce tableau"
@@ -470,6 +444,12 @@ msgstr "Presse-papiers vide"
 
 msgid "Nothing to be imported from clipboard."
 msgstr "Aucune donnée ne peut être importée depuis le presse-papiers."
+
+msgid "Save and Close"
+msgstr "Enregistrer et Fermer"
+
+msgid "Close"
+msgstr "Fermer"
 
 msgid "Help..."
 msgstr "Aide..."
@@ -498,12 +478,8 @@ msgstr "Commandes système :"
 msgid "Python help:"
 msgstr "Aide Python :"
 
-msgid ""
-"In order to use commands like \"input\" run console with the multithread "
-"option"
-msgstr ""
-"Pour utiliser des commandes du type \"input\" dans la console, utiliser "
-"l'option multithread"
+msgid "In order to use commands like \"input\" run console with the multithread option"
+msgstr "Pour utiliser des commandes du type \"input\" dans la console, utiliser l'option multithread"
 
 msgid "Arguments"
 msgstr "Arguments"
@@ -515,9 +491,7 @@ msgid "Save history log..."
 msgstr "Enregistrer l'historique..."
 
 msgid "Save current history log (i.e. all inputs and outputs) in a text file"
-msgstr ""
-"Enregistrer l'historique actuel (c.-à-d. toutes les entrées-sorties) dans un "
-"fichier texte"
+msgstr "Enregistrer l'historique actuel (c.-à-d. toutes les entrées-sorties) dans un fichier texte"
 
 msgid "Delete"
 msgstr "Supprimer"
@@ -563,15 +537,30 @@ msgstr "Vers flottant"
 msgid "To str"
 msgstr "Vers chaîne"
 
+#, python-format
 msgid "%s editor"
 msgstr "Éditeur de %s"
+
+msgid "Format"
+msgstr "Format"
+
+msgid "Resize"
+msgstr "Ajuster"
+
+msgid "Background color"
+msgstr "Couleur de fond"
 
 msgid "Column min/max"
 msgstr "Min/max de colonne"
 
+msgid "Float formatting"
+msgstr "Format de flottant"
+
+#, python-brace-format
 msgid "Format ({}) is incorrect"
 msgstr "Le format ({}) est incorrect"
 
+#, python-brace-format
 msgid "Format ({}) should start with '%'"
 msgstr "Le format ({}) ne doit pas commencer par '%'"
 
@@ -656,12 +645,9 @@ msgstr "Suivant"
 msgid "Done"
 msgstr "Terminer"
 
-msgid ""
-"<b>Unable to proceed to next step</b><br><br>Please check your entries."
-"<br><br>Error message:<br>%s"
-msgstr ""
-"<b>Impossible de passer à l'étape suivante</b><br><br>Merci de vérifier "
-"votre saisie.<br><br>Message d'erreur :<br>%s"
+#, python-format
+msgid "<b>Unable to proceed to next step</b><br><br>Please check your entries.<br><br>Error message:<br>%s"
+msgstr "<b>Impossible de passer à l'étape suivante</b><br><br>Merci de vérifier votre saisie.<br><br>Message d'erreur :<br>%s"
 
 msgid "Background:"
 msgstr "Fond :"
@@ -713,3 +699,4 @@ msgstr "Instance :"
 
 msgid "Text editor"
 msgstr "Éditeur de texte"
+

@@ -2,6 +2,7 @@ Coverage
 NumPy>=1.19
 PyQt5
 QtPy>=1.9
+babel == 2.17.0
 h5py>=3.1
 myst_parser
 pandas
@@ -10,10 +11,11 @@ pylint
 pytest
 pytest-xvfb
 python-docs-theme
+python-dotenv == 1.1.0
 requests
 ruff
 sphinx-copybutton
 sphinx>6
 sphinx_qt_documentation
-toml-to-requirements==0.3.0
+toml-to-requirements
 tomli
