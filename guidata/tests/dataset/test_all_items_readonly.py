@@ -10,7 +10,6 @@ on all DataItem types.
 
 # guitest: show
 
-
 import numpy as np
 
 from guidata.env import execenv

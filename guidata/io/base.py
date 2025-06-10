@@ -120,11 +120,12 @@ class BaseIOHandler:
             section (str): The name of the section to end.
         """
         sect = self.option.pop(-1)
-        assert (
-            sect == section
-        ), "Ending section does not match the current section: %s != %s" % (
-            sect,
-            section,
+        assert sect == section, (
+            "Ending section does not match the current section: %s != %s"
+            % (
+                sect,
+                section,
+            )
         )
 
 

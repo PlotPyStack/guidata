@@ -11,7 +11,6 @@ console widget features to an independant widget based on QTextEdit for the
 IPython console plugin.
 """
 
-
 import os
 import os.path as osp
 import re

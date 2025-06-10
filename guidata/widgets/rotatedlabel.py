@@ -11,7 +11,6 @@ The ``guidata.widgets.rotatedlabel`` module provides a widget for displaying
 rotated text.
 """
 
-
 from math import cos, pi, sin
 
 from qtpy.QtCore import QSize, Qt

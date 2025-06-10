@@ -347,7 +347,7 @@ class InternalShell(PythonShellWidget):
                 args.append("%s%d".format(goto_option, goto))
             run_program(editor_path, args)
         except OSError:
-            self.write_error("External editor was not found:" " %s\n" % editor_path)
+            self.write_error("External editor was not found: %s\n" % editor_path)
 
     # ------ I/O
     def flush(self, error=False, prompt=False):

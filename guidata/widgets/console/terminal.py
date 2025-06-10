@@ -113,9 +113,7 @@ class ANSIEscapeCodeHandler(object):
         raise NotImplementedError
 
     def reset(self):
-        """
-
-        """
+        """ """
         self.current_format = None
         self.intensity = 0
         self.italic = False

@@ -177,7 +177,7 @@ def gen_path_req_rst(
         )
     text = f"""The :mod:`{modname}` package requires the following Python modules:
 
-{reqlist_to_table(requirements["main"]+additional_reqs)}"""
+{reqlist_to_table(requirements["main"] + additional_reqs)}"""
     for category, title in (
         ("dev", "development"),
         ("doc", "building the documentation"),

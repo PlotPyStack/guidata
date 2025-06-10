@@ -813,9 +813,9 @@ class SliderWidget(HLayoutMixin, LineEditWidget):
         if item.get_prop_value("display", "slider"):
             self.vmin = item.get_prop_value("data", "min")
             self.vmax = item.get_prop_value("data", "max")
-            assert (
-                self.vmin is not None and self.vmax is not None
-            ), "SliderWidget requires that item min/max have been defined"
+            assert self.vmin is not None and self.vmax is not None, (
+                "SliderWidget requires that item min/max have been defined"
+            )
             self.slider = QSlider()
             self.slider.setOrientation(Qt.Horizontal)  # type:ignore
             self.setup_slider(item)

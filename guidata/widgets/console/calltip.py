@@ -16,7 +16,6 @@ Now located at qtconsole/call_tip_widget.py as part of the
 `Jupyter QtConsole Project <https://github.com/jupyter/qtconsole>`_.
 """
 
-
 from unicodedata import category
 
 from qtpy.QtCore import QBasicTimer, QCoreApplication, QEvent, Qt

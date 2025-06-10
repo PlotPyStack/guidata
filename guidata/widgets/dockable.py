@@ -53,9 +53,9 @@ class DockableWidgetMixin:
             features (QDockWidget.DockWidgetFeatures): Dockwidget features
             allowed_areas (Qt.DockWidgetAreas): Dockwidget allowed areas
         """
-        assert (
-            self.dockwidget is None
-        ), "Dockwidget must be setup before calling 'create_dockwidget'"
+        assert self.dockwidget is None, (
+            "Dockwidget must be setup before calling 'create_dockwidget'"
+        )
         if location is not None:
             self._location = location
         if features is not None:

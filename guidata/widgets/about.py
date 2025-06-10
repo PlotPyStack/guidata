@@ -115,7 +115,7 @@ class AboutInfo:
         """
         auth, year, org = self.author, self.year, self.organization
         if html:
-            author = f"<a href='https://github.com/{auth.replace(' ','')}'>{auth}</a>"
+            author = f"<a href='https://github.com/{auth.replace(' ', '')}'>{auth}</a>"
             organization = f"<a href='https://github.com/{org}'>{org}</a>"
         shdesc = f"{self.name} {self.version}\n{self.description}"
         if html:

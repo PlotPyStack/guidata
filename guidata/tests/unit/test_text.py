@@ -5,7 +5,6 @@
 
 """Test in text mode"""
 
-
 import pytest
 
 import guidata.dataset as gds
