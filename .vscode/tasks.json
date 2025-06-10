@@ -4,6 +4,52 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "Run Ruff",
+            "command": "ruff",
+            "args": [
+                "check",
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "presentation": {
+                "clear": true,
+                "echo": true,
+                "focus": false,
+                "panel": "dedicated",
+                "reveal": "always",
+                "showReuseMessage": true,
+            },
+            "type": "shell"
+        },
+        {
+            "label": "Run Pylint",
+            "command": "pylint",
+            "args": [
+                "guidata"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "presentation": {
+                "clear": true,
+                "echo": true,
+                "focus": false,
+                "panel": "dedicated",
+                "reveal": "always",
+                "showReuseMessage": true
+            },
+            "type": "shell"
+        },
+        {
             "label": "gettext - Scan",
             "type": "shell",
             "command": "cmd",
@@ -63,12 +109,12 @@
             }
         },
         {
-            "label": "Run Coverage",
+            "label": "Run pytest",
             "type": "shell",
             "command": "cmd",
             "args": [
                 "/c",
-                "run_coverage.bat"
+                "run_pytest.bat"
             ],
             "options": {
                 "cwd": "scripts",
@@ -91,12 +137,38 @@
             }
         },
         {
-            "label": "Run pytest",
+            "label": "Update requirements.txt",
+            "command": "toml-to-req",
+            "args": [
+                "--toml-file",
+                "pyproject.toml",
+                "--optional-lists",
+                "dev,doc,test",
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "presentation": {
+                "clear": true,
+                "echo": true,
+                "focus": false,
+                "panel": "dedicated",
+                "reveal": "always",
+                "showReuseMessage": true,
+            },
+            "type": "shell"
+        },
+        {
+            "label": "Run Coverage",
             "type": "shell",
             "command": "cmd",
             "args": [
                 "/c",
-                "run_pytest.bat"
+                "run_coverage.bat"
             ],
             "options": {
                 "cwd": "scripts",
@@ -169,78 +241,6 @@
                 "showReuseMessage": true,
                 "clear": false
             }
-        },
-        {
-            "label": "Run Pylint",
-            "command": "pylint",
-            "args": [
-                "guidata"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "group": {
-                "kind": "build",
-                "isDefault": false
-            },
-            "presentation": {
-                "clear": true,
-                "echo": true,
-                "focus": false,
-                "panel": "dedicated",
-                "reveal": "always",
-                "showReuseMessage": true
-            },
-            "type": "shell"
-        },
-        {
-            "label": "Run Ruff",
-            "command": "ruff",
-            "args": [
-                "check",
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "group": {
-                "kind": "build",
-                "isDefault": false
-            },
-            "presentation": {
-                "clear": true,
-                "echo": true,
-                "focus": false,
-                "panel": "dedicated",
-                "reveal": "always",
-                "showReuseMessage": true,
-            },
-            "type": "shell"
-        },
-        {
-            "label": "Update requirements.txt",
-            "command": "toml-to-req",
-            "args": [
-                "--toml-file",
-                "pyproject.toml",
-                "--optional-lists",
-                "dev,doc,test",
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "group": {
-                "kind": "build",
-                "isDefault": false
-            },
-            "presentation": {
-                "clear": true,
-                "echo": true,
-                "focus": false,
-                "panel": "dedicated",
-                "reveal": "always",
-                "showReuseMessage": true,
-            },
-            "type": "shell"
         },
         {
             "label": "Build documentation",
