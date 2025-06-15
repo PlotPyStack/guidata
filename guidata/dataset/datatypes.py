@@ -471,7 +471,7 @@ class DataItem(ABC):
         Args:
             instance (DataSet): instance of the DataSet
         """
-        self.__set__(instance, self._default)
+        self.__set__(instance, deepcopy(self._default))
 
     def accept(self, visitor: object) -> None:
         """This is the visitor pattern's accept function.

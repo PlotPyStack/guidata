@@ -1,5 +1,15 @@
 # Changelog #
 
+## Version 3.9.1 ##
+
+🛠️ Bug fixes:
+
+* [Issue #88](https://github.com/PlotPyStack/guidata/issues/88) - `DictItem` default value persists across dataset instances (missing `deepcopy`)
+  * This issue is as old as the `DictItem` class itself.
+  * When using a `DictItem` in a dataset, if a value is set to the item instance, this value was incorrectly used as the default for the next instance of the same dataset class.
+  * This happened because a `deepcopy` was not made when setting the defaults of the class items in `guidata.dataset.datatypes`.
+  * The fix ensures that each dataset instance has its own independent default value for `DictItem`, preventing side effects from one instance to another.
+
 ## Version 3.9.0 ##
 
 💥 New features:
