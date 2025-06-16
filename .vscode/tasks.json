@@ -14,7 +14,7 @@
             },
             "group": {
                 "kind": "build",
-                "isDefault": false
+                "isDefault": true
             },
             "presentation": {
                 "clear": true,
@@ -37,7 +37,7 @@
             },
             "group": {
                 "kind": "build",
-                "isDefault": false
+                "isDefault": true
             },
             "presentation": {
                 "clear": true,
@@ -60,7 +60,7 @@
             },
             "group": {
                 "kind": "build",
-                "isDefault": false
+                "isDefault": true
             },
             "presentation": {
                 "clear": true,
@@ -173,7 +173,7 @@
             },
             "group": {
                 "kind": "build",
-                "isDefault": false
+                "isDefault": true
             },
             "presentation": {
                 "clear": true,
