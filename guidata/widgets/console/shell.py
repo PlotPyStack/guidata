@@ -11,7 +11,6 @@
 # pylint: disable=R0911
 # pylint: disable=R0201
 
-
 import builtins
 import keyword
 import locale
@@ -161,8 +160,7 @@ class ShellBaseWidget(ConsoleBaseWidget, SaveHistoryMixin, BrowseHistoryMixin):
             _("Save history log..."),
             icon=get_icon("filesave.png"),
             tip=_(
-                "Save current history log (i.e. all "
-                "inputs and outputs) in a text file"
+                "Save current history log (i.e. all inputs and outputs) in a text file"
             ),
             triggered=self.save_historylog,
         )
@@ -730,7 +728,7 @@ class PythonShellWidget(TracebackLinksMixin, ShellBaseWidget, GetHelpMixin):
                 self,
                 _("Clear shell"),
                 icon=get_icon("editclear.png"),
-                tip=_("Clear shell contents " "('cls' command)"),
+                tip=_("Clear shell contents ('cls' command)"),
                 triggered=self.clear_terminal,
             )
             actions += [clear_line_action, clear_action]

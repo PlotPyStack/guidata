@@ -56,33 +56,11 @@ try:
     from numpy import set_printoptions, uint8, uint16, uint32, uint64
     from numpy.ma import MaskedArray
 except:
-    ndarray = (
-        array
-    ) = (
-        matrix
-    ) = (
-        recarray
-    ) = (
-        MaskedArray
-    ) = (
-        np_savetxt
-    ) = (
-        int64
-    ) = (
-        int32
-    ) = (
+    ndarray = array = matrix = recarray = MaskedArray = np_savetxt = int64 = int32 = (
         int16
-    ) = (
-        int8
-    ) = (
-        uint64
-    ) = (
-        uint32
-    ) = (
-        uint16
-    ) = (
-        uint8
-    ) = float64 = float32 = float16 = complex64 = complex128 = bool_ = FakeObject
+    ) = int8 = uint64 = uint32 = uint16 = uint8 = float64 = float32 = float16 = (
+        complex64
+    ) = complex128 = bool_ = FakeObject
 
 
 def get_numpy_dtype(obj):

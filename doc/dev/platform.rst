@@ -17,12 +17,12 @@ which is the reference file for the project dependencies.
     Please note that the generation is not systematic and the ``requirements.txt``
     file may not be up-to-date.
 
-To update the ``requirements.txt`` file, you need to install the
-``toml-to-requirements`` and execute the following command:
+To update the ``requirements.txt`` file, use the Visual Studio task
+``Update requirements.txt`` or execute the following command:
 
 .. code-block:: bash
 
-    toml-to-req --toml-file .\pyproject.toml --include-optional
+    toml-to-req --toml-file pyproject.toml --include-optional-lists dev,doc,test
 
 
 Microsoft Windows 10
@@ -47,13 +47,6 @@ That's it, you can now run the tests using the following command:
 .. code-block:: bash
 
     pytest
-
-If you want to rely on Visual Studio Code for editing and take advantage of the
-project settings and tasks, you will need to set the following environment variable:
-
-.. code-block:: bash
-
-    set PPSTACK_PYTHONEXE=C:\WPy64-31110\python-3.11.1.amd64\python.exe
 
 CentOS Stream 8.8
 ^^^^^^^^^^^^^^^^^

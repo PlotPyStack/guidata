@@ -47,6 +47,9 @@ Optional modules for development:
     * - Coverage
       - 
       - Code coverage measurement for Python
+    * - toml-to-requirements
+      - ==0.3.0
+      - Convert a pyproject.toml file to a requirements.txt file
 
 Optional modules for building the documentation:
 

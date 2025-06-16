@@ -18,7 +18,6 @@ This package provides a text editor widget based on QtGui.QPlainTextEdit.
 
 """
 
-
 from qtpy.QtCore import Qt, Slot
 from qtpy.QtWidgets import QDialog, QHBoxLayout, QPushButton, QTextEdit, QVBoxLayout
 

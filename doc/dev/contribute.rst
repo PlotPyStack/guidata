@@ -91,14 +91,9 @@ development environment. The easiest way to do this is to use `virtualenv
 <http://pypi.python.org/pypi/virtualenv>`_ and `pip
 <http://pypi.python.org/pypi/pip>`_.
 
-Some parameters are required to be set before using the project from within
-Visual Studio Code (used in `launch.json` and `tasks.json`). These are:
+Visual Studio Code `.env` file:
 
-* ``PPSTACK_PYTHONEXE``: The path to the Python interpreter to use. This is
-  used to launch the application from within Visual Studio Code. If not set,
-  the default Python interpreter will be used.
-
-* `.env` file: This file is used to set environment variables for the
+* This file is used to set environment variables for the
   application. It is used to set the ``PYTHONPATH`` environment variable to
   the root of the project. This is required to be able to import the project
   modules from within Visual Studio Code. To create this file, copy the

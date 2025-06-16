@@ -5,7 +5,6 @@
 
 """Unit tests"""
 
-
 import unittest
 
 import guidata.dataset as gds

@@ -126,7 +126,7 @@ def assert_interface_supported(klass: Type, iface: Type) -> None:
             imp_nargs = imp_code.co_argcount
             nargs = code.co_argcount
             if imp_code.co_varnames[:imp_nargs] != code.co_varnames[:nargs]:
-                assert False, "Arguments of %s.%s differ from interface: " "%r!=%r" % (
+                assert False, "Arguments of %s.%s differ from interface: %r!=%r" % (
                     klass.__name__,
                     imp_func.__name__,
                     imp_code.co_varnames[:imp_nargs],
@@ -263,7 +263,7 @@ def run_shell_command(cmdstr, **subprocess_kwargs):
     """
     if "shell" in subprocess_kwargs and not subprocess_kwargs["shell"]:
         raise ProgramError(
-            'The "shell" kwarg may be omitted, but if ' "provided it must be True."
+            'The "shell" kwarg may be omitted, but if provided it must be True.'
         )
     else:
         subprocess_kwargs["shell"] = True

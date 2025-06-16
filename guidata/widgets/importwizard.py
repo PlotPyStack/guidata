@@ -10,7 +10,6 @@
 Text data Importing Wizard based on Qt
 """
 
-
 # ----date and datetime objects support
 import datetime
 import io

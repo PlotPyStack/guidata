@@ -71,12 +71,12 @@ class ExecEnv:
         # Check that all properties are defined in the class and that they are
         # really properties:
         for prop in props:
-            assert hasattr(
-                self, prop
-            ), f"Property {prop} is not defined in class {self.__class__.__name__}"
-            assert isinstance(
-                getattr(self.__class__, prop), property
-            ), f"Attribute {prop} is not a property in class {self.__class__.__name__}"
+            assert hasattr(self, prop), (
+                f"Property {prop} is not defined in class {self.__class__.__name__}"
+            )
+            assert isinstance(getattr(self.__class__, prop), property), (
+                f"Attribute {prop} is not a property in class {self.__class__.__name__}"
+            )
 
         # Return a dictionary with the properties as keys and their values as values:
         return {p: getattr(self, p) for p in props}

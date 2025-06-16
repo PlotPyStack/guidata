@@ -1230,7 +1230,7 @@ class BaseTableView(QTableView):
                 QMessageBox.warning(
                     self,
                     _("Import error"),
-                    _("Please install <b>PlotPy</b>" " or <b>matplotlib</b>."),
+                    _("Please install <b>PlotPy</b> or <b>matplotlib</b>."),
                 )
 
     def plot_item(self, funcname):
@@ -1244,7 +1244,7 @@ class BaseTableView(QTableView):
                 QMessageBox.critical(
                     self,
                     _("Plot"),
-                    _("<b>Unable to plot data.</b>" "<br><br>Error message:<br>%s")
+                    _("<b>Unable to plot data.</b><br><br>Error message:<br>%s")
                     % str(error),
                 )
 
@@ -1263,7 +1263,7 @@ class BaseTableView(QTableView):
                 QMessageBox.critical(
                     self,
                     _("Plot"),
-                    _("<b>Unable to show image.</b>" "<br><br>Error message:<br>%s")
+                    _("<b>Unable to show image.</b><br><br>Error message:<br>%s")
                     % str(error),
                 )
 
@@ -1289,7 +1289,7 @@ class BaseTableView(QTableView):
                 QMessageBox.critical(
                     self,
                     title,
-                    _("<b>Unable to save array</b>" "<br><br>Error message:<br>%s")
+                    _("<b>Unable to save array</b><br><br>Error message:<br>%s")
                     % str(error),
                 )
 
@@ -1312,7 +1312,7 @@ class BaseTableView(QTableView):
                     QMessageBox.warning(
                         self,
                         _("Warning"),
-                        _("It was not possible to copy " "this array"),
+                        _("It was not possible to copy this array"),
                     )
                     return
                 obj = output.getvalue().decode("utf-8")
@@ -1325,7 +1325,7 @@ class BaseTableView(QTableView):
                     QMessageBox.warning(
                         self,
                         _("Warning"),
-                        _("It was not possible to copy " "this dataframe"),
+                        _("It was not possible to copy this dataframe"),
                     )
                     return
                 obj = output.getvalue()
