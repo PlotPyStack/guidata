@@ -11,7 +11,6 @@ pylint
 pytest
 pytest-xvfb
 python-docs-theme
-python-dotenv == 1.1.0
 requests
 ruff
 sphinx-copybutton

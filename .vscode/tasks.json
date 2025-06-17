@@ -73,10 +73,16 @@
             "type": "shell"
         },
         {
-            "label": "Preprocess internationalization",
+            "label": "🔎 Scan translations",
             "command": "${command:python.interpreterPath}",
             "args": [
-                "scripts/internationalization_preprocess.py"
+                "-m",
+                "guidata.utils.translations",
+                "scan",
+                "--name",
+                "guidata",
+                "--directory",
+                ".",
             ],
             "group": {
                 "kind": "build",
@@ -96,10 +102,16 @@
             "type": "shell",
         },
         {
-            "label": "Postprocess internationalization",
+            "label": "📚 Compile translations",
             "command": "${command:python.interpreterPath}",
             "args": [
-                "scripts/internationalization_postprocess.py"
+                "-m",
+                "guidata.utils.translations",
+                "compile",
+                "--name",
+                "guidata",
+                "--directory",
+                ".",
             ],
             "group": {
                 "kind": "build",

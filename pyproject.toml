@@ -45,18 +45,10 @@ dynamic = ["version"]
 guidata-tests = "guidata.tests:run"
 
 [project.scripts]
-i18npreprocess = "scripts.internationalization_postprocess:main"
-i18npostprocess = "scripts.internationalization_preprocess:main"
+guidata-translations = "guidata.utils.translations:main"
 
 [project.optional-dependencies]
-dev = [
-    "babel == 2.17.0",
-    "Coverage",
-    "pylint",
-    "ruff",
-    "python-dotenv == 1.1.0",
-    "toml-to-requirements"
-]
+dev = ["babel", "Coverage", "pylint", "ruff", "toml-to-requirements"]
 doc = [
     "PyQt5",
     "pillow",

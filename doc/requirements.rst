@@ -39,7 +39,7 @@ Optional modules for development:
       - Version
       - Summary
     * - babel
-      -  == 2.17.0
+      - 
       - Internationalization utilities
     * - Coverage
       - 
@@ -50,9 +50,6 @@ Optional modules for development:
     * - ruff
       - 
       - An extremely fast Python linter and code formatter, written in Rust.
-    * - python-dotenv
-      -  == 1.1.0
-      - Read key-value pairs from a .env file and set them as environment variables
     * - toml-to-requirements
       - 
       - Convert a pyproject.toml file to a requirements.txt file
