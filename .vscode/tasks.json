@@ -173,7 +173,7 @@
             },
             "group": {
                 "kind": "build",
-                "isDefault": true
+                "isDefault": false
             },
             "presentation": {
                 "clear": true,
@@ -254,7 +254,7 @@
             },
             "group": {
                 "kind": "build",
-                "isDefault": true
+                "isDefault": false
             },
             "presentation": {
                 "echo": true,
@@ -312,7 +312,7 @@
             "problemMatcher": [],
             "group": {
                 "kind": "build",
-                "isDefault": true
+                "isDefault": false
             },
             "presentation": {
                 "echo": true,
