@@ -13,9 +13,9 @@ Description
 ^^^^^^^^^^^
 
 This module provides utilities for managing translations in guidata.
-Those features are based on `Babel <https://babel.pocoo.org/en/latest/>`_.
+It is based on `Babel <https://babel.pocoo.org/en/latest/>`_.
 
-Two functions are provided:
+Three functions are provided:
 
 - :func:`scan_translations`: Extracts translatable strings from Python files
   and generates translation files.
@@ -69,10 +69,11 @@ def get_default_language_code() -> str:
     return lang.split("_")[0] if lang else "en"
 
 
-def scan_translations(  # noqa: PLR0913 # pylint: disable=too-many-positional-arguments
+def scan_translations(
     name: str,
     directory: typing.Union[str, os.PathLike],
     version: str | None = None,
+    copyright_holder: str | None = None,
     languages: typing.List[str] | None = None,
 ) -> None:
     """Extract and process translatable strings from Python files using Babel.
@@ -90,6 +91,7 @@ def scan_translations(  # noqa: PLR0913 # pylint: disable=too-many-positional-ar
         name: The name of the project, used for directory and domain naming.
         directory: The root directory of the project.
         version: The version of the project.
+        copyright_holder: The name of the copyright holder for the project.
         languages: A list of language codes (e.g., ['fr', 'it'])
          for which translation files should be generated or updated.
 
@@ -99,11 +101,12 @@ def scan_translations(  # noqa: PLR0913 # pylint: disable=too-many-positional-ar
     """
     if version is None:
         version = ""
+    if copyright_holder is None:
+        copyright_holder = ""
     if languages is None:
         # If no language codes are specified, use the system's default language code
         languages = [get_default_language_code()]
 
-    # pylint: disable=duplicate-code
     # Check the project root directory
     if not os.path.exists(directory):
         print(f"Error: Project root directory {directory} does not exist.")
@@ -151,6 +154,8 @@ def scan_translations(  # noqa: PLR0913 # pylint: disable=too-many-positional-ar
                 name,
                 "--version",
                 version,
+                "--copyright-holder",
+                copyright_holder,
             ],
             check=True,
         )
@@ -217,7 +222,6 @@ def compile_translations(
         does not exist.
         RuntimeError: The compilation failed.
     """
-    # pylint: disable=duplicate-code
     # Check the project root directory
     if not os.path.exists(directory):
         print(f"Error: Project root directory {directory} does not exist.")
@@ -297,6 +301,9 @@ def main():
     )
     scan_parser.add_argument("--version", required=False, help="Project version")
     scan_parser.add_argument(
+        "--copyright_holder", required=False, help="Copyright holder name"
+    )
+    scan_parser.add_argument(
         "--languages",
         required=False,
         default=None,
@@ -313,6 +320,7 @@ def main():
             args.name,
             args.directory,
             args.version,
+            args.copyright_holder,
             languages=args.languages,
         )
     else:
