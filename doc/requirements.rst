@@ -38,17 +38,20 @@ Optional modules for development:
     * - Name
       - Version
       - Summary
-    * - ruff
+    * - babel
       - 
-      - An extremely fast Python linter and code formatter, written in Rust.
-    * - pylint
-      - 
-      - python code static checker
+      - Internationalization utilities
     * - Coverage
       - 
       - Code coverage measurement for Python
+    * - pylint
+      - 
+      - python code static checker
+    * - ruff
+      - 
+      - An extremely fast Python linter and code formatter, written in Rust.
     * - toml-to-requirements
-      - ==0.3.0
+      - 
       - Convert a pyproject.toml file to a requirements.txt file
 
 Optional modules for building the documentation:

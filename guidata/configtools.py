@@ -97,27 +97,8 @@ def get_translation(modname: str, dirname: str | None = None) -> Callable[[str],
         lang = get_system_lang()
         if lang is not None:
             os.environ["LANG"] = lang
-    try:
-        modlocpath = get_module_locale_path(dirname)
-        _trans = gettext.translation(modname, modlocpath)
-        lgettext = _trans.gettext
-
-        def translate_gettext(x):
-            y = lgettext(x)
-            if isinstance(y, str):
-                return y
-            else:
-                return str(y, "utf-8")
-
-        return translate_gettext
-    except IOError as _e:
-        # print "Not using translations (%s)" % _e
-        def translate_dumb(x):
-            if not isinstance(x, str):
-                return str(x, "utf-8")
-            return x
-
-        return translate_dumb
+    modlocpath = get_module_locale_path(dirname)
+    return gettext.translation(modname, modlocpath, fallback=True).gettext
 
 
 def get_module_locale_path(modname: str) -> str:

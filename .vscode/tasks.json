@@ -73,67 +73,65 @@
             "type": "shell"
         },
         {
-            "label": "gettext - Scan",
-            "type": "shell",
-            "command": "cmd",
+            "label": "🔎 Scan translations",
+            "command": "${command:python.interpreterPath}",
             "args": [
-                "/c",
-                "gettext.bat",
-                "rescan"
+                "-m",
+                "guidata.utils.translations",
+                "scan",
+                "--name",
+                "guidata",
+                "--directory",
+                ".",
             ],
-            "options": {
-                "cwd": "scripts",
-                "env": {
-                    "UNATTENDED": "1",
-                    "PYTHONUTF8": "1",
-                    "PYTHON": "${command:python.interpreterPath}"
-                }
-            },
             "group": {
                 "kind": "build",
-                "isDefault": true
+                "isDefault": false
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
             },
             "presentation": {
                 "echo": true,
-                "reveal": "always",
                 "focus": false,
                 "panel": "shared",
+                "reveal": "always",
                 "showReuseMessage": true,
                 "clear": false
-            }
+            },
+            "type": "shell",
         },
         {
-            "label": "gettext - Compile",
-            "type": "shell",
-            "command": "cmd",
+            "label": "📚 Compile translations",
+            "command": "${command:python.interpreterPath}",
             "args": [
-                "/c",
-                "gettext.bat",
-                "compile"
+                "-m",
+                "guidata.utils.translations",
+                "compile",
+                "--name",
+                "guidata",
+                "--directory",
+                ".",
             ],
-            "options": {
-                "cwd": "scripts",
-                "env": {
-                    "UNATTENDED": "1",
-                    "PYTHON": "${command:python.interpreterPath}"
-                }
-            },
             "group": {
                 "kind": "build",
-                "isDefault": true
+                "isDefault": false
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
             },
             "presentation": {
                 "echo": true,
-                "reveal": "always",
                 "focus": false,
                 "panel": "shared",
+                "reveal": "always",
                 "showReuseMessage": true,
                 "clear": false
-            }
+            },
+            "type": "shell"
         },
         {
             "label": "Run pytest",
-            "type": "shell",
             "command": "cmd",
             "args": [
                 "/c",
@@ -157,7 +155,8 @@
                 "panel": "dedicated",
                 "showReuseMessage": true,
                 "clear": true
-            }
+            },
+            "type": "shell"
         },
         {
             "label": "Update requirements.txt",

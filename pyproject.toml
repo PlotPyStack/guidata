@@ -41,15 +41,14 @@ requires-python = ">=3.9, <4"
 dependencies = ["h5py>=3.1", "NumPy>=1.19", "QtPy>=1.9", "requests", "tomli"]
 dynamic = ["version"]
 
-[project.urls]
-Homepage = "https://github.com/PlotPyStack/guidata/"
-Documentation = "https://guidata.readthedocs.io/en/latest/"
-
 [project.gui-scripts]
 guidata-tests = "guidata.tests:run"
 
+[project.scripts]
+guidata-translations = "guidata.utils.translations:main"
+
 [project.optional-dependencies]
-dev = ["ruff", "pylint", "Coverage", "toml-to-requirements==0.3.0"]
+dev = ["babel", "Coverage", "pylint", "ruff", "toml-to-requirements"]
 doc = [
     "PyQt5",
     "pillow",
@@ -62,8 +61,12 @@ doc = [
 ]
 test = ["pytest", "pytest-xvfb"]
 
+[project.urls]
+Homepage = "https://github.com/PlotPyStack/guidata/"
+Documentation = "https://guidata.readthedocs.io/en/latest/"
+
 [tool.setuptools.packages.find]
-include = ["guidata*"]
+include = ["guidata*", "scripts*"]
 
 [tool.setuptools.package-data]
 "*" = ["*.png", "*.svg", "*.mo", "*.cfg", "*.toml"]
