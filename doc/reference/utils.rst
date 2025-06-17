@@ -8,3 +8,5 @@ Utilities
 .. automodule:: guidata.utils.misc
 
 .. automodule:: guidata.configtools
+
+.. automodule:: guidata.utils.translations

@@ -9,6 +9,9 @@
 Translations utilities
 ----------------------
 
+Description
+^^^^^^^^^^^
+
 This module provides utilities for managing translations in guidata.
 Those features are based on `Babel <https://babel.pocoo.org/en/latest/>`_.
 
@@ -21,6 +24,27 @@ Two functions are provided:
 
 - :func:`main`: Convenience function to call :func:`scan_translations` or
   :func:`compile_translations` with command-line arguments.
+
+Usage
+^^^^^
+
+To extract translatable strings and generate translation files, use:
+
+.. code-block:: console
+
+    $ # Scan translations
+    $ python -m guidata.utils.translations scan <name> <directory>
+    $ # Alternatively, you can use the command-line tool:
+    $ guidata_translations scan <name> <directory>
+
+To compile translation files into binary format, use:
+
+.. code-block:: console
+
+    $ # Compile translations
+    $ python -m guidata.utils.translations compile <name> <directory>
+    $ # Alternatively, you can use the command-line tool:
+    $ guidata_translations compile <name> <directory>
 """
 
 from __future__ import annotations
