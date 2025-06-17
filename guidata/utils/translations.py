@@ -295,7 +295,7 @@ def main():
     )
     scan_parser.add_argument("--version", required=False, help="Project version")
     scan_parser.add_argument(
-        "--copyright_holder", required=False, help="Copyright holder name"
+        "--copyright-holder", required=False, help="Copyright holder name"
     )
     scan_parser.add_argument(
         "--languages",

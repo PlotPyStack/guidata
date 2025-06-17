@@ -83,7 +83,7 @@
                 "guidata",
                 "--directory",
                 ".",
-                "--copyright_holder",
+                "--copyright-holder",
                 "CEA, Codra, Pierre Raybaut"
             ],
             "group": {
