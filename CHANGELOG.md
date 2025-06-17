@@ -9,11 +9,11 @@
   * It has been replaced by a new module `guidata.utils.translations`, which provides a more modern and flexible way to handle translations, thanks to the `babel` library.
   * This change introduces a new script for managing translations, which may be used as follows:
     * Scan for new translations:
-      * `python -m guidata.utils.translations scan <name> <directory>`
-      * or `guidata-translations scan <name> <directory>`
+      * `python -m guidata.utils.translations scan --name <name> --directory <directory>`
+      * or `guidata-translations scan --name <name> --directory <directory>`
     * Compile translations:
-      * `python -m guidata.utils.translations compile <name> <directory>`
-      * or `guidata-translations compile <name> <directory>`
+      * `python -m guidata.utils.translations compile --name <name> --directory <directory>`
+      * or `guidata-translations compile --name <name> --directory <directory>`
     * More options are available, see the help message of the script:
       * `python -m guidata.utils.translations --help`
       * or `guidata-translations --help`

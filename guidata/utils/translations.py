@@ -33,18 +33,18 @@ To extract translatable strings and generate translation files, use:
 .. code-block:: console
 
     $ # Scan translations
-    $ python -m guidata.utils.translations scan <name> <directory>
+    $ python -m guidata.utils.translations scan --name <name> --directory <directory>
     $ # Alternatively, you can use the command-line tool:
-    $ guidata-translations scan <name> <directory>
+    $ guidata-translations scan --name <name> --directory <directory>
 
 To compile translation files into binary format, use:
 
 .. code-block:: console
 
     $ # Compile translations
-    $ python -m guidata.utils.translations compile <name> <directory>
+    $ python -m guidata.utils.translations compile --name <name> --directory <directory>
     $ # Alternatively, you can use the command-line tool:
-    $ guidata-translations compile <name> <directory>
+    $ guidata-translations compile --name <name> --directory <directory>
 """
 
 from __future__ import annotations
