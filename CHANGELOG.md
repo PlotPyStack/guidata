@@ -1,6 +1,22 @@
 # Changelog #
 
-## Version 3.9.1 ##
+## Version 3.10.0 ##
+
+💥 New features:
+
+* [Issue #81](https://github.com/PlotPyStack/guidata/issues/81) - Modernize the internationalization utilities
+  * The `guidata.utils.gettext_helpers` module, based on the `gettext` module, has been deprecated.
+  * It has been replaced by a new module `guidata.utils.translations`, which provides a more modern and flexible way to handle translations, thanks to the `babel` library.
+  * This change introduces a new script for managing translations, which may be used as follows:
+    * Scan for new translations:
+      * `python -m guidata.utils.translations scan <name> <directory>`
+      * or `guidata_translations scan <name> <directory>`
+    * Compile translations:
+      * `python -m guidata.utils.translations compile <name> <directory>`
+      * or `guidata_translations compile <name> <directory>`
+    * More options are available, see the help message of the script:
+      * `python -m guidata.utils.translations --help`
+      * or `guidata_translations --help`
 
 🛠️ Bug fixes:
 
