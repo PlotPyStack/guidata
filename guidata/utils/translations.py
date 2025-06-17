@@ -35,7 +35,7 @@ To extract translatable strings and generate translation files, use:
     $ # Scan translations
     $ python -m guidata.utils.translations scan <name> <directory>
     $ # Alternatively, you can use the command-line tool:
-    $ guidata_translations scan <name> <directory>
+    $ guidata-translations scan <name> <directory>
 
 To compile translation files into binary format, use:
 
@@ -44,7 +44,7 @@ To compile translation files into binary format, use:
     $ # Compile translations
     $ python -m guidata.utils.translations compile <name> <directory>
     $ # Alternatively, you can use the command-line tool:
-    $ guidata_translations compile <name> <directory>
+    $ guidata-translations compile <name> <directory>
 """
 
 from __future__ import annotations
