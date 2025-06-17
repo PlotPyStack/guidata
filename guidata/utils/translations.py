@@ -72,7 +72,6 @@ def get_default_language_code() -> str:
 def scan_translations(
     name: str,
     directory: typing.Union[str, os.PathLike],
-    version: str | None = None,
     copyright_holder: str | None = None,
     languages: typing.List[str] | None = None,
 ) -> None:
@@ -90,7 +89,6 @@ def scan_translations(
     Args:
         name: The name of the project, used for directory and domain naming.
         directory: The root directory of the project.
-        version: The version of the project.
         copyright_holder: The name of the copyright holder for the project.
         languages: A list of language codes (e.g., ['fr', 'it'])
          for which translation files should be generated or updated.
@@ -99,8 +97,6 @@ def scan_translations(
         FileNotFoundError: The Babel configuration file does not exist.
         RuntimeError: Extraction or translation file generation failed.
     """
-    if version is None:
-        version = ""
     if copyright_holder is None:
         copyright_holder = ""
     if languages is None:
@@ -152,8 +148,6 @@ def scan_translations(
 #""",
                 "--project",
                 name,
-                "--version",
-                version,
                 "--copyright-holder",
                 copyright_holder,
             ],
@@ -319,9 +313,8 @@ def main():
         scan_translations(
             args.name,
             args.directory,
-            args.version,
             args.copyright_holder,
-            languages=args.languages,
+            args.languages,
         )
     else:
         parser.print_help()
