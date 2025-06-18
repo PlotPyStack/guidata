@@ -4,7 +4,7 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Run Ruff Formatter",
+            "label": "🧽 Run Ruff Formatter",
             "command": "ruff",
             "args": [
                 "format"
@@ -27,7 +27,7 @@
             "type": "shell"
         },
         {
-            "label": "Run Ruff Linter",
+            "label": "🔦 Run Ruff Linter",
             "command": "ruff",
             "args": [
                 "check",
@@ -50,7 +50,7 @@
             "type": "shell"
         },
         {
-            "label": "Run Pylint",
+            "label": "🔦 Run Pylint",
             "command": "pylint",
             "args": [
                 "guidata"
@@ -133,7 +133,7 @@
             "type": "shell"
         },
         {
-            "label": "Run pytest",
+            "label": "🚀 Run pytest",
             "command": "cmd",
             "args": [
                 "/c",
@@ -218,7 +218,7 @@
             }
         },
         {
-            "label": "Clean Up",
+            "label": "🧹 Clean Up",
             "type": "shell",
             "command": "cmd",
             "args": [
