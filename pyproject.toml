@@ -75,7 +75,8 @@ include = ["guidata*"]
 version = { attr = "guidata.__version__" }
 
 [tool.pytest.ini_options]
-addopts = "guidata"
+addopts = "guidata --import-mode=importlib"
+# addopts = "guidata --import-mode=importlib --show-windows"  # Disable offscreen mode
 
 [tool.ruff]
 exclude = [".git", ".vscode", "build", "dist", "guidata/external"]

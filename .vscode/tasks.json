@@ -134,16 +134,16 @@
         },
         {
             "label": "🚀 Run pytest",
-            "command": "cmd",
+            "command": "${command:python.interpreterPath}",
             "args": [
-                "/c",
-                "run_pytest.bat"
+                "-m",
+                "pytest",
+                "--ff",
             ],
             "options": {
-                "cwd": "scripts",
+                "cwd": "${workspaceFolder}",
                 "env": {
-                    "UNATTENDED": "1",
-                    "PYTHON": "${command:python.interpreterPath}"
+                    "UNATTENDED": "1"
                 }
             },
             "group": {
@@ -158,7 +158,7 @@
                 "showReuseMessage": true,
                 "clear": true
             },
-            "type": "shell"
+            "type": "shell",
         },
         {
             "label": "Update requirements.txt",
