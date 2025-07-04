@@ -850,8 +850,9 @@ class SliderWidget(HLayoutMixin, LineEditWidget):
         """Update the visual status of the widget and enables/disables it if
         necessary"""
         super().set_state()
-        if self.is_readonly():  # Widget does not support readonly mode, disable it
-            self.slider.setDisabled(True)
+        if self.slider is not None:
+            if self.is_readonly():  # Widget does not support readonly mode, disable it
+                self.slider.setDisabled(True)
 
 
 class FloatSliderWidget(SliderWidget):
