@@ -289,32 +289,40 @@
         },
         {
             "label": "Build documentation",
-            "type": "shell",
-            "command": "cmd",
+            "command": "${command:python.interpreterPath}",
+            "args": [
+                "-m",
+                "sphinx",
+                "build",
+                ".",
+                "../build/doc",
+                "-b",
+                "html",
+                "-W"
+            ],
             "options": {
-                "cwd": "scripts",
-                "env": {
-                    "PYTHON": "${command:python.interpreterPath}",
-                    "UNATTENDED": "1"
+                "cwd": "${workspaceFolder}/doc",
+                "statusbar": {
+                    "hide": true
                 }
             },
-            "args": [
-                "/c",
-                "build_doc.bat"
-            ],
-            "problemMatcher": [],
             "group": {
                 "kind": "build",
-                "isDefault": true
+                "isDefault": false
             },
             "presentation": {
+                "clear": true,
                 "echo": true,
-                "reveal": "always",
                 "focus": false,
-                "panel": "shared",
+                "panel": "dedicated",
+                "reveal": "always",
                 "showReuseMessage": true,
-                "clear": true
-            }
+            },
+            "type": "shell",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "Generate requirements"
+            ]
         },
         {
             "label": "Build Python packages",
