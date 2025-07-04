@@ -2,3 +2,4 @@ graft doc
 include *.desktop
 include CHANGELOG.md
 include requirements.txt
+include requirements-min.rst
