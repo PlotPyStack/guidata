@@ -10,7 +10,14 @@ on another item's value.
 
 # guitest: show
 
-from guidata.dataset import ChoiceItem, DataSet, FloatItem, FuncProp, GetAttrProp
+from guidata.dataset import (
+    BoolItem,
+    ChoiceItem,
+    DataSet,
+    FloatItem,
+    FuncProp,
+    GetAttrProp,
+)
 from guidata.env import execenv
 from guidata.qthelpers import qt_app_context
 
@@ -25,6 +32,7 @@ class Parameters(DataSet):
     x1 = FloatItem("x1")
     x2 = FloatItem("x2").set_prop("display", active=FuncProp(_prop, lambda x: x == "B"))
     x3 = FloatItem("x3").set_prop("display", active=FuncProp(_prop, lambda x: x == "C"))
+    b1 = BoolItem("b1").set_prop("display", active=FuncProp(_prop, lambda x: x == "C"))
 
 
 def test_activable_items():
