@@ -1,5 +1,15 @@
 # Changelog #
 
+## Version 3.11.1 ##
+
+🛠️ Bug fixes:
+
+* [Issue #90](https://github.com/PlotPyStack/guidata/issues/90) - `BoolItem`: Fix checkbox state management in `qtitemwidgets`
+  * Before this fix, the checkbox state was not correctly managed when the item's active state changed.
+  * In other words, when using `set_prop("display", active=` on `BoolItem`, the checkbox was not updated.
+  * The checkbox state is now correctly managed based on the item's active state.
+  * This fixes a regression introduced in version 3.3.0 with the new dataset read-only mode feature.
+
 ## Version 3.11.0 ##
 
 💥 New features:
