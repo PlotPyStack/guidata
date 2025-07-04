@@ -177,13 +177,12 @@
             "type": "shell",
         },
         {
-            "label": "Update requirements.txt",
-            "command": "toml-to-req",
+            "label": "Generate requirements",
+            "command": "${command:python.interpreterPath}",
             "args": [
-                "--toml-file",
-                "pyproject.toml",
-                "--optional-lists",
-                "dev,doc,test",
+                "-m",
+                "guidata.utils.genreqs",
+                "all",
             ],
             "options": {
                 "cwd": "${workspaceFolder}",
@@ -351,6 +350,7 @@
             "dependsOrder": "sequence",
             "dependsOn": [
                 "Clean Up",
+                "Generate requirements"
             ]
         },
     ]
