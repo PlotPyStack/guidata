@@ -1,4 +1,4 @@
-The :mod:`guidata` package requires the following Python modules:
+The `guidata` package requires the following Python modules:
 
 .. list-table::
     :header-rows: 1
@@ -25,6 +25,16 @@ The :mod:`guidata` package requires the following Python modules:
     * - tomli
       - 
       - A lil' TOML parser
+
+Optional modules for GUI support (Qt):
+
+.. list-table::
+    :header-rows: 1
+    :align: left
+
+    * - Name
+      - Version
+      - Summary
     * - PyQt5
       - >=5.11
       - Python bindings for the Qt cross platform application toolkit
@@ -73,7 +83,7 @@ Optional modules for building the documentation:
       - 
       - Powerful data structures for data analysis, time series, and statistics
     * - sphinx
-      - >6
+      - 
       - Python documentation generator
     * - myst_parser
       - 
