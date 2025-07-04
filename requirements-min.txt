@@ -1,5 +1,5 @@
 Coverage
-NumPy==1.19
+NumPy==1.22.0
 PyQt5
 PyQt5==5.11
 QtPy==1.9
