@@ -48,12 +48,13 @@ guidata-tests = "guidata.tests:run"
 guidata-translations = "guidata.utils.translations:main"
 
 [project.optional-dependencies]
+qt = ["PyQt5>=5.11"]
 dev = ["babel", "Coverage", "pylint", "ruff", "toml-to-requirements"]
 doc = [
     "PyQt5",
     "pillow",
     "pandas",
-    "sphinx>6",
+    "sphinx",
     "myst_parser",
     "sphinx-copybutton",
     "sphinx_qt_documentation",
