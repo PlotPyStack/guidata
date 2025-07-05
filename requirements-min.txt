@@ -1,10 +1,9 @@
 Coverage
-NumPy==1.19
-PyQt5
-PyQt5==5.11
+NumPy==1.22
+PyQt5==5.15.6
 QtPy==1.9
 babel
-h5py==3.1
+h5py==3.6
 myst_parser
 pandas
 pillow
@@ -17,5 +16,4 @@ ruff
 sphinx
 sphinx-copybutton
 sphinx_qt_documentation
-toml-to-requirements
 tomli

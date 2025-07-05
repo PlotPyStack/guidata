@@ -38,7 +38,7 @@ classifiers = [
     "Topic :: Utilities",
 ]
 requires-python = ">=3.9, <4"
-dependencies = ["h5py>=3.1", "NumPy>=1.19", "QtPy>=1.9", "requests", "tomli"]
+dependencies = ["h5py >= 3.6", "NumPy >= 1.22", "QtPy >= 1.9", "requests", "tomli"]
 dynamic = ["version"]
 
 [project.gui-scripts]
@@ -49,10 +49,9 @@ guidata-translations = "guidata.utils.translations:main"
 guidata-genreqs = "guidata.utils.genreqs:main"
 
 [project.optional-dependencies]
-qt = ["PyQt5>=5.11"]
+qt = ["PyQt5 >= 5.15.6"]
 dev = ["babel", "Coverage", "pylint", "ruff"]
 doc = [
-    "PyQt5",
     "pillow",
     "pandas",
     "sphinx",
