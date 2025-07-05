@@ -108,7 +108,9 @@ def get_test_data():
         ),
     }
     if PILImage is not None:
-        image = PILImage.fromarray(np.random.randint(256, size=(100, 100)), mode="P")
+        image = PILImage.fromarray(
+            np.random.randint(256, size=(100, 100)).astype(np.uint8)
+        ).convert("P")
         test_data["image"] = image
     return test_data
 
