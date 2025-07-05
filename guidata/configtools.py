@@ -271,10 +271,10 @@ def font_is_installed(font: str) -> list[str]:
         list[str]: list of installed fonts
     """
     # Importing Qt here because this module should be independent from it
-    from qtpy import QT5
+    from qtpy import PYQT5
     from qtpy import QtGui as QG  # pylint: disable=import-outside-toplevel
 
-    if QT5:
+    if PYQT5:
         fontfamilies = QG.QFontDatabase().families()
     else:
         # Qt6
