@@ -60,9 +60,6 @@ Optional modules for development:
     * - ruff
       - 
       - An extremely fast Python linter and code formatter, written in Rust.
-    * - toml-to-requirements
-      - 
-      - Convert a pyproject.toml file to a requirements.txt file
 
 Optional modules for building the documentation:
 

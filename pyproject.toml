@@ -50,7 +50,7 @@ guidata-genreqs = "guidata.utils.genreqs:main"
 
 [project.optional-dependencies]
 qt = ["PyQt5>=5.11"]
-dev = ["babel", "Coverage", "pylint", "ruff", "toml-to-requirements"]
+dev = ["babel", "Coverage", "pylint", "ruff"]
 doc = [
     "PyQt5",
     "pillow",
