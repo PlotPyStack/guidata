@@ -4,7 +4,7 @@
 
 💥 New features:
 
-* New script `guidata-gbuild` for building the package:
+* New script `gbuild` for building the package:
   * This script is a wrapper around the `guidata.utils.securebuild` module, which ensures that the build process is secure and reproducible.
   * It checks that the `pyproject.toml` file is present in the root of the repository, and that it is committed to Git.
   * It also ensures that the build process is reproducible by using a temporary directory for the build artifacts.
