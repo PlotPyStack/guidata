@@ -2,6 +2,12 @@
 
 ## Version 3.11.1 ##
 
+ℹ️ Changes:
+
+* Renamed scripts associated to `guidata.utils.translations` and `guidata.utils.genreqs` modules:
+  * `guidata-translations` is now `gtrans`
+  * `guidata-genreqs` is now `greqs`
+
 🛠️ Bug fixes:
 
 * [Issue #90](https://github.com/PlotPyStack/guidata/issues/90) - `BoolItem`: Fix checkbox state management in `qtitemwidgets`

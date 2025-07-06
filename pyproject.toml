@@ -45,8 +45,8 @@ dynamic = ["version"]
 guidata-tests = "guidata.tests:run"
 
 [project.scripts]
-guidata-translations = "guidata.utils.translations:main"
-guidata-genreqs = "guidata.utils.genreqs:main"
+gtrans = "guidata.utils.translations:main"
+greqs = "guidata.utils.genreqs:main"
 
 [project.optional-dependencies]
 qt = ["PyQt5 >= 5.15.6"]
