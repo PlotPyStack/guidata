@@ -49,7 +49,7 @@ gtrans = "guidata.utils.translations:main"
 greqs = "guidata.utils.genreqs:main"
 
 [project.optional-dependencies]
-qt = ["PyQt5 >= 5.15.6"]
+qt = ["PyQt5 > 5.15.5"]
 dev = ["build", "babel", "Coverage", "pylint", "ruff"]
 doc = [
     "pillow",

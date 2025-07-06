@@ -1,8 +1,9 @@
 Coverage
 NumPy==1.22
-PyQt5==5.15.6
+PyQt5
 QtPy==1.9
 babel
+build
 h5py==3.6
 myst_parser
 pandas

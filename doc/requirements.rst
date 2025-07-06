@@ -36,7 +36,7 @@ Optional modules for GUI support (Qt):
       - Version
       - Summary
     * - PyQt5
-      -  >= 5.15.6
+      -  > 5.15.5
       - Python bindings for the Qt cross platform application toolkit
 
 Optional modules for development:
@@ -48,6 +48,9 @@ Optional modules for development:
     * - Name
       - Version
       - Summary
+    * - build
+      - 
+      - A simple, correct Python build frontend
     * - babel
       - 
       - Internationalization utilities
