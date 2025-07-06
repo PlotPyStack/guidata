@@ -24,43 +24,39 @@ import tempfile
 from pathlib import Path
 
 
-def find_git_root(path: Path) -> Path:
-    """Find the root directory of the Git repository containing the given path.
+def run_secure_build(root_path: str | None = None) -> None:
+    """Run a secure build of the Python package.
 
     Args:
-        path: Path to a file or directory within the Git repository.
-
-    Returns:
-        Path to the root directory of the Git repository.
-
-    Raises:
-        RuntimeError: If the root directory cannot be found.
-    """
-    for parent in [path] + list(path.parents):
-        if (parent / ".git").exists():
-            return parent
-    raise RuntimeError("Impossible de trouver la racine du dépôt Git")
-
-
-def run_secure_build() -> None:
-    """Run a secure build of the Python package.
+        root_path: Path to the root directory of the Git repository. If None,
+         the function will take the current working directory as the root.
 
     This function performs the following steps:
 
-    1. Finds the root directory of the Git repository.
-    2. Creates a temporary directory to hold the build files.
-    3. Creates a tar archive of the current HEAD of the Git repository.
-    4. Extracts the contents of the tar archive into the temporary directory.
-    5. Checks for the presence of `pyproject.toml` in the extracted files.
-    6. Runs the build process using `build` to create source distribution and wheels.
-    7. Copies the generated files to the `dist/` directory in repository root.
+    1. Creates a temporary directory to hold the build files.
+    2. Creates a tar archive of the current HEAD of the Git repository.
+    3. Extracts the contents of the tar archive into the temporary directory.
+    4. Checks for the presence of `pyproject.toml` in the extracted files.
+    5. Runs the build process using `build` to create source distribution and wheels.
+    6. Copies the generated files to the `dist/` directory in repository root.
 
     Raises:
-        RuntimeError: If the `pyproject.toml` file is not found in the extracted files.
+        RuntimeError: If the current directory is not a Git repository and no
+         `root_path` is provided, or if the `pyproject.toml` file is not found
+         in the extracted files.
     """
-    # Point de départ : ce script
-    this_file = Path(__file__).resolve()
-    root_dir = find_git_root(this_file)
+    # Check if root_path is None
+    if root_path is None:
+        root_dir = Path.cwd()
+        # Raise an error if the current directory is not a Git repository
+        if not (root_dir / ".git").exists():
+            raise RuntimeError(
+                f"Current directory '{root_dir}' is not a Git repository. "
+                "Please provide a valid root path or run this script in a "
+                "Git repository."
+            )
+    else:
+        root_dir = Path(root_path).resolve()
     dist_dir = root_dir / "dist"
 
     print(f"📁 Git root directory: {root_dir}")
