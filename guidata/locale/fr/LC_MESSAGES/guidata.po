@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: guidata 3.10.0\n"
 "Report-Msgid-Bugs-To: p.raybaut@codra.fr\n"
-"POT-Creation-Date: 2025-06-17 15:47+0200\n"
+"POT-Creation-Date: 2025-07-06 14:53+0200\n"
 "PO-Revision-Date: 2025-06-17 15:47+0200\n"
 "Last-Translator: Christophe Debonnel <c.debonnel@codra.fr>\n"
 "Language: fr\n"
@@ -699,3 +699,4 @@ msgstr "Instance :"
 
 msgid "Text editor"
 msgstr "Éditeur de texte"
+
