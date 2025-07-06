@@ -359,7 +359,6 @@
             "dependsOrder": "sequence",
             "dependsOn": [
                 "🧹 Clean Up",
-                "Generate requirements"
             ]
         },
     ]
