@@ -4,7 +4,7 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "🧽 Run Ruff Formatter",
+            "label": "🧽 Ruff Formatter",
             "command": "${command:python.interpreterPath}",
             "args": [
                 "-m",
@@ -29,7 +29,7 @@
             "type": "shell"
         },
         {
-            "label": "🔦 Run Ruff Linter",
+            "label": "🔦 Ruff Linter",
             "command": "${command:python.interpreterPath}",
             "args": [
                 "-m",
@@ -55,7 +55,7 @@
             "type": "shell"
         },
         {
-            "label": "🔦 Run Pylint",
+            "label": "🔦 Pylint",
             "command": "${command:python.interpreterPath}",
             "args": [
                 "-m",
@@ -149,7 +149,7 @@
             "type": "shell"
         },
         {
-            "label": "🚀 Run pytest",
+            "label": "🚀 Pytest",
             "command": "${command:python.interpreterPath}",
             "args": [
                 "-m",
@@ -205,7 +205,7 @@
             "type": "shell"
         },
         {
-            "label": "🧪 Run coverage tests",
+            "label": "🧪 Coverage tests",
             "type": "shell",
             "command": "${command:python.interpreterPath}",
             "args": [
@@ -258,7 +258,7 @@
             "problemMatcher": [],
             "dependsOrder": "sequence",
             "dependsOn": [
-                "🧪 Run coverage tests",
+                "🧪 Coverage tests",
             ],
         },
         {
