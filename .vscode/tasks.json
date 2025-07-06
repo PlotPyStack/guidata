@@ -358,7 +358,7 @@
             "problemMatcher": [],
             "dependsOrder": "sequence",
             "dependsOn": [
-                "Clean Up",
+                "🧹 Clean Up",
                 "Generate requirements"
             ]
         },
