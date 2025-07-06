@@ -322,6 +322,23 @@
             ]
         },
         {
+            "label": "🌐 Open HTML doc",
+            "type": "shell",
+            "windows": {
+                "command": "start ../build/doc/index.html"
+            },
+            "linux": {
+                "command": "xdg-open ../build/doc/index.html"
+            },
+            "osx": {
+                "command": "open ../build/doc/index.html"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/doc"
+            },
+            "problemMatcher": []
+        },
+        {
             "label": "📦 Build Python packages",
             "type": "shell",
             "command": "cmd",
