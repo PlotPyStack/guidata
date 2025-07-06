@@ -180,7 +180,14 @@ def __extract_min_requirements(dependencies: list[str]) -> list[str]:
             ):
                 result.append(f"{parts[0].strip()}=={parts[1].strip()}")
             else:
-                print(f"⚠️  Skipping complex requirement: {dep}")
+                parts = dep.split(">")
+                if len(parts) == 2:
+                    print(
+                        f"ℹ️  Removing version constraint for strict requirement: {dep}"
+                    )
+                    result.append(parts[0].strip())
+                else:
+                    print(f"⚠️  Skipping complex requirement: {dep}")
         else:
             result.append(dep)  # No version specified
     return result

@@ -9,6 +9,10 @@
   * In other words, when using `set_prop("display", active=` on `BoolItem`, the checkbox was not updated.
   * The checkbox state is now correctly managed based on the item's active state.
   * This fixes a regression introduced in version 3.3.0 with the new dataset read-only mode feature.
+* Requirements generation scripts (`greqs` or `python -m guidata.utils.genreqs`):
+  * Before this fix, strict superior version requirements (e.g. `pyqt5 > 5.15`) were skipped in the generated requirements files (with a warning message).
+  * Now, these strict superior version requirements are included but the version is not specified (e.g. `pyqt5` instead of `pyqt5 > 5.15`).
+  * A warning message is still displayed to inform the user that the version is not specified.
 
 ## Version 3.11.0 ##
 
