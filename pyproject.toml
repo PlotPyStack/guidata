@@ -50,7 +50,7 @@ greqs = "guidata.utils.genreqs:main"
 
 [project.optional-dependencies]
 qt = ["PyQt5 >= 5.15.6"]
-dev = ["babel", "Coverage", "pylint", "ruff"]
+dev = ["build", "babel", "Coverage", "pylint", "ruff"]
 doc = [
     "pillow",
     "pandas",
