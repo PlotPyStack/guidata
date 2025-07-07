@@ -53,6 +53,9 @@ Handling item properties
 
 .. autoclass:: guidata.dataset.FuncProp
     :members:
+
+.. autoclass:: guidata.dataset.FuncPropMulti
+    :members:
 """
 
 # pylint: disable-msg=W0622
@@ -247,6 +250,42 @@ class FuncProp(ItemProperty):
             value (Any): value to set
         """
         self.property.set(instance, item, self.inverse_function(value))
+
+
+class FuncPropMulti(ItemProperty):
+    """An 'operator property' for multiple properties
+
+    Args:
+        props (list[ItemProperty]): properties to apply function to
+        func (function): function to apply
+        invfunc (function): inverse function (default: func)
+    """
+
+    def __init__(
+        self,
+        props: list[ItemProperty],
+        func: Callable,
+        invfunc: Callable | None = None,
+    ) -> None:
+        self.properties = props
+        self.function = func
+        if invfunc is None:
+            invfunc = func
+        self.inverse_function = invfunc
+
+    def __call__(self, instance: DataSet, item: DataItem, value: Any) -> Any:
+        return self.function(*[prop(instance, item, value) for prop in self.properties])
+
+    def set(self, instance: DataSet, item: DataItem, value: Any) -> None:
+        """Sets the value of the property given an instance, item and value
+
+        Args:
+            instance (DataSet): instance of the DataSet
+            item (Any): item to set the value of
+            value (Any): value to set
+        """
+        for prop in self.properties:
+            prop.set(instance, item, self.inverse_function(value))
 
 
 class DataItem(ABC):
