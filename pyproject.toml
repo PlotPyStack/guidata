@@ -51,7 +51,7 @@ gbuild = "guidata.utils.securebuild:main"
 
 [project.optional-dependencies]
 qt = ["PyQt5 > 5.15.5"]
-dev = ["build", "babel", "Coverage", "pylint", "ruff"]
+dev = ["build", "babel", "Coverage", "pylint", "ruff", "pre-commit"]
 doc = [
     "pillow",
     "pandas",
