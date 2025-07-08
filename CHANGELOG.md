@@ -35,6 +35,15 @@
   * The fix ensures that all pending Qt events are processed before scheduling the dialog closure.
   * This avoids the necessity to use timeouts in tests, which can lead to flaky tests.
 
+ℹ️ Other changes:
+
+* Updated dependencies following the latest security advisories (NumPy >= 1.22)
+* Added `pre-commit` hook to run `ruff` (both `ruff check` and `ruff format`) on commit
+* Added missing `build` optional dependency to development dependencies in `pyproject.toml`
+* Visual Studio Code tasks:
+  * Major overhaul (cleanup and simplification)
+  * Removal of no longer used batch files
+
 ## Version 3.11.0 ##
 
 💥 New features:
