@@ -29,6 +29,11 @@
   * Before this fix, strict superior version requirements (e.g. `pyqt5 > 5.15`) were skipped in the generated requirements files (with a warning message).
   * Now, these strict superior version requirements are included but the version is not specified (e.g. `pyqt5` instead of `pyqt5 > 5.15`).
   * A warning message is still displayed to inform the user that the version is not specified.
+* Issue with automated test suite using `exec_dialog`:
+  * The `exec_dialog` function was not properly handling the dialog closure in automated tests.
+  * This could lead to unexpected behavior and side effects between tests.
+  * The fix ensures that all pending Qt events are processed before scheduling the dialog closure.
+  * This avoids the necessity to use timeouts in tests, which can lead to flaky tests.
 
 ## Version 3.11.0 ##
 
