@@ -720,6 +720,10 @@ def exec_dialog(dlg: QW.QDialog) -> int:
         int: Dialog exit code
     """
     if execenv.unattended:
+        # Important: process all pending Qt events before scheduling dialog closure.
+        # This avoids side-effects between tests (timers, widgets) and ensures
+        # clean dialog lifecycle in non-interactive automated test environments.
+        QW.QApplication.processEvents()
         QC.QTimer.singleShot(
             execenv.delay,
             lambda: close_dialog_and_quit(dlg, screenshot=execenv.screenshot),
