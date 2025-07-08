@@ -183,10 +183,11 @@ class AbstractDataSetWidget:
         """Update the visual status of the widget and enables/disables the widget if
         necessary"""
         active = self.is_active()
-        if self.group:
-            self.group.setEnabled(active)
-        if self.label:
-            self.label.setEnabled(active)
+        if active is not None:
+            if self.group:
+                self.group.setEnabled(active)
+            if self.label:
+                self.label.setEnabled(active)
 
     def notify_value_change(self) -> None:
         """Notify parent layout that widget value has changed"""
