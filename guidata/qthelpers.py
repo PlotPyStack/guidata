@@ -844,7 +844,7 @@ def qt_wait(
 
 
 def qt_wait_until(
-    condition: Callable[[], bool], timeout: float = 1.0, interval: float = 0.01
+    condition: Callable[[], bool], timeout: float = 5.0, interval: float = 0.05
 ) -> None:
     """Wait until a condition is met or timeout occurs, processing Qt events.
 
