@@ -843,6 +843,23 @@ def qt_wait(
         msgbox.deleteLater()
 
 
+def qt_wait_until(
+    condition: Callable[[], bool], timeout: float = 1.0, interval: float = 0.01
+) -> None:
+    """Wait until a condition is met or timeout occurs, processing Qt events.
+
+    Args:
+        condition: A callable that returns True when the condition is met.
+        timeout: Maximum time to wait in seconds.
+        interval: Time to wait between checks in seconds.
+    """
+    end = time.time() + timeout
+    while not condition() and time.time() < end:
+        QW.QApplication.processEvents()
+        time.sleep(interval)
+    assert condition(), "Condition not met within timeout"
+
+
 @contextmanager
 def save_restore_stds() -> Generator[None, None, None]:
     """Save/restore standard I/O before/after doing some things

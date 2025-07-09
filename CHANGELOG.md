@@ -14,6 +14,10 @@
   * It checks that the `pyproject.toml` file is present in the root of the repository, and that it is committed to Git.
   * It also ensures that the build process is reproducible by using a temporary directory for the build artifacts.
 
+* New `qt_wait_until` function (`guidata.qthelpers`) for waiting until a condition is met:
+  * This function allows you to wait for a specific condition to be true, while still processing Qt events.
+  * It can be useful in situations where you need to wait for a background task to complete or for a specific UI state to be reached.
+
 * Renamed scripts associated to `guidata.utils.translations` and `guidata.utils.genreqs` modules:
   * `guidata-translations` is now `gtrans`
   * `guidata-genreqs` is now `greqs`
