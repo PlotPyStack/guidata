@@ -9,14 +9,14 @@
             "args": [
                 "-m",
                 "ruff",
-                "format"
+                "format",
             ],
             "options": {
-                "cwd": "${workspaceFolder}"
+                "cwd": "${workspaceFolder}",
             },
             "group": {
                 "kind": "build",
-                "isDefault": true
+                "isDefault": true,
             },
             "presentation": {
                 "clear": true,
@@ -24,9 +24,9 @@
                 "focus": false,
                 "panel": "dedicated",
                 "reveal": "always",
-                "showReuseMessage": true
+                "showReuseMessage": true,
             },
-            "type": "shell"
+            "type": "shell",
         },
         {
             "label": "🔦 Ruff Linter",
@@ -38,11 +38,11 @@
                 "--fix",
             ],
             "options": {
-                "cwd": "${workspaceFolder}"
+                "cwd": "${workspaceFolder}",
             },
             "group": {
                 "kind": "build",
-                "isDefault": true
+                "isDefault": true,
             },
             "presentation": {
                 "clear": true,
@@ -52,7 +52,7 @@
                 "reveal": "always",
                 "showReuseMessage": true,
             },
-            "type": "shell"
+            "type": "shell",
         },
         {
             "label": "🔦 Pylint",
@@ -69,14 +69,14 @@
                 "--disable=too-many-lines",
                 "--disable=too-many-locals",
                 "--disable=too-many-public-methods",
-                "--disable=too-many-statements"
+                "--disable=too-many-statements",
             ],
             "options": {
-                "cwd": "${workspaceFolder}"
+                "cwd": "${workspaceFolder}",
             },
             "group": {
                 "kind": "build",
-                "isDefault": true
+                "isDefault": true,
             },
             "presentation": {
                 "clear": true,
@@ -84,9 +84,9 @@
                 "focus": false,
                 "panel": "dedicated",
                 "reveal": "always",
-                "showReuseMessage": true
+                "showReuseMessage": true,
             },
-            "type": "shell"
+            "type": "shell",
         },
         {
             "label": "🔎 Scan translations",
@@ -100,14 +100,14 @@
                 "--directory",
                 ".",
                 "--copyright-holder",
-                "CEA, Codra, Pierre Raybaut"
+                "CEA, Codra, Pierre Raybaut",
             ],
             "group": {
                 "kind": "build",
-                "isDefault": false
+                "isDefault": false,
             },
             "options": {
-                "cwd": "${workspaceFolder}"
+                "cwd": "${workspaceFolder}",
             },
             "presentation": {
                 "echo": true,
@@ -115,7 +115,7 @@
                 "panel": "shared",
                 "reveal": "always",
                 "showReuseMessage": true,
-                "clear": false
+                "clear": false,
             },
             "type": "shell",
         },
@@ -133,10 +133,10 @@
             ],
             "group": {
                 "kind": "build",
-                "isDefault": false
+                "isDefault": false,
             },
             "options": {
-                "cwd": "${workspaceFolder}"
+                "cwd": "${workspaceFolder}",
             },
             "presentation": {
                 "echo": true,
@@ -144,9 +144,9 @@
                 "panel": "shared",
                 "reveal": "always",
                 "showReuseMessage": true,
-                "clear": false
+                "clear": false,
             },
-            "type": "shell"
+            "type": "shell",
         },
         {
             "label": "🚀 Pytest",
@@ -159,12 +159,12 @@
             "options": {
                 "cwd": "${workspaceFolder}",
                 "env": {
-                    "UNATTENDED": "1"
-                }
+                    "UNATTENDED": "1",
+                },
             },
             "group": {
                 "kind": "build",
-                "isDefault": true
+                "isDefault": true,
             },
             "presentation": {
                 "echo": true,
@@ -172,7 +172,7 @@
                 "focus": false,
                 "panel": "dedicated",
                 "showReuseMessage": true,
-                "clear": true
+                "clear": true,
             },
             "type": "shell",
         },
@@ -187,12 +187,12 @@
             "options": {
                 "cwd": "${workspaceFolder}",
                 "statusbar": {
-                    "hide": true
-                }
+                    "hide": true,
+                },
             },
             "group": {
                 "kind": "build",
-                "isDefault": false
+                "isDefault": false,
             },
             "presentation": {
                 "clear": true,
@@ -202,7 +202,7 @@
                 "reveal": "always",
                 "showReuseMessage": true,
             },
-            "type": "shell"
+            "type": "shell",
         },
         {
             "label": "🧪 Coverage tests",
@@ -214,7 +214,7 @@
                 "run",
                 "-m",
                 "pytest",
-                "guidata"
+                "guidata",
             ],
             "options": {
                 "cwd": "${workspaceFolder}",
@@ -222,38 +222,38 @@
                     "COVERAGE_PROCESS_START": "${workspaceFolder}/.coveragerc",
                 },
                 "statusbar": {
-                    "hide": true
-                }
+                    "hide": true,
+                },
             },
             "group": {
                 "kind": "test",
-                "isDefault": true
+                "isDefault": true,
             },
             "presentation": {
-                "panel": "dedicated"
+                "panel": "dedicated",
             },
-            "problemMatcher": []
+            "problemMatcher": [],
         },
         {
             "label": "📊 Coverage full",
             "type": "shell",
             "windows": {
-                "command": "${command:python.interpreterPath} -m coverage combine && ${command:python.interpreterPath} -m coverage html && start htmlcov\\index.html"
+                "command": "${command:python.interpreterPath} -m coverage combine && ${command:python.interpreterPath} -m coverage html && start htmlcov\\index.html",
             },
             "linux": {
-                "command": "${command:python.interpreterPath} -m coverage combine && ${command:python.interpreterPath} -m coverage html && xdg-open htmlcov/index.html"
+                "command": "${command:python.interpreterPath} -m coverage combine && ${command:python.interpreterPath} -m coverage html && xdg-open htmlcov/index.html",
             },
             "osx": {
-                "command": "${command:python.interpreterPath} -m coverage combine && ${command:python.interpreterPath} -m coverage html && open htmlcov/index.html"
+                "command": "${command:python.interpreterPath} -m coverage combine && ${command:python.interpreterPath} -m coverage html && open htmlcov/index.html",
             },
             "options": {
                 "cwd": "${workspaceFolder}",
                 "env": {
-                    "COVERAGE_PROCESS_START": "${workspaceFolder}/.coveragerc"
-                }
+                    "COVERAGE_PROCESS_START": "${workspaceFolder}/.coveragerc",
+                },
             },
             "presentation": {
-                "panel": "dedicated"
+                "panel": "dedicated",
             },
             "problemMatcher": [],
             "dependsOrder": "sequence",
@@ -267,14 +267,14 @@
             "command": "cmd",
             "args": [
                 "/c",
-                "clean_up.bat"
+                "clean_up.bat",
             ],
             "options": {
-                "cwd": "scripts"
+                "cwd": "scripts",
             },
             "group": {
                 "kind": "build",
-                "isDefault": true
+                "isDefault": true,
             },
             "presentation": {
                 "echo": true,
@@ -282,8 +282,8 @@
                 "focus": false,
                 "panel": "shared",
                 "showReuseMessage": true,
-                "clear": false
-            }
+                "clear": false,
+            },
         },
         {
             "label": "📚 Build documentation",
@@ -296,14 +296,14 @@
                 "build/doc",
                 "-b",
                 "html",
-                "-W"
+                "-W",
             ],
             "options": {
                 "cwd": "${workspaceFolder}",
             },
             "group": {
                 "kind": "build",
-                "isDefault": true
+                "isDefault": true,
             },
             "presentation": {
                 "clear": true,
@@ -316,25 +316,25 @@
             "type": "shell",
             "dependsOrder": "sequence",
             "dependsOn": [
-                "Generate requirements"
-            ]
+                "Generate requirements",
+            ],
         },
         {
             "label": "🌐 Open HTML doc",
             "type": "shell",
             "windows": {
-                "command": "start build/doc/index.html"
+                "command": "start build/doc/index.html",
             },
             "linux": {
-                "command": "xdg-open build/doc/index.html"
+                "command": "xdg-open build/doc/index.html",
             },
             "osx": {
-                "command": "open build/doc/index.html"
+                "command": "open build/doc/index.html",
             },
             "options": {
-                "cwd": "${workspaceFolder}"
+                "cwd": "${workspaceFolder}",
             },
-            "problemMatcher": []
+            "problemMatcher": [],
         },
         {
             "label": "📦 Build package",
@@ -345,21 +345,21 @@
                 "guidata.utils.securebuild",
             ],
             "options": {
-                "cwd": "${workspaceFolder}"
+                "cwd": "${workspaceFolder}",
             },
             "group": {
                 "kind": "build",
-                "isDefault": false
+                "isDefault": false,
             },
             "presentation": {
                 "clear": true,
-                "panel": "dedicated"
+                "panel": "dedicated",
             },
             "problemMatcher": [],
             "dependsOrder": "sequence",
             "dependsOn": [
                 "🧹 Clean Up",
-            ]
+            ],
         },
-    ]
+    ],
 }
