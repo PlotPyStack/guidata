@@ -1039,10 +1039,7 @@ class DataSetMeta(type):
                 if attrname in items:
                     value._order = items[attrname]._order
                 items[attrname] = value
-        items_list = list(items.values())
-        items_list.sort(key=lambda x: x._order)
-
-        dct["_items"] = items_list
+        dct["_items"] = list(items.values())
         return type.__new__(cls, name, bases, dct)
 
 
