@@ -1,5 +1,13 @@
 # Changelog #
 
+## Version 3.12.1 ##
+
+🛠️ Bug fixes:
+
+* [Issue #92](https://github.com/PlotPyStack/guidata/issues/92) - Changing base class order in DataSet inheritance does not affect item order as expected
+  * When using multiple inheritance with DataSet classes, changing the order of the base classes in the child class definition did not affect the order of the items in the resulting dataset.
+  * One would expect the items to appear in the order in which the base classes are listed, and thanks to this fix, this is now the case.
+
 ## Version 3.12.0 ##
 
 💥 New features:

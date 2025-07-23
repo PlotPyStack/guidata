@@ -1018,6 +1018,31 @@ class DataItemVariable:
         return self.item.get_prop("display", "label")
 
 
+def collect_items_in_bases_order(
+    bases: tuple[type], seen: set | None = None
+) -> list[DataItem]:
+    """Collect items in bases order
+
+    Args:
+        bases: tuple of base classes
+        seen: set of already seen items to avoid duplicates
+
+    Returns:
+        List of data items
+    """
+    if seen is None:
+        seen = set()
+    items = []
+    for base in bases:
+        items.extend(collect_items_in_bases_order(base.__bases__, seen))
+        base_dict = getattr(base, "__dict__", {})
+        for name, obj in base_dict.items():
+            if isinstance(obj, DataItem) and name not in seen:
+                items.append(obj)
+                seen.add(name)
+    return items
+
+
 class DataSetMeta(type):
     """
     DataSet metaclass
@@ -1027,12 +1052,7 @@ class DataSetMeta(type):
     """
 
     def __new__(cls: type, name: str, bases: Any, dct: dict[str, Any]) -> type:
-        items = {}
-        for base in bases:
-            if getattr(base, "__metaclass__", None) is DataSetMeta:
-                for item in base._items:
-                    items[item._name] = item
-
+        items = {item._name: item for item in collect_items_in_bases_order(bases)}
         for attrname, value in list(dct.items()):
             if isinstance(value, DataItem):
                 value.set_name(attrname)
