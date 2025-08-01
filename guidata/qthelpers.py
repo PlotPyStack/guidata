@@ -720,6 +720,10 @@ def exec_dialog(dlg: QW.QDialog) -> int:
         int: Dialog exit code
     """
     if execenv.unattended:
+        # Important: process all pending Qt events before scheduling dialog closure.
+        # This avoids side-effects between tests (timers, widgets) and ensures
+        # clean dialog lifecycle in non-interactive automated test environments.
+        QW.QApplication.processEvents()
         QC.QTimer.singleShot(
             execenv.delay,
             lambda: close_dialog_and_quit(dlg, screenshot=execenv.screenshot),
@@ -837,6 +841,23 @@ def qt_wait(
     if msgbox is not None:
         msgbox.close()
         msgbox.deleteLater()
+
+
+def qt_wait_until(
+    condition: Callable[[], bool], timeout: float = 5.0, interval: float = 0.05
+) -> None:
+    """Wait until a condition is met or timeout occurs, processing Qt events.
+
+    Args:
+        condition: A callable that returns True when the condition is met.
+        timeout: Maximum time to wait in seconds.
+        interval: Time to wait between checks in seconds.
+    """
+    end = time.time() + timeout
+    while not condition() and time.time() < end:
+        QW.QApplication.processEvents()
+        time.sleep(interval)
+    assert condition(), "Condition not met within timeout"
 
 
 @contextmanager

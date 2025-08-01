@@ -183,10 +183,11 @@ class AbstractDataSetWidget:
         """Update the visual status of the widget and enables/disables the widget if
         necessary"""
         active = self.is_active()
-        if self.group:
-            self.group.setEnabled(active)
-        if self.label:
-            self.label.setEnabled(active)
+        if active is not None:
+            if self.group:
+                self.group.setEnabled(active)
+            if self.label:
+                self.label.setEnabled(active)
 
     def notify_value_change(self) -> None:
         """Notify parent layout that widget value has changed"""
@@ -566,7 +567,8 @@ class CheckBoxWidget(AbstractDataSetWidget):
         """Update the visual status of the widget and enables/disables it if
         necessary"""
         super().set_state()
-        self.checkbox.setEnabled(not self.is_readonly())
+        if self.is_readonly():  # Widget does not support readonly mode, disable it
+            self.group.setDisabled(True)
 
 
 class DateWidget(AbstractDataSetWidget):
@@ -850,7 +852,8 @@ class SliderWidget(HLayoutMixin, LineEditWidget):
         necessary"""
         super().set_state()
         if self.slider is not None:
-            self.slider.setEnabled(not self.is_readonly())
+            if self.is_readonly():  # Widget does not support readonly mode, disable it
+                self.slider.setDisabled(True)
 
 
 class FloatSliderWidget(SliderWidget):
@@ -942,7 +945,8 @@ class FileWidget(HLayoutMixin, LineEditWidget):
         """Update the visual status of the widget and disbales/enables it if
         necessary"""
         super().set_state()
-        self.button.setEnabled(not self.is_readonly() and self.is_active())
+        if self.is_readonly():  # Widget does not support readonly mode, disable it
+            self.button.setDisabled(True)
 
 
 class DirectoryWidget(HLayoutMixin, LineEditWidget):
@@ -972,7 +976,8 @@ class DirectoryWidget(HLayoutMixin, LineEditWidget):
         """Update the visual status of the widget and disbales/enables it if
         necessary"""
         super().set_state()
-        self.button.setEnabled(not self.is_readonly() and self.is_active())
+        if self.is_readonly():  # Widget does not support readonly mode, disable it
+            self.button.setDisabled(True)
 
 
 class ChoiceWidget(AbstractDataSetWidget):
@@ -1126,11 +1131,8 @@ class ChoiceWidget(AbstractDataSetWidget):
         """Update the visual status of the widget and disables/enables it if
         necessary"""
         super().set_state()
-        enabled = not self.is_readonly()
-        if self.is_radio:
-            self.vbox.setEnabled(enabled)
-        else:
-            self.combobox.setEnabled(enabled)
+        if self.is_readonly():  # Widget does not support readonly mode, disable it
+            self.group.setDisabled(True)
 
 
 class MultipleChoiceWidget(AbstractDataSetWidget):
@@ -1212,7 +1214,8 @@ class MultipleChoiceWidget(AbstractDataSetWidget):
         """Update the visual status of the widget and disables/enables it if
         necessary"""
         super().set_state()
-        self.groupbox.setEnabled(not self.is_readonly())
+        if self.is_readonly():  # Widget does not support readonly mode, disable it
+            self.group.setDisabled(True)
 
     def checkbox_clicked(self):
         """Update the data item value when a checkbox is clicked"""

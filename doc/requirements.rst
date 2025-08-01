@@ -1,4 +1,4 @@
-The :mod:`guidata` package requires the following Python modules:
+The `guidata` package requires the following Python modules:
 
 .. list-table::
     :header-rows: 1
@@ -11,13 +11,13 @@ The :mod:`guidata` package requires the following Python modules:
       - >=3.9, <4
       - Python programming language
     * - h5py
-      - >=3.1
+      -  >= 3.6
       - Read and write HDF5 files from Python
     * - NumPy
-      - >=1.19
+      -  >= 1.22
       - Fundamental package for array computing in Python
     * - QtPy
-      - >=1.9
+      -  >= 1.9
       - Provides an abstraction layer on top of the various Qt bindings (PyQt5/6 and PySide2/6).
     * - requests
       - 
@@ -25,8 +25,18 @@ The :mod:`guidata` package requires the following Python modules:
     * - tomli
       - 
       - A lil' TOML parser
+
+Optional modules for GUI support (Qt):
+
+.. list-table::
+    :header-rows: 1
+    :align: left
+
+    * - Name
+      - Version
+      - Summary
     * - PyQt5
-      - >=5.11
+      -  > 5.15.5
       - Python bindings for the Qt cross platform application toolkit
 
 Optional modules for development:
@@ -38,6 +48,9 @@ Optional modules for development:
     * - Name
       - Version
       - Summary
+    * - build
+      - 
+      - A simple, correct Python build frontend
     * - babel
       - 
       - Internationalization utilities
@@ -50,9 +63,6 @@ Optional modules for development:
     * - ruff
       - 
       - An extremely fast Python linter and code formatter, written in Rust.
-    * - toml-to-requirements
-      - 
-      - Convert a pyproject.toml file to a requirements.txt file
 
 Optional modules for building the documentation:
 
@@ -63,9 +73,6 @@ Optional modules for building the documentation:
     * - Name
       - Version
       - Summary
-    * - PyQt5
-      - 
-      - Python bindings for the Qt cross platform application toolkit
     * - pillow
       - 
       - Python Imaging Library (Fork)
@@ -73,7 +80,7 @@ Optional modules for building the documentation:
       - 
       - Powerful data structures for data analysis, time series, and statistics
     * - sphinx
-      - >6
+      - 
       - Python documentation generator
     * - myst_parser
       - 

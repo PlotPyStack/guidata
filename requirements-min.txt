@@ -1,10 +1,10 @@
 Coverage
-NumPy >= 1.22
-PyQt5 > 5.15.5
-QtPy >= 1.9
+NumPy==1.22
+PyQt5
+QtPy==1.9
 babel
 build
-h5py >= 3.6
+h5py==3.6
 myst_parser
 pandas
 pillow

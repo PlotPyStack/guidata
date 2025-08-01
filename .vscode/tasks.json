@@ -4,40 +4,22 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Run Ruff Formatter",
-            "command": "ruff",
+            "label": "🧽 Ruff Formatter",
+            "command": "${command:python.interpreterPath}",
             "args": [
-                "format"
+                "-m",
+                "ruff",
+                "format",
             ],
             "options": {
-                "cwd": "${workspaceFolder}"
+                "cwd": "${workspaceFolder}",
+                "statusbar": {
+                    "hide": true,
+                },
             },
             "group": {
                 "kind": "build",
-                "isDefault": true
-            },
-            "presentation": {
-                "clear": true,
-                "echo": true,
-                "focus": false,
-                "panel": "dedicated",
-                "reveal": "always",
-                "showReuseMessage": true
-            },
-            "type": "shell"
-        },
-        {
-            "label": "Run Ruff Linter",
-            "command": "ruff",
-            "args": [
-                "check",
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            },
-            "group": {
-                "kind": "build",
-                "isDefault": true
+                "isDefault": true,
             },
             "presentation": {
                 "clear": true,
@@ -47,20 +29,26 @@
                 "reveal": "always",
                 "showReuseMessage": true,
             },
-            "type": "shell"
+            "type": "shell",
         },
         {
-            "label": "Run Pylint",
-            "command": "pylint",
+            "label": "🔦 Ruff Linter",
+            "command": "${command:python.interpreterPath}",
             "args": [
-                "guidata"
+                "-m",
+                "ruff",
+                "check",
+                "--fix",
             ],
             "options": {
-                "cwd": "${workspaceFolder}"
+                "cwd": "${workspaceFolder}",
+                "statusbar": {
+                    "hide": true,
+                },
             },
             "group": {
                 "kind": "build",
-                "isDefault": true
+                "isDefault": true,
             },
             "presentation": {
                 "clear": true,
@@ -68,9 +56,64 @@
                 "focus": false,
                 "panel": "dedicated",
                 "reveal": "always",
-                "showReuseMessage": true
+                "showReuseMessage": true,
             },
-            "type": "shell"
+            "type": "shell",
+        },
+        {
+            "label": "🧽🔦 Ruff",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "🧽 Ruff Formatter",
+                "🔦 Ruff Linter",
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false,
+            },
+            "presentation": {
+                "clear": true,
+                "echo": true,
+                "focus": false,
+                "panel": "dedicated",
+                "reveal": "always",
+                "showReuseMessage": true,
+            },
+            "type": "shell",
+        },
+        {
+            "label": "🔦 Pylint",
+            "command": "${command:python.interpreterPath}",
+            "args": [
+                "-m",
+                "pylint",
+                "guidata",
+                "--disable=duplicate-code",
+                "--disable=fixme",
+                "--disable=too-many-arguments",
+                "--disable=too-many-branches",
+                "--disable=too-many-instance-attributes",
+                "--disable=too-many-lines",
+                "--disable=too-many-locals",
+                "--disable=too-many-public-methods",
+                "--disable=too-many-statements",
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}",
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true,
+            },
+            "presentation": {
+                "clear": true,
+                "echo": true,
+                "focus": false,
+                "panel": "dedicated",
+                "reveal": "always",
+                "showReuseMessage": true,
+            },
+            "type": "shell",
         },
         {
             "label": "🔎 Scan translations",
@@ -84,14 +127,14 @@
                 "--directory",
                 ".",
                 "--copyright-holder",
-                "CEA, Codra, Pierre Raybaut"
+                "CEA, Codra, Pierre Raybaut",
             ],
             "group": {
                 "kind": "build",
-                "isDefault": false
+                "isDefault": false,
             },
             "options": {
-                "cwd": "${workspaceFolder}"
+                "cwd": "${workspaceFolder}",
             },
             "presentation": {
                 "echo": true,
@@ -99,7 +142,7 @@
                 "panel": "shared",
                 "reveal": "always",
                 "showReuseMessage": true,
-                "clear": false
+                "clear": false,
             },
             "type": "shell",
         },
@@ -117,10 +160,10 @@
             ],
             "group": {
                 "kind": "build",
-                "isDefault": false
+                "isDefault": false,
             },
             "options": {
-                "cwd": "${workspaceFolder}"
+                "cwd": "${workspaceFolder}",
             },
             "presentation": {
                 "echo": true,
@@ -128,27 +171,27 @@
                 "panel": "shared",
                 "reveal": "always",
                 "showReuseMessage": true,
-                "clear": false
+                "clear": false,
             },
-            "type": "shell"
+            "type": "shell",
         },
         {
-            "label": "Run pytest",
-            "command": "cmd",
+            "label": "🚀 Pytest",
+            "command": "${command:python.interpreterPath}",
             "args": [
-                "/c",
-                "run_pytest.bat"
+                "-m",
+                "pytest",
+                "--ff",
             ],
             "options": {
-                "cwd": "scripts",
+                "cwd": "${workspaceFolder}",
                 "env": {
                     "UNATTENDED": "1",
-                    "PYTHON": "${command:python.interpreterPath}"
-                }
+                },
             },
             "group": {
                 "kind": "build",
-                "isDefault": true
+                "isDefault": true,
             },
             "presentation": {
                 "echo": true,
@@ -156,28 +199,27 @@
                 "focus": false,
                 "panel": "dedicated",
                 "showReuseMessage": true,
-                "clear": true
+                "clear": true,
             },
-            "type": "shell"
+            "type": "shell",
         },
         {
-            "label": "Update requirements.txt",
-            "command": "toml-to-req",
+            "label": "Generate requirements",
+            "command": "${command:python.interpreterPath}",
             "args": [
-                "--toml-file",
-                "pyproject.toml",
-                "--optional-lists",
-                "dev,doc,test",
+                "-m",
+                "guidata.utils.genreqs",
+                "all",
             ],
             "options": {
                 "cwd": "${workspaceFolder}",
                 "statusbar": {
-                    "hide": true
-                }
+                    "hide": true,
+                },
             },
             "group": {
                 "kind": "build",
-                "isDefault": false
+                "isDefault": false,
             },
             "presentation": {
                 "clear": true,
@@ -187,155 +229,164 @@
                 "reveal": "always",
                 "showReuseMessage": true,
             },
-            "type": "shell"
+            "type": "shell",
         },
         {
-            "label": "Run Coverage",
+            "label": "🧪 Coverage tests",
             "type": "shell",
-            "command": "cmd",
+            "command": "${command:python.interpreterPath}",
             "args": [
-                "/c",
-                "run_coverage.bat"
+                "-m",
+                "coverage",
+                "run",
+                "-m",
+                "pytest",
+                "guidata",
             ],
             "options": {
-                "cwd": "scripts",
+                "cwd": "${workspaceFolder}",
                 "env": {
-                    "UNATTENDED": "1",
-                    "PYTHON": "${command:python.interpreterPath}"
-                }
+                    "COVERAGE_PROCESS_START": "${workspaceFolder}/.coveragerc",
+                },
+                "statusbar": {
+                    "hide": true,
+                },
             },
             "group": {
-                "kind": "build",
-                "isDefault": true
+                "kind": "test",
+                "isDefault": true,
             },
             "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
                 "panel": "dedicated",
-                "showReuseMessage": true,
-                "clear": true
-            }
-        },
-        {
-            "label": "Clean Up",
-            "type": "shell",
-            "command": "cmd",
-            "args": [
-                "/c",
-                "clean_up.bat"
-            ],
-            "options": {
-                "cwd": "scripts"
             },
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared",
-                "showReuseMessage": true,
-                "clear": false
-            }
-        },
-        {
-            "label": "Upgrade environment",
-            "type": "shell",
-            "command": "cmd",
-            "args": [
-                "/c",
-                "upgrade_env.bat"
-            ],
-            "options": {
-                "cwd": "scripts",
-                "env": {
-                    "UNATTENDED": "1",
-                    "PYTHON": "${command:python.interpreterPath}"
-                },
-                "statusbar": {
-                    "hide": true
-                }
-            },
-            "group": {
-                "kind": "build",
-                "isDefault": false
-            },
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared",
-                "showReuseMessage": true,
-                "clear": false
-            }
-        },
-        {
-            "label": "Build documentation",
-            "type": "shell",
-            "command": "cmd",
-            "options": {
-                "cwd": "scripts",
-                "env": {
-                    "PYTHON": "${command:python.interpreterPath}",
-                    "UNATTENDED": "1"
-                }
-            },
-            "args": [
-                "/c",
-                "build_doc.bat"
-            ],
             "problemMatcher": [],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared",
-                "showReuseMessage": true,
-                "clear": true
-            }
         },
         {
-            "label": "Build Python packages",
+            "label": "📊 Coverage full",
             "type": "shell",
-            "command": "cmd",
-            "options": {
-                "cwd": "scripts",
-                "env": {
-                    "PYTHON": "${command:python.interpreterPath}",
-                    "UNATTENDED": "1"
-                },
-                "statusbar": {
-                    "hide": true
-                }
+            "windows": {
+                "command": "${command:python.interpreterPath} -m coverage combine && ${command:python.interpreterPath} -m coverage html && start htmlcov\\index.html",
             },
-            "args": [
-                "/c",
-                "build_dist.bat"
-            ],
-            "problemMatcher": [],
-            "group": {
-                "kind": "build",
-                "isDefault": false
+            "linux": {
+                "command": "${command:python.interpreterPath} -m coverage combine && ${command:python.interpreterPath} -m coverage html && xdg-open htmlcov/index.html",
+            },
+            "osx": {
+                "command": "${command:python.interpreterPath} -m coverage combine && ${command:python.interpreterPath} -m coverage html && open htmlcov/index.html",
+            },
+            "options": {
+                "cwd": "${workspaceFolder}",
+                "env": {
+                    "COVERAGE_PROCESS_START": "${workspaceFolder}/.coveragerc",
+                },
             },
             "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared",
-                "showReuseMessage": true,
-                "clear": true
+                "panel": "dedicated",
             },
+            "problemMatcher": [],
             "dependsOrder": "sequence",
             "dependsOn": [
-                "Clean Up",
-            ]
+                "🧪 Coverage tests",
+            ],
         },
-    ]
+        {
+            "label": "🧹 Clean Up",
+            "type": "shell",
+            "command": "cmd",
+            "args": [
+                "/c",
+                "clean_up.bat",
+            ],
+            "options": {
+                "cwd": "scripts",
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true,
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false,
+            },
+        },
+        {
+            "label": "📚 Build documentation",
+            "command": "${command:python.interpreterPath}",
+            "args": [
+                "-m",
+                "sphinx",
+                "build",
+                "doc",
+                "build/doc",
+                "-b",
+                "html",
+                "-W",
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}",
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true,
+            },
+            "presentation": {
+                "clear": true,
+                "echo": true,
+                "focus": false,
+                "panel": "dedicated",
+                "reveal": "always",
+                "showReuseMessage": true,
+            },
+            "type": "shell",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "Generate requirements",
+            ],
+        },
+        {
+            "label": "🌐 Open HTML doc",
+            "type": "shell",
+            "windows": {
+                "command": "start build/doc/index.html",
+            },
+            "linux": {
+                "command": "xdg-open build/doc/index.html",
+            },
+            "osx": {
+                "command": "open build/doc/index.html",
+            },
+            "options": {
+                "cwd": "${workspaceFolder}",
+            },
+            "problemMatcher": [],
+        },
+        {
+            "label": "📦 Build package",
+            "type": "shell",
+            "command": "${command:python.interpreterPath}",
+            "args": [
+                "-m",
+                "guidata.utils.securebuild",
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}",
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": false,
+            },
+            "presentation": {
+                "clear": true,
+                "panel": "dedicated",
+            },
+            "problemMatcher": [],
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "🧹 Clean Up",
+            ],
+        },
+    ],
 }

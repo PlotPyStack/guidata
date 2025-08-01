@@ -48,6 +48,7 @@ from .datatypes import (
     EndTabGroup,
     FormatProp,
     FuncProp,
+    FuncPropMulti,
     GetAttrProp,
     GroupItem,
     ItemProperty,
