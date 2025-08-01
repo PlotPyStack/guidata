@@ -752,7 +752,7 @@ class DataItemProxy:
         """
         return self.item.get_value(instance)
 
-    def check_item(self, instance: DataItem) -> Any:
+    def check_item(self, instance: DataItem) -> bool:
         """DataItem method proxy
 
         Args:
@@ -763,7 +763,7 @@ class DataItemProxy:
         """
         return self.item.check_item(instance)
 
-    def check_value(self, value: Any) -> Any:
+    def check_value(self, value: Any) -> bool:
         """DataItem method proxy
 
         Args:
@@ -940,7 +940,7 @@ class DataItemVariable:
         """
         return self.item.set_from_string(self.instance, string_value)
 
-    def check_item(self) -> Any:
+    def check_item(self) -> bool:
         """Re-implement DataItem method
 
         Returns:
@@ -948,7 +948,7 @@ class DataItemVariable:
         """
         return self.item.check_item(self.instance)
 
-    def check_value(self, value) -> Any:
+    def check_value(self, value) -> bool:
         """Re-implement DataItem method
 
         Args:
