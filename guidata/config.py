@@ -8,6 +8,7 @@ Handle *guidata* module configuration
 (options, images and icons)
 """
 
+import enum
 import os.path as osp
 
 from guidata.configtools import add_image_module_path, get_translation
@@ -263,3 +264,35 @@ DEFAULTS = {
 }
 
 CONF = UserConfig(DEFAULTS)
+
+
+class ValidationMode(enum.Enum):
+    """Type checking modes for DataItems"""
+
+    DISABLED = 0  # No checking at all
+    ENABLED = 1  # Warnings on validation error
+    STRICT = 2  # Exceptions on validation error
+
+
+# Internal (non-user) runtime configuration
+class InternalConfig:
+    """Internal guidata configuration flags"""
+
+    def __init__(self):
+        # Validation mode is disabled by default for backward compatibility
+        self.validation_mode = ValidationMode.DISABLED
+
+
+_INTERNAL_CONF = InternalConfig()
+
+
+def set_validation_mode(mode: ValidationMode) -> None:
+    """Set the validation mode for DataItems"""
+    if not isinstance(mode, ValidationMode):
+        raise ValueError("Invalid validation mode")
+    _INTERNAL_CONF.validation_mode = mode
+
+
+def get_validation_mode() -> ValidationMode:
+    """Get the current validation mode for DataItems"""
+    return _INTERNAL_CONF.validation_mode

@@ -62,11 +62,13 @@ from __future__ import annotations
 
 import re
 import sys
+import warnings
 from abc import ABC, abstractmethod
 from collections.abc import Callable
 from copy import deepcopy
 from typing import TYPE_CHECKING, Any, TypeVar
 
+from guidata.config import ValidationMode, get_validation_mode
 from guidata.io import INIReader, INIWriter
 from guidata.userconfig import UserConfig
 
@@ -78,6 +80,13 @@ if TYPE_CHECKING:
 
     from guidata.dataset.qtwidgets import DataSetEditDialog
     from guidata.io import HDF5Reader, HDF5Writer, JSONReader, JSONWriter
+
+
+class DataItemValidationWarning(UserWarning):
+    """Warning raised when a DataItem value is invalid
+    and validation mode is 'ENABLED'"""
+
+    pass
 
 
 class NoDefault:
@@ -490,7 +499,27 @@ class DataItem(ABC):
         func = getattr(visitor, funcname)
         func(self)
 
-    def __set__(self, instance: Any, value: Any):
+    def __set__(self, instance: Any, value: Any) -> None:
+        """Set data item's value
+
+        Args:
+            instance (Any): instance of the DataSet
+            value (Any): value to set
+        """
+        vmode = get_validation_mode()
+        if vmode != ValidationMode.DISABLED:
+            try:
+                self.check_value(value, raise_exception=True)
+            except Exception as exc:
+                msg = f"Checking ({str(self)}): {exc}"
+                if vmode == ValidationMode.ENABLED:
+                    # Show a warning in replacement of the exception
+                    warnings.warn(msg, DataItemValidationWarning)
+                elif vmode == ValidationMode.STRICT:
+                    # Raise an exception if strict validation is enabled
+                    raise ValueError(msg) from exc
+                else:
+                    raise ValueError(f"Unknown validation mode: {vmode}") from exc
         setattr(instance, "_%s" % (self._name), value)
 
     def __get__(self, instance: Any, klass: type) -> Any | None:
@@ -510,7 +539,7 @@ class DataItem(ABC):
         """
         return self.__get__(instance, instance.__class__)
 
-    def check_item(self, instance: Any) -> Any:
+    def check_item(self, instance: Any) -> bool:
         """Check data item's current value (calling method check_value)
 
         Args:
@@ -522,11 +551,13 @@ class DataItem(ABC):
         value = getattr(instance, "_%s" % (self._name))
         return self.check_value(value)
 
-    def check_value(self, value: Any) -> bool:
+    def check_value(self, value: Any, raise_exception: bool = True) -> bool:
         """Check if `value` is valid for this data item
 
         Args:
             value (Any): value to check
+            raise_exception (bool): if True, raise an exception if the value is invalid.
+            Defaults to True.
 
         Returns:
             bool: value
@@ -763,16 +794,18 @@ class DataItemProxy:
         """
         return self.item.check_item(instance)
 
-    def check_value(self, value: Any) -> bool:
+    def check_value(self, value: float | int, raise_exception: bool = True) -> bool:
         """DataItem method proxy
 
         Args:
             value (Any): value
+            raise_exception (bool): if True, raise an exception if the value is invalid.
+             Defaults to True.
 
         Returns:
             Any: value
         """
-        return self.item.check_value(value)
+        return self.item.check_value(value, raise_exception)
 
     def from_string(self, string_value: str) -> Any:
         """DataItem method proxy
@@ -948,16 +981,18 @@ class DataItemVariable:
         """
         return self.item.check_item(self.instance)
 
-    def check_value(self, value) -> bool:
+    def check_value(self, value: float | int, raise_exception: bool = True) -> bool:
         """Re-implement DataItem method
 
         Args:
             value (Any): value
+            raise_exception (bool): if True, raise an exception if the value is invalid.
+             Defaults to True.
 
         Returns:
             Any: value
         """
-        return self.item.check_value(value)
+        return self.item.check_value(value, raise_exception)
 
     def from_string(self, string_value: str) -> Any:
         """Re-implement DataItem method

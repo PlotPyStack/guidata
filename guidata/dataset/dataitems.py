@@ -184,19 +184,27 @@ class NumericTypeItem(DataItem):
             text += " " + unit
         return text
 
-    def check_value(self, value: float | int) -> bool:
+    def check_value(self, value: float | int, raise_exception: bool = True) -> bool:
         """Override DataItem method"""
         if not self.get_prop("data", "check_value", True):
             return True
         if not isinstance(value, self.type):
+            if raise_exception:
+                raise TypeError(f"Expected {self.type}, got {type(value)}")
             return False
         if self.get_prop("data", "nonzero") and value == 0:
+            if raise_exception:
+                raise ValueError("Zero is not a valid value")
             return False
         _min = self.get_prop("data", "min")
         if _min is not None and value < _min:
+            if raise_exception:
+                raise ValueError(f"Value {value} is lower than minimum {_min}")
             return False
         _max = self.get_prop("data", "max")
         if _max is not None and value > _max:
+            if raise_exception:
+                raise ValueError(f"Value {value} is greater than maximum {_max}")
             return False
         return True
 
@@ -325,17 +333,20 @@ class IntItem(NumericTypeItem):
                 auto_help += ", " + _("odd")
         return auto_help
 
-    def check_value(self, value: Any) -> bool:
+    def check_value(self, value: float | int, raise_exception: bool = True) -> bool:
         """Override DataItem method"""
         if not self.get_prop("data", "check_value", True):
             return True
-        valid = super().check_value(value)
+        valid = super().check_value(value, raise_exception=raise_exception)
         if not valid:
             return False
         even = self.get_prop("data", "even")
         if even is not None:
             is_even = value // 2 == value / 2.0
             if (even and not is_even) or (not even and is_even):
+                if raise_exception:
+                    oddity = "even" if even else "odd"
+                    raise ValueError(f"Value {value} is not {oddity}")
                 return False
         return True
 
@@ -387,14 +398,25 @@ class StringItem(DataItem):
             auto_help += ", " + _("regexp:") + " " + regexp
         return auto_help
 
-    def check_value(self, value: Any) -> bool:
+    def check_value(self, value: float | int, raise_exception: bool = True) -> bool:
         """Override DataItem method"""
+        if not self.get_prop("data", "check_value", True):
+            return True
+        if not isinstance(value, self.type):
+            if raise_exception:
+                raise TypeError(f"Expected {self.type}, got {type(value)}")
+            return False
         notempty = self.get_prop("data", "notempty")
         if notempty and not value:
+            if raise_exception:
+                raise ValueError("Empty string is not a valid value")
             return False
         regexp = self.get_prop("data", "regexp")
         if regexp is not None:
-            return bool(re.match(regexp, "" if value is None else value))
+            ok = bool(re.match(regexp, "" if value is None else value))
+            if not ok and raise_exception:
+                raise ValueError(f"Value {value} does not match regexp {regexp}")
+            return ok
         return True
 
     def from_string(self, value: str) -> str:
@@ -534,15 +556,20 @@ class ColorItem(StringItem):
         check: if False, value is not checked (optional, default=True)
     """
 
-    def check_value(self, value: str) -> bool:
+    def check_value(self, value: float | int, raise_exception: bool = True) -> bool:
         """Override DataItem method"""
         if not self.get_prop("data", "check_value", True):
             return True
         if not isinstance(value, self.type):
+            if raise_exception:
+                raise TypeError(f"Expected {self.type}, got {type(value)}")
             return False
         from qtpy import QtGui as QG
 
-        return QG.QColor(value).isValid()
+        ok = QG.QColor(value).isValid()
+        if not ok and raise_exception:
+            raise ValueError(f"Value {value} is not a valid color")
+        return ok
 
     def get_value_from_reader(self, reader: HDF5Reader | JSONReader | INIReader) -> str:
         """Reads value from the reader object, inside the try...except
@@ -596,13 +623,18 @@ class FileSaveItem(StringItem):
             else _("supported file types:") + " *.%s" % ", *.".join(formats)
         )
 
-    def check_value(self, value: str) -> bool:
+    def check_value(self, value: float | int, raise_exception: bool = True) -> bool:
         """Override DataItem method"""
         if not self.get_prop("data", "check_value", True):
             return True
         if not isinstance(value, self.type):
+            if raise_exception:
+                raise TypeError(f"Expected {self.type}, got {type(value)}")
             return False
-        return len(value) > 0
+        ok = len(value) > 0
+        if not ok and raise_exception:
+            raise ValueError("Empty string is not a valid value")
+        return ok
 
     def from_string(self, value) -> str:
         """Override DataItem method"""
@@ -635,13 +667,18 @@ class FileOpenItem(FileSaveItem):
         check: if False, value is not checked (optional, default=True)
     """
 
-    def check_value(self, value: str) -> bool:
+    def check_value(self, value: float | int, raise_exception: bool = True) -> bool:
         """Override DataItem method"""
         if not self.get_prop("data", "check_value", True):
             return True
         if not isinstance(value, self.type):
+            if raise_exception:
+                raise TypeError(f"Expected {self.type}, got {type(value)}")
             return False
-        return os.path.exists(value) and os.path.isfile(value)
+        ok = os.path.exists(value) and os.path.isfile(value)
+        if not ok and raise_exception:
+            raise ValueError(f"File {value} does not exist or is not a file")
+        return ok
 
 
 class FilesOpenItem(FileSaveItem):
@@ -693,15 +730,19 @@ class FilesOpenItem(FileSaveItem):
             else os.path.basename(paths)
         )
 
-    def check_value(self, value: str) -> bool:
+    def check_value(self, value: float | int, raise_exception: bool = True) -> bool:
         """Override DataItem method"""
         if not self.get_prop("data", "check_value", True):
             return True
         if value is None:
+            if raise_exception:
+                raise ValueError("Value cannot be None")
             return False
         allexist = True
         for path in value:
             allexist = allexist and os.path.exists(path) and os.path.isfile(path)
+        if not allexist and raise_exception:
+            raise ValueError(f"Some files do not exist or are not files: {value}")
         return allexist
 
     def from_string(self, value: Any) -> list[str]:  # type:ignore
@@ -736,13 +777,18 @@ class DirectoryItem(StringItem):
         check: if False, value is not checked (optional, default=True)
     """
 
-    def check_value(self, value: str) -> bool:
+    def check_value(self, value: float | int, raise_exception: bool = True) -> bool:
         """Override DataItem method"""
         if not self.get_prop("data", "check_value", True):
             return True
         if not isinstance(value, self.type):
+            if raise_exception:
+                raise TypeError(f"Expected {self.type}, got {type(value)}")
             return False
-        return os.path.exists(value) and os.path.isdir(value)
+        ok = os.path.exists(value) and os.path.isdir(value)
+        if not ok and raise_exception:
+            raise ValueError(f"Directory {value} does not exist or is not a directory")
+        return ok
 
 
 class FirstChoice:

@@ -37,6 +37,7 @@ from .datatypes import (
     AnyDataSet,
     BeginGroup,
     BeginTabGroup,
+    DataItemValidationWarning,
     DataItem,
     DataItemProxy,
     DataItemVariable,
