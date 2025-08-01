@@ -1,5 +1,22 @@
 # Changelog #
 
+## Version 3.13.0 ##
+
+💥 New features:
+
+* New validation modes for `DataItem` objects:
+  * Validation modes allow you to control how `DataItem` values are validated when they are set.
+  * `ValidationMode.DISABLED`: no validation is performed (default behavior, for backward compatibility)
+  * `ValidationMode.ENABLED`: validation is performed, but warnings are raised instead of exceptions
+  * `ValidationMode.STRICT`: validation is performed, and exceptions are raised if the value is invalid
+  * To use these validation modes, you need to set the option:
+
+    ```python
+    from guidata.config import set_validation_mode, ValidationMode
+
+    set_validation_mode(ValidationMode.STRICT)
+    ```
+
 ## Version 3.12.1 ##
 
 🛠️ Bug fixes:
@@ -68,19 +85,6 @@
 ## Version 3.10.0 ##
 
 💥 New features:
-
-* New validation modes for `DataItem` objects:
-  * Validation modes allow you to control how `DataItem` values are validated when they are set.
-  * `ValidationMode.DISABLED`: no validation is performed (default behavior, for backward compatibility)
-  * `ValidationMode.ENABLED`: validation is performed, but warnings are raised instead of exceptions
-  * `ValidationMode.STRICT`: validation is performed, and exceptions are raised if the value is invalid
-  * To use these validation modes, you need to set the option:
-
-    ```python
-    from guidata.config import set_validation_mode, ValidationMode
-
-    set_validation_mode(ValidationMode.STRICT)
-    ```
 
 * [Issue #81](https://github.com/PlotPyStack/guidata/issues/81) - Modernize the internationalization utilities
   * The `guidata.utils.gettext_helpers` module, based on the `gettext` module, has been deprecated.
