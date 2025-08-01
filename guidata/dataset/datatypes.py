@@ -590,7 +590,7 @@ class DataItem(ABC):
         value = getattr(instance, "_%s" % (self._name))
         return self.check_value(value)
 
-    def check_value(self, value: Any, raise_exception: bool = True) -> bool:
+    def check_value(self, value: Any, raise_exception: bool = False) -> bool:
         """Check if `value` is valid for this data item
 
         Args:
@@ -833,7 +833,7 @@ class DataItemProxy:
         """
         return self.item.check_item(instance)
 
-    def check_value(self, value: float | int, raise_exception: bool = True) -> bool:
+    def check_value(self, value: Any, raise_exception: bool = False) -> bool:
         """DataItem method proxy
 
         Args:
@@ -1020,7 +1020,7 @@ class DataItemVariable:
         """
         return self.item.check_item(self.instance)
 
-    def check_value(self, value: float | int, raise_exception: bool = True) -> bool:
+    def check_value(self, value: Any, raise_exception: bool = False) -> bool:
         """Re-implement DataItem method
 
         Args:

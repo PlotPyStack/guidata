@@ -17,6 +17,10 @@
     set_validation_mode(ValidationMode.STRICT)
     ```
 
+* `StringItem` behavior change:
+  * The `StringItem` class now uses the new validation modes (see above).
+  * As a side effect, the `StringItem` class now considers `None` as an invalid default value, and highlights it in the UI.
+
 ## Version 3.12.1 ##
 
 🛠️ Bug fixes:

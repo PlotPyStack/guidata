@@ -184,7 +184,7 @@ class NumericTypeItem(DataItem):
             text += " " + unit
         return text
 
-    def check_value(self, value: float | int, raise_exception: bool = True) -> bool:
+    def check_value(self, value: float | int, raise_exception: bool = False) -> bool:
         """Override DataItem method"""
         if not self.get_prop("data", "check_value", True):
             return True
@@ -333,7 +333,7 @@ class IntItem(NumericTypeItem):
                 auto_help += ", " + _("odd")
         return auto_help
 
-    def check_value(self, value: float | int, raise_exception: bool = True) -> bool:
+    def check_value(self, value: int, raise_exception: bool = False) -> bool:
         """Override DataItem method"""
         if not self.get_prop("data", "check_value", True):
             return True
@@ -398,7 +398,7 @@ class StringItem(DataItem):
             auto_help += ", " + _("regexp:") + " " + regexp
         return auto_help
 
-    def check_value(self, value: float | int, raise_exception: bool = True) -> bool:
+    def check_value(self, value: str, raise_exception: bool = False) -> bool:
         """Override DataItem method"""
         if not self.get_prop("data", "check_value", True):
             return True
@@ -556,7 +556,7 @@ class ColorItem(StringItem):
         check: if False, value is not checked (optional, default=True)
     """
 
-    def check_value(self, value: float | int, raise_exception: bool = True) -> bool:
+    def check_value(self, value: str, raise_exception: bool = False) -> bool:
         """Override DataItem method"""
         if not self.get_prop("data", "check_value", True):
             return True
@@ -623,7 +623,7 @@ class FileSaveItem(StringItem):
             else _("supported file types:") + " *.%s" % ", *.".join(formats)
         )
 
-    def check_value(self, value: float | int, raise_exception: bool = True) -> bool:
+    def check_value(self, value: str, raise_exception: bool = False) -> bool:
         """Override DataItem method"""
         if not self.get_prop("data", "check_value", True):
             return True
@@ -667,7 +667,7 @@ class FileOpenItem(FileSaveItem):
         check: if False, value is not checked (optional, default=True)
     """
 
-    def check_value(self, value: float | int, raise_exception: bool = True) -> bool:
+    def check_value(self, value: str, raise_exception: bool = False) -> bool:
         """Override DataItem method"""
         if not self.get_prop("data", "check_value", True):
             return True
@@ -730,7 +730,7 @@ class FilesOpenItem(FileSaveItem):
             else os.path.basename(paths)
         )
 
-    def check_value(self, value: float | int, raise_exception: bool = True) -> bool:
+    def check_value(self, value: str, raise_exception: bool = False) -> bool:
         """Override DataItem method"""
         if not self.get_prop("data", "check_value", True):
             return True
@@ -777,7 +777,7 @@ class DirectoryItem(StringItem):
         check: if False, value is not checked (optional, default=True)
     """
 
-    def check_value(self, value: float | int, raise_exception: bool = True) -> bool:
+    def check_value(self, value: str, raise_exception: bool = False) -> bool:
         """Override DataItem method"""
         if not self.get_prop("data", "check_value", True):
             return True
