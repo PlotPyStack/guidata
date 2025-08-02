@@ -549,6 +549,9 @@ class DataItem(ABC):
         if vmode != ValidationMode.DISABLED:
             try:
                 self.check_value(value, raise_exception=True)
+            except NotImplementedError:
+                # Checking is not implemented for this item
+                pass
             except Exception as exc:
                 msg = f"Checking ({str(self)}): {exc}"
                 if vmode == ValidationMode.ENABLED:
