@@ -1068,7 +1068,7 @@ class FloatArrayItem(DataItem):
         check: if False, value is not checked (optional, default=True)
         variable_size: if True, allows to add/remove row/columns on all axis
         allow_none: if True, None is a valid value regardless of other constraints
-         (optional, default=False)
+         (optional, default=True)
     """
 
     type = np.ndarray
@@ -1083,7 +1083,7 @@ class FloatArrayItem(DataItem):
         minmax: str = "all",
         check: bool = True,
         variable_size=False,
-        allow_none: bool = False,
+        allow_none: bool = True,
     ) -> None:
         super().__init__(
             label, default=default, help=help, check=check, allow_none=allow_none

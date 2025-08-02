@@ -21,7 +21,7 @@
   * The `allow_none` parameter allows you to specify whether `None` is a valid value for the item, which can be especially useful when validation modes are used.
   * If `allow_none` is set to `True`, `None` is considered a valid value regardless of other constraints.
   * If `allow_none` is set to `False`, `None` is considered an invalid value.
-  * The default value for `allow_none` is `False`, except for the `ChoiceItem` and its subclasses, where it is set to `True` by default.
+  * The default value for `allow_none` is `False`, except for `FloatArrayItem`, and `ChoiceItem` and its subclasses, where it is set to `True` by default.
 
 * Improved type handling in `IntItem` and `FloatItem`:
   * `IntItem` and `FloatItem` now automatically convert NumPy numeric types (like `np.int32` or `np.float64`) to native Python types (`int` or `float`) during validation
