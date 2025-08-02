@@ -193,14 +193,6 @@ class NumericTypeItem(DataItem):
         """Override DataItem method"""
         if not self.get_prop("data", "check_value", True):
             return True
-
-        # Try to convert numpy numeric types to Python types
-        try:
-            if hasattr(value, "dtype") and not isinstance(value, self.type):
-                value = self.type(value)
-        except (TypeError, ValueError):
-            pass
-
         if not isinstance(value, self.type):
             if raise_exception:
                 raise TypeError(f"Expected {self.type}, got {type(value)}")
@@ -285,19 +277,20 @@ class FloatItem(NumericTypeItem):
         self.set_prop("display", slider=slider)
         self.set_prop("data", step=step)
 
-    def check_value(self, value: float, raise_exception: bool = False) -> bool:
-        """Override DataItem method"""
-        if not self.get_prop("data", "check_value", True):
-            return True
-
-        # Try to convert numpy float types to Python float
+    def __set__(self, instance: Any, value: Any) -> None:
+        """Override DataItem.__set__ to convert integers to float"""
+        # Try to convert NumPy numeric types to Python float
+        # (will convert silently either floating point or integer types to float)
         try:
             if hasattr(value, "dtype") and not isinstance(value, self.type):
                 value = self.type(value)
         except (TypeError, ValueError):
             pass
-
-        return super().check_value(value, raise_exception=raise_exception)
+        # Now acceptable values could be either float or int
+        # (no more NumPy types at this point)
+        if isinstance(value, int):
+            value = float(value)
+        super().__set__(instance, value)
 
     def get_value_from_reader(
         self, reader: HDF5Reader | JSONReader | INIReader
@@ -368,11 +361,21 @@ class IntItem(NumericTypeItem):
                 auto_help += ", " + _("odd")
         return auto_help
 
+    def __set__(self, instance: Any, value: Any) -> None:
+        """Override DataItem.__set__ to convert NumPy numeric types to int"""
+        # Try to convert NumPy integer types to Python int
+        # (will convert silently only integer types to int)
+        try:
+            if isinstance(value, np.integer):
+                value = self.type(value)
+        except (TypeError, ValueError):
+            pass
+        super().__set__(instance, value)
+
     def check_value(self, value: int, raise_exception: bool = False) -> bool:
         """Override DataItem method"""
         if not self.get_prop("data", "check_value", True):
             return True
-
         valid = super().check_value(value, raise_exception=raise_exception)
         if not valid:
             return False

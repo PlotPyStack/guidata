@@ -25,6 +25,7 @@
 
 * Improved type handling in `IntItem` and `FloatItem`:
   * `IntItem` and `FloatItem` now automatically convert NumPy numeric types (like `np.int32` or `np.float64`) to native Python types (`int` or `float`) during validation
+  * `FloatItem` now accepts integer values and silently converts them to float values
   * This makes it easier to use these items with NumPy arrays and other numeric libraries
 
 * `StringItem` behavior change:
