@@ -17,6 +17,12 @@
     set_validation_mode(ValidationMode.STRICT)
     ```
 
+* New `allow_none` parameter for `DataItem` objects:
+  * The `allow_none` parameter allows you to specify whether `None` is a valid value for the item, which can be especially useful when validation modes are used.
+  * If `allow_none` is set to `True`, `None` is considered a valid value regardless of other constraints.
+  * If `allow_none` is set to `False`, `None` is considered an invalid value.
+  * The default value for `allow_none` is `False`, except for the `ChoiceItem` and its subclasses, where it is set to `True` by default.
+
 * `StringItem` behavior change:
   * The `StringItem` class now uses the new validation modes (see above).
   * As a side effect, the `StringItem` class now considers `None` as an invalid default value, and highlights it in the UI.

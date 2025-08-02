@@ -134,6 +134,8 @@ class NumericTypeItem(DataItem):
           edit widget (default is False)
         help: text shown in tooltip (optional)
         check: if False, value is not checked (optional, default=True)
+        allow_none: if True, None is a valid value regardless of other constraints
+          (optional, default=False)
     """
 
     type: type[int | float]
@@ -148,8 +150,11 @@ class NumericTypeItem(DataItem):
         unit: str = "",
         help: str = "",
         check: bool = True,
+        allow_none: bool = False,
     ) -> None:
-        super().__init__(label, default=default, help=help, check=check)
+        super().__init__(
+            label, default=default, help=help, check=check, allow_none=allow_none
+        )
         self.set_prop("data", min=min, max=max, nonzero=nonzero, check_value=check)
         self.set_prop("display", unit=unit)
 
@@ -238,6 +243,8 @@ class FloatItem(NumericTypeItem):
          edit widget (default is False)
         help: text shown in tooltip (optional)
         check: if False, value is not checked (optional, default=True)
+        allow_none: if True, None is a valid value regardless of other constraints
+         (optional, default=False)
     """
 
     type = float
@@ -254,6 +261,7 @@ class FloatItem(NumericTypeItem):
         slider: bool = False,
         help: str = "",
         check: bool = True,
+        allow_none: bool = False,
     ) -> None:
         super().__init__(
             label,
@@ -264,6 +272,7 @@ class FloatItem(NumericTypeItem):
             unit=unit,
             help=help,
             check=check,
+            allow_none=allow_none,
         )
         self.set_prop("display", slider=slider)
         self.set_prop("data", step=step)
@@ -292,6 +301,8 @@ class IntItem(NumericTypeItem):
          edit widget (default is False)
         help: text shown in tooltip (optional)
         check: if False, value is not checked (optional, default=True)
+        allow_none: if True, None is a valid value regardless of other constraints
+         (optional, default=False)
     """
 
     type = int
@@ -308,6 +319,7 @@ class IntItem(NumericTypeItem):
         slider: bool = False,
         help: str = "",
         check: bool = True,
+        allow_none: bool = False,
     ) -> None:
         super().__init__(
             label,
@@ -318,6 +330,7 @@ class IntItem(NumericTypeItem):
             unit=unit,
             help=help,
             check=check,
+            allow_none=allow_none,
         )
         self.set_prop("data", even=even)
         self.set_prop("display", slider=slider)
@@ -368,6 +381,8 @@ class StringItem(DataItem):
         regexp: regular expression for checking value (optional)
         help: text shown in tooltip (optional)
         check: if False, value is not checked (ineffective for strings)
+        allow_none: if True, None is a valid value regardless of other constraints
+         (optional, default=False)
     """
 
     type: Any = str
@@ -382,8 +397,11 @@ class StringItem(DataItem):
         regexp: str | None = None,
         help: str = "",
         check: bool = True,
+        allow_none: bool = False,
     ) -> None:
-        super().__init__(label, default=default, help=help, check=check)
+        super().__init__(
+            label, default=default, help=help, check=check, allow_none=allow_none
+        )
         self.set_prop("data", notempty=notempty, regexp=regexp)
         self.set_prop("display", wordwrap=wordwrap, password=password)
 
@@ -445,6 +463,8 @@ class TextItem(StringItem):
         notempty: if True, empty string is not a valid value (optional)
         wordwrap: toggle word wrapping (optional)
         help: text shown in tooltip (optional)
+        allow_none: if True, None is a valid value regardless of other constraints
+         (optional, default=False)
     """
 
     def __init__(
@@ -454,6 +474,7 @@ class TextItem(StringItem):
         notempty: bool | None = None,
         wordwrap: bool = True,
         help: str = "",
+        allow_none: bool = False,
     ) -> None:
         super().__init__(
             label,
@@ -461,6 +482,7 @@ class TextItem(StringItem):
             notempty=notempty,
             wordwrap=wordwrap,
             help=help,
+            allow_none=allow_none,
         )
 
 
@@ -473,6 +495,8 @@ class BoolItem(DataItem):
         default: default value (optional)
         help: text shown in tooltip (optional)
         check: if False, value is not checked (optional, default=True)
+        allow_none: if True, None is a valid value regardless of other constraints
+         (optional, default=False)
     """
 
     type = bool
@@ -484,8 +508,11 @@ class BoolItem(DataItem):
         default: bool | None = None,
         help: str = "",
         check: bool = True,
+        allow_none: bool = False,
     ) -> None:
-        super().__init__(label, default=default, help=help, check=check)
+        super().__init__(
+            label, default=default, help=help, check=check, allow_none=allow_none
+        )
         self.set_prop("display", text=text)
 
     def get_value_from_reader(
@@ -505,6 +532,8 @@ class DateItem(DataItem):
         format: date format (as in :py:func:`datetime.date.strftime`)
         help: text displayed on data item's tooltip
         check: check value (default: True)
+        allow_none: if True, None is a valid value regardless of other constraints
+         (optional, default=False)
     """
 
     type = datetime.date
@@ -516,8 +545,11 @@ class DateItem(DataItem):
         format: str | None = None,
         help: str | None = "",
         check: bool | None = True,
+        allow_none: bool = False,
     ) -> None:
-        super().__init__(label, default=default, help=help, check=check)
+        super().__init__(
+            label, default=default, help=help, check=check, allow_none=allow_none
+        )
         self.set_prop("display", format=format)
 
 
@@ -530,6 +562,8 @@ class DateTimeItem(DateItem):
         format: date format (as in :py:func:`datetime.date.strftime`)
         help: text displayed on data item's tooltip
         check: check value (default: True)
+        allow_none: if True, None is a valid value regardless of other constraints
+         (optional, default=False)
     """
 
     type = datetime.datetime
@@ -541,8 +575,9 @@ class DateTimeItem(DateItem):
         format: str | None = None,
         help: str | None = "",
         check: bool | None = True,
+        allow_none: bool = False,
     ) -> None:
-        super().__init__(label, default, format, help, check)
+        super().__init__(label, default, format, help, check, allow_none=allow_none)
 
 
 class ColorItem(StringItem):
@@ -591,6 +626,8 @@ class FileSaveItem(StringItem):
         regexp: regular expression for checking value (optional)
         help: text shown in tooltip (optional)
         check: if False, value is not checked (optional, default=True)
+        all_files_first: if True, "All files" is the first item in the list
+         (optional, default=False)
     """
 
     def __init__(
@@ -603,10 +640,18 @@ class FileSaveItem(StringItem):
         regexp: str | None = None,
         help: str = "",
         check: bool = True,
+        allow_none: bool = False,
     ) -> None:
         default = os.path.join(*default) if isinstance(default, list) else default
 
-        super().__init__(label, default=default, regexp=regexp, help=help, check=check)
+        super().__init__(
+            label,
+            default=default,
+            regexp=regexp,
+            help=help,
+            check=check,
+            allow_none=allow_none,
+        )
         if isinstance(formats, str):
             formats = [formats]  # type:ignore
         self.set_prop("data", formats=formats)
@@ -692,6 +737,8 @@ class FilesOpenItem(FileSaveItem):
         regexp: regular expression for checking value (optional)
         help: text shown in tooltip (optional)
         check: if False, value is not checked (optional, default=True)
+        all_files_first: if True, "All files" is the first item in the list
+         (optional, default=False)
     """
 
     type = list
@@ -706,6 +753,7 @@ class FilesOpenItem(FileSaveItem):
         regexp: str | None = None,
         help: str = "",
         check: bool = True,
+        allow_none: bool = False,
     ) -> None:
         if isinstance(default, str):
             default = [default]
@@ -718,6 +766,7 @@ class FilesOpenItem(FileSaveItem):
             regexp=regexp,
             help=help,
             check=check,
+            allow_none=allow_none,
         )
         self.set_prop("display", func=self.paths_basename)
 
@@ -815,6 +864,8 @@ class ChoiceItem(DataItem, Generic[_T]):
         radio: if True, shows radio buttons instead of a combo box
          (default is False)
         size: size (optional) of the combo box or button widget (for radio buttons)
+        allow_none: if True, None is a valid value regardless of other constraints
+         (optional, default=True)
     """
 
     type = Any
@@ -828,6 +879,7 @@ class ChoiceItem(DataItem, Generic[_T]):
         check: bool = True,
         radio: bool = False,
         size: tuple[int, int] | None = None,
+        allow_none: bool = True,
     ) -> None:
         _choices_data: Any
         if isinstance(choices, Callable):
@@ -840,7 +892,9 @@ class ChoiceItem(DataItem, Generic[_T]):
             default = _choices_data[0][0]
         elif default is FirstChoice:
             default = None
-        super().__init__(label, default=default, help=help, check=check)
+        super().__init__(
+            label, default=default, help=help, check=check, allow_none=allow_none
+        )
         self.set_prop("data", choices=_choices_data)
         self.set_prop("display", radio=radio)
         self.set_prop("display", size=size)
@@ -875,6 +929,8 @@ class MultipleChoiceItem(ChoiceItem):
         default: default value (optional)
         help: text shown in tooltip (optional)
         check: if False, value is not checked (optional, default=True)
+        allow_none: if True, None is a valid value regardless of other constraints
+         (optional, default=True)
     """
 
     def __init__(
@@ -884,8 +940,11 @@ class MultipleChoiceItem(ChoiceItem):
         default: tuple[()] = (),
         help: str = "",
         check: bool = True,
+        allow_none: bool = True,
     ) -> None:
-        super().__init__(label, choices, default, help, check=check)
+        super().__init__(
+            label, choices, default, help, check=check, allow_none=allow_none
+        )
         self.set_prop("display", shape=(1, -1))
 
     def horizontal(self, row_nb: int = 1) -> MultipleChoiceItem:
@@ -953,7 +1012,11 @@ class ImageChoiceItem(ChoiceItem):
          a function of one argument (key) returning a QIcon instance
         default: default value (optional)
         help: text shown in tooltip (optional)
-        check: if False, value is not checked (optional, default=True)
+        radio: if True, shows radio buttons instead of a combo box
+         (default is False)
+        size: size (optional) of the combo box or button widget (for radio buttons)
+        allow_none: if True, None is a valid value regardless of other constraints
+         (optional, default=True)
     """
 
     def _normalize_choice(
@@ -981,6 +1044,8 @@ class FloatArrayItem(DataItem):
         minmax: "all" (default), "columns", "rows"
         check: if False, value is not checked (optional, default=True)
         variable_size: if True, allows to add/remove row/columns on all axis
+        allow_none: if True, None is a valid value regardless of other constraints
+         (optional, default=False)
     """
 
     type = np.ndarray
@@ -995,8 +1060,11 @@ class FloatArrayItem(DataItem):
         minmax: str = "all",
         check: bool = True,
         variable_size=False,
+        allow_none: bool = False,
     ) -> None:
-        super().__init__(label, default=default, help=help, check=check)
+        super().__init__(
+            label, default=default, help=help, check=check, allow_none=allow_none
+        )
         self.set_prop("display", format=format, transpose=transpose, minmax=minmax)
         self.set_prop("edit", variable_size=variable_size)
 
@@ -1046,13 +1114,24 @@ class DictItem(DataItem):
         default: default value (optional)
         help: text shown in tooltip (optional)
         check: if False, value is not checked (optional, default=True)
+        allow_none: if True, None is a valid value regardless of other constraints
+         (optional, default=False)
     """
 
     type: type[dict[str, Any]] = dict
 
     # pylint: disable=redefined-builtin,abstract-method
-    def __init__(self, label, default: dict | None = None, help="", check=True):
-        super().__init__(label, default=default, help=help, check=check)
+    def __init__(
+        self,
+        label,
+        default: dict | None = None,
+        help="",
+        check=True,
+        allow_none: bool = False,
+    ):
+        super().__init__(
+            label, default=default, help=help, check=check, allow_none=allow_none
+        )
         self.set_prop("display", callback=self.__dictedit)
         self.set_prop("display", icon="dictedit.png")
 
@@ -1102,6 +1181,8 @@ class ButtonItem(DataItem):
         help: text shown in button's tooltip (optional)
         check: if False, value is not checked (optional, default=True)
         size: size (optional) of the button widget
+        allow_none: if True, None is a valid value regardless of other constraints
+         (optional, default=True)
 
     The value of this item is unspecified but is passed to the callback along
     with the whole dataset. The value is assigned the callback`s return value.
@@ -1116,8 +1197,11 @@ class ButtonItem(DataItem):
         help: str = "",
         check: bool = True,
         size: tuple[int, int] | None = None,
+        allow_none: bool = True,
     ) -> None:
-        super().__init__(label, default=default, help=help, check=check)
+        super().__init__(
+            label, default=default, help=help, check=check, allow_none=allow_none
+        )
         self.set_prop("display", callback=callback)
         self.set_prop("display", icon=icon)
         self.set_prop("display", size=size)

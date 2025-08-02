@@ -327,6 +327,8 @@ class DataItem(ABC):
         default (Any): default value
         help (str): text displayed on data item's tooltip
         check (bool): check value (default: True)
+        allow_none (bool): if True, None values are allowed regardless of the
+            expected type (default: False)
     """
 
     type = type
@@ -338,6 +340,7 @@ class DataItem(ABC):
         default: Any | None = None,
         help: str | None = "",
         check: bool | None = True,
+        allow_none: bool = False,
     ) -> None:
         self._order = DataItem.count
         DataItem.count += 1
@@ -348,7 +351,7 @@ class DataItem(ABC):
             Any, Any
         ] = {}  # a dict realm->dict containing realm-specific properties
         self.set_prop("display", col=0, colspan=None, row=None, label=label)
-        self.set_prop("data", check_value=check)
+        self.set_prop("data", check_value=check, allow_none=allow_none)
 
     def get_prop(self, realm: str, name: str, default: Any = NoDefault) -> Any:
         """Get one property of this item
@@ -575,7 +578,11 @@ class DataItem(ABC):
             value (Any): value to set
         """
         vmode = get_validation_mode()
-        if vmode != ValidationMode.DISABLED:
+
+        # If value is None and allow_none is True, skip validation
+        allow_none = self.get_prop("data", "allow_none", False)
+
+        if vmode != ValidationMode.DISABLED and not (value is None and allow_none):
             try:
                 self.check_value(value, raise_exception=True)
             except NotImplementedError:
