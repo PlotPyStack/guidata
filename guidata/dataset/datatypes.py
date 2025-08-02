@@ -550,7 +550,9 @@ class DataItem(ABC):
             # Convert generic ValueError to a more specific DataItemValidationError
             # to provide clearer context when setting default values fails
             raise DataItemValidationError(
-                self, str(exc.__cause__ or exc), operation="Setting default value"
+                self,
+                str(exc.__cause__ or exc),
+                operation=f"Setting default value ({instance.__class__.__name__})",
             ) from exc
 
     def accept(self, visitor: object) -> None:
