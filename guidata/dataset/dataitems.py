@@ -608,11 +608,34 @@ class ColorItem(StringItem):
 
     Args:
         label: item name
-        default: default value (optional). Color can be specified as
-         a string (e.g. "#FF0000" or "red") or as a Qt name (e.g. "red")
+        default: default value (optional)
+        notempty: if True, empty string is not a valid value (optional)
+        regexp: regular expression for checking value (optional)
         help: text shown in tooltip (optional)
-        check: if False, value is not checked (optional, default=True)
+        check: if False, value is not checked (ineffective for strings)
+        allow_none: if True, None is a valid value regardless of other constraints
+         (optional, default=True)
     """
+
+    def __init__(
+        self,
+        label: str,
+        default: str | None = None,
+        notempty: bool | None = None,
+        regexp: str | None = None,
+        help: str = "",
+        check: bool = True,
+        allow_none: bool = True,
+    ) -> None:
+        super().__init__(
+            label,
+            default=default,
+            notempty=notempty,
+            regexp=regexp,
+            help=help,
+            check=check,
+            allow_none=allow_none,
+        )
 
     def check_value(self, value: str, raise_exception: bool = False) -> bool:
         """Override DataItem method"""
