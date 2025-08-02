@@ -193,6 +193,14 @@ class NumericTypeItem(DataItem):
         """Override DataItem method"""
         if not self.get_prop("data", "check_value", True):
             return True
+
+        # Try to convert numpy numeric types to Python types
+        try:
+            if hasattr(value, "dtype") and not isinstance(value, self.type):
+                value = self.type(value)
+        except (TypeError, ValueError):
+            pass
+
         if not isinstance(value, self.type):
             if raise_exception:
                 raise TypeError(f"Expected {self.type}, got {type(value)}")
@@ -277,6 +285,20 @@ class FloatItem(NumericTypeItem):
         self.set_prop("display", slider=slider)
         self.set_prop("data", step=step)
 
+    def check_value(self, value: float, raise_exception: bool = False) -> bool:
+        """Override DataItem method"""
+        if not self.get_prop("data", "check_value", True):
+            return True
+
+        # Try to convert numpy float types to Python float
+        try:
+            if hasattr(value, "dtype") and not isinstance(value, self.type):
+                value = self.type(value)
+        except (TypeError, ValueError):
+            pass
+
+        return super().check_value(value, raise_exception=raise_exception)
+
     def get_value_from_reader(
         self, reader: HDF5Reader | JSONReader | INIReader
     ) -> float:
@@ -350,6 +372,7 @@ class IntItem(NumericTypeItem):
         """Override DataItem method"""
         if not self.get_prop("data", "check_value", True):
             return True
+
         valid = super().check_value(value, raise_exception=raise_exception)
         if not valid:
             return False

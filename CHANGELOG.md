@@ -23,6 +23,10 @@
   * If `allow_none` is set to `False`, `None` is considered an invalid value.
   * The default value for `allow_none` is `False`, except for the `ChoiceItem` and its subclasses, where it is set to `True` by default.
 
+* Improved type handling in `IntItem` and `FloatItem`:
+  * `IntItem` and `FloatItem` now automatically convert NumPy numeric types (like `np.int32` or `np.float64`) to native Python types (`int` or `float`) during validation
+  * This makes it easier to use these items with NumPy arrays and other numeric libraries
+
 * `StringItem` behavior change:
   * The `StringItem` class now uses the new validation modes (see above).
   * As a side effect, the `StringItem` class now considers `None` as an invalid default value, and highlights it in the UI.
