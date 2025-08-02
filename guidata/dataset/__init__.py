@@ -38,6 +38,7 @@ from .datatypes import (
     BeginGroup,
     BeginTabGroup,
     DataItemValidationWarning,
+    DataItemValidationError,
     DataItem,
     DataItemProxy,
     DataItemVariable,

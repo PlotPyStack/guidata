@@ -92,7 +92,29 @@ class DataItemValidationWarning(UserWarning):
     pass
 
 
+class DataItemValidationError(ValueError):
+    """Error raised when a DataItem value is invalid during validation.
+    Provides more context about where the error occurred.
+
+    Args:
+        item: the DataItem that caused the error
+        msg: error message
+        operation: operation that failed, if applicable
+    """
+
+    def __init__(self, item: DataItem, msg: str, operation: str | None = None) -> None:
+        self.item = item
+        self.operation = operation
+        if operation:
+            full_msg = f"{operation} failed for {item}: {msg}"
+        else:
+            full_msg = f"Checking {item}: {msg}"
+        super().__init__(full_msg)
+
+
 class NoDefault:
+    """Special value used to indicate that no default value is set for a DataItem"""
+
     pass
 
 
@@ -519,7 +541,14 @@ class DataItem(ABC):
         Args:
             instance (DataSet): instance of the DataSet
         """
-        self.__set__(instance, deepcopy(self._default))
+        try:
+            self.__set__(instance, deepcopy(self._default))
+        except ValueError as exc:
+            # Convert generic ValueError to a more specific DataItemValidationError
+            # to provide clearer context when setting default values fails
+            raise DataItemValidationError(
+                self, str(exc.__cause__ or exc), operation="Setting default value"
+            ) from exc
 
     def accept(self, visitor: object) -> None:
         """This is the visitor pattern's accept function.
@@ -553,13 +582,13 @@ class DataItem(ABC):
                 # Checking is not implemented for this item
                 pass
             except Exception as exc:
-                msg = f"Checking ({str(self)}): {exc}"
                 if vmode == ValidationMode.ENABLED:
                     # Show a warning in replacement of the exception
+                    msg = f"Checking ({str(self)}): {exc}"
                     warnings.warn(msg, DataItemValidationWarning)
                 elif vmode == ValidationMode.STRICT:
                     # Raise an exception if strict validation is enabled
-                    raise ValueError(msg) from exc
+                    raise DataItemValidationError(self, str(exc)) from exc
                 else:
                     raise ValueError(f"Unknown validation mode: {vmode}") from exc
         setattr(instance, "_%s" % (self._name), value)

@@ -124,7 +124,7 @@ def test_invalid_data_with_strict_validation():
         for value in values:
             execenv.print(f"  Testing {name} with value: {value}")
             # Check that an exception is raised
-            with pytest.raises(ValueError):
+            with pytest.raises(gds.DataItemValidationError):
                 setattr(params, name, value)
             # The value should not be set
             assert getattr(params, name) != value
