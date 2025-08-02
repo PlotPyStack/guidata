@@ -1091,6 +1091,16 @@ class FloatArrayItem(DataItem):
         self.set_prop("display", format=format, transpose=transpose, minmax=minmax)
         self.set_prop("edit", variable_size=variable_size)
 
+    def check_value(self, value: np.ndarray, raise_exception: bool = False) -> bool:
+        """Override DataItem method"""
+        if not self.get_prop("data", "check_value", True):
+            return True
+        if not isinstance(value, self.type):
+            if raise_exception:
+                raise TypeError(f"Expected {self.type}, got {type(value)}")
+            return False
+        return True
+
     def format_string(
         self, instance: DataSet, value: Any, fmt: str, func: Callable
     ) -> str:
