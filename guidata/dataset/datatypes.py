@@ -1126,6 +1126,8 @@ class DataSet(metaclass=DataSetMeta):
         title (str): title
         comment (str): comment. Text shown on the top of the first data item
         icon (str): icon filename as in image search paths
+        readonly (bool): if True, the DataSet is read-only
+        skip_defaults (bool): if True, do not set default values for items
     """
 
     _items: list[DataItem] = []
@@ -1137,6 +1139,7 @@ class DataSet(metaclass=DataSetMeta):
         comment: str | None = None,
         icon: str = "",
         readonly: bool = False,
+        skip_defaults: bool = False,
     ):
         self.__comment = comment
         self.__icon = icon
@@ -1151,7 +1154,8 @@ class DataSet(metaclass=DataSetMeta):
 
         self.__readonly: bool = readonly
 
-        self.set_defaults()
+        if not skip_defaults:
+            self.set_defaults()
 
     def get_items(self, copy=False) -> list[DataItem]:
         """Returns all the DataItem objects from the DataSet instance. Ignore private
@@ -1177,14 +1181,26 @@ class DataSet(metaclass=DataSetMeta):
         Returns:
             DataSet instance
         """  # noqa
-        instance = cls()
+        # Validate that all kwargs correspond to actual items in the class
         for name in kwargs:
-            for item in instance._items:
+            for item in cls._items:
                 if item._name == name:
-                    setattr(instance, name, kwargs[name])
                     break
             else:
                 raise AttributeError(f"Unknown attribute {name}")
+
+        # Create the instance but skip set_defaults in __init__
+        instance = cls(skip_defaults=True)
+
+        # Set only the defaults for items that don't have values in kwargs
+        for item in instance._items:
+            if item._name not in kwargs:
+                item.set_default(instance)
+
+        # Now set the provided values
+        for name, value in kwargs.items():
+            setattr(instance, name, value)
+
         return instance
 
     def _get_translation(self):
