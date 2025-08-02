@@ -97,18 +97,21 @@ class DataItemValidationError(ValueError):
     Provides more context about where the error occurred.
 
     Args:
+        instance: the DataSet instance where the error occurred
         item: the DataItem that caused the error
         msg: error message
         operation: operation that failed, if applicable
     """
 
-    def __init__(self, item: DataItem, msg: str, operation: str | None = None) -> None:
+    def __init__(
+        self, instance: DataSet, item: DataItem, msg: str, operation: str | None = None
+    ) -> None:
         self.item = item
         self.operation = operation
         if operation:
             full_msg = f"{operation} failed for {item}: {msg}"
         else:
-            full_msg = f"Checking {item}: {msg}"
+            full_msg = f"Checking {instance.__class__.__name__}.{item}: {msg}"
         super().__init__(full_msg)
 
 
@@ -550,6 +553,7 @@ class DataItem(ABC):
             # Convert generic ValueError to a more specific DataItemValidationError
             # to provide clearer context when setting default values fails
             raise DataItemValidationError(
+                instance,
                 self,
                 str(exc.__cause__ or exc),
                 operation=f"Setting default value ({instance.__class__.__name__})",
@@ -593,11 +597,11 @@ class DataItem(ABC):
             except Exception as exc:
                 if vmode == ValidationMode.ENABLED:
                     # Show a warning in replacement of the exception
-                    msg = f"Checking ({str(self)}): {exc}"
+                    msg = f"Checking {instance.__class__.__name__}.{str(self)}: {exc}"
                     warnings.warn(msg, DataItemValidationWarning)
                 elif vmode == ValidationMode.STRICT:
                     # Raise an exception if strict validation is enabled
-                    raise DataItemValidationError(self, str(exc)) from exc
+                    raise DataItemValidationError(instance, self, str(exc)) from exc
                 else:
                     raise ValueError(f"Unknown validation mode: {vmode}") from exc
         setattr(instance, "_%s" % (self._name), value)
