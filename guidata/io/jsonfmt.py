@@ -55,18 +55,20 @@ class CustomJSONDecoder(json.JSONDecoder):
 
     def __iterate_dict(self, obj: Any) -> Any:
         """Iterate dictionaries"""
-        if isinstance(obj, list) and len(obj) == 3:
-            family, data, dtypestr = obj
-            try:
-                dtype = np.dtype(dtypestr)
-                if family == "array":
-                    if dtype in (np.complex64, np.complex128):
-                        return np.asarray(
-                            data[: len(data) // 2], dtype
-                        ) + 1j * np.asarray(data[len(data) // 2 :], dtype)
-                    return np.asarray(data, dtype)
-            except (TypeError, ValueError):
-                pass
+        if isinstance(obj, list):
+            if len(obj) == 3:
+                family, data, dtypestr = obj
+                try:
+                    dtype = np.dtype(dtypestr)
+                    if family == "array":
+                        if dtype in (np.complex64, np.complex128):
+                            return np.asarray(
+                                data[: len(data) // 2], dtype
+                            ) + 1j * np.asarray(data[len(data) // 2 :], dtype)
+                        return np.asarray(data, dtype)
+                except (TypeError, ValueError):
+                    pass
+            return [self.__iterate_dict(item) for item in obj]
         elif isinstance(obj, dict):
             for key, value in list(obj.items()):
                 obj[key] = self.__iterate_dict(value)
