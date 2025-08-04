@@ -15,9 +15,10 @@ from guidata.env import execenv
 class Parameters(gds.DataSet):
     """Example dataset"""
 
-    float1 = gds.FloatItem("float #1", min=1, max=250, help="height in cm")
-    float2 = gds.FloatItem("float #2", min=1, max=250, help="width in cm")
-    number = gds.IntItem("number", min=3, max=20)
+    float1 = gds.FloatItem("float #1", default=150.0, min=1.0, max=250.0)
+    float2 = gds.FloatItem("float #2", default=200.0, min=1.0, max=250.0)
+    number = gds.IntItem("number", default=5, min=3, max=20)
+    string = gds.StringItem("string", default="default string", help="a string item")
 
 
 class TestCheck(unittest.TestCase):
@@ -33,11 +34,10 @@ class TestCheck(unittest.TestCase):
     def test_typechecking(self):
         """Test type checking of FloatItem"""
         e = Parameters()
-        e.float1 = 150
-        e.float2 = 400
+        e.string = 400
         e.number = 4.0
         errors = e.check()
-        self.assertEqual(errors, ["float1", "float2", "number"])
+        self.assertEqual(errors, ["number", "string"])
 
     def test_update(self):
         e1 = Parameters()
