@@ -42,7 +42,7 @@ VALID_DATA = {
 INVALID_DATA = {
     "fitem": (
         300.0,  # Out of range
-        10,  # Not a float
+        "10",  # Not a float
     ),
     "iitem": (
         30,  # Out of range
