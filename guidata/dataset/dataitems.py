@@ -1095,6 +1095,10 @@ class FloatArrayItem(DataItem):
         variable_size: if True, allows to add/remove row/columns on all axis
         allow_none: if True, None is a valid value regardless of other constraints
          (optional, default=True)
+        check_callback: additional callback to check the value
+         (function of two arguments (value, raise_exception) returning a boolean,
+         where value is the value to check and raise_exception is a boolean
+         indicating whether to raise an exception on invalid value)
     """
 
     type = np.ndarray
@@ -1110,12 +1114,14 @@ class FloatArrayItem(DataItem):
         check: bool = True,
         variable_size=False,
         allow_none: bool = True,
+        check_callback: Callable[[np.ndarray, bool], bool] | None = None,
     ) -> None:
         super().__init__(
             label, default=default, help=help, check=check, allow_none=allow_none
         )
         self.set_prop("display", format=format, transpose=transpose, minmax=minmax)
         self.set_prop("edit", variable_size=variable_size)
+        self.check_callback = check_callback
 
     def check_value(self, value: np.ndarray, raise_exception: bool = False) -> bool:
         """Override DataItem method"""
@@ -1125,6 +1131,8 @@ class FloatArrayItem(DataItem):
             if raise_exception:
                 raise TypeError(f"Expected {self.type}, got {type(value)}")
             return False
+        if self.check_callback is not None:
+            return self.check_callback(value, raise_exception)
         return True
 
     def format_string(

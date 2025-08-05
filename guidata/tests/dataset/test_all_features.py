@@ -16,6 +16,7 @@ import tempfile
 import numpy as np
 
 import guidata.dataset as gds
+from guidata.config import ValidationMode, get_validation_mode, set_validation_mode
 from guidata.dataset.qtitemwidgets import DataSetWidget
 from guidata.dataset.qtwidgets import DataSetEditLayout, DataSetShowLayout
 from guidata.env import execenv
@@ -65,10 +66,10 @@ class Parameters(gds.DataSet):
             "float_col": 1.0,
         },
     )
-    string = gds.StringItem("String")
+    string = gds.StringItem("String", default="")
     string_regexp = gds.StringItem("String", regexp=r"^[a-z]+[0-9]$", default="abcd9")
-    password = gds.StringItem("Password", password=True)
-    text = gds.TextItem("Text")
+    password = gds.StringItem("Password", default="", password=True)
+    text = gds.TextItem("Text", default="")
     _bg = gds.BeginGroup("A sub group")
     float_slider = gds.FloatItem(
         "Float (with slider)", default=0.5, min=0, max=1, step=0.01, slider=True
@@ -121,11 +122,13 @@ class Parameters(gds.DataSet):
     integer_slider = gds.IntItem(
         "Integer (with slider)", default=5, min=-50, max=50, slider=True
     )
-    integer = gds.IntItem("Integer", default=5, min=3, max=6).set_pos(col=1)
+    integer = gds.IntItem("Integer", default=5, min=3, max=60).set_pos(col=1)
 
 
 def test_all_features():
     """Test all guidata item/group features"""
+    old_mode = get_validation_mode()
+    set_validation_mode(ValidationMode.STRICT)
     with execenv.context(accept_dialogs=True):
         with qt_app_context():
             prm1 = Parameters()
@@ -137,8 +140,8 @@ def test_all_features():
                 execenv.print(prm1)
             prm1.view()
 
-            prm2 = Parameters.create(integer=10101010, string="Using `create`")
-            assert prm2.integer == 10101010
+            prm2 = Parameters.create(integer=59, string="Using `create`")
+            assert prm2.integer == 59
             print(prm2)
 
             try:
@@ -150,6 +153,7 @@ def test_all_features():
                 raise AssertionError("AttributeError not raised")
 
             execenv.print("OK")
+    set_validation_mode(old_mode)
 
 
 if __name__ == "__main__":

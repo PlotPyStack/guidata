@@ -17,6 +17,11 @@
     set_validation_mode(ValidationMode.STRICT)
     ```
 
+* New `check_callback` parameter for `FloatArrayItem`:
+  * The `check_callback` parameter allows you to specify a custom validation function for the item.
+  * This function will be called to validate the item's value whenever it is set.
+  * If the function returns `False`, the value will be considered invalid.
+
 * New `allow_none` parameter for `DataItem` objects:
   * The `allow_none` parameter allows you to specify whether `None` is a valid value for the item, which can be especially useful when validation modes are used.
   * If `allow_none` is set to `True`, `None` is considered a valid value regardless of other constraints.
