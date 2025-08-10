@@ -19,10 +19,12 @@ import atexit
 import datetime
 import shutil
 import tempfile
+from enum import Enum
 
 import numpy as np
 
 import guidata.dataset as gds
+from guidata.config import _
 from guidata.env import execenv
 from guidata.qthelpers import qt_app_context
 
@@ -33,6 +35,23 @@ FILE_ETA = tempfile.NamedTemporaryFile(suffix=".eta", dir=TEMPDIR)
 atexit.register(FILE_ETA.close)
 FILE_CSV = tempfile.NamedTemporaryFile(suffix=".csv", dir=TEMPDIR)
 atexit.register(FILE_CSV.close)
+
+
+class ImageTypes(Enum):
+    """Image types."""
+
+    #: Image filled with zeros
+    ZEROS = _("Zeros")
+    #: Empty image (filled with data from memory state)
+    EMPTY = _("Empty")
+    #: Image filled with random data (uniform law)
+    UNIFORMRANDOM = _("Random (uniform law)")
+    #: Image filled with random data (normal law)
+    NORMALRANDOM = _("Random (normal law)")
+    #: 2D Gaussian image
+    GAUSS = _("Gaussian")
+    #: Bilinear form image
+    RAMP = _("2D ramp")
 
 
 class Parameters(gds.DataSet):
@@ -64,10 +83,11 @@ class Parameters(gds.DataSet):
     bool2 = gds.BoolItem("Boolean option with label", "Label")
     _bg = gds.BeginGroup("A sub group")
     color = gds.ColorItem("Color", default="red")
-    choice = gds.ChoiceItem(
+    choice1 = gds.ChoiceItem(
         "Single choice 1",
         [("16", "first choice"), ("32", "second choice"), ("64", "third choice")],
     )
+    choice2 = gds.ChoiceItem("Image type", ImageTypes, default=ImageTypes.GAUSS)
     mchoice2 = gds.ImageChoiceItem(
         "Single choice 2",
         [

@@ -95,7 +95,9 @@ from __future__ import annotations
 import datetime
 import os
 import re
+import warnings
 from collections.abc import Callable
+from enum import Enum, EnumMeta
 from typing import TYPE_CHECKING, Any, Generic, Iterable, TypeVar
 
 import numpy as np
@@ -922,16 +924,23 @@ class ChoiceItem(DataItem, Generic[_T]):
     def __init__(
         self,
         label: str,
-        choices: Iterable[_T] | Callable[[Any], Iterable[_T]],
-        default: tuple[()] | type[FirstChoice] | int | _T | None = FirstChoice,
+        choices: Iterable[_T] | Callable[[Any], Iterable[_T]] | EnumMeta,
+        default: tuple[()] | type[FirstChoice] | int | _T | Enum | None = FirstChoice,
         help: str = "",
         check: bool = True,
         radio: bool = False,
         size: tuple[int, int] | None = None,
         allow_none: bool = True,
     ) -> None:
+        self._enum_cls: type[Enum] | None = None
         _choices_data: Any
-        if isinstance(choices, Callable):
+        if isinstance(choices, EnumMeta):
+            self._enum_cls = choices
+            _choices_data = [(m.name, str(m.value), None) for m in choices]
+            # Only coerce if default is a real value
+            if default not in (FirstChoice, None):
+                default = self._enum_coerce_in(default)
+        elif isinstance(choices, Callable):
             _choices_data = ItemProperty(choices)
         else:
             _choices_data = []
@@ -947,6 +956,43 @@ class ChoiceItem(DataItem, Generic[_T]):
         self.set_prop("data", choices=_choices_data)
         self.set_prop("display", radio=radio)
         self.set_prop("display", size=size)
+
+    def _enum_coerce_in(self, v: Any) -> str:
+        """Accept Enum | name | value | label -> return string name (key)"""
+        # Enum member
+        if isinstance(v, self._enum_cls):
+            warnings.warn(
+                f"Using enum member {v} directly is not recommended, "
+                f"use its name ({repr(v.name)}) instead.",
+                UserWarning,
+            )
+            return v.name
+        # name
+        if isinstance(v, str) and v in self._enum_cls.__members__:
+            return v
+        # try value
+        for m in self._enum_cls:
+            if v == m.value:
+                return m.name
+        # Index
+        if isinstance(v, int):
+            members = list(self._enum_cls)
+            if 0 <= v < len(members):
+                return members[v].name
+        # try label (what UI shows) — rely on normalized choices
+        for name, label in [(m.name, str(m.value)) for m in self._enum_cls]:
+            if v == label:
+                return name
+        raise ValueError(
+            f"Invalid value '{v}' for {self._enum_cls.__name__} "
+            f"(expected a member, name, value or label)."
+        )
+
+    def __set__(self, instance: Any, value: Any) -> None:
+        """Override DataItem.__set__ to accept Enum members"""
+        if self._enum_cls is not None and value is not None:
+            value = self._enum_coerce_in(value)
+        super().__set__(instance, value)
 
     def _normalize_choice(
         self, idx: int, choice_tuple: tuple[Any, ...]

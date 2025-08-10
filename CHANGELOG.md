@@ -33,6 +33,13 @@
   * `FloatItem` now accepts integer values and silently converts them to float values
   * This makes it easier to use these items with NumPy arrays and other numeric libraries
 
+* `ChoiceItem` now supports `Enum` subclasses:
+  * You can now use `Enum` subclasses as choices for `ChoiceItem` and its subclasses.
+  * The enum members will be displayed in the UI, and their values will be used for validation.
+  * For backward compatibility, if an `Enum` subclass is used as a choice, its members will be automatically converted to their string representations:
+    * This means that default value must be the name of one of the enum members.
+    * Also, any value assigned to the item must be one of the enum members (by name).
+
 * `StringItem` behavior change:
   * The `StringItem` class now uses the new validation modes (see above).
   * As a side effect, the `StringItem` class now considers `None` as an invalid default value, and highlights it in the UI.
