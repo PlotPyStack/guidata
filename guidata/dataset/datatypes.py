@@ -1292,8 +1292,26 @@ class DataSet(metaclass=DataSetMeta):
         for item in self._items:
             item.set_default(self)
 
-    def __str__(self):
+    def __str__(self) -> str:
+        """Return string representation of the data set"""
         return self.to_string(debug=False)
+
+    def __eq__(self, other: object) -> bool:
+        """Check equality with another DataSet"""
+        if not isinstance(other, DataSet):
+            return NotImplemented
+        items, other_items = self.get_items(), other.get_items()
+        if items != other_items:
+            return False
+        # Check that values are equal
+        for item1, item2 in zip(items, other_items):
+            if item1.get_value(self) != item2.get_value(other):
+                # print(
+                #     f"Item values are not equal: {item1._name}="
+                #     f"{item1.get_value(self)} != {item2.get_value(other)}"
+                # )
+                return False
+        return True
 
     def check(self) -> list[str]:
         """Check the dataset item values
