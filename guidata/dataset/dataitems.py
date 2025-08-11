@@ -95,6 +95,7 @@ from __future__ import annotations
 import datetime
 import os
 import re
+import warnings
 from collections.abc import Callable
 from enum import Enum, EnumMeta
 from typing import TYPE_CHECKING, Any, Generic, Iterable, TypeVar
@@ -964,15 +965,22 @@ class ChoiceItem(DataItem, Generic[_T]):
             return True
         if value not in [v for v, _k, _i in self.get_prop("data", "choices", [])]:
             if raise_exception:
-                raise ValueError(f"Invalid value '{value}'")
+                values = [v for v, _k, _i in self.get_prop("data", "choices", [])]
+                raise ValueError(f"Invalid value '{value}' (valid values: {values})")
             return False
         return True
 
     def _enum_coerce_in(self, v: Any) -> str:
         """Accept Enum | name | value | label -> return string name (key)"""
         # Enum member
-        if isinstance(v, self._enum_cls):
-            return v.name
+        if self._enum_cls is not None:
+            if isinstance(v, self._enum_cls):
+                return v.name
+            warnings.warn(
+                "When a ChoiceItem is created with an Enum, using its members for "
+                "default and assigned values is the recommended usage.",
+                UserWarning,
+            )
         # name
         if isinstance(v, str) and v in self._enum_cls.__members__:
             return v
