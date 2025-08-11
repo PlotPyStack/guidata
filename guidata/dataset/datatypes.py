@@ -71,6 +71,8 @@ from collections.abc import Callable
 from copy import deepcopy
 from typing import TYPE_CHECKING, Any, TypeVar
 
+import numpy as np
+
 from guidata.config import ValidationMode, get_validation_mode
 from guidata.io import INIReader, INIWriter
 from guidata.userconfig import UserConfig
@@ -1149,6 +1151,44 @@ Meta_Py3Compat = DataSetMeta("Meta_Py3Compat", (object,), {})
 AnyDataSet = TypeVar("AnyDataSet", bound="DataSet")
 
 
+def assert_datasets_equal(ds1: DataSet, ds2: DataSet, msg: str | None = None) -> None:
+    """Assert that two DataSet objects are equal. Exception message shows details on
+    which attributes are different, if any.
+
+    Args:
+        ds1: The first DataSet to compare.
+        ds2: The second DataSet to compare.
+        msg: Optional message to include in the assertion error.
+
+    Raises:
+        AssertionError: If the DataSet objects are not equal.
+    """
+    diff: list[str] = []
+    items1, items2 = ds1.get_items(), ds2.get_items()
+    if len(items1) != len(items2):
+        diff.append(f"Different number of items: {len(items1)} != {len(items2)}")
+    else:
+        for item1, item2 in zip(items1, items2):
+            name1, name2 = item1.get_name(), item2.get_name()
+            if item1 != item2:
+                diff.append(f"Item '{name1}' differs from '{name2}'")
+            val1, val2 = item1.get_value(ds1), item2.get_value(ds2)
+            diffval = False
+            if isinstance(val1, (list, tuple, set)):
+                if not all(v1 == v2 for v1, v2 in zip(val1, val2)):
+                    diffval = True
+            elif isinstance(val1, np.ndarray) and isinstance(val2, np.ndarray):
+                if not np.array_equal(val1, val2):
+                    diffval = True
+            elif val1 != val2:
+                diffval = True
+            if diffval:
+                diff.append(f"Item '{name1}' has different value: {val1} != {val2}")
+    if diff:
+        msg = "" if msg is None else msg + "\n"
+        raise AssertionError(msg + "Datasets are not equal:\n" + "\n".join(diff))
+
+
 class DataSet(metaclass=DataSetMeta):
     """Construct a DataSet object is a set of DataItem objects
 
@@ -1300,17 +1340,10 @@ class DataSet(metaclass=DataSetMeta):
         """Check equality with another DataSet"""
         if not isinstance(other, DataSet):
             return NotImplemented
-        items, other_items = self.get_items(), other.get_items()
-        if items != other_items:
+        try:
+            assert_datasets_equal(self, other)
+        except AssertionError:
             return False
-        # Check that values are equal
-        for item1, item2 in zip(items, other_items):
-            if item1.get_value(self) != item2.get_value(other):
-                # print(
-                #     f"Item values are not equal: {item1._name}="
-                #     f"{item1.get_value(self)} != {item2.get_value(other)}"
-                # )
-                return False
         return True
 
     def check(self) -> list[str]:

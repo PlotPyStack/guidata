@@ -35,6 +35,7 @@ from .dataitems import (
 from .datatypes import (
     ActivableDataSet,
     AnyDataSet,
+    assert_datasets_equal,
     BeginGroup,
     BeginTabGroup,
     DataItemValidationWarning,

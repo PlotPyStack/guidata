@@ -946,7 +946,9 @@ class ChoiceItem(DataItem, Generic[_T]):
             _choices_data = []
             for idx, choice in enumerate(choices):
                 _choices_data.append(self._normalize_choice(idx, choice))
-        if default is FirstChoice and not isinstance(choices, Callable):
+        if default is FirstChoice and (
+            not isinstance(choices, Callable) or issubclass(choices, Enum)
+        ):
             default = _choices_data[0][0]
         elif default is FirstChoice:
             default = None
@@ -957,15 +959,20 @@ class ChoiceItem(DataItem, Generic[_T]):
         self.set_prop("display", radio=radio)
         self.set_prop("display", size=size)
 
+    def check_value(self, value: str, raise_exception: bool = False) -> bool:
+        """Override DataItem method"""
+        if not self.get_prop("data", "check_value", True):
+            return True
+        if value not in [v for v, _k, _i in self.get_prop("data", "choices", [])]:
+            if raise_exception:
+                raise ValueError(f"Invalid value '{value}'")
+            return False
+        return True
+
     def _enum_coerce_in(self, v: Any) -> str:
         """Accept Enum | name | value | label -> return string name (key)"""
         # Enum member
         if isinstance(v, self._enum_cls):
-            warnings.warn(
-                f"Using enum member {v} directly is not recommended, "
-                f"use its name ({repr(v.name)}) instead.",
-                UserWarning,
-            )
             return v.name
         # name
         if isinstance(v, str) and v in self._enum_cls.__members__:
@@ -988,10 +995,25 @@ class ChoiceItem(DataItem, Generic[_T]):
             f"(expected a member, name, value or label)."
         )
 
-    def __set__(self, instance: Any, value: Any) -> None:
+    def __get__(self, instance: DataSet, owner: type | None = None) -> Any:
+        """Override DataItem.__get__ to return Enum member if applicable"""
+        # descriptor for user access → return Enum member if applicable
+        if instance is None:
+            return self
+        raw = super().__get__(instance, owner)  # stored key (string) from DataItem
+        if self._enum_cls is not None and raw is not None:
+            return self._enum_cls[raw]  # Enum member
+        return raw  # legacy: keep as-is
+
+    def get_value(self, instance: DataSet) -> str | None:
+        """Override DataItem.get_value"""
+        # guidata internals should call this; keep it returning the raw key
+        return super().__get__(instance, instance.__class__)  # string (or None)
+
+    def __set__(self, instance: DataSet, value: Any) -> None:
         """Override DataItem.__set__ to accept Enum members"""
         if self._enum_cls is not None and value is not None:
-            value = self._enum_coerce_in(value)
+            value = self._enum_coerce_in(value)  # → member.name
         super().__set__(instance, value)
 
     def _normalize_choice(
@@ -1041,6 +1063,21 @@ class MultipleChoiceItem(ChoiceItem):
             label, choices, default, help, check=check, allow_none=allow_none
         )
         self.set_prop("display", shape=(1, -1))
+
+    def check_value(self, value: str, raise_exception: bool = False) -> bool:
+        """Override DataItem method"""
+        if not self.get_prop("data", "check_value", True):
+            return True
+        if not isinstance(value, tuple):
+            if raise_exception:
+                raise ValueError(f"Invalid value '{value}' (expecting tuple)")
+            return False
+        for val in value:
+            if val not in [v for v, _k, _i in self.get_prop("data", "choices", [])]:
+                if raise_exception:
+                    raise ValueError(f"Invalid value '{value}'")
+                return False
+        return True
 
     def horizontal(self, row_nb: int = 1) -> MultipleChoiceItem:
         """

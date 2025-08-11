@@ -36,9 +36,10 @@
 * `ChoiceItem` now supports `Enum` subclasses:
   * You can now use `Enum` subclasses as choices for `ChoiceItem` and its subclasses.
   * The enum members will be displayed in the UI, and their values will be used for validation.
-  * For backward compatibility, if an `Enum` subclass is used as a choice, its members will be automatically converted to their string representations:
-    * This means that default value must be the name of one of the enum members.
-    * Also, any value assigned to the item must be one of the enum members (by name).
+  * Valid values for the item may be one of the following:
+    * The members themselves (as enum instances) - this is the recommended usage for setting values as it corresponds to the value returned by the item
+    * The names of the enum members (as strings)
+    * The index of the enum member (as an integer)
 
 * `StringItem` behavior change:
   * The `StringItem` class now uses the new validation modes (see above).
