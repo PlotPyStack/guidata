@@ -1336,16 +1336,6 @@ class DataSet(metaclass=DataSetMeta):
         """Return string representation of the data set"""
         return self.to_string(debug=False)
 
-    def __eq__(self, other: object) -> bool:
-        """Check equality with another DataSet"""
-        if not isinstance(other, DataSet):
-            return NotImplemented
-        try:
-            assert_datasets_equal(self, other)
-        except AssertionError:
-            return False
-        return True
-
     def check(self) -> list[str]:
         """Check the dataset item values
 
