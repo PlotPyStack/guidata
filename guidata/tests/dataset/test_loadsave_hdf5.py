@@ -28,18 +28,22 @@ def test_loadsave_hdf5():
         if os.path.exists(fname):
             os.unlink(fname)
 
-        e = Parameters()
-        if execenv.unattended or e.edit():
+        p1 = Parameters()
+        if execenv.unattended or p1.edit():
             writer = HDF5Writer(fname)
-            e.serialize(writer)
+            p1.serialize(writer)
             writer.close()
 
-            e = Parameters()
+            p2 = Parameters()
             reader = HDF5Reader(fname)
-            e.deserialize(reader)
+            p2.deserialize(reader)
             reader.close()
-            e.edit()
+            p2.edit()
             os.unlink(fname)
+
+        # TODO: Uncomment this part of the test, and make it work!
+        # if execenv.unattended:
+        #     assert_datasets_equal(p1, p2, "Parameters do not match after HDF5 I/O")
         execenv.print("OK")
 
 

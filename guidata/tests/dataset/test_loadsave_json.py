@@ -27,17 +27,23 @@ def test_loadsave_json():
         if os.path.exists(fname):
             os.unlink(fname)
 
-        e = Parameters()
-        if execenv.unattended or e.edit():
+        p1 = Parameters()
+        if execenv.unattended or p1.edit():
             writer = JSONWriter(fname)
-            e.serialize(writer)
+            p1.serialize(writer)
             writer.save()
 
-            e = Parameters()
+            p2 = Parameters()
             reader = JSONReader(fname)
-            e.deserialize(reader)
-            e.edit()
+            p2.deserialize(reader)
+            reader.close()
+            p2.edit()
             os.unlink(fname)
+
+        # TODO: Uncomment this part of the test, and make it work!
+        # if execenv.unattended:
+        #     assert_datasets_equal(p1, p2, "Parameters do not match after HDF5 I/O")
+
         execenv.print("OK")
 
 
