@@ -976,11 +976,6 @@ class ChoiceItem(DataItem, Generic[_T]):
         if self._enum_cls is not None:
             if isinstance(v, self._enum_cls):
                 return v.name
-            warnings.warn(
-                "When a ChoiceItem is created with an Enum, using its members for "
-                "default and assigned values is the recommended usage.",
-                UserWarning,
-            )
         # name
         if isinstance(v, str) and v in self._enum_cls.__members__:
             return v
