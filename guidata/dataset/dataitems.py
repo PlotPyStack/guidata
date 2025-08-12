@@ -95,7 +95,6 @@ from __future__ import annotations
 import datetime
 import os
 import re
-import warnings
 from collections.abc import Callable
 from enum import Enum, EnumMeta
 from typing import TYPE_CHECKING, Any, Generic, Iterable, TypeVar
