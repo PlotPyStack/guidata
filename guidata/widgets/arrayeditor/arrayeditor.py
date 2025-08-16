@@ -18,6 +18,7 @@ Module that provides array editor dialog boxes to edit various types of NumPy ar
 
 from __future__ import annotations
 
+import sys
 from typing import Generic
 
 import numpy as np
@@ -453,6 +454,8 @@ class ArrayEditor(QDialog, Generic[AnySupportedArray]):
         Args:
             message: Error message
         """
+        if "pytest" in sys.modules:
+            raise RuntimeError(message)
         QMessageBox.critical(self, _("Array editor"), message)
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
         self.reject()
