@@ -962,11 +962,15 @@ class ChoiceItem(DataItem, Generic[_T]):
         """Override DataItem method"""
         if not self.get_prop("data", "check_value", True):
             return True
-        if value not in [v for v, _k, _i in self.get_prop("data", "choices", [])]:
-            if raise_exception:
-                values = [v for v, _k, _i in self.get_prop("data", "choices", [])]
-                raise ValueError(f"Invalid value '{value}' (valid values: {values})")
-            return False
+        choices = self.get_prop("data", "choices", [])
+        if not isinstance(choices, ItemProperty):
+            values = [v for v, _k, _i in choices]
+            if value not in values:
+                if raise_exception:
+                    raise ValueError(
+                        f"Invalid value '{value}' (valid values: {values})"
+                    )
+                return False
         return True
 
     def _enum_coerce_in(self, v: Any) -> str:
