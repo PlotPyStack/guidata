@@ -313,7 +313,10 @@ class CreateMethodDocumenter(MethodDocumenter):
             "Args:",
         ]
 
-        dataset = self.parent()
+        try:
+            dataset = self.parent()
+        except TypeError:
+            return [""]
         for item in dataset.get_items():
             docstring_lines.append(ItemDoc(dataset, item).to_function_parameter())
 
@@ -392,7 +395,11 @@ class DataSetDocumenter(ClassDocumenter):
         ]
         if not self.options.get("hideattr", False):
             docstring_lines.extend(("", "Attributes:"))
-            dataset = self.object()
+            try:
+                dataset = self.object()
+            except TypeError:
+                # May occur when trying to instantiate an abstract class
+                return [[""]]
             for item in dataset.get_items():
                 docstring_lines.append(ItemDoc(dataset, item).to_attribute())
 
