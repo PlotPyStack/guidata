@@ -139,7 +139,7 @@
             "presentation": {
                 "echo": true,
                 "focus": false,
-                "panel": "shared",
+                "panel": "dedicated",
                 "reveal": "always",
                 "showReuseMessage": true,
                 "clear": false,
@@ -168,7 +168,7 @@
             "presentation": {
                 "echo": true,
                 "focus": false,
-                "panel": "shared",
+                "panel": "dedicated",
                 "reveal": "always",
                 "showReuseMessage": true,
                 "clear": false,
