@@ -278,8 +278,10 @@ class FloatItem(NumericTypeItem):
         self.set_prop("display", slider=slider)
         self.set_prop("data", step=step)
 
-    def __set__(self, instance: Any, value: Any) -> None:
-        """Override DataItem.__set__ to convert integers to float"""
+    def _set_value_with_validation(
+        self, instance: Any, value: Any, force_allow_none: bool = False
+    ) -> None:
+        """Override DataItem._set_value_with_validation to convert integers to float"""
         # Try to convert NumPy numeric types to Python float
         # (will convert silently either floating point or integer types to float)
         try:
@@ -291,7 +293,7 @@ class FloatItem(NumericTypeItem):
         # (no more NumPy types at this point)
         if isinstance(value, int):
             value = float(value)
-        super().__set__(instance, value)
+        super()._set_value_with_validation(instance, value, force_allow_none)
 
     def get_value_from_reader(
         self, reader: HDF5Reader | JSONReader | INIReader
@@ -362,8 +364,11 @@ class IntItem(NumericTypeItem):
                 auto_help += ", " + _("odd")
         return auto_help
 
-    def __set__(self, instance: Any, value: Any) -> None:
-        """Override DataItem.__set__ to convert NumPy numeric types to int"""
+    def _set_value_with_validation(
+        self, instance: Any, value: Any, force_allow_none: bool = False
+    ) -> None:
+        """Override DataItem._set_value_with_validation
+        to convert NumPy numeric types to int"""
         # Try to convert NumPy integer types to Python int
         # (will convert silently only integer types to int)
         try:
@@ -371,7 +376,7 @@ class IntItem(NumericTypeItem):
                 value = self.type(value)
         except (TypeError, ValueError):
             pass
-        super().__set__(instance, value)
+        super()._set_value_with_validation(instance, value, force_allow_none)
 
     def check_value(self, value: int, raise_exception: bool = False) -> bool:
         """Override DataItem method"""
@@ -1015,11 +1020,13 @@ class ChoiceItem(DataItem, Generic[_T]):
         # guidata internals should call this; keep it returning the raw key
         return super().__get__(instance, instance.__class__)  # string (or None)
 
-    def __set__(self, instance: DataSet, value: Any) -> None:
-        """Override DataItem.__set__ to accept Enum members"""
+    def _set_value_with_validation(
+        self, instance: Any, value: Any, force_allow_none: bool = False
+    ) -> None:
+        """Override DataItem._set_value_with_validation to accept Enum members"""
         if self._enum_cls is not None and value is not None:
             value = self._enum_coerce_in(value)  # → member.name
-        super().__set__(instance, value)
+        super()._set_value_with_validation(instance, value, force_allow_none)
 
     def _normalize_choice(
         self, idx: int, choice_tuple: tuple[Any, ...]
