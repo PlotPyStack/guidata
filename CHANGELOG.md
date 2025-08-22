@@ -4,6 +4,8 @@
 
 💥 New features:
 
+* [Issue #94](https://github.com/PlotPyStack/guidata/issues/94) - Make dataset description text selectable
+
 * New validation modes for `DataItem` objects:
   * Validation modes allow you to control how `DataItem` values are validated when they are set.
   * `ValidationMode.DISABLED`: no validation is performed (default behavior, for backward compatibility)
