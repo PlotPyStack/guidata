@@ -550,7 +550,8 @@ class DataItem(ABC):
             instance (DataSet): instance of the DataSet
         """
         try:
-            self.__set__(instance, deepcopy(self._default))
+            value = deepcopy(self._default)
+            self._set_value_with_validation(instance, value, force_allow_none=True)
         except ValueError as exc:
             # Convert generic ValueError to a more specific DataItemValidationError
             # to provide clearer context when setting default values fails
@@ -585,12 +586,26 @@ class DataItem(ABC):
             instance (Any): instance of the DataSet
             value (Any): value to set
         """
+        self._set_value_with_validation(instance, value, force_allow_none=False)
+
+    def _set_value_with_validation(
+        self, instance: Any, value: Any, force_allow_none: bool = False
+    ) -> None:
+        """Internal method to set data item's value with validation
+
+        Args:
+            instance (Any): instance of the DataSet
+            value (Any): value to set
+            force_allow_none (bool): if True, allow None values even when
+             allow_none is False (used for default values)
+        """
         vmode = get_validation_mode()
 
-        # If value is None and allow_none is True, skip validation
+        # Determine if validation should be skipped
         allow_none = self.get_prop("data", "allow_none", False)
+        skip_validation = value is None and (allow_none or force_allow_none)
 
-        if vmode != ValidationMode.DISABLED and not (value is None and allow_none):
+        if vmode != ValidationMode.DISABLED and not skip_validation:
             try:
                 self.check_value(value, raise_exception=True)
             except NotImplementedError:

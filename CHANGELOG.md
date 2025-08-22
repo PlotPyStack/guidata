@@ -28,6 +28,12 @@
   * If `allow_none` is set to `False`, `None` is considered an invalid value.
   * The default value for `allow_none` is `False`, except for `FloatArrayItem`, `ColorItem` and `ChoiceItem` and its subclasses, where it is set to `True` by default.
 
+* Enhanced default value handling for `DataItem` objects:
+  * Default values can now be `None` even when `allow_none=False` is set on the item.
+  * This allows developers to use `None` as a sensible default value while still preventing users from setting `None` at runtime.
+  * This feature provides better flexibility for data item initialization without compromising runtime validation.
+  * The implementation uses a clean internal architecture that separates default value setting from regular value setting, maintaining the standard Python descriptor protocol.
+
 * Improved type handling in `IntItem` and `FloatItem`:
   * `IntItem` and `FloatItem` now automatically convert NumPy numeric types (like `np.int32` or `np.float64`) to native Python types (`int` or `float`) during validation
   * `FloatItem` now accepts integer values and silently converts them to float values
