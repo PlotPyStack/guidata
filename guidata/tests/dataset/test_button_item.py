@@ -12,6 +12,8 @@ other items, it is purely GUI oriented and has no sense in a non-GUI context.
 
 # guitest: show
 
+from __future__ import annotations
+
 import os.path as osp
 import re
 
@@ -49,7 +51,10 @@ class Parameters(gds.DataSet):
     as well as special characters (α, β, γ, δ, ...)
     """
 
-    def button_callback(dataset, item, value, parent):
+    def button_cb(
+        dataset: Parameters, item: gds.ButtonItem, value: None, parent: QW.QWidget
+    ) -> None:
+        """Button callback"""
         execenv.print(f"Button clicked: {dataset}, {item}, {value}, {parent}")
         text = "<br>".join(
             [
@@ -61,8 +66,9 @@ class Parameters(gds.DataSet):
         information_selectable(parent, "Button Clicked", text)
 
     dir = gds.DirectoryItem("Directory", osp.dirname(__file__))
+    pattern = gds.StringItem("File pattern", "*.py")
+    button = gds.ButtonItem("Help", button_cb, "MessageBoxInformation").set_pos(col=1)
     preview = gds.TextItem("File names preview")
-    button = gds.ButtonItem("Click me", button_callback, "MessageBoxInformation")
 
 
 def test_button_item():
