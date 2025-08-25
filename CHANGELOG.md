@@ -4,6 +4,10 @@
 
 ✨ New features:
 
+* `guidata.configtools.get_icon`:
+  * This function retrieves a QIcon from the specified image file.
+  * Now supports Qt standard icons (e.g. "MessageBoxInformation" or "DialogApplyButton").
+
 * Added a `readonly` parameter to `StringItem` and `TextItem` in `guidata.dataset.dataitems`:
   * This allows these items to be set as read-only, preventing user edits in the GUI.
   * The `readonly` property is now respected in the corresponding widgets (see `guidata.dataset.qtitemwidgets`).

@@ -197,8 +197,19 @@ def get_icon(name: str, default: str = "not_found.png") -> QG.QIcon:
     try:
         return ICON_CACHE[name]
     except KeyError:
-        # Importing Qt here because this module should be independent from it
-        from qtpy import QtGui as QG  # pylint: disable=import-outside-toplevel
+        # Importing Qt objects here because this module should not depend on them
+        # pylint: disable=import-outside-toplevel
+
+        # Try to get standard icon first
+        from guidata.qthelpers import get_std_icon
+
+        try:
+            return get_std_icon(name)
+        except AttributeError:
+            pass
+
+        # Retrieve icon from file (original implementation)
+        from qtpy import QtGui as QG
 
         icon = QG.QIcon(get_image_file_path(name, default))
         ICON_CACHE[name] = icon
