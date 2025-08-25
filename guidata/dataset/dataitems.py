@@ -415,6 +415,7 @@ class StringItem(DataItem):
         check: if False, value is not checked (ineffective for strings)
         allow_none: if True, None is a valid value regardless of other constraints
          (optional, default=False)
+        readonly: if True, the item is read-only (optional, default=False)
     """
 
     type: Any = str
@@ -430,12 +431,15 @@ class StringItem(DataItem):
         help: str = "",
         check: bool = True,
         allow_none: bool = False,
+        readonly: bool = False,
     ) -> None:
         super().__init__(
             label, default=default, help=help, check=check, allow_none=allow_none
         )
         self.set_prop("data", notempty=notempty, regexp=regexp)
-        self.set_prop("display", wordwrap=wordwrap, password=password)
+        self.set_prop(
+            "display", wordwrap=wordwrap, password=password, readonly=readonly
+        )
 
     def get_auto_help(self, instance: DataSet) -> str:
         """Override DataItem method"""
@@ -497,6 +501,7 @@ class TextItem(StringItem):
         help: text shown in tooltip (optional)
         allow_none: if True, None is a valid value regardless of other constraints
          (optional, default=False)
+        readonly: if True, the item is read-only (optional, default=False)
     """
 
     def __init__(
@@ -507,6 +512,7 @@ class TextItem(StringItem):
         wordwrap: bool = True,
         help: str = "",
         allow_none: bool = False,
+        readonly: bool = False,
     ) -> None:
         super().__init__(
             label,
@@ -515,6 +521,7 @@ class TextItem(StringItem):
             wordwrap=wordwrap,
             help=help,
             allow_none=allow_none,
+            readonly=readonly,
         )
 
 

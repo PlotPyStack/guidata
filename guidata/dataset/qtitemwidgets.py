@@ -152,7 +152,9 @@ class AbstractDataSetWidget:
         Returns:
             True if associated dataset is readonly
         """
-        return self.item.instance.is_readonly()
+        return self.item.instance.is_readonly() or self.item.get_prop_value(
+            "display", "readonly", False
+        )
 
     def check(self) -> bool:
         """Item validator

@@ -2,7 +2,19 @@
 
 ## Version 3.13.0 ##
 
-💥 New features:
+✨ New features:
+
+* Added a `readonly` parameter to `StringItem` and `TextItem` in `guidata.dataset.dataitems`:
+  * This allows these items to be set as read-only, preventing user edits in the GUI.
+  * The `readonly` property is now respected in the corresponding widgets (see `guidata.dataset.qtitemwidgets`).
+  * Example usage:
+
+    ```python
+    text = gds.TextItem("Text", default="Multi-line text", readonly=True)
+    string = gds.StringItem("String", readonly=True)
+    ```
+
+  * Note: Any other item type can also be turned into read-only mode by using `set_prop("display", readonly=True)`. This is a generic mechanism, but the main use case is for `StringItem` and `TextItem` (hence the dedicated input parameter for convenience).
 
 * [Issue #94](https://github.com/PlotPyStack/guidata/issues/94) - Make dataset description text selectable
 
