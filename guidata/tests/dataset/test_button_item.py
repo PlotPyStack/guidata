@@ -42,6 +42,7 @@ def information_selectable(parent: QW.QWidget, title: str, text: str) -> None:
     box.setText(text)
     box.setStandardButtons(QW.QMessageBox.Close)
     box.setDefaultButton(QW.QMessageBox.Close)
+    box.setWindowFlags(QC.Qt.Window)  # This is necessary only on non-Windows platforms
     box.setModal(False)
     box.show()
 
