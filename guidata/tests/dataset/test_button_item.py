@@ -22,11 +22,12 @@ from qtpy import QtWidgets as QW
 
 import guidata.dataset as gds
 from guidata.env import execenv
-from guidata.qthelpers import exec_dialog, qt_app_context
+from guidata.qthelpers import qt_app_context
 
 
-def information_selectable(parent: QW.QWidget, title: str, text: str) -> int:
-    """Show an information message box with selectable text."""
+def information_selectable(parent: QW.QWidget, title: str, text: str) -> None:
+    """Show an information message box with selectable text.
+    Dialog box is *not* modal."""
     box = QW.QMessageBox(parent)
     box.setIcon(QW.QMessageBox.Information)
     box.setWindowTitle(title)
@@ -39,8 +40,10 @@ def information_selectable(parent: QW.QWidget, title: str, text: str) -> int:
             QC.Qt.TextSelectableByMouse | QC.Qt.TextSelectableByKeyboard
         )
     box.setText(text)
-    box.setStandardButtons(QW.QMessageBox.Ok)
-    return exec_dialog(box)
+    box.setStandardButtons(QW.QMessageBox.Close)
+    box.setDefaultButton(QW.QMessageBox.Close)
+    box.setModal(False)
+    box.show()
 
 
 class Parameters(gds.DataSet):
