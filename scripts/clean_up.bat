@@ -37,3 +37,6 @@ if exist coverage.xml ( del /q coverage.xml )
 if exist htmlcov ( rmdir /s /q htmlcov )
 del /q .coverage.* 1>nul 2>&1
 if exist sitecustomize.py ( del /q sitecustomize.py )
+
+@REM Removing .bak files
+del /s /q *.bak 1>nul 2>&1

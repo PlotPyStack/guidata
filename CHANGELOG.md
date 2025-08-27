@@ -2,7 +2,25 @@
 
 ## Version 3.13.0 ##
 
-💥 New features:
+✨ New features:
+
+* `guidata.configtools.get_icon`:
+  * This function retrieves a QIcon from the specified image file.
+  * Now supports Qt standard icons (e.g. "MessageBoxInformation" or "DialogApplyButton").
+
+* Added a `readonly` parameter to `StringItem` and `TextItem` in `guidata.dataset.dataitems`:
+  * This allows these items to be set as read-only, preventing user edits in the GUI.
+  * The `readonly` property is now respected in the corresponding widgets (see `guidata.dataset.qtitemwidgets`).
+  * Example usage:
+
+    ```python
+    text = gds.TextItem("Text", default="Multi-line text", readonly=True)
+    string = gds.StringItem("String", readonly=True)
+    ```
+
+  * Note: Any other item type can also be turned into read-only mode by using `set_prop("display", readonly=True)`. This is a generic mechanism, but the main use case is for `StringItem` and `TextItem` (hence the dedicated input parameter for convenience).
+
+* [Issue #94](https://github.com/PlotPyStack/guidata/issues/94) - Make dataset description text selectable
 
 * New validation modes for `DataItem` objects:
   * Validation modes allow you to control how `DataItem` values are validated when they are set.
@@ -27,6 +45,12 @@
   * If `allow_none` is set to `True`, `None` is considered a valid value regardless of other constraints.
   * If `allow_none` is set to `False`, `None` is considered an invalid value.
   * The default value for `allow_none` is `False`, except for `FloatArrayItem`, `ColorItem` and `ChoiceItem` and its subclasses, where it is set to `True` by default.
+
+* Enhanced default value handling for `DataItem` objects:
+  * Default values can now be `None` even when `allow_none=False` is set on the item.
+  * This allows developers to use `None` as a sensible default value while still preventing users from setting `None` at runtime.
+  * This feature provides better flexibility for data item initialization without compromising runtime validation.
+  * The implementation uses a clean internal architecture that separates default value setting from regular value setting, maintaining the standard Python descriptor protocol.
 
 * Improved type handling in `IntItem` and `FloatItem`:
   * `IntItem` and `FloatItem` now automatically convert NumPy numeric types (like `np.int32` or `np.float64`) to native Python types (`int` or `float`) during validation

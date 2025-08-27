@@ -126,6 +126,7 @@ class DataSetEditDialog(QDialog):
         self._layout = QVBoxLayout()
         if instance.get_comment():
             label = QLabel(instance.get_comment())
+            label.setTextInteractionFlags(Qt.TextSelectableByMouse)
             label.setWordWrap(wordwrap)
             self._layout.addWidget(label)
         self.instance = instance
@@ -275,6 +276,7 @@ class DataSetGroupEditDialog(DataSetEditDialog):
             layout.setAlignment(Qt.AlignmentFlag.AlignTop)
             if dataset.get_comment():
                 label = QLabel(dataset.get_comment())
+                label.setTextInteractionFlags(Qt.TextSelectableByMouse)
                 label.setWordWrap(self.wordwrap)
                 layout.addWidget(label)
             grid = QGridLayout()
@@ -772,6 +774,7 @@ class DataSetShowGroupBox(Generic[AnyDataSet], QGroupBox):
         self._layout = QVBoxLayout()
         if self.dataset.get_comment():
             label = QLabel(self.dataset.get_comment())
+            label.setTextInteractionFlags(Qt.TextSelectableByMouse)
             label.setWordWrap(wordwrap)
             self._layout.addWidget(label)
         self.grid_layout = QGridLayout()
@@ -1067,6 +1070,7 @@ class DataSetGroupTableEditDialog(QDialog):
         self._layout = QVBoxLayout()
         if instance.get_comment():
             label = QLabel(instance.get_comment())
+            label.setTextInteractionFlags(Qt.TextSelectableByMouse)
             label.setWordWrap(wordwrap)
             self._layout.addWidget(label)
         self.instance = instance

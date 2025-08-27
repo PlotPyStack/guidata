@@ -278,8 +278,10 @@ class FloatItem(NumericTypeItem):
         self.set_prop("display", slider=slider)
         self.set_prop("data", step=step)
 
-    def __set__(self, instance: Any, value: Any) -> None:
-        """Override DataItem.__set__ to convert integers to float"""
+    def _set_value_with_validation(
+        self, instance: Any, value: Any, force_allow_none: bool = False
+    ) -> None:
+        """Override DataItem._set_value_with_validation to convert integers to float"""
         # Try to convert NumPy numeric types to Python float
         # (will convert silently either floating point or integer types to float)
         try:
@@ -291,7 +293,7 @@ class FloatItem(NumericTypeItem):
         # (no more NumPy types at this point)
         if isinstance(value, int):
             value = float(value)
-        super().__set__(instance, value)
+        super()._set_value_with_validation(instance, value, force_allow_none)
 
     def get_value_from_reader(
         self, reader: HDF5Reader | JSONReader | INIReader
@@ -362,8 +364,11 @@ class IntItem(NumericTypeItem):
                 auto_help += ", " + _("odd")
         return auto_help
 
-    def __set__(self, instance: Any, value: Any) -> None:
-        """Override DataItem.__set__ to convert NumPy numeric types to int"""
+    def _set_value_with_validation(
+        self, instance: Any, value: Any, force_allow_none: bool = False
+    ) -> None:
+        """Override DataItem._set_value_with_validation
+        to convert NumPy numeric types to int"""
         # Try to convert NumPy integer types to Python int
         # (will convert silently only integer types to int)
         try:
@@ -371,7 +376,7 @@ class IntItem(NumericTypeItem):
                 value = self.type(value)
         except (TypeError, ValueError):
             pass
-        super().__set__(instance, value)
+        super()._set_value_with_validation(instance, value, force_allow_none)
 
     def check_value(self, value: int, raise_exception: bool = False) -> bool:
         """Override DataItem method"""
@@ -410,6 +415,7 @@ class StringItem(DataItem):
         check: if False, value is not checked (ineffective for strings)
         allow_none: if True, None is a valid value regardless of other constraints
          (optional, default=False)
+        readonly: if True, the item is read-only (optional, default=False)
     """
 
     type: Any = str
@@ -425,12 +431,15 @@ class StringItem(DataItem):
         help: str = "",
         check: bool = True,
         allow_none: bool = False,
+        readonly: bool = False,
     ) -> None:
         super().__init__(
             label, default=default, help=help, check=check, allow_none=allow_none
         )
         self.set_prop("data", notempty=notempty, regexp=regexp)
-        self.set_prop("display", wordwrap=wordwrap, password=password)
+        self.set_prop(
+            "display", wordwrap=wordwrap, password=password, readonly=readonly
+        )
 
     def get_auto_help(self, instance: DataSet) -> str:
         """Override DataItem method"""
@@ -492,6 +501,7 @@ class TextItem(StringItem):
         help: text shown in tooltip (optional)
         allow_none: if True, None is a valid value regardless of other constraints
          (optional, default=False)
+        readonly: if True, the item is read-only (optional, default=False)
     """
 
     def __init__(
@@ -502,6 +512,7 @@ class TextItem(StringItem):
         wordwrap: bool = True,
         help: str = "",
         allow_none: bool = False,
+        readonly: bool = False,
     ) -> None:
         super().__init__(
             label,
@@ -510,6 +521,7 @@ class TextItem(StringItem):
             wordwrap=wordwrap,
             help=help,
             allow_none=allow_none,
+            readonly=readonly,
         )
 
 
@@ -1015,11 +1027,13 @@ class ChoiceItem(DataItem, Generic[_T]):
         # guidata internals should call this; keep it returning the raw key
         return super().__get__(instance, instance.__class__)  # string (or None)
 
-    def __set__(self, instance: DataSet, value: Any) -> None:
-        """Override DataItem.__set__ to accept Enum members"""
+    def _set_value_with_validation(
+        self, instance: Any, value: Any, force_allow_none: bool = False
+    ) -> None:
+        """Override DataItem._set_value_with_validation to accept Enum members"""
         if self._enum_cls is not None and value is not None:
             value = self._enum_coerce_in(value)  # → member.name
-        super().__set__(instance, value)
+        super()._set_value_with_validation(instance, value, force_allow_none)
 
     def _normalize_choice(
         self, idx: int, choice_tuple: tuple[Any, ...]
