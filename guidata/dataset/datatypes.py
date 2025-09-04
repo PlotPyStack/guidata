@@ -83,7 +83,6 @@ if TYPE_CHECKING:
     from qtpy.QtCore import QSize
     from qtpy.QtWidgets import QDialog, QWidget
 
-    from guidata.dataset.qtwidgets import DataSetEditDialog
     from guidata.io import HDF5Reader, HDF5Writer, JSONReader, JSONWriter
 
 
@@ -1375,7 +1374,7 @@ class DataSet(metaclass=DataSetMeta):
         apply: Callable | None = None,
         wordwrap: bool = True,
         size: QSize | tuple[int, int] | None = None,
-    ) -> DataSetEditDialog:
+    ) -> int:
         """Open a dialog box to edit data set
 
         Args:
@@ -1383,6 +1382,9 @@ class DataSet(metaclass=DataSetMeta):
             apply: apply callback (default is None)
             wordwrap: if True, comment text is wordwrapped
             size: dialog size (QSize object or integer tuple (width, height))
+
+        Returns:
+            Dialog exit code.
         """
         # Importing those modules here avoids Qt dependency when
         # guidata is used without Qt
