@@ -137,7 +137,7 @@ class CompletionWidget(QListWidget):
 
         # Computing completion widget and its parent right positions
         comp_right = point.x() + self.width()
-        ancestor = self.parent()
+        ancestor = self.parentWidget()
         if ancestor is None:
             anc_right = screen_right
         else:
@@ -150,7 +150,7 @@ class CompletionWidget(QListWidget):
 
         # Computing completion widget and its parent bottom positions
         comp_bottom = point.y() + self.height()
-        ancestor = self.parent()
+        ancestor = self.parentWidget()
         if ancestor is None:
             anc_bottom = screen_bottom
         else:

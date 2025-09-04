@@ -262,7 +262,7 @@ class InternalShell(PythonShellWidget):
         if external_editor:
             self.external_editor(filename)
         else:
-            self.parent().edit_script(filename)
+            self.parentWidget().edit_script(filename)
 
     def stdout_avail(self):
         """Data is available in stdout, let's empty the queue and write it!"""
