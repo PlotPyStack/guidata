@@ -161,42 +161,9 @@ def __extract_exact_requirements(dependencies: list[str]) -> list[str]:
     return list(dependencies)
 
 
-def __extract_min_requirements(dependencies: list[str]) -> list[str]:
-    """Convert 'pkg>=x.y.z' into 'pkg==x.y.z', ignoring complex constraints.
-
-    Args:
-        dependencies: List of dependency strings from pyproject.toml.
-
-    Returns:
-        List of minimal requirements with version pinned to the minimum specified.
-        Complex constraints (e.g., with <, >, ~, !, *, ;) are skipped with a warning.
-    """
-    result = []
-    for dep in dependencies:
-        if any(op in dep for op in ("<", ">", "~", "!", "*", ";", "==")):
-            parts = dep.split(">=")
-            if len(parts) == 2 and not any(
-                op in parts[1] for op in ("<", "~", "!", "*", ";")
-            ):
-                result.append(f"{parts[0].strip()}=={parts[1].strip()}")
-            else:
-                parts = dep.split(">")
-                if len(parts) == 2:
-                    print(
-                        f"ℹ️  Removing version constraint for strict requirement: {dep}"
-                    )
-                    result.append(parts[0].strip())
-                else:
-                    print(f"⚠️  Skipping complex requirement: {dep}")
-        else:
-            result.append(dep)  # No version specified
-    return result
-
-
 def generate_requirements_txt(
     pyproject_fname: str,
     output_fname: str,
-    minimal: bool = False,
     include_optional: bool = False,
 ) -> None:
     """Process the pyproject.toml file and write requirements to output file.
@@ -204,7 +171,6 @@ def generate_requirements_txt(
     Args:
         pyproject_path: Path to the pyproject.toml file.
         output_path: Path to the output requirements file.
-        minimal: If True, generate minimal requirements (pkg==x.y.z).
         include_optional: If True, include optional dependencies.
     """
     pyproject_path = pathlib.Path(pyproject_fname)
@@ -218,13 +184,12 @@ def generate_requirements_txt(
     project = data.get("project", {})
     deps = project.get("dependencies", [])
 
-    extract_fn = __extract_min_requirements if minimal else __extract_exact_requirements
-    all_deps = extract_fn(deps)
+    all_deps = __extract_exact_requirements(deps)
 
     if include_optional:
         opt_deps = project.get("optional-dependencies", {})
         for extra, deps in opt_deps.items():
-            all_deps += extract_fn(deps)
+            all_deps += __extract_exact_requirements(deps)
 
     # Remove duplicates and sort
     all_deps = sorted(set(all_deps))
@@ -241,14 +206,12 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description="Convert pyproject.toml to documentation or requirements files",
         epilog="Use 'rst' to generate requirements.rst, "
-        "'txt' for requirements.txt or requirements-min.txt, "
+        "'txt' for requirements.txt, "
         "'all' for both formats.",
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    txt_parser = subparsers.add_parser(
-        "txt", help="Generate requirements.txt or requirements-min.txt"
-    )
+    txt_parser = subparsers.add_parser("txt", help="Generate requirements.txt")
     txt_parser.add_argument(
         "--pyproject",
         default="pyproject.toml",
@@ -257,12 +220,7 @@ def main() -> None:
     txt_parser.add_argument(
         "--output",
         default=None,
-        help="Output filename (default: requirements.txt or requirements-min.txt)",
-    )
-    txt_parser.add_argument(
-        "--min",
-        action="store_true",
-        help="Generate requirements-min.txt with minimal versions (pkg==x.y.z)",
+        help="Output filename (default: requirements.txt)",
     )
     txt_parser.add_argument(
         "--include-optional",
@@ -290,11 +248,10 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.command == "txt":
-        default_output = "requirements-min.txt" if args.min else "requirements.txt"
+        default_output = "requirements.txt"
         generate_requirements_txt(
             pyproject_fname=osp.abspath(args.pyproject),
             output_fname=osp.abspath(args.output or default_output),
-            minimal=args.min,
             include_optional=args.include_optional,
         )
     elif args.command == "rst":
@@ -307,13 +264,6 @@ def main() -> None:
         generate_requirements_txt(
             pyproject_fname=osp.abspath("pyproject.toml"),
             output_fname=osp.abspath("requirements.txt"),
-            minimal=False,
-            include_optional=True,
-        )
-        generate_requirements_txt(
-            pyproject_fname=osp.abspath("pyproject.toml"),
-            output_fname=osp.abspath("requirements-min.txt"),
-            minimal=True,
             include_optional=True,
         )
         generate_requirements_rst(

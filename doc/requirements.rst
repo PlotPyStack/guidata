@@ -63,6 +63,9 @@ Optional modules for development:
     * - ruff
       - 
       - An extremely fast Python linter and code formatter, written in Rust.
+    * - pre-commit
+      - 
+      - A framework for managing and maintaining multi-language pre-commit hooks.
 
 Optional modules for building the documentation:
 

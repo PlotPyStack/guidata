@@ -8,6 +8,12 @@
   * This function retrieves a QIcon from the specified image file.
   * Now supports Qt standard icons (e.g. "MessageBoxInformation" or "DialogApplyButton").
 
+* Removed `requirements-min.txt` generation feature from `guidata.utils.genreqs`:
+  * The minimal requirements feature was causing platform compatibility issues when specific minimum versions weren't available on all platforms (e.g., `SciPy==1.7.3` works on Windows but fails on Linux)
+  * Removed `__extract_min_requirements()` function and `--min` CLI flag
+  * The `genreqs` tool now only generates `requirements.txt` and `requirements.rst` files
+  * Updated documentation and MANIFEST.in files to remove references to `requirements-min.txt`
+
 * Added a `readonly` parameter to `StringItem` and `TextItem` in `guidata.dataset.dataitems`:
   * This allows these items to be set as read-only, preventing user edits in the GUI.
   * The `readonly` property is now respected in the corresponding widgets (see `guidata.dataset.qtitemwidgets`).
