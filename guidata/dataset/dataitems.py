@@ -95,7 +95,7 @@ from __future__ import annotations
 import datetime
 import os
 import re
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from enum import Enum, EnumMeta
 from typing import TYPE_CHECKING, Any, Generic, Iterable, TypeVar
 
@@ -957,8 +957,10 @@ class ChoiceItem(DataItem, Generic[_T]):
             _choices_data = []
             for idx, choice in enumerate(choices):
                 _choices_data.append(self._normalize_choice(idx, choice))
-        if default is FirstChoice and (
-            not isinstance(choices, Callable) or issubclass(choices, Enum)
+        if (
+            default is FirstChoice
+            and isinstance(_choices_data, Sequence)
+            and isinstance(_choices_data[0], Sequence)
         ):
             default = _choices_data[0][0]
         elif default is FirstChoice:
