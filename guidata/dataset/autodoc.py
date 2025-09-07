@@ -95,9 +95,11 @@ def document_choice_item(item: gds.ChoiceItem) -> str:
     Returns:
         Additional choice documentation.
     """
-    available_choices = item.get_prop("data", "choices")
-    str_choices = ", ".join(object_description(key) for key, *_ in available_choices)
-    doc = f"Single choice from: {str_choices}."
+    doc = ""
+    choices = item.get_prop("data", "choices")
+    if not isinstance(choices, gds.ItemProperty):
+        str_choices = ", ".join(object_description(key) for key, *_ in choices)
+        doc = f"Single choice from: {str_choices}."
     return doc
 
 
@@ -110,10 +112,12 @@ def document_multiple_choice_item(item: gds.MultipleChoiceItem) -> str:
     Returns:
         Additional choice documentation.
     """
-    available_choices = item.get_prop("data", "choices")
-    str_choices = ", ".join(object_description(key) for key, *_ in available_choices)
-    doc = f"Multiple choice from: {str_choices}."
-    return doc
+    doc = ""
+    choices = item.get_prop("data", "choices")
+    if not isinstance(choices, gds.ItemProperty):
+        str_choices = ", ".join(object_description(key) for key, *_ in choices)
+        doc = f"Multiple choice from: {str_choices}."
+        return doc
 
 
 def get_auto_help(item: gds.DataItem, dataset: gds.DataSet) -> str:
@@ -201,14 +205,16 @@ class ItemDoc:
         if not type_:
             type_ = Any
         if isinstance(item, gds.ChoiceItem):
-            types = set(type(key) for key, *_ in item.get_prop("data", "choices"))
-            if types:
-                if len(types) == 1:
-                    type_ = types.pop()
+            choices = item.get_prop("data", "choices")
+            if not isinstance(choices, gds.ItemProperty):
+                types = set(type(key) for key, *_ in item.get_prop("data", "choices"))
+                if types:
+                    if len(types) == 1:
+                        type_ = types.pop()
+                    else:
+                        type_ = f"Union[{', '.join(t.__name__ for t in types)}]"
                 else:
-                    type_ = f"Union[{', '.join(t.__name__ for t in types)}]"
-            else:
-                type_ = Any
+                    type_ = Any
 
         self.type_ = stringify_annotation(type_)
 
