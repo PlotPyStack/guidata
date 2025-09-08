@@ -21,7 +21,7 @@ import re
 import requests
 
 try:
-    import tomllib  # Python 3.11+
+    import tomllib  # type: ignore # Python 3.11+
 except ImportError:
     import tomli as tomllib  # fallback pour Python <3.11
 

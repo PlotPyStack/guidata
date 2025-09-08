@@ -28,6 +28,14 @@
 
 * [Issue #94](https://github.com/PlotPyStack/guidata/issues/94) - Make dataset description text selectable
 
+* New `guidata.utils.cleanup` utility:
+  * Added a comprehensive repository cleanup utility similar to `genreqs` and `securebuild`
+  * Provides both programmatic API (`from guidata.utils.cleanup import run_cleanup`) and command-line interface (`python -m guidata.utils.cleanup`)
+  * Automatically detects repository type and cleans Python cache files, build artifacts, temporary files, coverage data, backup files, and empty directories
+  * Features comprehensive Google-style docstrings and full typing annotations
+  * Cross-platform compatible with proper logging and error handling
+  * Can be integrated into project workflows via VSCode tasks or build scripts
+
 * New validation modes for `DataItem` objects:
   * Validation modes allow you to control how `DataItem` values are validated when they are set.
   * `ValidationMode.DISABLED`: no validation is performed (default behavior, for backward compatibility)

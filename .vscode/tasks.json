@@ -291,13 +291,13 @@
         {
             "label": "🧹 Clean Up",
             "type": "shell",
-            "command": "cmd",
+            "command": "${command:python.interpreterPath}",
             "args": [
-                "/c",
-                "clean_up.bat",
+                "-m",
+                "guidata.utils.cleanup"
             ],
             "options": {
-                "cwd": "scripts",
+                "cwd": "${workspaceFolder}",
             },
             "group": {
                 "kind": "build",

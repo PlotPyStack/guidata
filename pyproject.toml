@@ -48,6 +48,7 @@ guidata-tests = "guidata.tests:run"
 gtrans = "guidata.utils.translations:main"
 greqs = "guidata.utils.genreqs:main"
 gbuild = "guidata.utils.securebuild:main"
+gclean = "guidata.utils.cleanup:main"
 
 [project.optional-dependencies]
 qt = ["PyQt5 > 5.15.5"]
