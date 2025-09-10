@@ -72,6 +72,7 @@ class ExampleMultiGroupDataSet(gds.DataSet):
 class OtherDataSet(gds.DataSet):
     """Another example dataset"""
 
+    group1 = gds.BeginGroup("Group 1")
     title = gds.StringItem("Title", default="Title")
     icon = gds.ChoiceItem(
         "Icon",
@@ -83,9 +84,12 @@ class OtherDataSet(gds.DataSet):
     )
     opacity = gds.FloatItem("Opacity", default=1.0, min=0.1, max=1)
     transform = gds.FloatArrayItem("Transform", default=np.array([1, 2, 3, 4, 5, 6]))
+    _group1 = gds.EndGroup("Group 1")
+    group2 = gds.BeginGroup("Group 2")
     computed = gds.StringItem("Computed").set_computed(
         lambda ds: f"T: {ds.title}, I: {ds.icon}, O: {ds.opacity}"
     )
+    _group2 = gds.EndGroup("Group 2")
 
 
 class MainWindow(QMainWindow):

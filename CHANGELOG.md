@@ -110,6 +110,13 @@
   * The `StringItem` class now uses the new validation modes (see above).
   * As a side effect, the `StringItem` class now considers `None` as an invalid default value, and highlights it in the UI.
 
+🛠️ Bug fixes:
+
+* Callbacks for `DataItem` objects:
+  * Before this fix, callbacks were inoperative when the item to be updated was in a different group than the item that triggered the callback.
+  * Now, callbacks work across different groups in the dataset, allowing for more flexible inter-item dependencies.
+
+
 ## Version 3.12.1 ##
 
 🛠️ Bug fixes:

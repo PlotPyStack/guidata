@@ -230,6 +230,20 @@ class AbstractDataSetWidget:
         if not self.build_mode:
             self.parent_layout.widget_value_changed()
 
+    def get_highest_layout(self) -> DataSetEditLayout:
+        """Get the highest-level layout (in case of nested groups)
+
+        Returns:
+            Highest-level DataSetEditLayout instance
+        """
+        higher_level_layout = self.parent_layout
+
+        if self.parent_layout.group_widget is not None:
+            # If we are in a group, we need to iterate over widgets of this group but
+            # also over widgets of the other groups
+            higher_level_layout = self.parent_layout.group_widget.parent_layout
+        return higher_level_layout
+
     def update_computed_items(self) -> bool:
         """Update widgets for computed items when any value changes.
 
@@ -237,8 +251,12 @@ class AbstractDataSetWidget:
             True if any computed items were updated
         """
         updated = False
-        # Check if any widgets in the layout are for computed items
-        for widget in self.parent_layout.widgets:
+        higher_level_layout = self.get_highest_layout()
+        widgets = higher_level_layout.widgets
+        for widget in higher_level_layout.widgets:
+            if isinstance(widget, GroupWidget):
+                widgets += widget.edit.widgets
+        for widget in widgets:
             if widget is not self:  # Don't update the widget that just changed
                 computed_prop = widget.item.get_prop("data", "computed", None)
                 if isinstance(computed_prop, ComputedProp):
@@ -273,6 +291,7 @@ class GroupWidget(AbstractDataSetWidget):
             self.layout,
             item.item.group,
             change_callback=self.notify_value_change,
+            group_widget=self,
         )
         self.group.setLayout(self.layout)
 
@@ -406,14 +425,15 @@ class TabGroupWidget(AbstractDataSetWidget):
 def _display_callback(widget: AbstractDataSetWidget, value):
     """Handling of display callback"""
     cb = widget.item.get_prop_value("display", "callback", None)
+    higher_level_layout = widget.get_highest_layout()
     if widget.update_computed_items() or cb is not None:
         if widget.build_mode:
             widget.set()
         else:
-            widget.parent_layout.update_dataitems()
+            higher_level_layout.update_dataitems()
         if cb is not None:
             cb(widget.item.instance, widget.item.item, value)
-        widget.parent_layout.update_widgets(except_this_one=widget)
+        higher_level_layout.update_widgets(except_this_one=widget)
 
 
 class LineEditWidget(AbstractDataSetWidget):

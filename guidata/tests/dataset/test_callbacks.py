@@ -35,9 +35,13 @@ class Parameters(gds.DataSet):
     string = gds.StringItem("String", default="foobar").set_prop(
         "display", callback=cb_example
     )
+    grp1 = gds.BeginGroup("Group 1")
     x1 = gds.FloatItem("x1").set_prop("display", callback=update_x1plusx2)
     x2 = gds.FloatItem("x2").set_prop("display", callback=update_x1plusx2)
+    _grp1 = gds.EndGroup("Group 1")
+    grp2 = gds.BeginGroup("Group 2")
     x1plusx2 = gds.FloatItem("x1+x2").set_prop("display", active=False)
+    _grp2 = gds.EndGroup("Group 2")
     boolean = gds.BoolItem("Boolean", default=True).set_prop(
         "display", callback=cb_example
     )
