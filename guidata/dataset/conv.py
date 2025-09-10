@@ -56,11 +56,16 @@ def update_dataset(
     If the attribute exists in the source object or the key exists in the dictionary,
     it will be set as the corresponding attribute in the destination dataset.
 
+    Computed items are automatically skipped as they are read-only and their values
+    are calculated automatically based on other dataset items.
+
     Returns:
         None
     """
     for item in dest._items:
         key = item._name
+        if isinstance(item.get_prop("data", "computed", None), gdt.ComputedProp):
+            continue  # Skip computed items
         if hasattr(source, key):
             try:
                 hide = item.get_prop_value("display", source, "hide", False)
@@ -86,6 +91,10 @@ def restore_dataset(source: gdt.DataSet, dest: Any | dict[str, Any]) -> None:
 
     Symmetrically from `update_dataset`, `dest` may also be a dictionary.
 
+    Computed items are automatically skipped when restoring to another dataset object
+    (since computed values should be recalculated), but are included when restoring
+    to a dictionary (since dictionaries store all current values).
+
     Returns:
         None
     """
@@ -93,6 +102,8 @@ def restore_dataset(source: gdt.DataSet, dest: Any | dict[str, Any]) -> None:
         key = item._name
         value = getattr(source, key)
         if hasattr(dest, key):
+            if isinstance(item.get_prop("data", "computed", None), gdt.ComputedProp):
+                continue  # Skip computed items if destination is not a dictionary
             try:
                 setattr(dest, key, value)
             except AttributeError:
