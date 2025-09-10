@@ -83,6 +83,9 @@ class OtherDataSet(gds.DataSet):
     )
     opacity = gds.FloatItem("Opacity", default=1.0, min=0.1, max=1)
     transform = gds.FloatArrayItem("Transform", default=np.array([1, 2, 3, 4, 5, 6]))
+    computed = gds.StringItem("Computed").set_computed(
+        lambda ds: f"T: {ds.title}, I: {ds.icon}, O: {ds.opacity}"
+    )
 
 
 class MainWindow(QMainWindow):
