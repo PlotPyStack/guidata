@@ -29,7 +29,9 @@
             ],
             "justMyCode": false,
             "args": [],
-            "env": {}
+            "env": {
+                // "QT_COLOR_MODE": "dark",
+            }
         },
         {
             "name": "Run current file (unattended)",

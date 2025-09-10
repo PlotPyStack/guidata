@@ -323,6 +323,56 @@ class FuncPropMulti(ItemProperty):
             prop.set(instance, item, self.inverse_function(value))
 
 
+class ComputedProp(ItemProperty):
+    """A computed property that calls a method of the dataset to calculate values
+
+    Args:
+        method_name (str): name of the method to call on the dataset instance
+    """
+
+    def __init__(self, method_name: str) -> None:
+        self.method_name = method_name
+
+    # pylint: disable=unused-argument
+    def __call__(self, instance: DataSet, item: DataItem, value: Any) -> Any:
+        """Compute the value by calling the specified method on the dataset instance
+
+        Args:
+            instance (DataSet): dataset instance
+            item (DataItem): the data item
+            value (Any): current value (ignored for computed items)
+
+        Returns:
+            Any: computed value
+        """
+        method = getattr(instance, self.method_name, None)
+        if method is None:
+            raise AttributeError(
+                f"Dataset {instance.__class__.__name__} has no method "
+                f"'{self.method_name}'"
+            )
+        if not callable(method):
+            raise TypeError(
+                f"Attribute '{self.method_name}' of {instance.__class__.__name__} "
+                "is not callable"
+            )
+        return method()
+
+    # pylint: disable=unused-argument
+    def set(self, instance: DataSet, item: DataItem, value: Any) -> None:
+        """Computed properties cannot be set directly - they are read-only
+
+        Args:
+            instance (DataSet): instance of the DataSet
+            item (DataItem): item to set the value of
+            value (Any): value to set
+
+        Raises:
+            ValueError: Always, since computed items are read-only
+        """
+        raise ValueError(f"Computed item '{item.get_name()}' is read-only")
+
+
 class DataItem(ABC):
     """DataSet data item
 
@@ -426,6 +476,22 @@ class DataItem(ABC):
             row (int): row number (default: None)
         """
         self.set_prop("display", col=col, colspan=colspan, row=row)
+        return self
+
+    def set_computed(self, method_name: str) -> DataItem:
+        """Set data item as computed using the specified method
+
+        Args:
+            method_name (str): name of the method to call on the dataset instance
+                             to compute the value
+
+        Returns:
+            DataItem: self
+        """
+        computed_prop = ComputedProp(method_name)
+        self.set_prop("data", computed=computed_prop)
+        # Also make it readonly in the display
+        self.set_prop("display", readonly=True)
         return self
 
     def __str__(self) -> str:
@@ -585,6 +651,11 @@ class DataItem(ABC):
             instance (Any): instance of the DataSet
             value (Any): value to set
         """
+        # Check if this item is computed (read-only)
+        computed_prop = self.get_prop("data", "computed", None)
+        if isinstance(computed_prop, ComputedProp):
+            raise ValueError(f"Computed item '{self.get_name()}' is read-only")
+
         self._set_value_with_validation(instance, value, force_allow_none=False)
 
     def _set_value_with_validation(
@@ -624,7 +695,14 @@ class DataItem(ABC):
 
     def __get__(self, instance: Any, klass: type) -> Any | None:
         if instance is not None:
-            return getattr(instance, "_%s" % (self._name), self._default)
+            # Check if this item is computed
+            computed_prop = self.get_prop("data", "computed", None)
+            if isinstance(computed_prop, ComputedProp):
+                # For computed items, calculate the value using the computed property
+                return computed_prop(instance, self, None)
+            else:
+                # For regular items, return the stored value or default
+                return getattr(instance, "_%s" % (self._name), self._default)
         else:
             return self
 

@@ -38,6 +38,7 @@ from .datatypes import (
     assert_datasets_equal,
     BeginGroup,
     BeginTabGroup,
+    ComputedProp,
     DataItemValidationWarning,
     DataItemValidationError,
     DataItem,

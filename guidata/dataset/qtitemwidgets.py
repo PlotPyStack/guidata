@@ -54,8 +54,8 @@ from qtpy.QtWidgets import (
 from guidata.config import _
 from guidata.configtools import get_icon, get_image_file_path, get_image_layout
 from guidata.dataset.conv import restore_dataset, update_dataset
-from guidata.dataset.datatypes import DataItemVariable
-from guidata.qthelpers import get_std_icon
+from guidata.dataset.datatypes import ComputedProp, DataItemVariable
+from guidata.qthelpers import get_std_icon, is_dark_theme
 from guidata.utils.misc import convert_date_format
 from guidata.widgets.arrayeditor import ArrayEditor
 
@@ -67,6 +67,35 @@ from guidata.widgets.arrayeditor import ArrayEditor
 # ========================== <!> IMPORTANT <!> =================================
 
 # XXX: consider providing an interface here...
+
+
+def _get_readonly_stylesheet() -> str:
+    """Get CSS stylesheet for read-only text widgets.
+
+    Returns CSS that automatically applies styling based on readOnly property.
+
+    Returns:
+        CSS stylesheet string
+    """
+    if is_dark_theme():
+        # Dark theme colors
+        bg_color = "#505050"  # Darker gray background
+        text_color = "#cccccc"  # Light gray text
+    else:
+        # Light theme colors
+        bg_color = "#f8f8f8"  # Light gray background
+        text_color = "#333333"  # Darker gray text
+    return f"""
+        QLineEdit[readOnly="true"] {{
+            background-color: {bg_color};
+            color: {text_color};
+        }}
+        QTextEdit[readOnly="true"] {{
+            background-color: {bg_color};
+            color: {text_color};
+        }}
+    """
+
 
 if TYPE_CHECKING:
     from guidata.dataset.qtwidgets import DataSetEditLayout
@@ -166,6 +195,11 @@ class AbstractDataSetWidget:
 
     def set(self) -> None:
         """Update data item value from widget contents"""
+        # Skip setting computed items as they are read-only
+        computed_prop = self.item.get_prop("data", "computed", None)
+        if isinstance(computed_prop, ComputedProp):
+            return  # Don't try to set computed items
+
         # XXX: consider using item.set instead of item.set_from_string...
         self.item.set_from_string(self.value())
 
@@ -195,6 +229,23 @@ class AbstractDataSetWidget:
         """Notify parent layout that widget value has changed"""
         if not self.build_mode:
             self.parent_layout.widget_value_changed()
+
+    def update_computed_items(self) -> bool:
+        """Update widgets for computed items when any value changes.
+
+        Returns:
+            True if any computed items were updated
+        """
+        updated = False
+        # Check if any widgets in the layout are for computed items
+        for widget in self.parent_layout.widgets:
+            if widget is not self:  # Don't update the widget that just changed
+                computed_prop = widget.item.get_prop("data", "computed", None)
+                if isinstance(computed_prop, ComputedProp):
+                    # Just trigger the widget to refresh its display
+                    widget.set_state()
+                    updated = True
+        return updated
 
 
 class GroupWidget(AbstractDataSetWidget):
@@ -355,12 +406,13 @@ class TabGroupWidget(AbstractDataSetWidget):
 def _display_callback(widget: AbstractDataSetWidget, value):
     """Handling of display callback"""
     cb = widget.item.get_prop_value("display", "callback", None)
-    if cb is not None:
+    if widget.update_computed_items() or cb is not None:
         if widget.build_mode:
             widget.set()
         else:
             widget.parent_layout.update_dataitems()
-        cb(widget.item.instance, widget.item.item, value)
+        if cb is not None:
+            cb(widget.item.instance, widget.item.item, value)
         widget.parent_layout.update_widgets(except_this_one=widget)
 
 
@@ -378,6 +430,7 @@ class LineEditWidget(AbstractDataSetWidget):
         password = self.item.get_prop_value("display", "password", False)
         if password:
             self.edit.setEchoMode(QLineEdit.Password)
+        self.edit.setStyleSheet(_get_readonly_stylesheet())
         self.edit.textChanged.connect(self.line_edit_changed)  # type:ignore
 
     def get(self) -> None:
@@ -399,7 +452,7 @@ class LineEditWidget(AbstractDataSetWidget):
         if not self.item.check_value(value):
             self.edit.setStyleSheet("background-color:rgb(255, 175, 90);")
         else:
-            self.edit.setStyleSheet("")
+            self.edit.setStyleSheet(_get_readonly_stylesheet())
             _display_callback(self, value)
         self.update(value)
         self.notify_value_change()
@@ -444,6 +497,7 @@ class TextEditWidget(AbstractDataSetWidget):
         super().__init__(item, parent_layout)
         self.edit = self.group = QTextEdit()
         self.edit.setToolTip(item.get_help())
+        self.edit.setStyleSheet(_get_readonly_stylesheet())
         self.edit.textChanged.connect(self.text_changed)  # type:ignore
 
     def __get_text(self) -> str:
@@ -463,7 +517,7 @@ class TextEditWidget(AbstractDataSetWidget):
         if not self.item.check_value(value):
             self.edit.setStyleSheet("background-color:rgb(255, 175, 90);")
         else:
-            self.edit.setStyleSheet("")
+            self.edit.setStyleSheet(_get_readonly_stylesheet())
         self.update(value)
         _display_callback(self, value)
         self.notify_value_change()

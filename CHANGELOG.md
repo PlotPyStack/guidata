@@ -4,6 +4,32 @@
 
 ✨ New features:
 
+* **Computed Items**: Added support for computed/calculated data items in datasets:
+  * New `ComputedProp` class allows defining items whose values are automatically calculated from other items
+  * Items can be marked as computed using the `set_computed(method_name)` method
+  * Computed items are automatically read-only and update in real-time when their dependencies change
+  * Example usage:
+
+    ```python
+    class DataSet(gdt.DataSet):
+        x = gdt.FloatItem("X", default=1.0)
+        y = gdt.FloatItem("Y", default=2.0)
+        sum_xy = gdt.FloatItem("Sum", default=0.0).set_computed("compute_sum")
+
+        def compute_sum(self):
+            return self.x + self.y
+    ```
+
+  * Computed items automatically display with visual distinction (neutral background color) in GUI forms
+  * Supports complex calculations and can access any other items in the dataset
+
+* **Improved Visual Distinction for Read-only Fields**: Enhanced user interface to clearly identify non-editable fields:
+  * Read-only text fields now display with a subtle gray background and darker text color
+  * Visual styling automatically adapts to your theme (light or dark mode)
+  * Applies to computed fields, locked parameters, and any field marked as read-only
+  * Makes it immediately clear which fields you can edit and which are display-only
+  * Validation errors are still highlighted with orange background when they occur
+
 * `guidata.configtools.get_icon`:
   * This function retrieves a QIcon from the specified image file.
   * Now supports Qt standard icons (e.g. "MessageBoxInformation" or "DialogApplyButton").
