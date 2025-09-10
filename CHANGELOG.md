@@ -12,12 +12,13 @@
 
     ```python
     class DataSet(gdt.DataSet):
+
+        def compute_sum(self) -> float:
+            return self.x + self.y
+
         x = gdt.FloatItem("X", default=1.0)
         y = gdt.FloatItem("Y", default=2.0)
-        sum_xy = gdt.FloatItem("Sum", default=0.0).set_computed("compute_sum")
-
-        def compute_sum(self):
-            return self.x + self.y
+        sum_xy = gdt.FloatItem("Sum", default=0.0).set_computed(compute_sum)
     ```
 
   * Computed items automatically display with visual distinction (neutral background color) in GUI forms

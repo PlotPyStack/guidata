@@ -21,21 +21,6 @@ from guidata.qthelpers import qt_app_context
 class Parameters(gds.DataSet):
     """Example dataset with computed items"""
 
-    string = gds.StringItem("String", default="foobar")
-    x1 = gds.FloatItem("x1", default=2.0)
-    x2 = gds.FloatItem("x2", default=3.0)
-    # This item will be computed by calling the compute_sum method
-    x1plusx2 = gds.FloatItem("x1+x2 (computed)").set_computed("compute_sum")
-    boolean = gds.BoolItem("Boolean", default=True)
-    color = gds.ColorItem("Color", default="red")
-    choice = gds.ChoiceItem(
-        "Single choice",
-        (("First", "first"), ("Second", "second"), ("Third", "third")),
-        default="first",
-    ).set_pos(col=1, colspan=2)
-    # This item will be computed by calling the compute_results method
-    results = gds.TextItem("Results (computed)").set_computed("compute_results")
-
     def compute_sum(self) -> float:
         """Compute the sum of x1 and x2"""
         return self.x1 + self.x2
@@ -50,6 +35,21 @@ class Parameters(gds.DataSet):
     Boolean: {self.boolean}
     Color: {self.color}
     Choice: {self.choice}"""
+
+    string = gds.StringItem("String", default="foobar")
+    x1 = gds.FloatItem("x1", default=2.0)
+    x2 = gds.FloatItem("x2", default=3.0)
+    # This item will be computed by calling the compute_sum method
+    x1plusx2 = gds.FloatItem("x1+x2 (computed)").set_computed(compute_sum)
+    boolean = gds.BoolItem("Boolean", default=True)
+    color = gds.ColorItem("Color", default="red")
+    choice = gds.ChoiceItem(
+        "Single choice",
+        (("First", "first"), ("Second", "second"), ("Third", "third")),
+        default="first",
+    ).set_pos(col=1, colspan=2)
+    # This item will be computed by calling the compute_results method
+    results = gds.TextItem("Results (computed)").set_computed(compute_results)
 
 
 def test_computed_items():

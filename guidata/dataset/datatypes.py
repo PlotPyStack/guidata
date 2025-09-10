@@ -327,11 +327,17 @@ class ComputedProp(ItemProperty):
     """A computed property that calls a method of the dataset to calculate values
 
     Args:
-        method_name (str): name of the method to call on the dataset instance
+        method_or_name: name of the method to call on the dataset instance,
+         or the function object itself
     """
 
-    def __init__(self, method_name: str) -> None:
-        self.method_name = method_name
+    def __init__(self, method_or_name: str | callable) -> None:
+        if callable(method_or_name):
+            self.method = method_or_name
+            self.method_name = getattr(method_or_name, "__name__", str(method_or_name))
+        else:
+            self.method = None
+            self.method_name = method_or_name
 
     # pylint: disable=unused-argument
     def __call__(self, instance: DataSet, item: DataItem, value: Any) -> Any:
@@ -345,18 +351,23 @@ class ComputedProp(ItemProperty):
         Returns:
             Any: computed value
         """
-        method = getattr(instance, self.method_name, None)
-        if method is None:
-            raise AttributeError(
-                f"Dataset {instance.__class__.__name__} has no method "
-                f"'{self.method_name}'"
-            )
-        if not callable(method):
-            raise TypeError(
-                f"Attribute '{self.method_name}' of {instance.__class__.__name__} "
-                "is not callable"
-            )
-        return method()
+        if self.method is not None:
+            # Function object was provided directly
+            return self.method(instance)
+        else:
+            # Method name was provided, get it from the instance
+            method = getattr(instance, self.method_name, None)
+            if method is None:
+                raise AttributeError(
+                    f"Dataset {instance.__class__.__name__} has no method "
+                    f"'{self.method_name}'"
+                )
+            if not callable(method):
+                raise TypeError(
+                    f"Attribute '{self.method_name}' of {instance.__class__.__name__} "
+                    "is not callable"
+                )
+            return method()
 
     # pylint: disable=unused-argument
     def set(self, instance: DataSet, item: DataItem, value: Any) -> None:
@@ -478,17 +489,17 @@ class DataItem(ABC):
         self.set_prop("display", col=col, colspan=colspan, row=row)
         return self
 
-    def set_computed(self, method_name: str) -> DataItem:
+    def set_computed(self, method_or_name: str | callable) -> DataItem:
         """Set data item as computed using the specified method
 
         Args:
-            method_name (str): name of the method to call on the dataset instance
-                             to compute the value
+            method_or_name: name of the method to call on the dataset instance to
+             compute the value, or the function object itself
 
         Returns:
             DataItem: self
         """
-        computed_prop = ComputedProp(method_name)
+        computed_prop = ComputedProp(method_or_name)
         self.set_prop("data", computed=computed_prop)
         # Also make it readonly in the display
         self.set_prop("display", readonly=True)
