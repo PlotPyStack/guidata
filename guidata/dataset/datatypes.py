@@ -1628,6 +1628,8 @@ class DataSet(metaclass=DataSetMeta):
         """
         for item in self._items:
             with reader.group(item._name):
+                if item.get_prop("data", "computed", None) is not None:
+                    continue  # Skip computed items
                 try:
                     item.deserialize(self, reader)
                 except RuntimeError as error:
