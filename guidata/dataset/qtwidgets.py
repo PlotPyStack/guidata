@@ -506,6 +506,24 @@ class DataSetEditLayout(Generic[AnyDataSet]):
         if self.change_callback is not None:
             self.change_callback()
 
+    def get_terminal_widgets(self) -> list[AbstractDataSetWidget]:
+        """Get all terminal widgets (i.e. not GroupWidget or TabGroupWidget).
+
+        Returns:
+            List of terminal widgets
+        """
+        stack = self.widgets[:]
+        terminal_widgets = []
+        while stack:
+            widget = stack.pop()
+            if isinstance(widget, GroupWidget):
+                stack.extend(widget.edit.widgets)
+            elif isinstance(widget, TabGroupWidget):
+                stack.extend(widget.widgets)
+            else:
+                terminal_widgets.append(widget)
+        return terminal_widgets
+
 
 from guidata.dataset.dataitems import (  # noqa: E402
     BoolItem,

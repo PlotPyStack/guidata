@@ -230,40 +230,30 @@ class AbstractDataSetWidget:
         if not self.build_mode:
             self.parent_layout.widget_value_changed()
 
-    def get_highest_layout(self) -> DataSetEditLayout:
-        """Get the highest-level layout (in case of nested groups)
+    def retrieve_top_level_layout(self) -> DataSetEditLayout:
+        """Retrieve the top-level layout associated with this widget.
+
+        If the current widget is part of a group, this method returns the parent layout
+        of the group widget. Otherwise, it returns the immediate parent layout.
 
         Returns:
-            Highest-level DataSetEditLayout instance
+            DataSetEditLayout: The top-level layout for this widget.
         """
-        higher_level_layout = self.parent_layout
-
+        top_level_layout = self.parent_layout
         if self.parent_layout.group_widget is not None:
             # If we are in a group, we need to iterate over widgets of this group but
             # also over widgets of the other groups
-            higher_level_layout = self.parent_layout.group_widget.parent_layout
-        return higher_level_layout
+            top_level_layout = self.parent_layout.group_widget.parent_layout
+        return top_level_layout
 
-    def update_computed_items(self) -> bool:
-        """Update widgets for computed items when any value changes.
-
-        Returns:
-            True if any computed items were updated
-        """
-        updated = False
-        higher_level_layout = self.get_highest_layout()
-        widgets = higher_level_layout.widgets
-        for widget in higher_level_layout.widgets:
-            if isinstance(widget, GroupWidget):
-                widgets += widget.edit.widgets
+    def contains_computed_items(self) -> bool:
+        """Check if there are any computed items in the layout."""
+        widgets = self.retrieve_top_level_layout().get_terminal_widgets()
         for widget in widgets:
-            if widget is not self:  # Don't update the widget that just changed
-                computed_prop = widget.item.get_prop("data", "computed", None)
-                if isinstance(computed_prop, ComputedProp):
-                    # Just trigger the widget to refresh its display
-                    widget.set_state()
-                    updated = True
-        return updated
+            computed_prop = widget.item.get_prop("data", "computed", None)
+            if isinstance(computed_prop, ComputedProp):
+                return True
+        return False
 
 
 class GroupWidget(AbstractDataSetWidget):
@@ -425,15 +415,15 @@ class TabGroupWidget(AbstractDataSetWidget):
 def _display_callback(widget: AbstractDataSetWidget, value):
     """Handling of display callback"""
     cb = widget.item.get_prop_value("display", "callback", None)
-    higher_level_layout = widget.get_highest_layout()
-    if widget.update_computed_items() or cb is not None:
+    if widget.contains_computed_items() or cb is not None:
+        top_level_layout = widget.retrieve_top_level_layout()
         if widget.build_mode:
             widget.set()
         else:
-            higher_level_layout.update_dataitems()
+            top_level_layout.update_dataitems()
         if cb is not None:
             cb(widget.item.instance, widget.item.item, value)
-        higher_level_layout.update_widgets(except_this_one=widget)
+        top_level_layout.update_widgets(except_this_one=widget)
 
 
 class LineEditWidget(AbstractDataSetWidget):
