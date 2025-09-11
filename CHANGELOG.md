@@ -116,6 +116,10 @@
   * Before this fix, callbacks were inoperative when the item to be updated was in a different group than the item that triggered the callback.
   * Now, callbacks work across different groups in the dataset, allowing for more flexible inter-item dependencies.
 
+* Handle exceptions in `FloatArrayItem`'s string representation method:
+  * The `__str__` method of `FloatArrayItem` could raise exceptions when the internal NumPy array was in an unexpected state (e.g., `None` or malformed).
+  * The fix ensures that the `__str__` method handles such exceptions gracefully, returning a meaningful string representation without crashing.
+
 
 ## Version 3.12.1 ##
 

@@ -1249,18 +1249,21 @@ class FloatArrayItem(DataItem):
         v: np.ndarray = func(value)
         if v.size == 0:
             return "= []"
-        if larg:
-            text = "= ["
-            for flt in v[:-1]:
-                text += fmt % flt + "; "
-            text += fmt % v[-1] + "]"
-        else:
-            text = "~= " + fmt % v.mean()
-            text += " [" + fmt % v.min()
-            text += " .. " + fmt % v.max()
-            text += "]"
-        text += " %s" % unit
-        return str(text)
+        try:
+            if larg:
+                text = "= ["
+                for flt in v[:-1]:
+                    text += fmt % flt + "; "
+                text += fmt % v[-1] + "]"
+            else:
+                text = "~= " + fmt % v.mean()
+                text += " [" + fmt % v.min()
+                text += " .. " + fmt % v.max()
+                text += "]"
+            text += " %s" % unit
+            return str(text)
+        except (ValueError, TypeError):
+            return "= %s %s" % (str(value), unit)
 
     def serialize(
         self,
