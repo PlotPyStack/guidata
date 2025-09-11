@@ -900,6 +900,14 @@ class DataItemProxy:
     def __str__(self):
         return self.item._name + "_proxy: " + self.__class__.__name__
 
+    def get_name(self) -> str:
+        """DataItem method proxy
+
+        Returns:
+            str: name
+        """
+        return self.item.get_name()
+
     def get_help(self, instance: DataSet) -> str:
         """DataItem method proxy
 
