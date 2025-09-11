@@ -967,7 +967,7 @@ class FileWidget(HLayoutMixin, LineEditWidget):
         self.filedialog = filedialog
         self.button = QPushButton()
         fmt = item.get_prop_value("data", "formats")
-        self.button.setIcon(get_icon("%s.png" % fmt[0].lower(), default="file.png"))
+        self.button.setIcon(get_icon("%s.png" % fmt[0].lower(), default="FileIcon"))
         self.button.clicked.connect(self.select_file)  # type:ignore
         self.group.addWidget(self.button)
         self.basedir = item.get_prop_value("data", "basedir")

@@ -182,10 +182,24 @@ def get_image_file_path(name: str, default: str = "not_found.png") -> str:
 ICON_CACHE = {}
 
 
+def get_std_icon(name: str) -> QG.QIcon | None:
+    """Get standard icon by name"""
+    # Importing Qt objects here because this module should not depend on them
+    # pylint: disable=import-outside-toplevel
+
+    # Try to get standard icon first
+    from guidata.qthelpers import get_std_icon
+
+    try:
+        return get_std_icon(name)
+    except AttributeError:
+        return None
+
+
 def get_icon(name: str, default: str = "not_found.png") -> QG.QIcon:
     """
     Construct a QIcon from the file with specified name
-    name, default: filenames with extensions
+    name, default: filenames with extensions or standard Qt icon names
 
     Args:
         name (str): name of the icon
@@ -197,22 +211,25 @@ def get_icon(name: str, default: str = "not_found.png") -> QG.QIcon:
     try:
         return ICON_CACHE[name]
     except KeyError:
+        std_icon = get_std_icon(name)
+        if std_icon is not None:
+            return std_icon
+
+        std_default_icon = get_std_icon(default)
+
         # Importing Qt objects here because this module should not depend on them
         # pylint: disable=import-outside-toplevel
-
-        # Try to get standard icon first
-        from guidata.qthelpers import get_std_icon
-
-        try:
-            return get_std_icon(name)
-        except AttributeError:
-            pass
 
         # Retrieve icon from file (original implementation)
         from qtpy import QtGui as QG
 
-        icon = QG.QIcon(get_image_file_path(name, default))
-        ICON_CACHE[name] = icon
+        try:
+            icon = QG.QIcon(get_image_file_path(name, default))
+            ICON_CACHE[name] = icon
+        except RuntimeError:  # default is a standard icon name
+            if std_default_icon is not None:
+                return std_default_icon
+            raise
         return icon
 
 
