@@ -965,7 +965,7 @@ class FileWidget(HLayoutMixin, LineEditWidget):
     ) -> None:
         super().__init__(item, parent_layout)
         self.filedialog = filedialog
-        self.button = QPushButton()
+        self.button = QPushButton(_("Browse..."))
         fmt = item.get_prop_value("data", "formats")
         self.button.setIcon(get_icon("%s.png" % fmt[0].lower(), default="FileIcon"))
         self.button.clicked.connect(self.select_file)  # type:ignore
@@ -1024,7 +1024,7 @@ class DirectoryWidget(HLayoutMixin, LineEditWidget):
         self, item: "DataItemVariable", parent_layout: "DataSetEditLayout"
     ) -> None:
         super().__init__(item, parent_layout)
-        self.button = QPushButton()
+        self.button = QPushButton(_("Browse..."))
         self.button.setIcon(get_std_icon("DirOpenIcon"))
         self.button.clicked.connect(self.select_directory)  # type:ignore
         self.group.addWidget(self.button)

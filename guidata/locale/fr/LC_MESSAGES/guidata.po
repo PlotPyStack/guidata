@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: guidata 3.10.0\n"
 "Report-Msgid-Bugs-To: p.raybaut@codra.fr\n"
-"POT-Creation-Date: 2025-07-06 14:53+0200\n"
+"POT-Creation-Date: 2025-09-11 19:11+0200\n"
 "PO-Revision-Date: 2025-06-17 15:47+0200\n"
 "Last-Translator: Christophe Debonnel <c.debonnel@codra.fr>\n"
 "Language: fr\n"
@@ -62,6 +62,9 @@ msgstr "tout type de fichier"
 msgid "supported file types:"
 msgstr "types de fichiers pris en charge : "
 
+msgid "Browse..."
+msgstr "Parcourir..."
+
 #, python-format
 msgid "%s files"
 msgstr "Fichiers %s"
@@ -112,6 +115,33 @@ msgstr "Erreur"
 #, python-format
 msgid "Waiting: %s s"
 msgstr "Attente : %s s"
+
+msgid "Zeros"
+msgstr "Zéros"
+
+msgid "Empty"
+msgstr "Vide"
+
+msgid "Random (uniform law)"
+msgstr "Aléatoire (loi uniforme)"
+
+msgid "Random (normal law)"
+msgstr "Aléatoire (loi normale)"
+
+msgid "Gaussian"
+msgstr "Gaussienne"
+
+msgid "2D ramp"
+msgstr "Rampe 2D"
+
+msgid "An apple"
+msgstr "Une pomme"
+
+msgid "A banana"
+msgstr "Une banane"
+
+msgid "A cherry"
+msgstr "Une cerise"
 
 msgid "Project website"
 msgstr "Site web du projet"
@@ -699,4 +729,3 @@ msgstr "Instance :"
 
 msgid "Text editor"
 msgstr "Éditeur de texte"
-
