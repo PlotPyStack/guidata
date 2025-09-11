@@ -1360,10 +1360,12 @@ class FloatArrayWidget(AbstractDataSetWidget):
 
     def get(self) -> None:
         """Update widget contents from data item value"""
-        self.arr = np.asarray(self.item.get())
-        if self.item.get_prop_value("display", "transpose"):
-            self.arr = self.arr.T
-        self.update(self.arr)
+        value = self.item.get()
+        if value is not None:
+            self.arr = np.asarray(value)
+            if self.item.get_prop_value("display", "transpose"):
+                self.arr = self.arr.T
+            self.update(self.arr)
 
     def update(self, arr: np.ndarray) -> None:
         shape = arr.shape

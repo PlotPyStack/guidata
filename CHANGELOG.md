@@ -120,6 +120,9 @@
   * The `__str__` method of `FloatArrayItem` could raise exceptions when the internal NumPy array was in an unexpected state (e.g., `None` or malformed).
   * The fix ensures that the `__str__` method handles such exceptions gracefully, returning a meaningful string representation without crashing.
 
+* Add `None` check in `FloatArrayWidget`'s `get` method to prevent errors:
+  * The `get` method of `FloatArrayWidget` was not handling the case where the internal data was `None`, leading to unexpected behavior.
+  * In particular, this would lead to replace the `None` value by `numpy.ndarray(None, object)` when showing the widget.
 
 ## Version 3.12.1 ##
 
