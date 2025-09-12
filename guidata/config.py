@@ -8,8 +8,10 @@ Handle *guidata* module configuration
 (options, images and icons)
 """
 
+import contextlib
 import enum
 import os.path as osp
+from typing import Generator
 
 from guidata.configtools import add_image_module_path, get_translation
 from guidata.userconfig import UserConfig
@@ -296,3 +298,15 @@ def set_validation_mode(mode: ValidationMode) -> None:
 def get_validation_mode() -> ValidationMode:
     """Get the current validation mode for DataItems"""
     return _INTERNAL_CONF.validation_mode
+
+
+# Add a context manager to temporarily set validation mode
+@contextlib.contextmanager
+def temporary_validation_mode(mode: ValidationMode) -> Generator[None, None, None]:
+    """Temporarily set the validation mode for DataItems"""
+    original_mode = get_validation_mode()
+    set_validation_mode(mode)
+    try:
+        yield
+    finally:
+        set_validation_mode(original_mode)
