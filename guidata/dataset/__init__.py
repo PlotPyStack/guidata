@@ -59,6 +59,7 @@ from .datatypes import (
     NotProp,
     Obj,
     ObjectItem,
+    SeparatorItem,
     TabGroupItem,
     ValueProp,
 )

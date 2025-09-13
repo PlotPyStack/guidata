@@ -1590,3 +1590,79 @@ class DataSetWidget(AbstractDataSetWidget):
             column_span: number of columns to span
         """
         layout.addWidget(self.group, row, label_column, row_span, column_span + 1)
+
+
+class SeparatorWidget(AbstractDataSetWidget):
+    """SeparatorItem widget
+
+    Displays a horizontal gray line as a visual separator between other items.
+
+    Args:
+        item: instance of `DataItemVariable` (not `DataItem`)
+        parent_layout: parent `DataSetEditLayout` instance
+    """
+
+    def __init__(
+        self, item: DataItemVariable, parent_layout: DataSetEditLayout
+    ) -> None:
+        super().__init__(item, parent_layout)
+
+        # Create a frame to hold the separator line
+        self.group = QFrame()
+        self.group.setFrameShape(QFrame.HLine)
+        self.group.setFrameShadow(QFrame.Sunken)
+
+        # Set the color to gray
+        self.group.setStyleSheet("QFrame { color: gray; }")
+
+        # Set minimum height for visibility
+        self.group.setMinimumHeight(10)
+        self.group.setMaximumHeight(10)
+
+    def get(self) -> None:
+        """Update widget contents from data item value
+
+        Separators don't have values, so this is a no-op.
+        """
+        pass
+
+    def set(self) -> None:
+        """Update data item value from widget contents
+
+        Separators don't have values, so this is a no-op.
+        """
+        pass
+
+    def value(self) -> None:
+        """Returns the widget's current value
+
+        Separators don't have values.
+
+        Returns:
+            None: separators don't have values
+        """
+        return None
+
+    def place_on_grid(
+        self,
+        layout: QGridLayout,
+        row: int,
+        label_column: int,
+        widget_column: int,
+        row_span: int = 1,
+        column_span: int = 1,
+    ) -> None:
+        """Place widget on layout at specified position
+
+        For separators, we span across both label and widget columns.
+
+        Args:
+            layout: parent layout
+            row: row index
+            label_column: column index for label (ignored for separators)
+            widget_column: column index for widget (ignored for separators)
+            row_span: number of rows to span
+            column_span: number of columns to span
+        """
+        # Span across both label and widget columns for full-width separator
+        layout.addWidget(self.group, row, label_column, row_span, column_span + 1)

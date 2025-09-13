@@ -34,6 +34,9 @@ Grouping items
 .. autoclass:: guidata.dataset.EndTabGroup
     :members:
 
+.. autoclass:: guidata.dataset.SeparatorItem
+    :members:
+
 Handling item properties
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -1986,3 +1989,105 @@ class EndTabGroup(EndGroup):
     """
 
     pass
+
+
+class SeparatorItem(DataItem):
+    """Data item which represents a visual separator between other items
+
+    In textual representation, it appears as a series of dashes.
+    In GUI, it appears as a horizontal gray line.
+
+    Args:
+        label (str): optional label for the separator (default: "")
+    """
+
+    def __init__(self, label: str = "") -> None:
+        super().__init__(label)
+
+    def get_string_value(self, instance: DataSet) -> str:
+        """Return a formatted string representation of the separator
+
+        Args:
+            instance (DataSet): instance of the DataSet
+
+        Returns:
+            str: string representation as a series of dashes
+        """
+        return "-" * 50  # Return a line of 50 dashes
+
+    def serialize(
+        self, instance: DataSet, writer: HDF5Writer | JSONWriter | INIWriter
+    ) -> None:
+        """Serialize this item using the writer object
+
+        Separators don't store any data, so this is a no-op.
+
+        Args:
+            instance (DataSet): instance of the DataSet
+            writer (HDF5Writer | JSONWriter | INIWriter): writer object
+        """
+        pass
+
+    def deserialize(
+        self, instance: DataSet, reader: HDF5Reader | JSONReader | INIReader
+    ) -> None:
+        """Deserialize this item using the reader object
+
+        Separators don't store any data, so this is a no-op.
+
+        Args:
+            instance (DataSet): instance of the DataSet
+            reader (HDF5Reader | JSONReader | INIReader): reader object
+        """
+        pass
+
+    def check_value(self, value: Any, raise_exception: bool = False) -> bool:
+        """Check if `value` is valid for this data item
+
+        Separators don't store values, so always return True.
+
+        Args:
+            value (Any): value to check
+            raise_exception (bool): if True, raise an exception if the value is invalid
+
+        Returns:
+            bool: True (separators always have valid "values")
+        """
+        return True
+
+    def from_string(self, string_value: str) -> None:
+        """Transform string into valid data item's value
+
+        Separators don't store values, so return None.
+
+        Args:
+            string_value (str): string value
+
+        Returns:
+            None: separators don't have values
+        """
+        return None
+
+    def get_value(self, instance: DataSet) -> None:
+        """Return data item's value
+
+        Separators don't store values.
+
+        Args:
+            instance (DataSet): instance of the DataSet
+
+        Returns:
+            None: separators don't have values
+        """
+        return None
+
+    def __set__(self, instance: DataSet, value: Any) -> None:
+        """Set data item's value
+
+        Separators don't store values, so this is a no-op.
+
+        Args:
+            instance (DataSet): instance of the DataSet
+            value (Any): value to set (ignored)
+        """
+        pass  # Separators don't store any value

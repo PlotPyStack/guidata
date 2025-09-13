@@ -4,6 +4,34 @@
 
 ✨ New features:
 
+* **SeparatorItem**: Added a new visual separator data item for better dataset organization:
+  * New `SeparatorItem` class allows inserting visual separators between sections in datasets
+  * In textual representation, separators appear as a line of dashes (`--------------------------------------------------`)
+  * In GUI dialogs, separators display as horizontal gray lines spanning the full width
+  * Separators don't store any data - they are purely visual elements for organizing forms
+  * Example usage:
+
+    ```python
+    class PersonDataSet(DataSet):
+        name = StringItem("Name", default="John Doe")
+        age = IntItem("Age", default=30)
+
+        # Visual separator with label
+        sep1 = SeparatorItem("Contact Information")
+
+        email = StringItem("Email", default="john@example.com")
+        phone = StringItem("Phone", default="123-456-7890")
+
+        # Visual separator without label
+        sep2 = SeparatorItem()
+
+        notes = StringItem("Notes", default="Additional notes")
+    ```
+
+  * Improves readability and visual organization of complex datasets
+  * Fully integrated with existing DataSet serialization/deserialization (separators are ignored during save/load)
+  * Compatible with both edit and show modes in dataset dialogs
+
 * **Computed Items**: Added support for computed/calculated data items in datasets:
   * New `ComputedProp` class allows defining items whose values are automatically calculated from other items
   * Items can be marked as computed using the `set_computed(method_name)` method

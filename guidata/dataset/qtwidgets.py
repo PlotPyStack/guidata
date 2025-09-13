@@ -90,6 +90,7 @@ from guidata.dataset.datatypes import (
     DataSetGroup,
     EndGroup,
     GroupItem,
+    SeparatorItem,
     TabGroupItem,
 )
 from guidata.qthelpers import win32_fix_title_bar_background
@@ -562,6 +563,7 @@ from guidata.dataset.qtitemwidgets import (  # noqa: E402
     GroupWidget,
     LineEditWidget,
     MultipleChoiceWidget,
+    SeparatorWidget,
     SliderWidget,
     TabGroupWidget,
     TextEditWidget,
@@ -594,6 +596,7 @@ DataSetEditLayout.register(MultipleChoiceItem, MultipleChoiceWidget)
 DataSetEditLayout.register(FloatArrayItem, FloatArrayWidget)
 DataSetEditLayout.register(ButtonItem, ButtonWidget)
 DataSetEditLayout.register(DictItem, ButtonWidget)
+DataSetEditLayout.register(SeparatorItem, SeparatorWidget)
 
 
 LABEL_CSS = """
@@ -769,6 +772,7 @@ DataSetShowLayout.register(ImageChoiceItem, DataSetShowWidget)
 DataSetShowLayout.register(MultipleChoiceItem, DataSetShowWidget)
 DataSetShowLayout.register(FloatArrayItem, DataSetShowWidget)
 DataSetShowLayout.register(DictItem, DataSetShowWidget)
+DataSetShowLayout.register(SeparatorItem, SeparatorWidget)
 
 
 class DataSetShowGroupBox(Generic[AnyDataSet], QGroupBox):
