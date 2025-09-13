@@ -1225,15 +1225,52 @@ def collect_items_in_bases_order(
     """
     if seen is None:
         seen = set()
-    items = []
+
+    # Collect all bases, respecting the order they appear in class definition
+    # For DerivedAB(DatasetA, DatasetB), we want DatasetA items first
+    all_bases = []
     for base in bases:
-        items.extend(collect_items_in_bases_order(base.__bases__, seen))
+        # Get all bases of this base class in MRO order (excluding object)
+        base_mro = [cls for cls in base.__mro__ if cls is not object]
+        all_bases.extend(base_mro)
+
+    # Remove duplicates while preserving order (use dict as ordered set)
+    unique_bases = list(dict.fromkeys(all_bases))
+
+    # Build a mapping of overridden items (most specific class wins)
+    items_dict = {}  # name -> DataItem mapping
+    for base in reversed(unique_bases):  # Reverse MRO: most specific first
         base_dict = getattr(base, "__dict__", {})
         for name, obj in base_dict.items():
-            if isinstance(obj, DataItem) and name not in seen:
-                items.append(obj)
-                seen.add(name)
-    return items
+            if isinstance(obj, DataItem):
+                items_dict[name] = obj  # Later (more specific) definitions override
+
+    # Now collect items following the inheritance chain order in bases
+    # Process each base and its ancestors in the order they appear
+    final_items = []
+    processed_bases = set()
+
+    for base in bases:  # Process in the order bases are listed in class definition
+        # Get MRO for this base, but exclude DataSet and object
+        base_chain = [
+            cls
+            for cls in base.__mro__
+            if cls is not object and issubclass(cls, DataSet)
+        ]
+
+        # Process from most ancestral to most derived within this chain
+        for cls in reversed(base_chain):
+            if cls in processed_bases:
+                continue  # Skip if already processed
+            processed_bases.add(cls)
+
+            cls_dict = getattr(cls, "__dict__", {})
+            for name, obj in cls_dict.items():
+                if isinstance(obj, DataItem) and name not in seen:
+                    final_items.append(items_dict[name])  # Use the overridden version
+                    seen.add(name)
+
+    return final_items
 
 
 class DataSetMeta(type):
