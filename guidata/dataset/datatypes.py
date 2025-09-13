@@ -1570,6 +1570,17 @@ class DataSet(metaclass=DataSetMeta):
     def set_readonly(self, readonly: bool = True):
         self.__readonly = readonly
 
+    def _get_items_for_text_representation(self) -> list[DataItem]:
+        """Get items for text representation, excluding trailing separators
+
+        Returns:
+            list: List of items with trailing separators filtered out
+        """
+        filtered_items = list(self._items)
+        while filtered_items and isinstance(filtered_items[-1], SeparatorItem):
+            filtered_items.pop()
+        return filtered_items
+
     def to_string(
         self,
         debug: bool | None = False,
@@ -1601,13 +1612,16 @@ class DataSet(metaclass=DataSetMeta):
             else:
                 return item.get_prop_value("display", self, "label")
 
+        # Get items for text representation (excluding trailing separators)
+        filtered_items = self._get_items_for_text_representation()
+
         length = 0
         if align:
-            for item in self._items:
+            for item in filtered_items:
                 item_length = len(_get_label(item))
                 if item_length > length:
                     length = item_length
-        for item in self._items:
+        for item in filtered_items:
             try:
                 hide = item.get_prop_value("display", self, "hide")
                 if not show_hidden and hide is True:

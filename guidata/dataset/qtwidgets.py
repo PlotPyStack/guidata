@@ -337,6 +337,9 @@ class DataSetEditLayout(Generic[AnyDataSet]):
         self.items_pos: dict[DataItem, list[int]] = {}
         if not items:
             items = self.instance._items
+        # Filter out trailing separators for GUI display
+        while items and isinstance(items[-1], SeparatorItem):
+            items = items[:-1]
         items = self.transform_items(items)  # type:ignore
         self.setup_layout(items)
 
