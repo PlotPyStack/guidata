@@ -76,7 +76,7 @@ class ShellBaseWidget(ConsoleBaseWidget, SaveHistoryMixin, BrowseHistoryMixin):
 
     def __init__(self, parent, profile=False, initial_message=None, read_only=False):
         """
-        parent : specifies the parent widget
+        `parent` : specifies the parent widget
         """
         ConsoleBaseWidget.__init__(self, parent)
         SaveHistoryMixin.__init__(self)

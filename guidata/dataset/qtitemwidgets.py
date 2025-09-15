@@ -1551,7 +1551,7 @@ class DataSetWidget(AbstractDataSetWidget):
         self.set_dataset()
 
     def get_dataset(self) -> None:
-        """update's internal parameter representation
+        """Update's internal parameter representation
         from the item's stored value
 
         default behavior uses update_dataset and assumes
@@ -1561,7 +1561,7 @@ class DataSetWidget(AbstractDataSetWidget):
         update_dataset(self.dataset, item)
 
     def set_dataset(self) -> None:
-        """update the item's value from the internal
+        """Update the item's value from the internal
         data representation
 
         default behavior uses restore_dataset and assumes

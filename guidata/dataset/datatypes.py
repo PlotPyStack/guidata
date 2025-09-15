@@ -166,7 +166,7 @@ class FormatProp(ItemProperty):
     """
 
     def __init__(self, fmt: str, ignore_error: bool | None = True) -> None:
-        """fmt is a format string
+        """`fmt` is a format string
         it can contain a single anonymous substition or
         several named substitions.
         """
