@@ -8,7 +8,7 @@ import pytest
 from guidata.dataset import DataSet, IntItem, SeparatorItem, StringItem
 
 
-class TestDataSetNormal(DataSet):
+class DataSetNormal(DataSet):
     """Dataset with separator not at the end"""
 
     name = StringItem("Name", default="test")
@@ -18,7 +18,7 @@ class TestDataSetNormal(DataSet):
     another_value = IntItem("Another Value", default=100)
 
 
-class TestDataSetWithTrailingSeparator(DataSet):
+class DataSetWithTrailingSeparator(DataSet):
     """Dataset with trailing separators"""
 
     name = StringItem("Name", default="test")
@@ -28,7 +28,7 @@ class TestDataSetWithTrailingSeparator(DataSet):
     separator3 = SeparatorItem("sep3")  # Trailing separator
 
 
-class TestDataSetOnlySeparators(DataSet):
+class DataSetOnlySeparators(DataSet):
     """Dataset with only separators"""
 
     separator1 = SeparatorItem("sep1")
@@ -36,7 +36,7 @@ class TestDataSetOnlySeparators(DataSet):
     separator3 = SeparatorItem("sep3")
 
 
-class TestDataSetMultipleTrailingSeparators(DataSet):
+class DataSetMultipleTrailingSeparators(DataSet):
     """Dataset with multiple trailing separators"""
 
     name = StringItem("Name", default="test")
@@ -46,7 +46,7 @@ class TestDataSetMultipleTrailingSeparators(DataSet):
     separator4 = SeparatorItem("sep4")
 
 
-class TestDataSetEmpty(DataSet):
+class DataSetEmpty(DataSet):
     """Empty dataset"""
 
     pass
@@ -54,7 +54,7 @@ class TestDataSetEmpty(DataSet):
 
 def test_normal_dataset_no_trailing_separator():
     """Test dataset with separator not at the end - no filtering should occur"""
-    ds = TestDataSetNormal()
+    ds = DataSetNormal()
     items = ds.get_items()
     item_names = [item._name for item in items]
 
@@ -71,7 +71,7 @@ def test_normal_dataset_no_trailing_separator():
 
 def test_trailing_separator_filtering():
     """Test dataset with trailing separators - they should be filtered out"""
-    ds = TestDataSetWithTrailingSeparator()
+    ds = DataSetWithTrailingSeparator()
     items = ds.get_items()
     item_names = [item._name for item in items]
 
@@ -89,7 +89,7 @@ def test_trailing_separator_filtering():
 
 def test_only_separators_dataset():
     """Test dataset with only separators - all should be filtered out"""
-    ds = TestDataSetOnlySeparators()
+    ds = DataSetOnlySeparators()
     items = ds.get_items()
 
     # Should have 3 items (separators NOT filtered in get_items())
@@ -105,7 +105,7 @@ def test_only_separators_dataset():
 
 def test_multiple_trailing_separators():
     """Test dataset with multiple trailing separators - all should be filtered"""
-    ds = TestDataSetMultipleTrailingSeparators()
+    ds = DataSetMultipleTrailingSeparators()
     items = ds.get_items()
     item_names = [item._name for item in items]
 
@@ -124,7 +124,7 @@ def test_multiple_trailing_separators():
 
 def test_empty_dataset():
     """Test empty dataset"""
-    ds = TestDataSetEmpty()
+    ds = DataSetEmpty()
     items = ds.get_items()
 
     # Should have 0 items
@@ -139,7 +139,7 @@ def test_empty_dataset():
 
 def test_get_items_copy_behavior():
     """Test that the copy parameter works correctly with filtering"""
-    ds = TestDataSetWithTrailingSeparator()
+    ds = DataSetWithTrailingSeparator()
 
     # Test without copy
     items1 = ds.get_items(copy=False)
@@ -162,7 +162,7 @@ def test_get_items_copy_behavior():
 
 def test_string_representation_consistency():
     """Test that string representation is consistent with get_items filtering"""
-    ds = TestDataSetWithTrailingSeparator()
+    ds = DataSetWithTrailingSeparator()
     items = ds.get_items()
     string_repr = str(ds)
 
@@ -185,16 +185,12 @@ def test_gui_trailing_separator_filtering():
 
         with qt_app_context():
             # Test the edit widget
-            dataset = TestDataSetWithTrailingSeparator()
+            dataset = DataSetWithTrailingSeparator()
 
-            edit_group = DataSetEditGroupBox(
-                "Edit Test", TestDataSetWithTrailingSeparator
-            )
+            edit_group = DataSetEditGroupBox("Edit Test", DataSetWithTrailingSeparator)
             edit_group.instance = dataset
 
-            show_group = DataSetShowGroupBox(
-                "Show Test", TestDataSetWithTrailingSeparator
-            )
+            show_group = DataSetShowGroupBox("Show Test", DataSetWithTrailingSeparator)
             show_group.instance = dataset
 
             # Count the number of child widgets that are actual item widgets
