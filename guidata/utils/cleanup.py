@@ -205,6 +205,23 @@ def clean_coverage_files(project_root: Path) -> None:
     remove_glob_pattern(".coverage.*", project_root)
 
 
+def clean_profile_files(project_root: Path) -> None:
+    """Remove profiling-related files.
+
+    Args:
+        project_root: The root directory of the project.
+    """
+    print("  Cleaning profile files...")
+
+    remove_glob_pattern("*.prof", project_root)
+    remove_glob_pattern("*.prof.*", project_root)
+    prof_dir = project_root / "prof"
+    if prof_dir.exists():
+        remove_glob_pattern("*.prof", prof_dir)
+        remove_glob_pattern("*.prof.*", prof_dir)
+        remove_glob_pattern("*.svg", prof_dir)
+
+
 def clean_backup_files(project_root: Path) -> None:
     """Remove backup files and version control leftovers.
 
@@ -366,6 +383,7 @@ def run_cleanup(project_root: Path | str | None = None) -> None:
             clean_python_cache(project_root)
             clean_public_repo_dirs(project_root, lib_name)
             clean_coverage_files(project_root)
+            clean_profile_files(project_root)
             clean_backup_files(project_root)
             clean_log_files(project_root)
             clean_localization_files(project_root, mod_name)
