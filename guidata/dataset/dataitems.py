@@ -456,18 +456,24 @@ class StringItem(DataItem):
         """Override DataItem method"""
         if not self.get_prop("data", "check_value", True):
             return True
+
         if not isinstance(value, self.type):
             if raise_exception:
                 raise TypeError(f"Expected {self.type}, got {type(value)}")
             return False
-        notempty = self.get_prop("data", "notempty")
+
+        # Get all data properties at once to reduce property lookups
+        data_props = self._props.get("data", {})
+
+        notempty = data_props.get("notempty")
         if notempty and not value:
             if raise_exception:
                 raise ValueError("Empty string is not a valid value")
             return False
-        regexp = self.get_prop("data", "regexp")
+
+        regexp = data_props.get("regexp")
         if regexp is not None:
-            ok = bool(re.match(regexp, "" if value is None else value))
+            ok = bool(re.match(regexp, value or ""))
             if not ok and raise_exception:
                 raise ValueError(f"Value {value} does not match regexp {regexp}")
             return ok

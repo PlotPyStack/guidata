@@ -432,12 +432,15 @@ class DataItem(ABC):
         Returns:
             Any: property value
         """
-        prop = self._props.get(realm)
-        if not prop:
-            prop = {}
+        realm_props = self._props.get(realm)
+        if realm_props is None:
+            if default is NoDefault:
+                raise KeyError(name)
+            return default
+
         if default is NoDefault:
-            return prop[name]
-        return prop.get(name, default)
+            return realm_props[name]  # Let KeyError propagate
+        return realm_props.get(name, default)
 
     def get_prop_value(
         self, realm: str, instance: DataSet, name: str, default: Any = NoDefault
@@ -685,27 +688,35 @@ class DataItem(ABC):
         """
         vmode = get_validation_mode()
 
-        # Determine if validation should be skipped
-        allow_none = self.get_prop("data", "allow_none", False)
-        skip_validation = value is None and (allow_none or force_allow_none)
+        # Early exit if validation is disabled
+        if vmode == ValidationMode.DISABLED:
+            setattr(instance, f"_{self._name}", value)
+            return
 
-        if vmode != ValidationMode.DISABLED and not skip_validation:
-            try:
-                self.check_value(value, raise_exception=True)
-            except NotImplementedError:
-                # Checking is not implemented for this item
-                pass
-            except Exception as exc:
-                if vmode == ValidationMode.ENABLED:
-                    # Show a warning in replacement of the exception
-                    msg = f"Checking {instance.__class__.__name__}.{str(self)}: {exc}"
-                    warnings.warn(msg, DataItemValidationWarning)
-                elif vmode == ValidationMode.STRICT:
-                    # Raise an exception if strict validation is enabled
-                    raise DataItemValidationError(instance, self, str(exc)) from exc
-                else:
-                    raise ValueError(f"Unknown validation mode: {vmode}") from exc
-        setattr(instance, "_%s" % (self._name), value)
+        # Check if validation should be skipped for None values
+        if value is None:
+            if force_allow_none or self.get_prop("data", "allow_none", False):
+                setattr(instance, f"_{self._name}", value)
+                return
+
+        # Perform validation
+        try:
+            self.check_value(value, raise_exception=True)
+        except NotImplementedError:
+            # Checking is not implemented for this item
+            pass
+        except Exception as exc:
+            if vmode == ValidationMode.ENABLED:
+                # Show a warning in replacement of the exception
+                msg = f"Checking {instance.__class__.__name__}.{str(self)}: {exc}"
+                warnings.warn(msg, DataItemValidationWarning)
+            elif vmode == ValidationMode.STRICT:
+                # Raise an exception if strict validation is enabled
+                raise DataItemValidationError(instance, self, str(exc)) from exc
+            else:
+                raise ValueError(f"Unknown validation mode: {vmode}") from exc
+
+        setattr(instance, f"_{self._name}", value)
 
     def __get__(self, instance: Any, klass: type) -> Any | None:
         if instance is not None:
