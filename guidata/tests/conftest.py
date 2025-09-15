@@ -24,6 +24,8 @@ def pytest_addoption(parser):
 
 def pytest_configure(config):
     """Configure pytest based on command line options."""
+    if config.option.durations is None:
+        config.option.durations = 10  # Default to showing 10 slowest tests
     if not config.getoption("--show-windows"):
         os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
