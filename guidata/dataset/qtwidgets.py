@@ -266,7 +266,6 @@ class DataSetGroupEditDialog(DataSetEditDialog):
         Args:
             instance: DataSetGroup instance to edit
         """
-
         assert isinstance(instance, DataSetGroup)
         tabs = QTabWidget()
         #        tabs.setUsesScrollButtons(False)
