@@ -165,6 +165,11 @@
   * The `get` method of `FloatArrayWidget` was not handling the case where the internal data was `None`, leading to unexpected behavior.
   * In particular, this would lead to replace the `None` value by `numpy.ndarray(None, object)` when showing the widget.
 
+* Fixed performance issue in `is_dark_theme()` function in `qthelpers` module:
+  * The `CURRENT_THEME` cache mechanism was not being properly utilized, causing expensive `darkdetect.isDark()` system queries on every call.
+  * Added early return check in `get_color_theme()` to use cached theme value when available, significantly improving performance after the first call.
+  * Improved documentation consistency across color-related functions by standardizing terminology and removing duplicate caching documentation.
+
 ## Version 3.12.1 ##
 
 🛠️ Bug fixes:

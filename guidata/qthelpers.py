@@ -100,11 +100,11 @@ def set_dark_mode(state: bool) -> None:
 
 
 def is_dark_mode() -> bool:
-    """Return True if current color mode is dark mode
+    """Return True if current color theme is dark
     (deprecated, use `is_dark_theme` instead)
 
     Returns:
-        True if dark mode is enabled
+        True if dark theme is enabled
     """
     warnings.warn(
         "`is_dark_mode` is deprecated and will be removed in a future version. "
@@ -125,6 +125,11 @@ def get_color_theme() -> Literal["light", "dark"]:
         Color theme ('light' or 'dark')
     """
     global CURRENT_THEME
+
+    # Return cached theme if available
+    if CURRENT_THEME is not None:
+        return CURRENT_THEME
+
     mode = get_color_mode()
     if mode == AUTO:
         theme = DARK if darkdetect.isDark() else LIGHT
@@ -135,20 +140,16 @@ def get_color_theme() -> Literal["light", "dark"]:
 
 
 def is_dark_theme() -> bool:
-    """Return True if current color mode is dark mode.
-
-    Color theme value is updated only once per session because the query to the system
-    may be expensive depending on the platform. It is updated when the color mode is
-    set to 'auto' using `set_color_mode('auto')`.
+    """Return True if current color theme is dark.
 
     Returns:
-        True if dark mode is enabled
+        True if dark theme is enabled
     """
     return get_color_theme() == DARK
 
 
 def get_color_mode() -> Literal["light", "dark", "auto"]:
-    """Get color mode
+    """Get color mode setting.
 
     Returns:
         Color mode ('light', 'dark' or 'auto')
