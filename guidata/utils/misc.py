@@ -43,23 +43,17 @@ from guidata.userconfig import get_home_dir
 
 
 def to_string(obj: Any) -> str:
-    """Convert to string, trying utf-8 then latin-1 codec
+    """Convert object to string.
 
-    Args:
-        obj (Any): Object to convert to string
-
-    Returns:
-        str: String representation of object
+    If `obj` is bytes-like, try decoding as UTF-8, falling back to Latin-1.
+    Otherwise, use str().
     """
-    if isinstance(obj, bytes):
+    if isinstance(obj, (bytes, bytearray, memoryview)):
         try:
-            return obj.decode()
+            return obj.decode("utf-8")
         except UnicodeDecodeError:
             return obj.decode("latin-1")
-    try:
-        return str(obj)
-    except UnicodeDecodeError:
-        return str(obj, encoding="latin-1")
+    return str(obj)
 
 
 def decode_fs_string(string: str) -> str:
