@@ -112,6 +112,7 @@ class ArrayEditor(QDialog, Generic[AnySupportedArray]):
         xlabels=None,
         ylabels=None,
         variable_size=False,
+        add_title_suffix=True,
     ) -> bool:
         """
         Setup the array editor dialog box and check if the array is supported.
@@ -123,6 +124,8 @@ class ArrayEditor(QDialog, Generic[AnySupportedArray]):
             xlabels: List of x labels
             ylabels: List of y labels
             variable_size: Flag indicating if the array is variable size
+            add_title_suffix: Flag indicating if the array type should be added to the
+             title
 
         Returns:
             True if the array is supported, False otherwise
@@ -191,9 +194,12 @@ class ArrayEditor(QDialog, Generic[AnySupportedArray]):
         self.layout = QGridLayout()
         self.setLayout(self.layout)
         self.setWindowIcon(get_icon("arredit.png"))
-        title = str(title) + " - " + _("NumPy array") if title else _("Array editor")
-        if readonly:
-            title += " (" + _("read only") + ")"
+        if add_title_suffix:
+            title = (
+                str(title) + " - " + _("NumPy array") if title else _("Array editor")
+            )
+            if readonly:
+                title += " (" + _("read only") + ")"
         self.setWindowTitle(title)
         self.resize(600, 500)
 

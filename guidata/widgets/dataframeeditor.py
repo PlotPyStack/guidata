@@ -116,9 +116,10 @@ class DataFrameModel(QAbstractTableModel):
     ROWS_TO_LOAD = 500
     COLS_TO_LOAD = 40
 
-    def __init__(self, dataFrame, format=DEFAULT_FORMAT, parent=None):
+    def __init__(self, dataFrame, format=DEFAULT_FORMAT, parent=None, readonly=False):
         QAbstractTableModel.__init__(self)
         self.dialog = parent
+        self.readonly = readonly
         self.df = dataFrame
         self.df_index = dataFrame.index.tolist()
         self.df_header = dataFrame.columns.tolist()
@@ -393,7 +394,7 @@ class DataFrameModel(QAbstractTableModel):
         column = index.column()
         row = index.row()
 
-        if index in self.display_error_idxs:
+        if index in self.display_error_idxs or self.readonly:
             return False
         if change_type is not None:
             try:
@@ -669,22 +670,23 @@ class DataFrameView(QTableView):
             triggered=self.copy,
             context=Qt.WidgetShortcut,
         )
-        functions = (
-            (_("To bool"), bool),
-            (_("To complex"), complex),
-            (_("To int"), int),
-            (_("To float"), float),
-            (_("To str"), str),
-        )
-        types_in_menu = [copy_action]
-        for name, func in functions:
-            # QAction.triggered works differently for PySide and PyQt
-            slot = lambda _checked, func=func: self.change_type(func)
-            types_in_menu += [
-                create_action(self, name, triggered=slot, context=Qt.WidgetShortcut)
-            ]
+        actions = [copy_action]
+        if not self.model().readonly:
+            functions = (
+                (_("To bool"), bool),
+                (_("To complex"), complex),
+                (_("To int"), int),
+                (_("To float"), float),
+                (_("To str"), str),
+            )
+            for name, func in functions:
+                # QAction.triggered works differently for PySide and PyQt
+                slot = lambda _checked, func=func: self.change_type(func)
+                actions += [
+                    create_action(self, name, triggered=slot, context=Qt.WidgetShortcut)
+                ]
         menu = QMenu(self)
-        add_actions(menu, types_in_menu)
+        add_actions(menu, actions)
         return menu
 
     def change_type(self, func):
@@ -743,19 +745,28 @@ class DataFrameEditor(QDialog):
         self.is_series = False
         self.layout = None
 
-    def setup_and_check(self, data, title=""):
-        """
-        Setup DataFrameEditor:
-        return False if data is not supported, True otherwise.
-        Supported types for data are DataFrame, Series and DatetimeIndex.
+    def setup_and_check(self, data, title="", readonly=False, add_title_suffix=True):
+        """Setup DataFrameEditor.
+
+        Args:
+            data: The DataFrame or Series to edit.
+            title: The dialog title.
+            readonly: If True, the DataFrame is not editable.
+            add_title_suffix: If True, the data type is added to the title.
+
+        Returns:
+            True if the editor could be set up, False otherwise.
         """
         self.layout = QGridLayout()
         self.setLayout(self.layout)
         self.setWindowIcon(get_icon("arredit.png"))
-        if title:
-            title = str(title) + " - %s" % data.__class__.__name__
-        else:
-            title = _("%s editor") % data.__class__.__name__
+        if add_title_suffix:
+            if title:
+                title = str(title) + " - %s" % data.__class__.__name__
+            else:
+                title = _("%s editor") % data.__class__.__name__
+            if readonly:
+                title += " (" + _("read only") + ")"
         if isinstance(data, Series):
             self.is_series = True
             data = data.to_frame()
@@ -765,7 +776,7 @@ class DataFrameEditor(QDialog):
         self.setWindowTitle(title)
         self.resize(600, 500)
 
-        self.dataModel = DataFrameModel(data, parent=self)
+        self.dataModel = DataFrameModel(data, parent=self, readonly=readonly)
         self.dataModel.dataChanged.connect(self.save_and_close_enable)
         self.dataTable = DataFrameView(self, self.dataModel)
 
@@ -800,10 +811,11 @@ class DataFrameEditor(QDialog):
 
         btn_layout.addStretch()
 
-        self.btn_save_and_close = QPushButton(_("Save and Close"))
-        self.btn_save_and_close.setDisabled(True)
-        self.btn_save_and_close.clicked.connect(self.accept)
-        btn_layout.addWidget(self.btn_save_and_close)
+        if not readonly:
+            self.btn_save_and_close = QPushButton(_("Save and Close"))
+            self.btn_save_and_close.setDisabled(True)
+            self.btn_save_and_close.clicked.connect(self.accept)
+            btn_layout.addWidget(self.btn_save_and_close)
 
         self.btn_close = QPushButton(_("Close"))
         self.btn_close.setAutoDefault(True)
@@ -812,6 +824,9 @@ class DataFrameEditor(QDialog):
         btn_layout.addWidget(self.btn_close)
 
         self.layout.addLayout(btn_layout, 2, 0)
+
+        # Resize column 0 (index column) to contents
+        self.dataTable.resizeColumnToContents(0)
 
         return True
 
