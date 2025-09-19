@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: guidata 3.10.0\n"
 "Report-Msgid-Bugs-To: p.raybaut@codra.fr\n"
-"POT-Creation-Date: 2025-09-11 19:11+0200\n"
+"POT-Creation-Date: 2025-09-19 11:57+0200\n"
 "PO-Revision-Date: 2025-06-17 15:47+0200\n"
 "Last-Translator: Christophe Debonnel <c.debonnel@codra.fr>\n"
 "Language: fr\n"
@@ -208,9 +208,6 @@ msgstr "Tableau NumPy"
 msgid "Array editor"
 msgstr "Éditeur de tableaux"
 
-msgid "read only"
-msgstr "lecture seule"
-
 msgid "Record array fields:"
 msgstr "Champs:"
 
@@ -299,27 +296,12 @@ msgstr "Impossible de copier les valeurs pour ce tableau"
 msgid "It was not possible to paste values for this array"
 msgstr "Impossible de coller les valeurs pour ce tableau"
 
-msgid "Copy all"
-msgstr "Copier tout"
-
-msgid "Copy all array data to clipboard"
-msgstr "Copier toutes les données du tableau dans le presse-papiers"
-
-msgid "Export"
-msgstr "Exporter"
-
-msgid "Export array to a file"
-msgstr "Exporter le tableau vers un fichier"
-
 #, python-format
 msgid "Format (%s) is incorrect"
 msgstr "Le format (%s) est incorrect"
 
 msgid "Export array"
 msgstr "Exporter le tableau"
-
-msgid "CSV Files"
-msgstr "Fichiers CSV"
 
 msgid "About..."
 msgstr "A propos..."
@@ -571,6 +553,9 @@ msgstr "Vers chaîne"
 msgid "%s editor"
 msgstr "Éditeur de %s"
 
+msgid "read only"
+msgstr "lecture seule"
+
 msgid "Format"
 msgstr "Format"
 
@@ -583,6 +568,18 @@ msgstr "Couleur de fond"
 msgid "Column min/max"
 msgstr "Min/max de colonne"
 
+msgid "Copy all"
+msgstr "Copier tout"
+
+msgid "Copy all array data to clipboard"
+msgstr "Copier toutes les données du tableau dans le presse-papiers"
+
+msgid "Export"
+msgstr "Exporter"
+
+msgid "Export array to a file"
+msgstr "Exporter le tableau vers un fichier"
+
 msgid "Float formatting"
 msgstr "Format de flottant"
 
@@ -593,6 +590,13 @@ msgstr "Le format ({}) est incorrect"
 #, python-brace-format
 msgid "Format ({}) should start with '%'"
 msgstr "Le format ({}) ne doit pas commencer par '%'"
+
+#, fuzzy
+msgid "Export dataframe"
+msgstr "DataFrame"
+
+msgid "CSV Files"
+msgstr "Fichiers CSV"
 
 msgid "Import as"
 msgstr "Importer en tant que"
@@ -729,3 +733,4 @@ msgstr "Instance :"
 
 msgid "Text editor"
 msgstr "Éditeur de texte"
+

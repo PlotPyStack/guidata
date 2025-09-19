@@ -138,11 +138,16 @@
   * The `StringItem` class now uses the new validation modes (see above).
   * As a side effect, the `StringItem` class now considers `None` as an invalid default value, and highlights it in the UI.
 
-* **DataFrame Editor: Read-only mode support**:
-  * The DataFrame editor (`guidata.widgets.dataframeeditor.DataFrameEditor`) now supports a `readonly` parameter.
-  * When `readonly=True`, the editor disables all editing features, making it suitable for display-only use cases.
-  * The context menu disables type conversion actions in read-only mode.
-  * This improves integration in applications where users should only view, not modify, DataFrame content.
+* **DataFrame Editor:**
+  * Read-only mode support:
+    * The DataFrame editor (`guidata.widgets.dataframeeditor.DataFrameEditor`) now supports a `readonly` parameter.
+    * When `readonly=True`, the editor disables all editing features, making it suitable for display-only use cases.
+    * The context menu disables type conversion actions in read-only mode.
+    * This improves integration in applications where users should only view, not modify, DataFrame content.
+  * Copy all to clipboard and export features:
+    * Added "Copy all" button to copy the entire DataFrame content (including headers) to the clipboard in a tab-separated format
+    * Added "Export" button to save the DataFrame content to a CSV file with UTF-8 BOM encoding
+    * These features enhance data sharing and exporting capabilities directly from the editor
 
 🛠️ Bug fixes:
 

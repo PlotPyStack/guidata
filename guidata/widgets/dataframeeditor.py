@@ -29,6 +29,7 @@ The current version is qtpandas/models/DataFrameModel.py of the
 """
 
 import io
+from qtpy.compat import getsavefilename
 
 import numpy as np
 from pandas import DataFrame, DatetimeIndex, Series
@@ -785,13 +786,14 @@ class DataFrameEditor(QDialog):
         self.setMinimumSize(400, 300)
         # Make the dialog act as a window
         self.setWindowFlags(Qt.Window)
+
         btn_layout = QHBoxLayout()
 
-        btn = QPushButton(_("Format"))
+        btn = QPushButton(get_icon("format.svg"), _("Format"), self)
         # disable format button for int type
         btn_layout.addWidget(btn)
         btn.clicked.connect(self.change_format)
-        btn = QPushButton(_("Resize"))
+        btn = QPushButton(get_icon("resize.svg"), _("Resize"), self)
         btn_layout.addWidget(btn)
         btn.clicked.connect(self.resize_to_contents)
 
@@ -808,6 +810,16 @@ class DataFrameEditor(QDialog):
         )
         self.bgcolor_global.stateChanged.connect(self.dataModel.colum_avg)
         btn_layout.addWidget(self.bgcolor_global)
+
+        btn_layout.addStretch(1)
+        btn = QPushButton(get_icon("copy_all.svg"), _("Copy all"), self)
+        btn.setToolTip(_("Copy all array data to clipboard"))
+        btn.clicked.connect(self.copy_all_to_clipboard)
+        btn_layout.addWidget(btn)
+        btn = QPushButton(get_icon("export.svg"), _("Export"), self)
+        btn.setToolTip(_("Export array to a file"))
+        btn_layout.addWidget(btn)
+        btn.clicked.connect(self.export_dataframe)
 
         btn_layout.addStretch()
 
@@ -872,6 +884,32 @@ class DataFrameEditor(QDialog):
                 return
             self.dataModel.set_format(format)
             self.sig_option_changed.emit("dataframe_format", format)
+
+    def copy_all_to_clipboard(self) -> None:
+        """Copy all array data, including headers, to clipboard"""
+        dataframe = self.dataModel.get_data()
+
+        if self.is_series:
+            dataframe = dataframe.iloc[:, 0]
+
+        output = io.StringIO()
+        dataframe.to_csv(output, sep="\t", index=True, header=True)
+        cliptxt = output.getvalue()
+        output.close()
+
+        if cliptxt:
+            clipboard = QApplication.clipboard()
+            clipboard.setText(cliptxt)
+
+    def export_dataframe(self) -> None:
+        """Export the dataframe to a CSV file with UTF-8 BOM."""
+        filename, _selfilter = getsavefilename(
+            self, _("Export dataframe"), "", _("CSV Files") + " (*.csv)"
+        )
+        if not filename:
+            return
+        dataframe = self.dataModel.get_data()
+        dataframe.to_csv(filename, sep="\t", index=True, header=True)
 
     def get_value(self):
         """Return modified Dataframe -- this is *not* a copy"""
