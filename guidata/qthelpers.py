@@ -44,8 +44,6 @@ Other
 
 .. autofunction:: grab_save_window
 
-.. autofunction:: click_on_widget
-
 .. autofunction:: block_signals
 
 .. autofunction:: qt_wait
@@ -70,7 +68,7 @@ from qtpy import QtWidgets as QW
 
 import guidata
 from guidata.config import _
-from guidata.configtools import get_icon, get_module_data_path
+from guidata.configtools import get_icon
 from guidata.env import execenv
 from guidata.external import darkdetect
 
@@ -736,42 +734,36 @@ def exec_dialog(dlg: QW.QDialog) -> int:
     return result
 
 
-def grab_save_window(widget: QW.QWidget, name: str) -> None:  # pragma: no cover
+def grab_save_window(
+    widget: QW.QWidget,
+    name: str | None = None,
+    save_dir: str | None = None,
+    add_timestamp: bool = True,
+) -> None:  # pragma: no cover
     """Grab window screenshot and save it
 
     Args:
-        widget (QWidget): Widget to grab
-        name (str): Widget name
+        widget: Widget to grab
+        name: Widget name. If None, uses ``widget.objectName()``
+        save_dir: Directory to save screenshot. If None, uses current working directory
+        add_timestamp: Whether to add timestamp suffix to filename
     """
+    if name is None:
+        name = widget.objectName()
+
     widget.activateWindow()
     widget.raise_()
     QW.QApplication.processEvents()
     pixmap = widget.grab()
+
     suffix = ""
-    if not name[-1].isdigit() and not name.startswith(("s_", "i_")):
+    if add_timestamp:
         suffix = "_" + datetime.now().strftime("%Y-%m-%d-%H%M%S")
-    pixmap.save(
-        osp.join(
-            get_module_data_path("guidata"),
-            os.pardir,
-            "doc",
-            "images",
-            "shots",
-            f"{name}{suffix}.png",
-        )
-    )
 
+    if save_dir is None:
+        save_dir = os.getcwd()
 
-def click_on_widget(widget: QW.QWidget) -> None:
-    """Click on widget and eventually save a screenshot
-
-    Args:
-        widget (QWidget): Widget to click on
-    """
-    wname = widget.objectName()
-    if wname and widget.isVisible():  # pragma: no cover
-        grab_save_window(widget, wname.lower())
-    widget.clicked()
+    pixmap.save(osp.join(save_dir, f"{name}{suffix}.png"))
 
 
 @contextmanager
