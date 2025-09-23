@@ -738,7 +738,7 @@ def grab_save_window(
     widget: QW.QWidget,
     name: str | None = None,
     save_dir: str | None = None,
-    add_timestamp: bool = True,
+    add_timestamp: bool = False,
 ) -> None:  # pragma: no cover
     """Grab window screenshot and save it
 
