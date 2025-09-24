@@ -12,18 +12,45 @@ The scraper works by:
 3. Converting the screenshots to appropriate formats for Sphinx-Gallery
 4. Saving the images in the expected location for gallery generation
 
+Configuration Options:
+    The scraper supports several configuration options for customizing behavior:
+
+    - thumbnail_widget: Which widget to use as thumbnail
+        * "first": Use the first successfully captured widget
+        * "last": Use the last successfully captured widget (default)
+        * None: Use default sphinx-gallery thumbnail behavior
+
+    - hide_toolbars: Hide all toolbars when capturing widgets (default: False)
+        * True: Temporarily hide QToolBar widgets during capture
+        * False: Keep toolbars visible in screenshots
+
+    - capture_inside_layout: Capture only widget content, excluding decorations
+        * True: Capture content area only (no title bars, window borders)
+        * False: Capture entire widget including window decorations (default)
+
 Usage:
-    This module is automatically used by Sphinx-Gallery when configured in conf.py:
+    Basic usage in conf.py:
 
     sphinx_gallery_conf = {
-        'image_scrapers': [guidata.utils.qt_scraper.qt_scraper],
+        'image_scrapers': ['guidata.utils.qt_scraper.qt_scraper'],
         # other configuration...
     }
 
-    Or use the helper function:
+    Advanced configuration with custom options:
 
-    from guidata.utils.qt_scraper import get_qt_scraper_config
-    sphinx_gallery_conf = get_qt_scraper_config()
+    from guidata.utils.qt_scraper import set_qt_scraper_config
+
+    # Configure before running examples
+    set_qt_scraper_config(
+        thumbnail_source="last",
+        hide_toolbars=True,
+        capture_inside_layout=True
+    )
+
+    Or use the helper function for basic configuration:
+
+    from guidata.utils.qt_scraper import get_sphinx_gallery_conf
+    sphinx_gallery_conf = get_sphinx_gallery_conf()
 """
 
 from __future__ import annotations
@@ -36,7 +63,7 @@ from typing import Any
 
 try:
     from qtpy.QtCore import Qt
-    from qtpy.QtWidgets import QApplication, QDialog, QMainWindow, QWidget
+    from qtpy.QtWidgets import QApplication, QDialog, QMainWindow, QToolBar, QWidget
 
     QT_AVAILABLE = True
 except ImportError:
@@ -44,6 +71,13 @@ except ImportError:
 
 # Set up logging
 logger = logging.getLogger(__name__)
+
+# Configuration for Qt scraper (module-level)
+_qt_scraper_config = {
+    "thumbnail_widget": "last",  # "first", "last", or None
+    "hide_toolbars": False,  # Hide all toolbars when capturing widgets
+    "capture_inside_layout": False,  # Capture only the central widget inside layouts
+}
 
 
 def _find_qt_top_widgets() -> list[QWidget]:
@@ -101,6 +135,12 @@ def _capture_widget(widget: QWidget, output_path: str | Path) -> bool:
         return False
 
     try:
+        if _qt_scraper_config.get("hide_toolbars", False):
+            # Hide all toolbars temporarily
+            toolbars = widget.findChildren(QToolBar)
+            for tb in toolbars:
+                tb.setVisible(False)
+
         # Make sure the widget is visible and rendered
         widget.show()
         widget.raise_()
@@ -108,14 +148,34 @@ def _capture_widget(widget: QWidget, output_path: str | Path) -> bool:
 
         # Process events to ensure the widget is fully rendered
         app = QApplication.instance()
-        if app:
-            app.processEvents()
+        app.processEvents()
 
         # Small delay to ensure rendering is complete
         time.sleep(0.1)
 
         # Capture the screenshot
-        pixmap = widget.grab()
+        if _qt_scraper_config.get("capture_inside_layout", False):
+            # Capture only the content inside the window, excluding title bar
+            if isinstance(widget, QDialog):
+                # For dialogs, grab the entire client area excluding decorations
+                content_rect = widget.contentsRect()
+                pixmap = widget.grab(content_rect)
+            elif isinstance(widget, QMainWindow):
+                # For main windows, grab the central widget if available
+                central_widget = widget.centralWidget()
+                if central_widget:
+                    pixmap = central_widget.grab()
+                else:
+                    # Fallback to content rect
+                    content_rect = widget.contentsRect()
+                    pixmap = widget.grab(content_rect)
+            else:
+                # For other widgets, use content rect
+                content_rect = widget.contentsRect()
+                pixmap = widget.grab(content_rect)
+        else:
+            # Default behavior: capture the entire widget including title bar
+            pixmap = widget.grab()
         if not pixmap.isNull():
             success = pixmap.save(str(output_path), "PNG")
             if success:
@@ -207,6 +267,39 @@ def _generate_rst_block(
 """
 
 
+def _save_as_thumbnail(widget: QWidget, img_dir: Path, example_name: str) -> bool:
+    """Save a widget as the thumbnail for sphinx-gallery.
+
+    Args:
+        widget: The Qt widget to use as thumbnail.
+        img_dir: Directory to save images.
+        example_name: Name of the example (without extension).
+
+    Returns:
+        True if thumbnail was saved successfully, False otherwise.
+    """
+    try:
+        # Create thumbnail directory following sphinx-gallery convention
+        thumb_dir = img_dir / "thumb"
+        thumb_dir.mkdir(parents=True, exist_ok=True)
+
+        thumb_name = f"sphx_glr_{example_name}_thumb.png"
+        thumb_path = thumb_dir / thumb_name
+
+        # Capture the widget as thumbnail
+        success = _capture_widget(widget, thumb_path)
+        if success:
+            logger.info("Saved thumbnail: %s", thumb_path)
+            return True
+        else:
+            logger.warning("Failed to save thumbnail: %s", thumb_path)
+            return False
+
+    except Exception as exc:
+        logger.error("Failed to save thumbnail: %s", exc)
+        return False
+
+
 def qt_scraper(
     block: str, block_vars: dict[str, Any], gallery_conf: dict[str, Any], **kwargs: Any
 ) -> str:
@@ -251,8 +344,14 @@ def qt_scraper(
 
     timestamp = int(time.time() * 1000)  # milliseconds for uniqueness
 
-    # Capture each widget
+    # Get thumbnail configuration from module config
+    thumbnail_config = _qt_scraper_config.get("thumbnail_widget", None)
+
+    # Capture each widget and collect successful captures
     rst_blocks = []
+    successful_widgets = []
+    successful_indices = []
+
     for i, widget in enumerate(widgets):
         try:
             # Generate unique image path
@@ -272,41 +371,56 @@ def qt_scraper(
             if success:
                 rst_block = _generate_rst_block(image_name, gallery_conf, i)
                 rst_blocks.append(rst_block)
+                successful_widgets.append(widget)
+                successful_indices.append(i)
                 logger.debug("Successfully captured widget %d", i + 1)
             else:
                 logger.warning("Failed to capture widget %d", i + 1)
-
-            # Close the widget to prevent accumulation (if it has a close method)
-            if hasattr(widget, "close") and hasattr(widget, "deleteLater"):
-                try:
-                    widget.close()
-                    # Don't call deleteLater() immediately as it may interfere
-                    # with other widgets or the application
-                except Exception as exc:
-                    logger.warning("Failed to close widget %d: %s", i + 1, exc)
 
         except Exception as exc:
             logger.error("Failed to process Qt widget %d: %s", i, exc)
             continue
 
+    # Handle thumbnail generation based on configuration
+    if thumbnail_config and successful_widgets:
+        if "src_file" in block_vars:
+            example_name = Path(str(block_vars["src_file"])).stem
+        else:
+            raise RuntimeError(
+                "Unable to determine example name: src_file not found in block_vars"
+            )
+        logger.info("Detected example name: %s", example_name)
+        try:
+            if thumbnail_config == "first":
+                thumbnail_widget = successful_widgets[0]
+                widget_idx = successful_indices[0]
+                logger.info("Using first widget (index %d) as thumbnail", widget_idx)
+            elif thumbnail_config == "last":
+                thumbnail_widget = successful_widgets[-1]
+                widget_idx = successful_indices[-1]
+                logger.info("Using last widget (index %d) as thumbnail", widget_idx)
+            else:
+                thumbnail_widget = None
+
+            if thumbnail_widget:
+                success = _save_as_thumbnail(thumbnail_widget, img_dir, example_name)
+                if success:
+                    logger.info("Thumbnail generated successfully")
+                else:
+                    logger.warning("Failed to generate thumbnail")
+
+        except Exception as exc:
+            logger.error("Failed to generate thumbnail: %s", exc)
+
+    # Close all widgets to prevent accumulation
+    for i, widget in enumerate(widgets):
+        if hasattr(widget, "close") and hasattr(widget, "deleteLater"):
+            try:
+                widget.close()
+            except Exception as exc:
+                logger.warning("Failed to close widget %d: %s", i + 1, exc)
+
     return "".join(rst_blocks)
-
-
-def _get_qt_version() -> str | None:
-    """Get Qt version if available.
-
-    Returns:
-        Qt version string or None if not available.
-    """
-    if not QT_AVAILABLE:
-        return None
-
-    try:
-        from qtpy.QtCore import QT_VERSION_STR
-
-        return QT_VERSION_STR
-    except ImportError:
-        return None
 
 
 def setup_qt_scraper(app: Any, config: Any) -> None:  # noqa: ARG001
@@ -332,12 +446,35 @@ def get_qt_scraper() -> Any:
     return qt_scraper
 
 
-def get_qt_scraper_config() -> dict[str, Any]:
-    """Return a configuration dict for Qt scraper.
+def set_qt_scraper_config(
+    thumbnail_source: str | None = "last",
+    hide_toolbars: bool = False,
+    capture_inside_layout: bool = False,
+) -> None:
+    """Set the Qt scraper thumbnail configuration.
 
-    Returns:
-        Configuration dictionary for Sphinx-Gallery.
+    Args:
+        thumbnail_source: Which widget to use as thumbnail. Options are "first" (use
+         the first successfully captured widget), "last" (use the last successfully
+         captured widget), or None (no automatic thumbnail generation).
+        hide_toolbars: If True, hide all toolbars when capturing widgets.
+        capture_inside_layout: If True, capture only the central widget inside layouts.
     """
+    global _qt_scraper_config
+    if thumbnail_source not in ("first", "last", None):
+        raise ValueError("widget must be 'first', 'last', or None")
+    _qt_scraper_config["thumbnail_widget"] = thumbnail_source
+    _qt_scraper_config["hide_toolbars"] = hide_toolbars
+    _qt_scraper_config["capture_inside_layout"] = capture_inside_layout
+    logger.info("Qt scraper thumbnail config set to: %s", thumbnail_source)
+    logger.info("Qt scraper hide_toolbars config set to: %s", hide_toolbars)
+    logger.info(
+        "Qt scraper capture_inside_layout config set to: %s", capture_inside_layout
+    )
+
+
+def get_sphinx_gallery_conf() -> dict[str, Any]:
+    """Return a Sphinx-Gallery configuration dict for Qt scraper."""
     config = {
         "image_scrapers": ["guidata.utils.qt_scraper.qt_scraper"],
         "examples_dirs": "examples",  # Path to example scripts
@@ -353,10 +490,4 @@ def get_qt_scraper_config() -> dict[str, Any]:
         "plot_gallery": True,  # Enable gallery plotting
         "run_stale_examples": False,  # Force run all examples
     }
-
-    # Add Qt version info if available
-    version = _get_qt_version()
-    if version:
-        config["qt_version"] = version
-
     return config
