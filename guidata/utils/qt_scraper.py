@@ -473,13 +473,13 @@ def set_qt_scraper_config(
     )
 
 
-def get_sphinx_gallery_conf() -> dict[str, Any]:
+def get_sphinx_gallery_conf(**kwargs) -> dict[str, Any]:
     """Return a Sphinx-Gallery configuration dict for Qt scraper."""
     config = {
         "image_scrapers": ["guidata.utils.qt_scraper.qt_scraper"],
         "examples_dirs": "examples",  # Path to example scripts
         "gallery_dirs": "auto_examples",  # Output directory for gallery
-        "filename_pattern": "plot_",  # Pattern for example files
+        "filename_pattern": "",  # Pattern for example files
         "reset_modules": (),  # Can be customized by the user
         "remove_config_comments": False,
         "expected_failing_examples": [],
@@ -490,4 +490,5 @@ def get_sphinx_gallery_conf() -> dict[str, Any]:
         "plot_gallery": True,  # Enable gallery plotting
         "run_stale_examples": False,  # Force run all examples
     }
+    config.update(kwargs)
     return config
