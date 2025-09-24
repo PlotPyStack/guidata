@@ -267,6 +267,7 @@ def clean_documentation_files(project_root: Path, lib_name: str, mod_name: str) 
     print("  Cleaning documentation files...")
     remove_if_exists(project_root / "doc" / "changelog.md")
     remove_if_exists(project_root / "doc" / "auto_examples")
+    remove_if_exists(project_root / "doc" / "sg_execution_times.rst")
     remove_glob_pattern(f"{mod_name}/data/doc/{lib_name}*.pdf", project_root)
 
 
