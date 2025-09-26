@@ -134,6 +134,29 @@
     * The names of the enum members (as strings)
     * The index of the enum member (as an integer)
 
+* **LabeledEnum with seamless interoperability**: Enhanced the `LabeledEnum` class to provide true seamless interoperability between enum members and their string values:
+  * Added `__eq__` and `__hash__` methods that enable bidirectional equality: `enum_member == "string_value"` and `"string_value" == enum_member` both work correctly
+  * Functions can now seamlessly accept both enum members and string values: `process(EnumType.VALUE)` works identically to `process("value")`
+  * Set operations correctly deduplicate enum members and their corresponding strings: `{EnumType.VALUE, "value"}` has length 1
+  * This enables API flexibility while maintaining type safety, allowing users to pass either enum instances or their string representations interchangeably
+  * Example usage:
+
+    ```python
+    class ProcessingMode(LabeledEnum):
+        FAST = ("fast_mode", "Fast Processing")
+        ACCURATE = ("accurate_mode", "Accurate Processing")
+
+    def process_data(mode):
+        if mode == ProcessingMode.FAST:  # Works with both enum and string
+            return "fast_processing"
+        # ...
+
+    # Both calls work identically:
+    result1 = process_data(ProcessingMode.FAST)  # Using enum
+    result2 = process_data("fast_mode")          # Using string
+    # result1 == result2 is True!
+    ```
+
 * `StringItem` behavior change:
   * The `StringItem` class now uses the new validation modes (see above).
   * As a side effect, the `StringItem` class now considers `None` as an invalid default value, and highlights it in the UI.

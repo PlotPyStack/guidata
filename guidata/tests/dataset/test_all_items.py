@@ -54,6 +54,26 @@ class ImageTypes(Enum):
     RAMP = _("2D ramp")
 
 
+class FilteringMethod(gds.LabeledEnum):
+    """LabeledEnum example with invariant keys and UI labels."""
+
+    GAUSSIAN = "gaussian", _("Gaussian filter")
+    MEDIAN = "median", _("Median filter")
+    SOBEL = "sobel", _("Sobel edge detection")
+    LAPLACIAN = "laplacian", _("Laplacian filter")
+    BILATERAL = "bilateral", _("Bilateral filter")
+    MORPHOLOGICAL = "morphological"  # Uses key as label
+
+
+class ThresholdMode(gds.LabeledEnum):
+    """Another LabeledEnum example."""
+
+    OTSU = "otsu_method", _("Otsu's method")
+    ADAPTIVE = "adaptive_mean", _("Adaptive mean")
+    GLOBAL = "global_threshold", _("Global threshold")
+    TRIANGLE = "triangle_algorithm", _("Triangle algorithm")
+
+
 class Parameters(gds.DataSet):
     """
     DataSet test
@@ -88,6 +108,15 @@ class Parameters(gds.DataSet):
         [("16", "first choice"), ("32", "second choice"), ("64", "third choice")],
     )
     choice2 = gds.ChoiceItem("Image type", ImageTypes, default=ImageTypes.GAUSS)
+
+    # LabeledEnum examples - Pattern 1 with invariant keys and UI labels
+    filter_method = gds.ChoiceItem(
+        "Filtering method", FilteringMethod, default=FilteringMethod.GAUSSIAN
+    )
+    threshold_mode = gds.ChoiceItem(
+        "Threshold mode", ThresholdMode, default=ThresholdMode.OTSU
+    )
+
     mchoice2 = gds.ImageChoiceItem(
         "Single choice 2",
         [
@@ -130,6 +159,26 @@ def test_all_items():
         prm = Parameters()
 
         prm.floatarray[:, 0] = np.linspace(-5, 5, 50)
+
+        # Demonstrate LabeledEnum functionality
+        execenv.print("=== LabeledEnum Pattern 1 Demo ===")
+        execenv.print(f"Filter method (enum member): {prm.filter_method!r}")
+        execenv.print(f"Filter value (invariant key): {prm.filter_method.value!r}")
+        execenv.print(f"Filter label (UI display): {prm.filter_method.label!r}")
+        execenv.print(f"Filter str(): {str(prm.filter_method)!r}")
+
+        # Show different ways to set LabeledEnum values
+        prm.filter_method = "sobel"  # Set by invariant key
+        execenv.print(f"Set by key 'sobel': {prm.filter_method!r}")
+
+        prm.filter_method = "Median filter"  # Set by UI label
+        execenv.print(f"Set by label 'Median filter': {prm.filter_method!r}")
+
+        prm.filter_method = 0  # Set by index
+        execenv.print(f"Set by index 0: {prm.filter_method!r}")
+
+        execenv.print("=== End LabeledEnum Demo ===")
+
         execenv.print(prm)
         if prm.edit():
             execenv.print(prm)

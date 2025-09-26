@@ -28,6 +28,7 @@ from .dataitems import (
     FontFamilyItem,
     ImageChoiceItem,
     IntItem,
+    LabeledEnum,
     MultipleChoiceItem,
     StringItem,
     TextItem,

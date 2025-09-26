@@ -119,6 +119,49 @@ if TYPE_CHECKING:
 _T = TypeVar("_T")
 
 
+class LabeledEnum(Enum):
+    """Enum with invariant key and optional translated label.
+
+    This enum supports Pattern 1:
+    - .value is the invariant key (used for API, serialization, comparisons)
+    - .label is the human-readable string (translated or not) used for UI display
+    - Seamless interoperability: enum_member == string_value works
+
+    Example:
+        class MyEnum(LabeledEnum):
+            OPTION1 = "opt1", _("Option 1")
+            OPTION2 = "opt2", _("Option 2")
+            OPTION3 = "opt3"  # Uses key as label
+
+        # These are equivalent:
+        MyEnum.OPTION1 == "opt1"  # True
+        func(MyEnum.OPTION1) == func("opt1")  # Same behavior
+    """
+
+    def __new__(cls, value, label=None):
+        if label is None:
+            label = value
+        obj = object.__new__(cls)
+        obj._value_ = value  # stable key
+        obj.label = label  # UI label (possibly translated)
+        return obj
+
+    def __str__(self) -> str:
+        return str(self.label)
+
+    def __eq__(self, other) -> bool:
+        """Enable seamless comparison between enum members and their string values."""
+        if isinstance(other, self.__class__):
+            return self._value_ == other._value_
+        elif isinstance(other, str):
+            return self._value_ == other
+        return False
+
+    def __hash__(self) -> int:
+        """Use the value for hashing to enable set operations with strings."""
+        return hash(self._value_)
+
+
 class NumericTypeItem(DataItem):
     """Numeric data item
 
@@ -953,7 +996,10 @@ class ChoiceItem(DataItem, Generic[_T]):
         _choices_data: Any
         if isinstance(choices, EnumMeta):
             self._enum_cls = choices
-            _choices_data = [(m.name, str(m.value), None) for m in choices]
+            # Build _choices_data as [(m.name, m.label, None)] for each member
+            _choices_data = [
+                (m.name, getattr(m, "label", str(m.value)), None) for m in choices
+            ]
             # Only coerce if default is a real value
             if default not in (FirstChoice, None):
                 default = self._enum_coerce_in(default)
@@ -993,31 +1039,35 @@ class ChoiceItem(DataItem, Generic[_T]):
                 return False
         return True
 
-    def _enum_coerce_in(self, v: Any) -> str:
-        """Accept Enum | name | value | label -> return string name (key)"""
+    def _enum_coerce_in(self, v: object) -> str:
+        """Accept Enum member | name | value | label | index
+        → return string name (the storage key).
+        """
+        if self._enum_cls is None:
+            raise TypeError("No Enum class set in ChoiceItem")
+
         # Enum member
-        if self._enum_cls is not None:
-            if isinstance(v, self._enum_cls):
-                return v.name
-        # name
+        if isinstance(v, self._enum_cls):
+            return v.name
+
+        # name (e.g. "LINEAR")
         if isinstance(v, str) and v in self._enum_cls.__members__:
             return v
-        # try value
+
+        # value (stable key) or label (UI string)
         for m in self._enum_cls:
-            if v == m.value:
+            if v == m.value or v == getattr(m, "label", str(m.value)):
                 return m.name
-        # Index
+
+        # index
         if isinstance(v, int):
             members = list(self._enum_cls)
             if 0 <= v < len(members):
                 return members[v].name
-        # try label (what UI shows) — rely on normalized choices
-        for name, label in [(m.name, str(m.value)) for m in self._enum_cls]:
-            if v == label:
-                return name
+
         raise ValueError(
             f"Invalid value '{v}' for {self._enum_cls.__name__} "
-            f"(expected a member, name, value or label)."
+            f"(expected a member, name, value, label, or index)"
         )
 
     def __get__(self, instance: DataSet, owner: type | None = None) -> Any:
