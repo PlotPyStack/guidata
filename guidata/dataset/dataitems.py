@@ -169,10 +169,6 @@ class LabeledEnum(Enum):
         """Return the length of the value string."""
         return len(self._value_)
 
-    def __iter__(self):
-        """Enable iteration over the value string."""
-        return iter(self._value_)
-
     def __contains__(self, item) -> bool:
         """Enable 'in' operator by checking the value string."""
         return item in self._value_
