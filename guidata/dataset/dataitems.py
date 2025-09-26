@@ -500,6 +500,10 @@ class StringItem(DataItem):
         if not self.get_prop("data", "check_value", True):
             return True
 
+        # Convert LabeledEnum members to their string values for validation
+        if isinstance(value, LabeledEnum):
+            value = value.value
+
         if not isinstance(value, self.type):
             if raise_exception:
                 raise TypeError(f"Expected {self.type}, got {type(value)}")
@@ -532,6 +536,15 @@ class StringItem(DataItem):
         if self.get_prop("display", "password"):
             return "*" * len(strval)
         return strval
+
+    def _set_value_with_validation(
+        self, instance: Any, value: Any, force_allow_none: bool = False
+    ) -> None:
+        """Override DataItem._set_value_with_validation to handle LabeledEnum members"""
+        # Convert LabeledEnum members to their string values before validation
+        if isinstance(value, LabeledEnum):
+            value = value.value
+        super()._set_value_with_validation(instance, value, force_allow_none)
 
     def get_value_from_reader(self, reader: HDF5Reader | JSONReader | INIReader) -> Any:
         """Reads value from the reader object, inside the try...except
