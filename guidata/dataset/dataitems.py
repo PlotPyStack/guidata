@@ -161,6 +161,86 @@ class LabeledEnum(Enum):
         """Use the value for hashing to enable set operations with strings."""
         return hash(self._value_)
 
+    def __getitem__(self, key):
+        """Enable subscripting like strings by delegating to the value."""
+        return self._value_[key]
+
+    def __len__(self) -> int:
+        """Return the length of the value string."""
+        return len(self._value_)
+
+    def __iter__(self):
+        """Enable iteration over the value string."""
+        return iter(self._value_)
+
+    def __contains__(self, item) -> bool:
+        """Enable 'in' operator by checking the value string."""
+        return item in self._value_
+
+    def __add__(self, other):
+        """Enable string concatenation with + operator."""
+        return self._value_ + other
+
+    def __radd__(self, other):
+        """Enable reverse string concatenation."""
+        return other + self._value_
+
+    def __mod__(self, other):
+        """Enable string formatting with % operator."""
+        return self._value_ % other
+
+    def __format__(self, format_spec):
+        """Enable string formatting with format() and f-strings."""
+        return format(self._value_, format_spec)
+
+    def lower(self):
+        """Return lowercase version of the value."""
+        return self._value_.lower()
+
+    def upper(self):
+        """Return uppercase version of the value."""
+        return self._value_.upper()
+
+    def strip(self, chars=None):
+        """Strip whitespace from the value."""
+        return self._value_.strip(chars)
+
+    def replace(self, old, new, count=-1):
+        """Replace occurrences in the value."""
+        return self._value_.replace(old, new, count)
+
+    def split(self, sep=None, maxsplit=-1):
+        """Split the value string."""
+        return self._value_.split(sep, maxsplit)
+
+    def join(self, iterable):
+        """Join strings using the value as separator."""
+        return self._value_.join(iterable)
+
+    def startswith(self, prefix, start=0, end=None):
+        """Check if value starts with prefix."""
+        if end is None:
+            return self._value_.startswith(prefix, start)
+        return self._value_.startswith(prefix, start, end)
+
+    def endswith(self, suffix, start=0, end=None):
+        """Check if value ends with suffix."""
+        if end is None:
+            return self._value_.endswith(suffix, start)
+        return self._value_.endswith(suffix, start, end)
+
+    def find(self, sub, start=0, end=None):
+        """Find substring in the value."""
+        if end is None:
+            return self._value_.find(sub, start)
+        return self._value_.find(sub, start, end)
+
+    def count(self, sub, start=0, end=None):
+        """Count occurrences of substring in the value."""
+        if end is None:
+            return self._value_.count(sub, start)
+        return self._value_.count(sub, start, end)
+
 
 class NumericTypeItem(DataItem):
     """Numeric data item
