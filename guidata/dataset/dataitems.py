@@ -141,14 +141,29 @@ class LabeledEnum(str, Enum):
     def __new__(cls, value, label=None):
         if label is None:
             label = value
-        # Initialize the str part with the value
+        # Initialize the str part with the value for consistent string behavior
+        # This ensures string operations, comparisons, and isinstance(obj, str) work
         obj = str.__new__(cls, value)
         obj._value_ = value  # stable key
         obj.label = label  # UI label (possibly translated)
         return obj
 
     def __str__(self) -> str:
+        """Return the label for display purposes."""
         return str(self.label)
+
+    def __repr__(self) -> str:
+        """Return the string representation of the enum value.
+
+        This is crucial for code generation where enum members are used as default
+        parameter values. By returning the string value directly, we avoid the need
+        for makefun to resolve enum class references in generated function signatures.
+        """
+        return repr(self._value_)
+
+    def __format__(self, format_spec):
+        """Use the label when formatting for display."""
+        return format(str(self.label), format_spec)
 
     def __eq__(self, other) -> bool:
         """Enable seamless comparison between enum members and their string values."""
