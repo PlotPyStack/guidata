@@ -6,6 +6,7 @@ import qtpy
 
 import guidata
 from guidata.env import execenv
+from guidata.utils.gitreport import format_git_info_for_pytest, get_git_info_for_modules
 
 # Turn on unattended mode for executing tests without user interaction
 execenv.unattended = True
@@ -35,7 +36,18 @@ def pytest_report_header(config):
     qtbindings_version = qtpy.PYSIDE_VERSION
     if qtbindings_version is None:
         qtbindings_version = qtpy.PYQT_VERSION
-    return [
+    infolist = [
         f"guidata {guidata.__version__}, "
         f"{qtpy.API_NAME} {qtbindings_version} [Qt version: {qtpy.QT_VERSION}]",
     ]
+
+    # Git information for all modules using the gitreport module
+    modules_config = [
+        ("guidata", guidata, "."),  # guidata uses current directory
+    ]
+    git_repos = get_git_info_for_modules(modules_config)
+    git_info_lines = format_git_info_for_pytest(git_repos, "guidata")
+    if git_info_lines:
+        infolist.extend(git_info_lines)
+
+    return infolist
