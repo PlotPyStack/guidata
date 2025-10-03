@@ -71,13 +71,13 @@
     ```python
     class PersonDataSet(DataSet):
         """Personal Information Dataset
-        
+
         This dataset collects basic personal information.
         """
         name = StringItem("Full Name", default="John Doe")
         age = IntItem("Age", default=30)
         active = BoolItem("Account Active", default=True)
-        
+
     dataset = PersonDataSet()
     html_output = dataset.to_html()  # Generate HTML representation
     ```
@@ -1019,7 +1019,7 @@ New features:
 
 Bug fixes:
 
-* disthelpers.prepend_module_to_path: unload modules which were already imported to be able to replace them by other versions (mostly `guidata` should be concerned by this if the function is used -as it should be- in package's __init__.py script)
+* disthelpers.prepend_module_to_path: unload modules which were already imported to be able to replace them by other versions (mostly `guidata` should be concerned by this if the function is used -as it should be- in package's `__init__`.py script)
 
 ### Version 1.5.1 ###
 
@@ -1159,7 +1159,7 @@ Other changes:
 * guidata.utils.utf8_to_unicode: translated error message in english
 * Add support for 'int' in hdf5 save function
 * guidata.dataset/Numeric items (FloatItem, IntItem): added option 'unit' (automatically add suffix ' (unit)' to label in edit mode and suffix ' unit' to value in read-only mode)
-* Improved dataset __str__ method: code refactoring with read-only dataset widgets (DataItem: added methods 'format_string' and 'get_string_value', DataSet: added method 'to_string')
+* Improved dataset `__str__` method: code refactoring with read-only dataset widgets (DataItem: added methods 'format_string' and 'get_string_value', DataSet: added method 'to_string')
 * Added coding guidelines to the documentation
 * guidata.dataset.qtwidget: added specific widget (ShowBooleanWidget) for read-only display of bool items (text is striked out when value is False)
 * guidata.hdf5io.Dset: added missing keyword argument 'optional' (same effect as parent class Attr)
@@ -1182,7 +1182,7 @@ Bug fixes:
 
 * setup.py: added svg icons to data files
 * gettext helpers were not working on Linux (Windows install pygettext was hardcoded)
-* DataSet/bugfix: comment/title options now override the DataSet class __doc__ attribute
+* DataSet/bugfix: comment/title options now override the DataSet class `__doc__` attribute
 * Added missing option 'basedir' for FilesOpenItem
 * DirectoryItem: fixed missing child_title attribute bug
 * For all DataSet GUI representation, the comment text is now word-wrapped
