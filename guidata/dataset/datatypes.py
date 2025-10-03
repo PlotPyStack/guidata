@@ -580,7 +580,7 @@ class DataItem(ABC):
             if value is not None:
                 text = self.format_string(instance, value, fmt, func)
             else:
-                text = ""
+                text = "-"
             return text
 
     def get_name(self) -> str:
@@ -1674,6 +1674,86 @@ class DataSet(metaclass=DataSetMeta):
         """
         for item in self._items:
             item.accept(vis)
+
+    def to_html(self) -> str:
+        """Return HTML representation of the dataset.
+
+        Similar to Sigima's TableResult transpose format with:
+
+        - Title and comment in blue
+        - Two-column table: item names (right-aligned) and values (left-aligned)
+        - For BoolItem: checkbox in first column with label:text formatting
+
+        Returns:
+            HTML representation
+        """
+        # Create the title with comment
+        html = f'<u><b style="color: blue">{self.__title}</b></u>'
+
+        if self.__comment:
+            # Add comment on new line, also in blue
+            html += f'<br><span style="color: blue">{self.__comment}</span>'
+
+        html += ":"
+
+        # Get items for representation (excluding trailing separators)
+        filtered_items = self._get_items_for_text_representation()
+
+        if not filtered_items:
+            html += "<br><em>No items to display</em>"
+            return html
+
+        # Start table with monospace font
+        html += '<table border="0" style="font-family: monospace;">'
+
+        for item in filtered_items:
+            # Skip group items and separators for HTML representation
+            if isinstance(item, (BeginGroup, EndGroup, SeparatorItem)):
+                continue
+
+            # Skip hidden items
+            try:
+                hide = item.get_prop_value("display", self, "hide")
+                if hide is True:
+                    continue
+            except KeyError:
+                pass
+
+            # Handle ObjectItem (nested datasets)
+            if isinstance(item, ObjectItem):
+                composite_dataset = item.get_value(self)
+                if hasattr(composite_dataset, "to_html"):
+                    item_label = item.get_prop_value("display", self, "label")
+                    html += (
+                        f'<tr><td style="text-align: right; vertical-align: top;">'
+                        f"{item_label}:</td>"
+                    )
+                    nested_html = composite_dataset.to_html(transpose=False)
+                    html += (
+                        f'<td style="text-align: left; padding-left: 10px;">'
+                        f"{nested_html}</td></tr>"
+                    )
+                continue
+
+            # Get item label and value
+            label = item.get_prop_value("display", self, "label")
+            if not label:
+                # For BoolItem without label, use name:text formatting
+                label = item.get_prop_value("display", self, "text", "")
+
+            # Get string representation of value
+            value_str = item.get_string_value(self)
+
+            html += (
+                f'<tr><td style="text-align: right; vertical-align: top;">{label}:</td>'
+            )
+            html += (
+                f'<td style="text-align: left; padding-left: 10px;">'
+                f"{value_str}</td></tr>"
+            )
+
+        html += "</table>"
+        return html
 
     def serialize(self, writer: HDF5Writer | JSONWriter | INIWriter) -> None:
         """Serialize the dataset

@@ -632,6 +632,15 @@ class BoolItem(DataItem):
         )
         self.set_prop("display", text=text)
 
+    def get_string_value(self, instance: DataSet) -> str:
+        """Override DataItem method"""
+        value_str = "☑" if self.get_value(instance) else "☐"
+        label = self.get_prop_value("display", self, "label")
+        text = self.get_prop_value("display", instance, "text", "")
+        if label and text:
+            value_str += " " + text
+        return value_str
+
     def get_value_from_reader(
         self, reader: HDF5Reader | JSONReader | INIReader
     ) -> bool:

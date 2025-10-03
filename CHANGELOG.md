@@ -59,6 +59,32 @@
   * Makes it immediately clear which fields you can edit and which are display-only
   * Validation errors are still highlighted with orange background when they occur
 
+* **DataSet HTML Export**: Added HTML representation method for datasets:
+  * New `to_html()` method on `DataSet` class generates HTML representation similar to Sigima's TableResult format
+  * Features blue-styled title and comment section derived from the dataset's docstring
+  * Two-column table layout with right-aligned item names and left-aligned values
+  * Special handling for `BoolItem` with checkbox characters (☑ for True, ☐ for False)
+  * Monospace font styling for consistent alignment and professional appearance
+  * Proper handling of None values (displayed as "-") and nested ObjectItem datasets
+  * Example usage:
+
+    ```python
+    class PersonDataSet(DataSet):
+        """Personal Information Dataset
+        
+        This dataset collects basic personal information.
+        """
+        name = StringItem("Full Name", default="John Doe")
+        age = IntItem("Age", default=30)
+        active = BoolItem("Account Active", default=True)
+        
+    dataset = PersonDataSet()
+    html_output = dataset.to_html()  # Generate HTML representation
+    ```
+
+  * Ideal for reports, documentation, and web-based dataset visualization
+  * Comprehensive unit test coverage ensures reliability across all item types
+
 * `guidata.configtools.get_icon`:
   * This function retrieves a QIcon from the specified image file.
   * Now supports Qt standard icons (e.g. "MessageBoxInformation" or "DialogApplyButton").
