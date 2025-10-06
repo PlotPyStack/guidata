@@ -200,6 +200,12 @@
 
 🛠️ Bug fixes:
 
+* Fixed widget `get()` methods to properly reset widgets to default state when item value is `None`:
+  * Previously, when a data item value was `None`, widgets would retain their previous displayed values instead of resetting to a default state.
+  * This affected multiple widget types: `LineEditWidget` (text fields), `TextEditWidget` (text areas), `CheckBoxWidget` (checkboxes), `DateWidget` (date pickers), `DateTimeWidget` (datetime pickers), `ChoiceWidget` (combo boxes/radio buttons), `MultipleChoiceWidget` (multiple checkboxes), and `FloatArrayWidget` (array editor).
+  * The fix ensures that when `item.get()` returns `None`, each widget resets to an appropriate default state: empty string for text fields, unchecked for checkboxes, today's date for date pickers, first choice for choice widgets, empty array for array widgets, etc.
+  * This prevents widgets from displaying stale values when the underlying data item is `None`, improving data integrity and user experience.
+
 * Fixed `DataSet` inheritance bug where attribute redefinition in intermediate base classes was not properly propagated to child classes:
   * Previously, when a `DataItem` was redefined in an intermediate base class (e.g., `MiddleClass` redefining an attribute from `BaseClass`), child classes would still inherit the original grandparent version instead of the redefined version from their immediate parent.
   * This was caused by the `collect_items_in_bases_order` function using a depth-first traversal with a `seen` set that prevented processing of redefined attributes.

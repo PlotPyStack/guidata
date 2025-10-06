@@ -454,7 +454,13 @@ class LineEditWidget(AbstractDataSetWidget):
             if value != old_value:
                 self.edit.setText(value)
         else:
-            self.line_edit_changed(value)
+            # Reset widget if value is None
+            if self.edit.text() != "":
+                self.edit.setText("")
+            else:
+                # Trigger callbacks even if widget is already empty, as the logical
+                # state changed from empty string to None
+                self.line_edit_changed(value)
 
     def line_edit_changed(self, qvalue: str | None) -> None:
         """QLineEdit validator"""
@@ -517,8 +523,7 @@ class TextEditWidget(AbstractDataSetWidget):
     def get(self) -> None:
         """Update widget contents from data item value"""
         value = self.item.get()
-        if value is not None:
-            self.edit.setPlainText(value)
+        self.edit.setPlainText(value or "")  # Reset widget if value is None
         self.text_changed()
 
     def text_changed(self) -> None:
@@ -580,6 +585,9 @@ class CheckBoxWidget(AbstractDataSetWidget):
         value = self.item.get()
         if value is not None:
             self.checkbox.setChecked(value)
+        else:
+            # Reset widget if value is None
+            self.checkbox.setChecked(False)
 
     def set(self) -> None:
         """Update data item value from widget contents"""
@@ -666,6 +674,9 @@ class DateWidget(AbstractDataSetWidget):
             if not isinstance(value, datetime.date):
                 value = datetime.date.fromordinal(value)
             self.dateedit.setDate(value)
+        elif value is None:
+            # Reset widget if value is None
+            self.dateedit.setDate(datetime.date.today())
 
     def set(self) -> None:
         """Update data item value from widget contents"""
@@ -721,6 +732,9 @@ class DateTimeWidget(AbstractDataSetWidget):
             if not isinstance(value, datetime.datetime):
                 value = datetime.datetime.fromtimestamp(value)
             self.dateedit.setDateTime(value)
+        elif value is None:
+            # Reset widget if value is None
+            self.dateedit.setDateTime(datetime.datetime.now())
 
     def set(self) -> None:
         """Update data item value from widget contents"""
@@ -1174,6 +1188,12 @@ class ChoiceWidget(AbstractDataSetWidget):
             if self._first_call:
                 self.index_changed(idx)
                 self._first_call = False
+        else:
+            # Reset widget if value is None
+            self.set_widget_value(0)
+            if self._first_call:
+                self.index_changed(0)
+                self._first_call = False
 
     def set(self) -> None:
         """Update data item value from widget contents"""
@@ -1240,6 +1260,9 @@ class MultipleChoiceWidget(AbstractDataSetWidget):
         for (i, _choice, _img), checkbox in zip(_choices, self.boxes):
             if value is not None and i in value:
                 checkbox.setChecked(True)
+            else:
+                # Reset widget if value is None or item not in value
+                checkbox.setChecked(False)
 
     def set(self) -> None:
         """Update data item value from widget contents"""
@@ -1355,6 +1378,10 @@ class FloatArrayWidget(AbstractDataSetWidget):
             self.arr = np.asarray(value)
             if self.item.get_prop_value("display", "transpose"):
                 self.arr = self.arr.T
+            self.update(self.arr)
+        else:
+            # Reset widget if value is None
+            self.arr = np.array([])
             self.update(self.arr)
 
     def update(self, arr: np.ndarray) -> None:
