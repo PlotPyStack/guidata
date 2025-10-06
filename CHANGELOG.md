@@ -200,6 +200,14 @@
 
 🛠️ Bug fixes:
 
+* Fixed dataset corruption in `DataSetShowGroupBox.get()` when updating widgets with dependencies:
+  * When updating widgets from dataset values (e.g., when switching between objects in DataLab), the `get()` method would set `build_mode=True` on widgets sequentially while calling their `get()` methods.
+  * This caused Qt signal callbacks to invoke `update_widgets()` on other widgets that hadn't yet had their `build_mode` set, leading `_display_callback()` to call `update_dataitems()`.
+  * As a result, stale widget values would be written back to the dataset before those widgets were updated from the new dataset values, corrupting the data.
+  * The fix uses a three-phase approach: (1) set `build_mode=True` on ALL terminal widgets (including nested ones) before any updates, (2) update all widgets from dataset values, (3) reset `build_mode=False` on all terminal widgets.
+  * This ensures callbacks during the update phase find all widgets with `build_mode=True`, preventing premature writes of stale widget values to the dataset.
+  * This issue was particularly visible when switching between images in DataLab where field values (like `zscalemin`) would incorrectly retain values from the previously selected object instead of showing `None` or the new object's actual values.
+
 * Fixed widget `get()` methods to properly reset widgets to default state when item value is `None`:
   * Previously, when a data item value was `None`, widgets would retain their previous displayed values instead of resetting to a default state.
   * This affected multiple widget types: `LineEditWidget` (text fields), `TextEditWidget` (text areas), `CheckBoxWidget` (checkboxes), `DateWidget` (date pickers), `DateTimeWidget` (datetime pickers), `ChoiceWidget` (combo boxes/radio buttons), `MultipleChoiceWidget` (multiple checkboxes), and `FloatArrayWidget` (array editor).

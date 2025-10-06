@@ -819,11 +819,23 @@ class DataSetShowGroupBox(Generic[AnyDataSet], QGroupBox):
 
     def get(self) -> None:
         """Update group box contents from data item values"""
-        for widget in self.edit.widgets:
+        # Set build_mode=True for ALL widgets (including nested ones) FIRST
+        # to prevent update_dataitems() from being called during callbacks
+        # (which would write stale widget values back to the dataset before
+        # those widgets have been updated)
+        all_widgets = self.edit.get_terminal_widgets()
+        for widget in all_widgets:
             widget.build_mode = True
+
+        # Now update all widgets from dataset
+        for widget in self.edit.widgets:
             widget.get()
             widget.set_state()
+
+        # Reset build_mode after all updates are complete
+        for widget in all_widgets:
             widget.build_mode = False
+
         if self.apply_button is not None:
             self.apply_button.setVisible(not self.dataset.is_readonly())
 
