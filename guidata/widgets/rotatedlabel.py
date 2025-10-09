@@ -14,7 +14,7 @@ rotated text.
 from math import cos, pi, sin
 
 from qtpy.QtCore import QSize, Qt
-from qtpy.QtGui import QPainter, QPen
+from qtpy.QtGui import QFont, QPainter, QPen
 from qtpy.QtWidgets import QLabel
 
 from guidata.configtools import get_family
@@ -49,6 +49,7 @@ class RotatedLabel(QLabel):
             font.setFamily(get_family(family))
         font.setBold(bold)
         font.setItalic(italic)
+        font.setHintingPreference(QFont.PreferNoHinting)
         self.setFont(font)
         self.color = color
         self.angle = angle

@@ -200,6 +200,8 @@
 
 🛠️ Bug fixes:
 
+* Fixed font hinting preference in `RotatedLabel` initialization for improved text rendering
+
 * Fixed dataset corruption in `DataSetShowGroupBox.get()` when updating widgets with dependencies:
   * When updating widgets from dataset values (e.g., when switching between objects in DataLab), the `get()` method would set `build_mode=True` on widgets sequentially while calling their `get()` methods.
   * This caused Qt signal callbacks to invoke `update_widgets()` on other widgets that hadn't yet had their `build_mode` set, leading `_display_callback()` to call `update_dataitems()`.

@@ -32,7 +32,7 @@ class Frame(QFrame):
             for column in range(7):
                 layout.addWidget(
                     RotatedLabel(
-                        "Label %03d°" % angle, angle=angle, color=Qt.blue, bold=True
+                        "Label %03d°" % angle, angle=angle, color=Qt.blue, bold=False
                     ),
                     row,
                     column,
