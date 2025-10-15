@@ -34,7 +34,7 @@ atexit.register(FILE_CSV.close)
 class SubDataSet(gds.DataSet):
     dir = gds.DirectoryItem("Directory", TEMPDIR)
     fname = gds.FileOpenItem("Single file (open)", ("csv", "eta"), FILE_CSV.name)
-    fnames = gds.FilesOpenItem("Multiple files", "csv", FILE_CSV.name)
+    fnames = gds.FilesOpenItem("Multiple files", "csv", [FILE_CSV.name])
     fname_s = gds.FileSaveItem("Single file (save)", "eta", FILE_ETA.name)
 
 

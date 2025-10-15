@@ -906,17 +906,20 @@ class FilesOpenItem(FileSaveItem):
     ) -> None:
         if isinstance(default, str):
             default = [default]
-        super().__init__(
+        StringItem.__init__(
+            self,
             label,
-            formats=formats,
             default=default,
-            basedir=basedir,
-            all_files_first=all_files_first,
             regexp=regexp,
             help=help,
             check=check,
             allow_none=allow_none,
         )
+        if isinstance(formats, str):
+            formats = [formats]  # type:ignore
+        self.set_prop("data", formats=formats)
+        self.set_prop("data", basedir=basedir)
+        self.set_prop("data", all_files_first=all_files_first)
         self.set_prop("display", func=self.paths_basename)
 
     @staticmethod
@@ -955,6 +958,8 @@ class FilesOpenItem(FileSaveItem):
     ) -> None:
         """Serialize this item"""
         value = self.get_value(instance)
+        if value is not None and not isinstance(value, (tuple, list)):
+            value = [value]
         writer.write_sequence([fname.encode("utf-8") for fname in value])
 
     def get_value_from_reader(

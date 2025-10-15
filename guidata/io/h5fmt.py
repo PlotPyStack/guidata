@@ -10,6 +10,7 @@ HDF5 files (.h5)
 from __future__ import annotations
 
 import datetime
+import numbers
 import sys
 from collections.abc import Callable, Sequence
 from typing import Any
@@ -474,10 +475,10 @@ class HDF5Writer(HDF5Handler, WriterMixin):
             group = self.get_parent_group()
             try:
                 group.attrs[self.option[-1]] = val
-            except TypeError:
+            except TypeError as exc:
                 raise NotImplementedError(
                     "cannot serialize %r of type %r" % (val, type(val))
-                )
+                ) from exc
 
         if group_name:
             self.end(group_name)
@@ -583,6 +584,32 @@ class NoDefault:
     pass
 
 
+def infer_datetime(value: Any) -> Any:
+    """Infer if a numeric value represents a datetime object.
+
+    Args:
+        value: The value to check.
+
+    Returns:
+        The inferred datetime object if applicable, otherwise the original value.
+    """
+    if isinstance(value, (numbers.Real, np.generic)):
+        # Convert NumPy scalars to native Python types for consistency
+        value = value.item() if isinstance(value, np.generic) else value
+
+        # datetime.datetime: seconds since epoch
+        if isinstance(value, float) and 1e8 < value < 2e9:
+            return datetime.datetime.fromtimestamp(value)
+
+        # datetime.date: ordinal days (typical range)
+        if isinstance(value, numbers.Integral) and 50000 < value < 1000000:
+            try:
+                return datetime.date.fromordinal(value)
+            except ValueError:
+                pass
+    return value
+
+
 class HDF5Reader(HDF5Handler):
     """
     Reader for HDF5 files. Inherits from HDF5Handler.
@@ -641,7 +668,18 @@ class HDF5Reader(HDF5Handler):
             self.end(group_name)
         return val
 
-    def read_any(self) -> str | bytes:
+    def read_any(
+        self,
+    ) -> (
+        str
+        | bytes
+        | int
+        | float
+        | datetime.date
+        | datetime.datetime
+        | list[Any]
+        | np.ndarray
+    ):
         """
         Read a value from the current group as a generic type.
 
@@ -659,8 +697,7 @@ class HDF5Reader(HDF5Handler):
             value = self.read_sequence()
         if isinstance(value, bytes):
             return value.decode("utf-8")
-        else:
-            return value
+        return infer_datetime(value)
 
     def read_bool(self) -> bool | None:
         """
@@ -756,7 +793,7 @@ class HDF5Reader(HDF5Handler):
         for key, value in dict_group.attrs.items():
             if key == DICT_NAME:
                 continue
-            dict_val[key] = value
+            dict_val[key] = infer_datetime(value)
         for key in dict_group:
             with self.group(key):
                 try:

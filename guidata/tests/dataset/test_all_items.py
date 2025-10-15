@@ -82,15 +82,15 @@ class Parameters(gds.DataSet):
     as well as special characters (α, β, γ, δ, ...)
     """
 
-    dir = gds.DirectoryItem("Directory")
-    preview = gds.TextItem("File names preview")
+    dir = gds.DirectoryItem("Directory", default=TEMPDIR)
+    preview = gds.TextItem("File names preview", default="-")
     option = gds.ChoiceItem("Option", (("1", "first choice"), ("2", "second choice")))
 
     fname = gds.FileOpenItem("Open file", ("csv", "eta"), FILE_CSV.name)
-    fnames = gds.FilesOpenItem("Open files", "csv", FILE_CSV.name)
+    fnames = gds.FilesOpenItem("Open files", "csv", [FILE_CSV.name])
     fname_s = gds.FileSaveItem("Save file", "eta", FILE_ETA.name)
-    string = gds.StringItem("String")
-    text = gds.TextItem("Text")
+    string = gds.StringItem("String", default="default string !?")
+    text = gds.TextItem("Text", default="default\nmultiline\ntext")
     float_slider = gds.FloatItem(
         "Float (with slider)", default=0.5, min=0, max=1, step=0.01, slider=True
     )

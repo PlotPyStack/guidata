@@ -13,8 +13,10 @@ file.
 
 # guitest: show
 
-import os
+import os.path as osp
+import tempfile
 
+from guidata.dataset import assert_datasets_equal
 from guidata.env import execenv
 from guidata.io import HDF5Reader, HDF5Writer
 from guidata.qthelpers import qt_app_context
@@ -23,28 +25,29 @@ from guidata.tests.dataset.test_all_items import Parameters
 
 def test_loadsave_hdf5():
     """Test HDF5 I/O"""
-    fname = "test.h5"
-    with qt_app_context():
-        if os.path.exists(fname):
-            os.unlink(fname)
+    with tempfile.TemporaryDirectory() as temp_dir:
+        fname = osp.join(temp_dir, "test.h5")
+        with qt_app_context():
+            p1 = Parameters()
+            # p1.edit()
 
-        p1 = Parameters()
-        if execenv.unattended or p1.edit():
+            # Save to HDF5 file
             writer = HDF5Writer(fname)
             p1.serialize(writer)
             writer.close()
 
             p2 = Parameters()
+            # Set all items to None for testing purposes:
+            for item in p2._items:
+                item.__set__(p2, None)
+
+            # Load from HDF5 file
             reader = HDF5Reader(fname)
             p2.deserialize(reader)
             reader.close()
-            p2.edit()
-            os.unlink(fname)
 
-        # TODO: Uncomment this part of the test, and make it work!
-        # if execenv.unattended:
-        #     assert_datasets_equal(p1, p2, "Parameters do not match after HDF5 I/O")
-        execenv.print("OK")
+            assert_datasets_equal(p1, p2, "Parameters do not match after HDF5 I/O")
+            execenv.print("OK")
 
 
 if __name__ == "__main__":

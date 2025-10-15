@@ -200,6 +200,25 @@
 
 🛠️ Bug fixes:
 
+* Fixed HDF5 serialization and deserialization for datetime and date objects:
+  * Previously, datetime and date objects were serialized as numerical values (timestamp for datetime, ordinal for date) but were not properly restored as the original object types upon deserialization.
+  * This caused `datetime.datetime` objects to be restored as `float` values and `datetime.date` objects to be restored as `int` values.
+  * The fix ensures that these temporal objects are now correctly restored as their original types, maintaining data integrity across save/load cycles.
+  * Updated the HDF5Reader to detect and convert numerical values back to datetime/date objects when appropriate.
+  * This affects all DataSet instances containing `DateItem` or `DateTimeItem` objects that are saved to and loaded from HDF5 files.
+
+* Fixed `FilesOpenItem` serialization bug in HDF5 files:
+  * Previously, when serializing file paths in `FilesOpenItem`, the paths were encoded to UTF-8 bytes but not properly decoded during deserialization.
+  * This caused file paths to be incorrectly restored as lists of individual characters instead of complete path strings.
+  * The fix ensures that file paths are properly decoded from bytes to strings during HDF5 deserialization.
+  * This resolves data corruption issues when saving and loading datasets containing multiple file selections.
+
+* Enhanced HDF5 serialization test to prevent regressions:
+  * The automatic unit test for HDF5 serialization (`test_loadsave_hdf5.py`) now properly validates dataset integrity after serialization/deserialization cycles.
+  * Previously, the test could pass even when values were corrupted during the save/load process due to improper initialization.
+  * The test now explicitly sets all items to `None` after creating the target dataset, ensuring that deserialized values truly come from the HDF5 file rather than from default initialization.
+  * This improvement helps catch serialization bugs early and prevents future regressions in HDF5 I/O functionality.
+
 * Fixed font hinting preference in `RotatedLabel` initialization for improved text rendering
 
 * Fixed dataset corruption in `DataSetShowGroupBox.get()` when updating widgets with dependencies:
