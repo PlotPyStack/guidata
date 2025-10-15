@@ -240,7 +240,7 @@
   * This was caused by the `collect_items_in_bases_order` function using a depth-first traversal with a `seen` set that prevented processing of redefined attributes.
   * The fix modifies the inheritance collection logic to respect Method Resolution Order (MRO) and ensures that more specific class definitions properly override parent class definitions while maintaining the expected item ordering (parent class items first, then child class items).
   * This enables cleaner inheritance patterns where intermediate base classes can redefine common attributes (like default values) that are automatically inherited by all child classes.
-  * Example: Now `BasePeriodicParam` can redefine `xunit = StringItem("X unit", default="s")` and all child parameter classes (`SinusParam`, `CosinusParam`, etc.) will correctly inherit the "s" default value instead of the empty string from the grandparent class.
+  * Example: Now `BasePeriodicParam` can redefine `xunit = StringItem("X unit", default="s")` and all child parameter classes (`SineParam`, `CosineParam`, etc.) will correctly inherit the "s" default value instead of the empty string from the grandparent class.
 
 * Fixed `DataSet` multiple inheritance item ordering to follow Python's Method Resolution Order (MRO):
   * Previously, in multiple inheritance scenarios like `class Derived(BaseA, BaseB)`, items from `BaseB` would appear before items from `BaseA`, which was counterintuitive.

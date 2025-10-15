@@ -1419,7 +1419,9 @@ class DataSet(metaclass=DataSetMeta):
                 if item._name == name:
                     break
             else:
-                raise AttributeError(f"Unknown attribute {name}")
+                raise AttributeError(
+                    f"DataSet class '{cls.__name__}' has no attribute '{name}'"
+                )
 
         # Create the instance but skip set_defaults in __init__
         instance = cls(skip_defaults=True)
