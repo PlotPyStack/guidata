@@ -10,7 +10,6 @@ HDF5 files (.h5)
 from __future__ import annotations
 
 import datetime
-import numbers
 import sys
 from collections.abc import Callable, Sequence
 from typing import Any
@@ -463,9 +462,9 @@ class HDF5Writer(HDF5Handler, WriterMixin):
         elif isinstance(val, dict):
             self.write_dict(val)
         elif isinstance(val, datetime.datetime):
-            self.write_float(val.timestamp())
+            self.write_datetime(val)
         elif isinstance(val, datetime.date):
-            self.write_int(val.toordinal())
+            self.write_date(val)
         elif isinstance(val, np.ndarray):
             self.write_array(val)
         elif hasattr(val, "serialize") and isinstance(val.serialize, Callable):
@@ -503,6 +502,30 @@ class HDF5Writer(HDF5Handler, WriterMixin):
             val: The boolean value to write.
         """
         self.write_int(int(val))
+
+    def write_datetime(self, val: datetime.datetime) -> None:
+        """
+        Write a datetime value to the HDF5 file with type metadata.
+
+        Args:
+            val: The datetime value to write.
+        """
+        group = self.get_parent_group()
+        attr_name = self.option[-1]
+        group.attrs[attr_name] = val.timestamp()
+        group.attrs[f"{attr_name}__type__"] = "datetime"
+
+    def write_date(self, val: datetime.date) -> None:
+        """
+        Write a date value to the HDF5 file with type metadata.
+
+        Args:
+            val: The date value to write.
+        """
+        group = self.get_parent_group()
+        attr_name = self.option[-1]
+        group.attrs[attr_name] = val.toordinal()
+        group.attrs[f"{attr_name}__type__"] = "date"
 
     def write_array(self, val: np.ndarray) -> None:
         """
@@ -584,32 +607,6 @@ class NoDefault:
     pass
 
 
-def infer_datetime(value: Any) -> Any:
-    """Infer if a numeric value represents a datetime object.
-
-    Args:
-        value: The value to check.
-
-    Returns:
-        The inferred datetime object if applicable, otherwise the original value.
-    """
-    if isinstance(value, (numbers.Real, np.generic)):
-        # Convert NumPy scalars to native Python types for consistency
-        value = value.item() if isinstance(value, np.generic) else value
-
-        # datetime.datetime: seconds since epoch
-        if isinstance(value, float) and 1e8 < value < 2e9:
-            return datetime.datetime.fromtimestamp(value)
-
-        # datetime.date: ordinal days (typical range)
-        if isinstance(value, numbers.Integral) and 50000 < value < 1000000:
-            try:
-                return datetime.date.fromordinal(value)
-            except ValueError:
-                pass
-    return value
-
-
 class HDF5Reader(HDF5Handler):
     """
     Reader for HDF5 files. Inherits from HDF5Handler.
@@ -687,17 +684,30 @@ class HDF5Reader(HDF5Handler):
             The read value.
         """
         group = self.get_parent_group()
+        attr_name = self.option[-1]
         try:
-            value = group.attrs[self.option[-1]]
+            value = group.attrs[attr_name]
         except KeyError:
             if self.read(SEQUENCE_NAME, func=self.read_int, default=None) is None:
                 # No sequence found, this means that the data we are trying to read
                 # is not here (e.g. compatibility issue), so we raise an error
                 raise
             value = self.read_sequence()
+
+        # Check for type metadata
+        type_key = f"{attr_name}__type__"
+        if type_key in group.attrs:
+            type_hint = group.attrs[type_key]
+            if isinstance(type_hint, bytes):
+                type_hint = type_hint.decode("utf-8")
+            if type_hint == "datetime":
+                return datetime.datetime.fromtimestamp(value)
+            if type_hint == "date":
+                return datetime.date.fromordinal(int(value))
+
         if isinstance(value, bytes):
             return value.decode("utf-8")
-        return infer_datetime(value)
+        return value
 
     def read_bool(self) -> bool | None:
         """
@@ -791,9 +801,21 @@ class HDF5Reader(HDF5Handler):
         dict_group = group[self.option[-1]]
         dict_val = {}
         for key, value in dict_group.attrs.items():
-            if key == DICT_NAME:
+            if key == DICT_NAME or key.endswith("__type__"):
                 continue
-            dict_val[key] = infer_datetime(value)
+            # Check for type metadata
+            type_key = f"{key}__type__"
+            if type_key in dict_group.attrs:
+                type_hint = dict_group.attrs[type_key]
+                if isinstance(type_hint, bytes):
+                    type_hint = type_hint.decode("utf-8")
+                if type_hint == "datetime":
+                    dict_val[key] = datetime.datetime.fromtimestamp(value)
+                    continue
+                if type_hint == "date":
+                    dict_val[key] = datetime.date.fromordinal(int(value))
+                    continue
+            dict_val[key] = value
         for key in dict_group:
             with self.group(key):
                 try:
