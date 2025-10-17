@@ -23,7 +23,7 @@ import requests
 try:
     import tomllib  # type: ignore # Python 3.11+
 except ImportError:
-    import tomli as tomllib  # fallback pour Python <3.11
+    import tomli as tomllib  # fallback for Python <3.11
 
 
 def __parse_toml_requirements(pyproject_fname: str) -> dict[str, list[str]] | None:
@@ -96,8 +96,18 @@ def __convert_requirements_to_rst_table(reqs: list[str]) -> str:
     modlist = []
     for req in reqs:
         try:
-            mod = re.split(" ?(>=|<=|=|<|>)", req)[0]
-            ver = req[len(mod) :]
+            # Split by environment marker first (semicolon)
+            req_parts = req.split(";", 1)
+            req_main = req_parts[0].strip()
+            env_marker = req_parts[1].strip() if len(req_parts) > 1 else ""
+
+            # Now split the main requirement by version operators
+            mod = re.split(" ?(>=|<=|=|<|>)", req_main)[0]
+            ver = req_main[len(mod) :].strip()
+
+            # Add environment marker to version if present
+            if env_marker:
+                ver = f"{ver} ({env_marker})" if ver else f"({env_marker})"
         except ValueError:
             mod, ver = req, ""
         if mod.lower() in modlist:

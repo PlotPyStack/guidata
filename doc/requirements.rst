@@ -11,19 +11,19 @@ The `guidata` package requires the following Python modules:
       - >=3.9, <4
       - Python programming language
     * - h5py
-      -  >= 3.6
+      - >= 3.6
       - Read and write HDF5 files from Python
     * - NumPy
-      -  >= 1.22
+      - >= 1.22
       - Fundamental package for array computing in Python
     * - QtPy
-      -  >= 1.9
+      - >= 1.9
       - Provides an abstraction layer on top of the various Qt bindings (PyQt5/6 and PySide2/6).
     * - requests
       - 
       - Python HTTP for Humans.
     * - tomli
-      - 
+      - (python_version < '3.11')
       - A lil' TOML parser
 
 Optional modules for GUI support (Qt):
@@ -36,7 +36,7 @@ Optional modules for GUI support (Qt):
       - Version
       - Summary
     * - PyQt5
-      -  > 5.15.5
+      - > 5.15.5
       - Python bindings for the Qt cross platform application toolkit
 
 Optional modules for development:
@@ -78,7 +78,7 @@ Optional modules for building the documentation:
       - Summary
     * - pillow
       - 
-      - Python Imaging Library (Fork)
+      - Python Imaging Library (fork)
     * - pandas
       - 
       - Powerful data structures for data analysis, time series, and statistics

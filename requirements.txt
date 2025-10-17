@@ -18,4 +18,4 @@ ruff
 sphinx
 sphinx-copybutton
 sphinx_qt_documentation
-tomli
+tomli; python_version < '3.11'
