@@ -200,6 +200,13 @@
 
 🛠️ Bug fixes:
 
+* [Issue #95](https://github.com/PlotPyStack/guidata/issues/95) - Limited tomli dependency to Python < 3.11:
+  * The `tomli` package is now only required for Python versions before 3.11
+  * Python 3.11+ includes `tomllib` in the standard library, making the external dependency unnecessary
+  * Code was already using `tomllib` when available, so this change only affects the declared dependencies
+  * Enhanced `genreqs.py` utility to properly handle environment markers when generating documentation
+  * Thanks to @tobypeterson for reporting the issue
+
 * Fixed HDF5 serialization and deserialization for datetime and date objects:
   * Previously, datetime and date objects were serialized as numerical values (timestamp for datetime, ordinal for date) but were not properly restored as the original object types upon deserialization.
   * This caused `datetime.datetime` objects to be restored as `float` values and `datetime.date` objects to be restored as `int` values.
