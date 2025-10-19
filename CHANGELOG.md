@@ -4,6 +4,36 @@
 
 ✨ New features:
 
+* **DataSet Class-Level Configuration**: Added support for configuring DataSet metadata at the class definition level using `__init_subclass__`:
+  * DataSet title, comment, icon, and readonly state can now be configured directly in the class inheritance declaration
+  * Uses Python's standard `__init_subclass__` mechanism (PEP 487) for explicit, type-safe configuration
+  * Configuration is embedded in the class definition, making it impossible to accidentally remove or forget
+  * Instance parameters can still override class-level settings for flexibility
+  * **Improved docstring handling**: When title is explicitly set (even to empty string), the entire docstring becomes the comment
+  * Backward compatibility: When no title is set at all, docstring first line is still used as title (old behavior)
+  * Example usage:
+
+    ```python
+    class MyParameters(DataSet,
+                       title="Analysis Parameters",
+                       comment="Configure your analysis options",
+                       icon="params.png"):
+        """This docstring is for developer documentation only"""
+
+        threshold = FloatItem("Threshold", default=0.5)
+        method = StringItem("Method", default="auto")
+
+    # No need to pass title when instantiating
+    params = MyParameters()
+
+    # Can still override at instance level if needed
+    params_custom = MyParameters(title="Custom Title")
+    ```
+
+  * Priority order: instance parameter > class-level config > empty/default
+  * Makes it explicit when title is intentionally set vs. accidentally left empty
+  * Improves code clarity by separating user-facing metadata from developer documentation
+
 * **SeparatorItem**: Added a new visual separator data item for better dataset organization:
   * New `SeparatorItem` class allows inserting visual separators between sections in datasets
   * In textual representation, separators appear as a line of dashes (`--------------------------------------------------`)

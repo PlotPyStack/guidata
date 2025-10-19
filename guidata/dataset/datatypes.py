@@ -1295,7 +1295,11 @@ class DataSetMeta(type):
     created in the same order as these attributes were written
     """
 
-    def __new__(cls: type, name: str, bases: Any, dct: dict[str, Any]) -> type:
+    def __new__(
+        cls: type, name: str, bases: Any, dct: dict[str, Any], **kwargs
+    ) -> type:
+        # Filter out DataSet configuration kwargs (handled by __init_subclass__)
+        # These include: title, comment, icon, readonly
         items = {item._name: item for item in collect_items_in_bases_order(bases)}
         for attrname, value in list(dct.items()):
             if isinstance(value, DataItem):
@@ -1304,7 +1308,8 @@ class DataSetMeta(type):
                     value._order = items[attrname]._order
                 items[attrname] = value
         dct["_items"] = list(items.values())
-        return type.__new__(cls, name, bases, dct)
+        # Pass kwargs through to type.__new__ (which will trigger __init_subclass__)
+        return super().__new__(cls, name, bases, dct, **kwargs)
 
 
 Meta_Py3Compat = DataSetMeta("Meta_Py3Compat", (object,), {})
@@ -1365,6 +1370,40 @@ class DataSet(metaclass=DataSetMeta):
     _items: list[DataItem] = []
     __metaclass__ = DataSetMeta  # keep it even with Python 3 (see DataSetMeta)
 
+    # Class-level configuration (set via __init_subclass__)
+    _class_title: str | None = None
+    _class_comment: str | None = None
+    _class_icon: str = ""
+    _class_readonly: bool = False
+
+    def __init_subclass__(
+        cls,
+        title: str | None = None,
+        comment: str | None = None,
+        icon: str = "",
+        readonly: bool = False,
+        **kwargs,
+    ) -> None:
+        """Called when a class inherits from DataSet.
+
+        This allows configuring DataSet metadata in the class definition:
+
+            class MyParams(DataSet, title="My Parameters", icon="myicon.png"):
+                param1 = FloatItem("Parameter 1")
+
+        Args:
+            title: Default title for this DataSet class
+            comment: Default comment for this DataSet class
+            icon: Default icon for this DataSet class
+            readonly: Default readonly state for this DataSet class
+            **kwargs: Additional arguments passed to parent __init_subclass__
+        """
+        super().__init_subclass__(**kwargs)
+        cls._class_title = title
+        cls._class_comment = comment
+        cls._class_icon = icon
+        cls._class_readonly = readonly
+
     def __init__(
         self,
         title: str | None = None,
@@ -1373,18 +1412,37 @@ class DataSet(metaclass=DataSetMeta):
         readonly: bool = False,
         skip_defaults: bool = False,
     ):
-        self.__comment = comment
-        self.__icon = icon
-        comp_title, comp_comment = self._compute_title_and_comment()
-        if title:
-            self.__title = title
-        else:
-            self.__title = comp_title
-        if comment is None:
-            self.__comment = comp_comment
-        self.__changed = False
+        # Priority: instance parameter > class-level config > empty/computed default
+        self.__icon = icon if icon else self._class_icon
+        self.__readonly: bool = readonly or self._class_readonly
 
-        self.__readonly: bool = readonly
+        # Handle title: instance param > class config > docstring fallback
+        if title is not None:
+            # Explicitly passed to __init__ (even if empty string)
+            self.__title = title
+        elif self._class_title is not None:
+            # Set at class level via __init_subclass__ (even if empty string)
+            self.__title = self._class_title
+        else:
+            # Fall back to docstring (for backward compatibility)
+            comp_title, comp_comment = self._compute_title_and_comment()
+            self.__title = comp_title
+
+        # Handle comment: instance param > class config > docstring comment
+        if comment is not None:
+            # Explicitly passed to __init__
+            self.__comment = comment
+        elif self._class_comment is not None:
+            # Set at class level via __init_subclass__
+            self.__comment = self._class_comment
+        else:
+            # Fall back to docstring for comment
+            if title is None and self._class_title is None:
+                # Title also came from docstring, reuse comp_comment from above
+                self.__comment = comp_comment
+            else:
+                # Title was explicitly set, treat entire docstring as comment
+                self.__comment = self._compute_comment_from_docstring()
 
         if not skip_defaults:
             self.set_defaults()
@@ -1452,20 +1510,37 @@ class DataSet(metaclass=DataSetMeta):
 
     def _compute_title_and_comment(self) -> tuple[str, str | None]:
         """
-        Private method to compute title and comment of the data set
+        Private method to compute title and comment of the data set from docstring.
+
+        Returns tuple of (title, comment) where:
+        - title: first line of docstring (stripped), or class name if no docstring
+        - comment: remaining lines of docstring (stripped), or None if no lines
         """
         comp_title = self.__class__.__name__
         comp_comment = None
         if self.__doc__:
             doc_lines = self.__doc__.splitlines()
-            # Remove empty lines at the begining of comment
+            # Remove empty lines at the beginning
             while doc_lines and not doc_lines[0].strip():
                 del doc_lines[0]
             if doc_lines:
+                # First line becomes the title
                 comp_title = doc_lines.pop(0).strip()
             if doc_lines:
+                # Remaining lines become the comment
                 comp_comment = "\n".join([x.strip() for x in doc_lines])
         return comp_title, comp_comment
+
+    def _compute_comment_from_docstring(self) -> str | None:
+        """
+        Extract entire docstring as comment (when title is explicitly set elsewhere).
+
+        Returns:
+            str | None: docstring as comment, or None if no docstring
+        """
+        if self.__doc__:
+            return self.__doc__.strip()
+        return None
 
     def get_title(self) -> str:
         """Return data set title

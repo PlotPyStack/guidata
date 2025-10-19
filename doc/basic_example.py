@@ -7,7 +7,13 @@ import guidata.dataset as gds
 _app = guidata.qapplication()
 
 
-class Processing(gds.DataSet):
+class Processing(
+    gds.DataSet,
+    title="Processing Parameters",
+    comment="This comment concerns this class of parameters, and may be overriden "
+    "when calling the constructor by passing a comment argument. That is the same for "
+    "the title.",
+):
     """Example"""
 
     a = gds.FloatItem("Parameter #1", default=2.3)
@@ -15,7 +21,7 @@ class Processing(gds.DataSet):
     type = gds.ChoiceItem("Processing algorithm", ("type 1", "type 2", "type 3"))
 
 
-param = Processing()
+param = Processing()  # Default title and comment are used if not provided here
 param.edit()
 print(param)  # Showing param contents
 param.b = 4  # Modifying item value
