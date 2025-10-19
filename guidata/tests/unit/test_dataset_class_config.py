@@ -51,7 +51,7 @@ def test_dataset_class_config():
     assert instance2.get_icon() == "override.png"
     execenv.print("  ✓ Passed\n")
 
-    # Test 3: No configuration - falls back to docstring (backward compatibility)
+    # Test 3: No configuration - falls back to docstring for title only
     class UnconfiguredDataSet(DataSet):
         """First line of docstring
 
@@ -65,12 +65,12 @@ def test_dataset_class_config():
     execenv.print(f"  Title: '{instance3.get_title()}'")
     execenv.print(f"  Comment: '{instance3.get_comment()}'")
     assert instance3.get_title() == "First line of docstring"  # Uses docstring
-    assert "remaining comment part" in (instance3.get_comment() or "")
-    execenv.print("  ✓ Passed (docstring used for title and comment)\n")
+    assert instance3.get_comment() is None  # No automatic comment from docstring
+    execenv.print("  ✓ Passed (docstring used for title, no comment)\n")
 
-    # Test 3b: Explicitly set empty title - docstring used for comment only
+    # Test 3b: Explicitly set empty title - no comment from docstring
     class EmptyTitleDataSet(DataSet, title=""):
-        """Docstring becomes comment when title explicitly set to empty"""
+        """Docstring is for developer documentation only"""
 
         param1 = FloatItem("Parameter 1")
 
@@ -79,11 +79,8 @@ def test_dataset_class_config():
     execenv.print(f"  Title: '{instance3b.get_title()}'")
     execenv.print(f"  Comment: '{instance3b.get_comment()}'")
     assert instance3b.get_title() == ""  # Explicitly empty
-    assert (
-        instance3b.get_comment()
-        == "Docstring becomes comment when title explicitly set to empty"
-    )
-    execenv.print("  ✓ Passed (empty title, docstring used for comment)\n")
+    assert instance3b.get_comment() is None  # No automatic comment from docstring
+    execenv.print("  ✓ Passed (empty title, no comment from docstring)\n")
 
     # Test 4: Partial configuration
     class PartialConfigDataSet(DataSet, title="Partial Config"):
@@ -97,7 +94,7 @@ def test_dataset_class_config():
     execenv.print(f"  Comment: '{instance4.get_comment()}'")
     execenv.print(f"  Icon: '{instance4.get_icon()}'")
     assert instance4.get_title() == "Partial Config"
-    assert instance4.get_comment() == "Docstring comment"  # Falls back to docstring
+    assert instance4.get_comment() is None  # No automatic comment from docstring
     assert instance4.get_icon() == ""
     execenv.print("  ✓ Passed\n")
 

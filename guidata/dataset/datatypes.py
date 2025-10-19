@@ -1428,7 +1428,7 @@ class DataSet(metaclass=DataSetMeta):
             comp_title, comp_comment = self._compute_title_and_comment()
             self.__title = comp_title
 
-        # Handle comment: instance param > class config > docstring comment
+        # Handle comment: instance param > class config > None (no docstring fallback)
         if comment is not None:
             # Explicitly passed to __init__
             self.__comment = comment
@@ -1436,13 +1436,8 @@ class DataSet(metaclass=DataSetMeta):
             # Set at class level via __init_subclass__
             self.__comment = self._class_comment
         else:
-            # Fall back to docstring for comment
-            if title is None and self._class_title is None:
-                # Title also came from docstring, reuse comp_comment from above
-                self.__comment = comp_comment
-            else:
-                # Title was explicitly set, treat entire docstring as comment
-                self.__comment = self._compute_comment_from_docstring()
+            # No automatic fallback to docstring for comment
+            self.__comment = None
 
         if not skip_defaults:
             self.set_defaults()
@@ -1530,17 +1525,6 @@ class DataSet(metaclass=DataSetMeta):
                 # Remaining lines become the comment
                 comp_comment = "\n".join([x.strip() for x in doc_lines])
         return comp_title, comp_comment
-
-    def _compute_comment_from_docstring(self) -> str | None:
-        """
-        Extract entire docstring as comment (when title is explicitly set elsewhere).
-
-        Returns:
-            str | None: docstring as comment, or None if no docstring
-        """
-        if self.__doc__:
-            return self.__doc__.strip()
-        return None
 
     def get_title(self) -> str:
         """Return data set title

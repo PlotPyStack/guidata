@@ -46,12 +46,11 @@ class ComplexDataset(gds.DataSet):
     optional_text = gds.StringItem("Optional", default=None, allow_none=True)
 
 
-class DatasetWithComment(gds.DataSet):
-    """A dataset with title and comment
-
-    This is the comment that should appear in blue
-    in the HTML output.
-    """
+class DatasetWithComment(
+    gds.DataSet,
+    comment="This is the comment that should appear in blue\nin the HTML output.",
+):
+    """A dataset with title and comment"""
 
     param = gds.StringItem("Parameter", default="value")
 
