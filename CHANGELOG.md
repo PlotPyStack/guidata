@@ -4,6 +4,23 @@
 
 ✨ New features:
 
+* **JSON Serialization for DataSets**: Added new functions for serializing/deserializing DataSet objects to/from JSON:
+  * New `dataset.dataset_to_json()` function: Serialize a DataSet instance to a JSON string
+  * New `dataset.json_to_dataset()` function: Deserialize a JSON string back to a DataSet instance
+  * The JSON format includes class module and name information for automatic type restoration
+  * Enables easy data interchange, storage, and transmission of DataSet configurations
+  * Example usage:
+
+    ```python
+    from guidata.dataset import dataset_to_json, json_to_dataset
+    
+    # Serialize to JSON
+    json_str = dataset_to_json(my_dataset)
+    
+    # Deserialize from JSON
+    restored_dataset = json_to_dataset(json_str)
+    ```
+
 * **DataSet Class-Level Configuration**: Added support for configuring DataSet metadata at the class definition level using `__init_subclass__`:
   * DataSet title, comment, icon, and readonly state can now be configured directly in the class inheritance declaration
   * Uses Python's standard `__init_subclass__` mechanism (PEP 487) for explicit, type-safe configuration

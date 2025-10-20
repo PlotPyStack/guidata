@@ -10,6 +10,8 @@ from .conv import (
     create_dataset_from_func,
     restore_dataset,
     update_dataset,
+    dataset_to_json,
+    json_to_dataset,
 )
 from .dataitems import (
     BoolItem,

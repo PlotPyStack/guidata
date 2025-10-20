@@ -24,11 +24,13 @@ Create dataset classes
 
 from __future__ import annotations
 
+import importlib
 import inspect
 from typing import TYPE_CHECKING, Any
 
 import guidata.dataset.dataitems as gdi
 import guidata.dataset.datatypes as gdt
+from guidata.io.jsonfmt import JSONReader, JSONWriter
 
 if TYPE_CHECKING:
     import guidata.dataset.datatypes as gdt
@@ -214,3 +216,49 @@ def create_dataset_from_dict(
         ditem = __get_dataitem_from_type(type(value))
         klassattrs[name] = ditem(name, default=value)
     return type(klassname, (gdt.DataSet,), klassattrs)
+
+
+# ==============================================================================
+# JSON serialization/deserialization of datasets
+# ==============================================================================
+
+
+def dataset_to_json(param: gdt.DataSet) -> str:
+    """Serialize dataset to JSON string.
+
+    Args:
+        param: dataset (gdt.DataSet)
+
+    Returns:
+        JSON string representation of the dataset
+    """
+    writer = JSONWriter(None)  # No filename, we'll get JSON text
+    # Store the class name so we can deserialize to the correct type
+    writer.write(param.__class__.__module__, "class_module")
+    writer.write(param.__class__.__name__, "class_name")
+    param.serialize(writer)
+    return writer.get_json()
+
+
+def json_to_dataset(json_str: str) -> gdt.DataSet:
+    """Deserialize dataset from JSON string.
+
+    Args:
+        json_str: JSON string representation
+
+    Returns:
+        Deserialized dataset object
+    """
+    reader = JSONReader(json_str)
+
+    # Read the class information
+    class_module = reader.read("class_module")
+    class_name = reader.read("class_name")
+
+    module = importlib.import_module(class_module)
+    param_class = getattr(module, class_name)
+
+    # Create instance and deserialize
+    param: gdt.DataSet = param_class()
+    param.deserialize(reader)
+    return param
