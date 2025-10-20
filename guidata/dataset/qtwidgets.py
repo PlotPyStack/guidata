@@ -888,6 +888,7 @@ class DataSetEditGroupBox(DataSetShowGroupBox[AnyDataSet]):
                 -1,
                 Qt.AlignRight,  # type:ignore
             )
+            layout.setRowStretch(layout.rowCount() + 1, 1)
 
     def get_edit_layout(self) -> DataSetEditLayout[AnyDataSet]:
         """Return edit layout
