@@ -13,10 +13,10 @@
 
     ```python
     from guidata.dataset import dataset_to_json, json_to_dataset
-    
+
     # Serialize to JSON
     json_str = dataset_to_json(my_dataset)
-    
+
     # Deserialize from JSON
     restored_dataset = json_to_dataset(json_str)
     ```
