@@ -1764,8 +1764,8 @@ class DataSet(metaclass=DataSetMeta):
             html += "<br><em>No items to display</em>"
             return html
 
-        # Start table with monospace font
-        html += '<table border="0" style="font-family: monospace;">'
+        # Start table
+        html += '<table border="0">'
 
         for item in filtered_items:
             # Skip group items and separators for HTML representation
