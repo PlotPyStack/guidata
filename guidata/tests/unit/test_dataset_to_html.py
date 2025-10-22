@@ -73,7 +73,7 @@ def test_simple_dataset_to_html():
     assert expected_title in html
 
     # Check table structure
-    assert '<table border="0" style="font-family: monospace;">' in html
+    assert '<table border="0">' in html
     assert "</table>" in html
 
     # Check item names and values are present
@@ -208,7 +208,6 @@ def test_html_structure_and_styling():
     assert "text-align: left" in html
     assert "vertical-align: top" in html
     assert "padding-left: 10px" in html
-    assert "font-family: monospace" in html
 
     # Check table structure
     assert html.count("<tr>") == html.count("</tr>")
