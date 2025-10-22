@@ -316,14 +316,17 @@ MONOSPACE = [
     "Cascadia Code",
     "Cascadia Mono",
     "Consolas",
+    "Lucida Console",
+    "Lucida Sans Typewriter",
     "Monospace",
     "Menlo",
     "Courier New",
+    "Courier",
     "Bitstream Vera Sans Mono",
     "Andale Mono",
     "Liberation Mono",
     "Monaco",
-    "Courier",
+    "Fixedsys",
     "monospace",
     "Fixed",
     "Terminal",
@@ -345,8 +348,14 @@ def get_family(families: str | list[str]) -> str:
         if font_is_installed(family):
             return family
     else:
-        warnings.warn("None of the following fonts is installed: %r" % families)
-        return ""
+        # On Windows, in offscreen/headless mode, Qt may not detect fonts properly
+        # Don't warn in this case, just return the first family as a fallback
+        is_windows_offscreen = (
+            sys.platform == "win32" and os.environ.get("QT_QPA_PLATFORM") == "offscreen"
+        )
+        if not is_windows_offscreen:
+            warnings.warn("None of the following fonts is installed: %r" % families)
+        return families[0] if families else ""
 
 
 def get_font(conf: UserConfig, section: str, option: str = "") -> QG.QFont:
