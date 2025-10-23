@@ -580,6 +580,7 @@ class TextItem(StringItem):
         allow_none: if True, None is a valid value regardless of other constraints
          (optional, default=False)
         readonly: if True, the item is read-only (optional, default=False)
+        regexp: regular expression for value validation (optional)
     """
 
     def __init__(
@@ -591,6 +592,7 @@ class TextItem(StringItem):
         help: str = "",
         allow_none: bool = False,
         readonly: bool = False,
+        regexp: str | None = None,
     ) -> None:
         super().__init__(
             label,
@@ -600,6 +602,7 @@ class TextItem(StringItem):
             help=help,
             allow_none=allow_none,
             readonly=readonly,
+            regexp=regexp,
         )
 
 
