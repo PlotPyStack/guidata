@@ -16,7 +16,6 @@ from guidata.io.jsonfmt import JSONHandler, JSONReader, JSONWriter
 __all__ = [
     "BaseIOHandler",
     "GroupContext",
-    "WriterMixin",
     "HDF5Handler",
     "HDF5Reader",
     "HDF5Writer",
@@ -26,6 +25,7 @@ __all__ = [
     "JSONHandler",
     "JSONReader",
     "JSONWriter",
+    "WriterMixin",
 ]
 
 warnings.warn(
