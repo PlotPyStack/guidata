@@ -508,7 +508,9 @@ class StringItem(DataItem):
             auto_help += ", " + _("not empty")
         regexp = self.get_prop_value("data", instance, "regexp")
         if regexp:
-            auto_help += ", " + _("regexp:") + " " + regexp
+            # Wrap regexp in backticks to prevent Sphinx from interpreting
+            # it as a reference
+            auto_help += ", " + _("regexp:") + f" ``{regexp}``"
         return auto_help
 
     def check_value(self, value: str, raise_exception: bool = False) -> bool:
