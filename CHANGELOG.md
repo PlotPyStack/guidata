@@ -11,15 +11,15 @@
   * Enables easy data interchange, storage, and transmission of DataSet configurations
   * Example usage:
 
-    ```python
-    from guidata.dataset import dataset_to_json, json_to_dataset
+```python
+from guidata.dataset import dataset_to_json, json_to_dataset
 
-    # Serialize to JSON
-    json_str = dataset_to_json(my_dataset)
+# Serialize to JSON
+json_str = dataset_to_json(my_dataset)
 
-    # Deserialize from JSON
-    restored_dataset = json_to_dataset(json_str)
-    ```
+# Deserialize from JSON
+restored_dataset = json_to_dataset(json_str)
+```
 
 * **DataSet Class-Level Configuration**: Added support for configuring DataSet metadata at the class definition level using `__init_subclass__`:
   * DataSet title, comment, icon, and readonly state can now be configured directly in the class inheritance declaration
@@ -30,22 +30,22 @@
   * Backward compatibility: When no title is set at all, docstring first line is still used as title (old behavior)
   * Example usage:
 
-    ```python
-    class MyParameters(DataSet,
-                       title="Analysis Parameters",
-                       comment="Configure your analysis options",
-                       icon="params.png"):
-        """This docstring is for developer documentation only"""
+```python
+class MyParameters(DataSet,
+                    title="Analysis Parameters",
+                    comment="Configure your analysis options",
+                    icon="params.png"):
+    """This docstring is for developer documentation only"""
 
-        threshold = FloatItem("Threshold", default=0.5)
-        method = StringItem("Method", default="auto")
+    threshold = FloatItem("Threshold", default=0.5)
+    method = StringItem("Method", default="auto")
 
-    # No need to pass title when instantiating
-    params = MyParameters()
+# No need to pass title when instantiating
+params = MyParameters()
 
-    # Can still override at instance level if needed
-    params_custom = MyParameters(title="Custom Title")
-    ```
+# Can still override at instance level if needed
+params_custom = MyParameters(title="Custom Title")
+```
 
   * Priority order: instance parameter > class-level config > empty/default
   * Makes it explicit when title is intentionally set vs. accidentally left empty
@@ -58,22 +58,22 @@
   * Separators don't store any data - they are purely visual elements for organizing forms
   * Example usage:
 
-    ```python
-    class PersonDataSet(DataSet):
-        name = StringItem("Name", default="John Doe")
-        age = IntItem("Age", default=30)
+```python
+class PersonDataSet(DataSet):
+    name = StringItem("Name", default="John Doe")
+    age = IntItem("Age", default=30)
 
-        # Visual separator with label
-        sep1 = SeparatorItem("Contact Information")
+    # Visual separator with label
+    sep1 = SeparatorItem("Contact Information")
 
-        email = StringItem("Email", default="john@example.com")
-        phone = StringItem("Phone", default="123-456-7890")
+    email = StringItem("Email", default="john@example.com")
+    phone = StringItem("Phone", default="123-456-7890")
 
-        # Visual separator without label
-        sep2 = SeparatorItem()
+    # Visual separator without label
+    sep2 = SeparatorItem()
 
-        notes = StringItem("Notes", default="Additional notes")
-    ```
+    notes = StringItem("Notes", default="Additional notes")
+```
 
   * Improves readability and visual organization of complex datasets
   * Fully integrated with existing DataSet serialization/deserialization (separators are ignored during save/load)
@@ -85,16 +85,16 @@
   * Computed items are automatically read-only and update in real-time when their dependencies change
   * Example usage:
 
-    ```python
-    class DataSet(gdt.DataSet):
+```python
+class DataSet(gdt.DataSet):
 
-        def compute_sum(self) -> float:
-            return self.x + self.y
+    def compute_sum(self) -> float:
+        return self.x + self.y
 
-        x = gdt.FloatItem("X", default=1.0)
-        y = gdt.FloatItem("Y", default=2.0)
-        sum_xy = gdt.FloatItem("Sum", default=0.0).set_computed(compute_sum)
-    ```
+    x = gdt.FloatItem("X", default=1.0)
+    y = gdt.FloatItem("Y", default=2.0)
+    sum_xy = gdt.FloatItem("Sum", default=0.0).set_computed(compute_sum)
+```
 
   * Computed items automatically display with visual distinction (neutral background color) in GUI forms
   * Supports complex calculations and can access any other items in the dataset
@@ -115,19 +115,19 @@
   * Proper handling of None values (displayed as "-") and nested ObjectItem datasets
   * Example usage:
 
-    ```python
-    class PersonDataSet(DataSet):
-        """Personal Information Dataset
+```python
+class PersonDataSet(DataSet):
+    """Personal Information Dataset
 
-        This dataset collects basic personal information.
-        """
-        name = StringItem("Full Name", default="John Doe")
-        age = IntItem("Age", default=30)
-        active = BoolItem("Account Active", default=True)
+    This dataset collects basic personal information.
+    """
+    name = StringItem("Full Name", default="John Doe")
+    age = IntItem("Age", default=30)
+    active = BoolItem("Account Active", default=True)
 
-    dataset = PersonDataSet()
-    html_output = dataset.to_html()  # Generate HTML representation
-    ```
+dataset = PersonDataSet()
+html_output = dataset.to_html()  # Generate HTML representation
+```
 
   * Ideal for reports, documentation, and web-based dataset visualization
   * Comprehensive unit test coverage ensures reliability across all item types
@@ -147,10 +147,10 @@
   * The `readonly` property is now respected in the corresponding widgets (see `guidata.dataset.qtitemwidgets`).
   * Example usage:
 
-    ```python
-    text = gds.TextItem("Text", default="Multi-line text", readonly=True)
-    string = gds.StringItem("String", readonly=True)
-    ```
+```python
+text = gds.TextItem("Text", default="Multi-line text", readonly=True)
+string = gds.StringItem("String", readonly=True)
+```
 
   * Note: Any other item type can also be turned into read-only mode by using `set_prop("display", readonly=True)`. This is a generic mechanism, but the main use case is for `StringItem` and `TextItem` (hence the dedicated input parameter for convenience).
 
@@ -171,11 +171,11 @@
   * `ValidationMode.STRICT`: validation is performed, and exceptions are raised if the value is invalid
   * To use these validation modes, you need to set the option:
 
-    ```python
-    from guidata.config import set_validation_mode, ValidationMode
+```python
+from guidata.config import set_validation_mode, ValidationMode
 
-    set_validation_mode(ValidationMode.STRICT)
-    ```
+set_validation_mode(ValidationMode.STRICT)
+```
 
 * New `check_callback` parameter for `FloatArrayItem`:
   * The `check_callback` parameter allows you to specify a custom validation function for the item.
@@ -214,21 +214,21 @@
   * This enables API flexibility while maintaining type safety, allowing users to pass either enum instances or their string representations interchangeably
   * Example usage:
 
-    ```python
-    class ProcessingMode(LabeledEnum):
-        FAST = ("fast_mode", "Fast Processing")
-        ACCURATE = ("accurate_mode", "Accurate Processing")
+```python
+class ProcessingMode(LabeledEnum):
+    FAST = ("fast_mode", "Fast Processing")
+    ACCURATE = ("accurate_mode", "Accurate Processing")
 
-    def process_data(mode):
-        if mode == ProcessingMode.FAST:  # Works with both enum and string
-            return "fast_processing"
-        # ...
+def process_data(mode):
+    if mode == ProcessingMode.FAST:  # Works with both enum and string
+        return "fast_processing"
+    # ...
 
-    # Both calls work identically:
-    result1 = process_data(ProcessingMode.FAST)  # Using enum
-    result2 = process_data("fast_mode")          # Using string
-    # result1 == result2 is True!
-    ```
+# Both calls work identically:
+result1 = process_data(ProcessingMode.FAST)  # Using enum
+result2 = process_data("fast_mode")          # Using string
+# result1 == result2 is True!
+```
 
 * `StringItem` behavior change:
   * The `StringItem` class now uses the new validation modes (see above).
