@@ -1583,6 +1583,7 @@ class DataSet(metaclass=DataSetMeta):
         apply: Callable | None = None,
         wordwrap: bool = True,
         size: QSize | tuple[int, int] | None = None,
+        object_name: str | None = None,
     ) -> int:
         """Open a dialog box to edit data set
 
@@ -1591,6 +1592,8 @@ class DataSet(metaclass=DataSetMeta):
             apply: apply callback (default is None)
             wordwrap: if True, comment text is wordwrapped
             size: dialog size (QSize object or integer tuple (width, height))
+            object_name: object name for the dialog (default is None, meaning
+             use class name + "Dialog")
 
         Returns:
             Dialog exit code.
@@ -1609,6 +1612,7 @@ class DataSet(metaclass=DataSetMeta):
             wordwrap=wordwrap,
             size=size,
         )
+        dlg.setObjectName(object_name or self.__class__.__name__ + "Dialog")
 
         return exec_dialog(dlg)
 
