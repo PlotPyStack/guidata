@@ -36,11 +36,13 @@ class ExecEnv:
     ACCEPT_DIALOGS_ARG = "accept_dialogs"
     VERBOSE_ARG = "verbose"
     SCREENSHOT_ARG = "screenshot"
+    SCREENSHOT_PATH_ARG = "screenshot_path"
     DELAY_ARG = "delay"
     UNATTENDED_ENV = "GUIDATA_UNATTENDED"
     ACCEPT_DIALOGS_ENV = "GUIDATA_ACCEPT_DIALOGS"
     VERBOSE_ENV = "GUIDATA_VERBOSE"
     SCREENSHOT_ENV = "GUIDATA_SCREENSHOT"
+    SCREENSHOT_PATH_ENV = "GUIDATA_SCREENSHOT_PATH"
     DELAY_ENV = "GUIDATA_DELAY"
 
     def __init__(self):
@@ -132,6 +134,19 @@ class ExecEnv:
         self.__set_mode(self.SCREENSHOT_ENV, value)
 
     @property
+    def screenshot_path(self):
+        """Get screenshot path"""
+        return os.environ.get(self.SCREENSHOT_PATH_ENV, "")
+
+    @screenshot_path.setter
+    def screenshot_path(self, value):
+        """Set screenshot path"""
+        if value:
+            os.environ[self.SCREENSHOT_PATH_ENV] = str(value)
+        elif self.SCREENSHOT_PATH_ENV in os.environ:
+            os.environ.pop(self.SCREENSHOT_PATH_ENV)
+
+    @property
     def verbose(self):
         """Get verbosity level"""
         env_val = os.environ.get(self.VERBOSE_ENV)
@@ -179,6 +194,12 @@ class ExecEnv:
             default=None,
         )
         parser.add_argument(
+            "--" + self.SCREENSHOT_PATH_ARG,
+            type=str,
+            help="path to save screenshots",
+            default=None,
+        )
+        parser.add_argument(
             "--" + self.DELAY_ARG,
             type=int,
             default=0,
@@ -200,6 +221,7 @@ class ExecEnv:
             self.UNATTENDED_ARG,
             self.ACCEPT_DIALOGS_ARG,
             self.SCREENSHOT_ARG,
+            self.SCREENSHOT_PATH_ARG,
             self.VERBOSE_ARG,
             self.DELAY_ARG,
         ):
@@ -252,6 +274,7 @@ class ExecEnv:
         unattended=None,
         accept_dialogs=None,
         screenshot=None,
+        screenshot_path=None,
         delay=None,
         verbose=None,
     ) -> Generator[None, None, None]:
@@ -264,6 +287,7 @@ class ExecEnv:
             unattended: whether to run in unattended mode
             accept_dialogs: whether to accept dialogs in unattended mode
             screenshot: whether to take screenshots
+            screenshot_path: path to save screenshots
             delay: delay (ms) before quitting application in unattended mode
             verbose: verbosity level
 
@@ -275,6 +299,7 @@ class ExecEnv:
             "unattended": unattended,
             "accept_dialogs": accept_dialogs,
             "screenshot": screenshot,
+            "screenshot_path": screenshot_path,
             "delay": delay,
             "verbose": verbose,
         }

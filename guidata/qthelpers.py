@@ -745,7 +745,8 @@ def grab_save_window(
     Args:
         widget: Widget to grab
         name: Widget name. If None, uses ``widget.objectName()``
-        save_dir: Directory to save screenshot. If None, uses current working directory
+        save_dir: Directory to save screenshot. If None, uses
+         ``execenv.screenshot_path`` or current working directory
         add_timestamp: Whether to add timestamp suffix to filename
     """
     if name is None:
@@ -761,7 +762,8 @@ def grab_save_window(
         suffix = "_" + datetime.now().strftime("%Y-%m-%d-%H%M%S")
 
     if save_dir is None:
-        save_dir = os.getcwd()
+        save_dir = execenv.screenshot_path or os.getcwd()
+    os.makedirs(save_dir, exist_ok=True)
 
     pixmap.save(osp.join(save_dir, f"{name}{suffix}.png"))
 
