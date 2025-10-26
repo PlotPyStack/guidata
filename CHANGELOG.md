@@ -1,5 +1,11 @@
 # Changelog #
 
+## Version 3.13.1 ##
+
+🛠️ Bug fixes:
+
+  *
+
 ## Version 3.13.0 ##
 
 ✨ New features:
