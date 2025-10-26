@@ -4,7 +4,11 @@
 
 🛠️ Bug fixes:
 
-  *
+* **Qt scraper**: Fixed thumbnail generation for sphinx-gallery examples in subdirectories
+  * The `qt_scraper` now correctly detects and handles examples organized in subsections (e.g., `examples/features/`, `examples/advanced/`)
+  * Thumbnails are now saved in the correct subdirectory-specific `images/thumb/` folders instead of the top-level directory
+  * Image paths in generated RST files now include the subdirectory path
+  * Added new `_get_example_subdirectory()` helper function to extract subdirectory from source file path and avoid code duplication
 
 ## Version 3.13.0 ##
 

@@ -214,11 +214,55 @@ def _ensure_qapplication() -> QApplication | None:
         return None
 
 
-def _get_image_directory(gallery_conf: dict[str, Any]) -> Path | None:
+def _get_example_subdirectory(
+    gallery_conf: dict[str, Any], block_vars: dict[str, Any] | None
+) -> str:
+    """Extract subdirectory from example source file path.
+
+    Args:
+        gallery_conf: Sphinx-Gallery configuration.
+        block_vars: Variables from the executed code block.
+
+    Returns:
+        Subdirectory name (e.g., "features", "advanced") or empty string if not found.
+    """
+    if not block_vars or "src_file" not in block_vars:
+        return ""
+
+    src_file = Path(str(block_vars["src_file"]))
+    examples_dirs = gallery_conf.get("examples_dirs", "examples")
+
+    # Handle both string and list cases for examples_dirs
+    if isinstance(examples_dirs, list):
+        examples_dir = examples_dirs[0] if examples_dirs else "examples"
+    else:
+        examples_dir = examples_dirs
+
+    # Try to extract subdirectory from source file path
+    # e.g., "examples/features/convolution.py" -> "features"
+    try:
+        if examples_dir in src_file.parts:
+            idx = src_file.parts.index(examples_dir)
+            # Check if there's a subdirectory between examples_dir and the file
+            if idx + 2 < len(src_file.parts):
+                subdirectory = src_file.parts[idx + 1]
+                logger.debug("Detected subdirectory: %s", subdirectory)
+                return subdirectory
+    except (ValueError, IndexError) as exc:
+        logger.debug("Could not determine subdirectory: %s", exc)
+
+    return ""
+
+
+def _get_image_directory(
+    gallery_conf: dict[str, Any], block_vars: dict[str, Any] | None = None
+) -> Path | None:
     """Get the image directory for saving screenshots.
 
     Args:
         gallery_conf: Sphinx-Gallery configuration.
+        block_vars: Variables from the executed code block (optional).
+         Used to determine subdirectory for examples in subsections.
 
     Returns:
         Path to image directory or None if cannot be determined.
@@ -236,13 +280,23 @@ def _get_image_directory(gallery_conf: dict[str, Any]) -> Path | None:
     else:
         gallery_dir = gallery_dirs
 
-    img_dir = src_dir / gallery_dir / "images"
+    # Determine subdirectory from source file if available
+    subdirectory = _get_example_subdirectory(gallery_conf, block_vars)
+
+    if subdirectory:
+        img_dir = src_dir / gallery_dir / subdirectory / "images"
+    else:
+        img_dir = src_dir / gallery_dir / "images"
+
     img_dir.mkdir(parents=True, exist_ok=True)
     return img_dir
 
 
 def _generate_rst_block(
-    image_name: str, gallery_conf: dict[str, Any], widget_index: int
+    image_name: str,
+    gallery_conf: dict[str, Any],
+    widget_index: int,
+    block_vars: dict[str, Any] | None = None,
 ) -> str:
     """Generate RST code block for an image.
 
@@ -250,6 +304,8 @@ def _generate_rst_block(
         image_name: Name of the image file.
         gallery_conf: Sphinx-Gallery configuration.
         widget_index: Index of the widget (for alt text).
+        block_vars: Variables from the executed code block (optional).
+         Used to determine subdirectory for examples in subsections.
 
     Returns:
         RST code block.
@@ -260,8 +316,16 @@ def _generate_rst_block(
     else:
         rst_gallery_dir = gallery_dirs
 
+    # Determine subdirectory from source file if available
+    subdirectory = _get_example_subdirectory(gallery_conf, block_vars)
+
+    if subdirectory:
+        image_path = f"/{rst_gallery_dir}/{subdirectory}/images/{image_name}"
+    else:
+        image_path = f"/{rst_gallery_dir}/images/{image_name}"
+
     return f"""
-.. image:: /{rst_gallery_dir}/images/{image_name}
+.. image:: {image_path}
    :alt: Qt widget {widget_index + 1}
    :class: sphx-glr-single-img
 """
@@ -336,8 +400,8 @@ def qt_scraper(
     if not widgets:
         return ""
 
-    # Get image directory
-    img_dir = _get_image_directory(gallery_conf)
+    # Get image directory (pass block_vars to determine subdirectory)
+    img_dir = _get_image_directory(gallery_conf, block_vars)
     if img_dir is None:
         logger.error("Cannot determine image directory")
         return ""
@@ -369,7 +433,7 @@ def qt_scraper(
             success = _capture_widget(widget, image_path)
 
             if success:
-                rst_block = _generate_rst_block(image_name, gallery_conf, i)
+                rst_block = _generate_rst_block(image_name, gallery_conf, i, block_vars)
                 rst_blocks.append(rst_block)
                 successful_widgets.append(widget)
                 successful_indices.append(i)
