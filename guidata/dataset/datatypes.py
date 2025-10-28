@@ -1723,6 +1723,9 @@ class DataSet(metaclass=DataSetMeta):
                 label = item._name
             else:
                 label = item.get_prop_value("display", self, "label")
+                if not label:
+                    # For BoolItem without label, use text as label
+                    label = item.get_prop_value("display", self, "text", "")
             if length and label is not None:
                 label = label.ljust(length)
             txt += f"{indent}{label}: {value_str}"

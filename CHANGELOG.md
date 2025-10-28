@@ -4,7 +4,16 @@
 
 🛠️ Bug fixes:
 
-  *
+* **DataSet.to_string()**: Fixed missing labels for BoolItem when only text is provided
+  * When a `BoolItem` is defined with only the `text` parameter (first argument) and no explicit `label` parameter (second argument), the label was displayed as empty in `to_string()` output, resulting in `: ☐` or `: ☑` instead of the expected `Item text: ☐`
+  * Added fallback logic to use the `text` property as label when `label` is empty, matching the behavior already implemented in `to_html()`
+  * This ensures consistency between text and HTML representations of DataSets containing BoolItems
+
+* **Qt scraper**: Fixed thumbnail generation for sphinx-gallery examples in subdirectories
+  * The `qt_scraper` now correctly detects and handles examples organized in subsections (e.g., `examples/features/`, `examples/advanced/`)
+  * Thumbnails are now saved in the correct subdirectory-specific `images/thumb/` folders instead of the top-level directory
+  * Image paths in generated RST files now include the subdirectory path
+  * Added new `_get_example_subdirectory()` helper function to extract subdirectory from source file path and avoid code duplication
 
 ## Version 3.13.0 ##
 
