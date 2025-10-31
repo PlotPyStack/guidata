@@ -4,7 +4,7 @@
 
 🛠️ Bug fixes:
 
-* ...
+* Fix the `AboutInfo.about` method: renamed parameter `addinfos` to `addinfo` for consistency
 
 ## Version 3.13.1 ##
 

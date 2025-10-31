@@ -20,11 +20,11 @@ from guidata.config import _
 from guidata.configtools import get_icon
 
 
-def get_python_libs_infos(addinfos: str = "") -> str:
+def get_python_libs_infos(addinfo: str = "") -> str:
     """Get Python and libraries information
 
     Args:
-        addinfos: additional information to be displayed
+        addinfo: additional information to be displayed
 
     Returns:
         str: Python and libraries information
@@ -38,25 +38,25 @@ def get_python_libs_infos(addinfos: str = "") -> str:
     else:
         qtb_version = qtpy.PYQT_VERSION
         qtb_name = "PyQt"
-    if addinfos:
-        addinfos = ", " + addinfos
+    if addinfo:
+        addinfo = ", " + addinfo
     return (
         f"Python {python_version}, "
         f"Qt {qtpy.QT_VERSION}, {qtb_name} {qtb_version}"
-        f"{addinfos} on {platform.system()}"
+        f"{addinfo} on {platform.system()}"
     )
 
 
-def get_general_infos(addinfos: str = "") -> str:
+def get_general_infos(addinfo: str = "") -> str:
     """Get general information (copyright, Qt versions, etc.)
 
     Args:
-        addinfos: additional information to be displayed
+        addinfo: additional information to be displayed
 
     Returns:
         str: Qt information
     """
-    return "Copyright © 2023 CEA-Codra\n\n" + get_python_libs_infos(addinfos=addinfos)
+    return "Copyright © 2023 CEA-Codra\n\n" + get_python_libs_infos(addinfo=addinfo)
 
 
 class AboutInfo:
@@ -101,14 +101,14 @@ class AboutInfo:
         return self.about()
 
     def about(
-        self, html: bool = True, copyright_only: bool = False, addinfos: str = ""
+        self, html: bool = True, copyright_only: bool = False, addinfo: str = ""
     ) -> str:
         """Return text about this package
 
         Args:
             html: return html text. Defaults to True.
             copyright_only: if True, return only copyright
-            addinfos: additional information to be displayed
+            addinfo: additional information to be displayed
 
         Returns:
             Text about this package
@@ -127,7 +127,7 @@ class AboutInfo:
             shdesc += _("More details about %s on %s or %s") % (self.name, plink, dlink)
         shdesc += "\n\n" + _("Created by %s in %d") % (author, year) + "\n"
         shdesc += _("Maintained by the %s organization") % organization
-        desc = get_general_infos(addinfos)
+        desc = get_general_infos(addinfo)
         if not copyright_only:
             desc = f"{shdesc}{desc}"
         if html:
