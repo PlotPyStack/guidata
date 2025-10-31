@@ -1,5 +1,11 @@
 # Changelog #
 
+## Version 3.13.2 ##
+
+🛠️ Bug fixes:
+
+* ...
+
 ## Version 3.13.1 ##
 
 🛠️ Bug fixes:
@@ -62,9 +68,9 @@ params = MyParameters()
 params_custom = MyParameters(title="Custom Title")
 ```
 
-  * Priority order: instance parameter > class-level config > empty/default
-  * Makes it explicit when title is intentionally set vs. accidentally left empty
-  * Improves code clarity by separating user-facing metadata from developer documentation
+* Priority order: instance parameter > class-level config > empty/default
+* Makes it explicit when title is intentionally set vs. accidentally left empty
+* Improves code clarity by separating user-facing metadata from developer documentation
 
 * **SeparatorItem**: Added a new visual separator data item for better dataset organization:
   * New `SeparatorItem` class allows inserting visual separators between sections in datasets
@@ -90,9 +96,9 @@ class PersonDataSet(DataSet):
     notes = StringItem("Notes", default="Additional notes")
 ```
 
-  * Improves readability and visual organization of complex datasets
-  * Fully integrated with existing DataSet serialization/deserialization (separators are ignored during save/load)
-  * Compatible with both edit and show modes in dataset dialogs
+* Improves readability and visual organization of complex datasets
+* Fully integrated with existing DataSet serialization/deserialization (separators are ignored during save/load)
+* Compatible with both edit and show modes in dataset dialogs
 
 * **Computed Items**: Added support for computed/calculated data items in datasets:
   * New `ComputedProp` class allows defining items whose values are automatically calculated from other items
@@ -111,8 +117,8 @@ class DataSet(gdt.DataSet):
     sum_xy = gdt.FloatItem("Sum", default=0.0).set_computed(compute_sum)
 ```
 
-  * Computed items automatically display with visual distinction (neutral background color) in GUI forms
-  * Supports complex calculations and can access any other items in the dataset
+* Computed items automatically display with visual distinction (neutral background color) in GUI forms
+* Supports complex calculations and can access any other items in the dataset
 
 * **Improved Visual Distinction for Read-only Fields**: Enhanced user interface to clearly identify non-editable fields:
   * Read-only text fields now display with a subtle gray background and darker text color
@@ -144,8 +150,8 @@ dataset = PersonDataSet()
 html_output = dataset.to_html()  # Generate HTML representation
 ```
 
-  * Ideal for reports, documentation, and web-based dataset visualization
-  * Comprehensive unit test coverage ensures reliability across all item types
+* Ideal for reports, documentation, and web-based dataset visualization
+* Comprehensive unit test coverage ensures reliability across all item types
 
 * `guidata.configtools.get_icon`:
   * This function retrieves a QIcon from the specified image file.
@@ -167,7 +173,7 @@ text = gds.TextItem("Text", default="Multi-line text", readonly=True)
 string = gds.StringItem("String", readonly=True)
 ```
 
-  * Note: Any other item type can also be turned into read-only mode by using `set_prop("display", readonly=True)`. This is a generic mechanism, but the main use case is for `StringItem` and `TextItem` (hence the dedicated input parameter for convenience).
+* Note: Any other item type can also be turned into read-only mode by using `set_prop("display", readonly=True)`. This is a generic mechanism, but the main use case is for `StringItem` and `TextItem` (hence the dedicated input parameter for convenience).
 
 * [Issue #94](https://github.com/PlotPyStack/guidata/issues/94) - Make dataset description text selectable
 
