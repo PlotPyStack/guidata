@@ -230,6 +230,35 @@ class AbstractDataSetWidget:
         if not self.build_mode:
             self.parent_layout.widget_value_changed()
 
+    def _trigger_auto_apply(self) -> None:
+        """Automatically trigger the apply action if in DataSetEditGroupBox context.
+
+        This method checks if the parent layout is part of a DataSetEditGroupBox
+        (which has an Apply button), and if so, automatically triggers the apply
+        action. This provides a better user experience for editors like the dictionary
+        and array editors, where users expect changes to be applied when they click
+        "Save & Close" rather than requiring an additional "Apply" button click.
+
+        The apply is deferred to the next event loop iteration to ensure that the
+        callback has finished updating the widget's value before apply is triggered.
+        """
+        # pylint: disable=import-outside-toplevel
+        from qtpy.QtCore import QTimer
+
+        from guidata.dataset.qtwidgets import DataSetEditGroupBox
+
+        # Walk up the widget hierarchy to find DataSetEditGroupBox
+        # The parent_layout.parent may not directly be the DataSetEditGroupBox,
+        # especially when the layout is embedded in tabs or other containers
+        current = self.parent_layout.parent
+        while current is not None:
+            if isinstance(current, DataSetEditGroupBox):
+                # Defer the apply to the next event loop iteration to ensure the
+                # callback has finished updating the value
+                QTimer.singleShot(0, lambda gb=current: gb.set(check=False))
+                return
+            current = current.parent() if hasattr(current, "parent") else None
+
     def retrieve_top_level_layout(self) -> DataSetEditLayout:
         """Retrieve the top-level layout associated with this widget.
 
@@ -1370,6 +1399,8 @@ class FloatArrayWidget(AbstractDataSetWidget):
         ):
             self.update(self.arr)
             self.notify_value_change()
+            # Auto-apply changes if in a DataSetEditGroupBox context
+            self._trigger_auto_apply()
 
     def get(self) -> None:
         """Update widget contents from data item value"""
@@ -1524,8 +1555,13 @@ class ButtonWidget(AbstractDataSetWidget):
         """
         self.parent_layout.update_dataitems()
         callback = self.item.get_prop_value("display", "callback")
+        # Pass auto-apply trigger function as optional 5th parameter
         self.cb_value = callback(
-            self.item.instance, self.item.item, self.cb_value, self.button.parent()
+            self.item.instance,
+            self.item.item,
+            self.cb_value,
+            self.button.parent(),
+            self._trigger_auto_apply,
         )
         self.set()
         self.parent_layout.update_widgets()

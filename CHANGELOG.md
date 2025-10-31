@@ -2,6 +2,17 @@
 
 ## Version 3.13.2 ##
 
+✨ New features:
+
+* **Auto-apply for DictItem and FloatArrayItem in DataSetEditGroupBox**: Improved user experience when editing dictionaries and arrays
+  * When a `DictItem` or `FloatArrayItem` is modified within a `DataSetEditGroupBox` (with an Apply button), changes are now automatically applied when the editor dialog is validated
+  * Previously, users had to click "Save & Close" in the dictionary/array editor, then click the "Apply" button in the dataset widget layout
+  * Now, clicking "Save & Close" automatically triggers the apply action, making changes immediately effective
+  * Implementation: The auto-apply trigger function is passed as an optional 5th parameter to button callbacks
+  * This behavior only applies to dataset layouts with an Apply button (DataSetEditGroupBox), not to standalone editors
+  * Provides more intuitive workflow and reduces the number of clicks required to apply changes
+  * Affects both `DictItem` (dictionary editor) and `FloatArrayItem` (array editor)
+
 🛠️ Bug fixes:
 
 * Fix the `AboutInfo.about` method: renamed parameter `addinfos` to `addinfo` for consistency

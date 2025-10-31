@@ -1415,8 +1415,22 @@ class DictItem(DataItem):
 
     @staticmethod
     # pylint: disable=unused-argument
-    def __dictedit(instance: DataSet, item: DataItem, value: dict, parent):
-        """Open a dictionary editor"""
+    def __dictedit(
+        instance: DataSet,
+        item: DataItem,
+        value: dict,
+        parent,
+        trigger_apply=None,
+    ):
+        """Open a dictionary editor
+
+        Args:
+            instance: DataSet instance
+            item: DataItem instance
+            value: Current dictionary value
+            parent: Parent widget
+            trigger_apply: Optional callback to trigger auto-apply
+        """
         # pylint: disable=import-outside-toplevel
         from guidata.qthelpers import exec_dialog
         from guidata.widgets.collectionseditor import CollectionsEditor
@@ -1426,8 +1440,13 @@ class DictItem(DataItem):
         if value_was_none:
             value = {}
         editor.setup(value, readonly=instance.is_readonly())
-        if exec_dialog(editor):
-            return editor.get_value()
+        result = exec_dialog(editor)
+        if result:
+            new_value = editor.get_value()
+            # Auto-apply changes if trigger function was provided
+            if trigger_apply is not None:
+                trigger_apply()
+            return new_value
         if value_was_none:
             return None
         return value
