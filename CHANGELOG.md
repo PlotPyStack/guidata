@@ -15,6 +15,13 @@
 
 🛠️ Bug fixes:
 
+* **ChoiceItem validation**: Fixed tuple/list equivalence during JSON deserialization
+  * When a `ChoiceItem` has tuple values (e.g., `((10, 90), "10% - 90%")`), JSON serialization converts tuples to lists
+  * During deserialization, validation failed because `[10, 90]` was not recognized as equivalent to `(10, 90)`
+  * Modified `ChoiceItem.check_value()` to compare sequence contents when both the value and choice are sequences (list/tuple)
+  * This ensures that ChoiceItems with tuple values work correctly with `dataset_to_json()`/`json_to_dataset()` round-trips
+  * Added regression test in `test_choice_tuple_serialization.py`
+
 * Fix the `AboutInfo.about` method: renamed parameter `addinfos` to `addinfo` for consistency
 
 ## Version 3.13.1 ##

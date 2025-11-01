@@ -1079,7 +1079,20 @@ class ChoiceItem(DataItem, Generic[_T]):
         choices = self.get_prop("data", "choices", [])
         if not isinstance(choices, ItemProperty):
             values = [v for v, _k, _i in choices]
-            if value not in values:
+            # Check if value is in values, with special handling for sequences
+            # (JSON serialization converts tuples to lists, so we need to compare
+            # their content rather than using strict equality)
+            value_found = False
+            for v in values:
+                if v == value:
+                    value_found = True
+                    break
+                # If both are sequences (list/tuple), compare their content
+                if isinstance(v, (list, tuple)) and isinstance(value, (list, tuple)):
+                    if len(v) == len(value) and all(a == b for a, b in zip(v, value)):
+                        value_found = True
+                        break
+            if not value_found:
                 if raise_exception:
                     raise ValueError(
                         f"Invalid value '{value}' (valid values: {values})"
