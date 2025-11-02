@@ -1756,13 +1756,12 @@ class DataSet(metaclass=DataSetMeta):
             HTML representation
         """
         # Create the title with comment
-        html = f'<u><b style="color: blue">{self.__title}</b></u>'
+        # Use a lighter blue (#5294e2) that works well in both light and dark modes
+        html = f'<u><b style="color: #5294e2">{self.__title}</b></u>:'
 
         if self.__comment:
             # Add comment on new line, also in blue
-            html += f'<br><span style="color: blue">{self.__comment}</span>'
-
-        html += ":"
+            html += f'<br><span style="color: #5294e2">{self.__comment}</span>'
 
         # Get items for representation (excluding trailing separators)
         filtered_items = self._get_items_for_text_representation()

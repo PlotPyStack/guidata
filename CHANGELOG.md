@@ -15,6 +15,11 @@
 
 🛠️ Bug fixes:
 
+* **DataSet.to_html()**: Improved color contrast for dark mode
+  * Changed title and comment color from standard blue (#0000FF) to a lighter shade (#5294e2)
+  * Provides better visibility in dark mode while maintaining good appearance in light mode
+  * Affects the HTML representation of DataSets displayed in applications with dark themes
+
 * **ChoiceItem validation**: Fixed tuple/list equivalence during JSON deserialization
   * When a `ChoiceItem` has tuple values (e.g., `((10, 90), "10% - 90%")`), JSON serialization converts tuples to lists
   * During deserialization, validation failed because `[10, 90]` was not recognized as equivalent to `(10, 90)`
