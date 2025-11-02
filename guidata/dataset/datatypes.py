@@ -1534,6 +1534,14 @@ class DataSet(metaclass=DataSetMeta):
         """
         return self.__title
 
+    def set_title(self, title: str) -> None:
+        """Set data set title
+
+        Args:
+            title (str): title
+        """
+        self.__title = title
+
     def get_comment(self) -> str | None:
         """Return data set comment
 
@@ -1542,6 +1550,14 @@ class DataSet(metaclass=DataSetMeta):
         """
         return self.__comment
 
+    def set_comment(self, comment: str | None) -> None:
+        """Set data set comment
+
+        Args:
+            comment (str | None): comment
+        """
+        self.__comment = comment
+
     def get_icon(self) -> str | None:
         """Return data set icon
 
@@ -1549,6 +1565,14 @@ class DataSet(metaclass=DataSetMeta):
             str | None: icon
         """
         return self.__icon
+
+    def set_icon(self, icon: str) -> None:
+        """Set data set icon
+
+        Args:
+            icon (str): icon
+        """
+        self.__icon = icon
 
     def set_defaults(self) -> None:
         """Set default values"""

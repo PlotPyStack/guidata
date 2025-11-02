@@ -4,6 +4,13 @@
 
 ✨ New features:
 
+* **DataSet setter methods**: Added public setter methods for title, comment, and icon
+  * New `set_title()` method: Sets the DataSet's title
+  * New `set_comment()` method: Sets the DataSet's comment
+  * New `set_icon()` method: Sets the DataSet's icon
+  * These methods provide a clean public API to modify DataSet metadata previously stored in private attributes
+  * Useful for applications that need to dynamically update DataSet metadata programmatically
+
 * **Auto-apply for DictItem and FloatArrayItem in DataSetEditGroupBox**: Improved user experience when editing dictionaries and arrays
   * When a `DictItem` or `FloatArrayItem` is modified within a `DataSetEditGroupBox` (with an Apply button), changes are now automatically applied when the editor dialog is validated
   * Previously, users had to click "Save & Close" in the dictionary/array editor, then click the "Apply" button in the dataset widget layout
