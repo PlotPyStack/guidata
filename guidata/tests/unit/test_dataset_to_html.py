@@ -49,8 +49,7 @@ class ComplexDataset(gds.DataSet):
 class DatasetWithComment(
     gds.DataSet,
     comment=(
-        "This is the comment that should appear in lighter blue\n"
-        "in the HTML output."
+        "This is the comment that should appear in lighter blue\nin the HTML output."
     ),
 ):
     """A dataset with title and comment"""
