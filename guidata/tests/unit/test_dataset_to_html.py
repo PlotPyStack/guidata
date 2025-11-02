@@ -48,7 +48,10 @@ class ComplexDataset(gds.DataSet):
 
 class DatasetWithComment(
     gds.DataSet,
-    comment="This is the comment that should appear in blue\nin the HTML output.",
+    comment=(
+        "This is the comment that should appear in lighter blue\n"
+        "in the HTML output."
+    ),
 ):
     """A dataset with title and comment"""
 
@@ -68,7 +71,7 @@ def test_simple_dataset_to_html():
 
     # Check title is present and styled (uses first line of docstring)
     expected_title = (
-        '<u><b style="color: blue">Simple dataset for testing HTML output</b></u>'
+        '<u><b style="color: #5294e2">Simple dataset for testing HTML output</b></u>'
     )
     assert expected_title in html
 
@@ -94,7 +97,7 @@ def test_complex_dataset_to_html():
 
     # Check title (uses first line of docstring)
     expected_title = (
-        '<u><b style="color: blue">'
+        '<u><b style="color: #5294e2">'
         "Dataset with various item types and BoolItem configurations"
         "</b></u>"
     )
@@ -129,13 +132,13 @@ def test_dataset_with_comment():
 
     # Check title (uses first line of docstring)
     expected_title = (
-        '<u><b style="color: blue">A dataset with title and comment</b></u>'
+        '<u><b style="color: #5294e2">A dataset with title and comment</b></u>'
     )
     assert expected_title in html
 
-    # Check comment is present and styled in blue
-    assert '<span style="color: blue">' in html
-    assert "This is the comment that should appear in blue" in html
+    # Check comment is present and styled with the lighter blue
+    assert '<span style="color: #5294e2">' in html
+    assert "This is the comment that should appear in lighter blue" in html
 
 
 def test_bool_item_combinations():
@@ -174,7 +177,7 @@ def test_empty_dataset():
 
     # Should have title (uses first line of docstring)
     expected_title = (
-        '<u><b style="color: blue">Empty dataset for edge case testing</b></u>'
+        '<u><b style="color: #5294e2">Empty dataset for edge case testing</b></u>'
     )
     assert expected_title in html  # Should indicate no items
     assert "No items to display" in html
@@ -375,8 +378,8 @@ class VisualizationDataset(gds.DataSet):
     <div class="container">
         <h2>Key Features Demonstrated</h2>
         <ul>
-            <li><strong>Title and Comment:</strong> Displayed in blue using the first
-            line of the docstring as title</li>
+            <li><strong>Title and Comment:</strong> Displayed in lighter blue
+            (#5294e2) using the first line of the docstring as title</li>
             <li><strong>Two-column Layout:</strong> Item names right-aligned,
             values left-aligned</li>
             <li><strong>BoolItem Checkboxes:</strong> ☑ for True, ☐ for False</li>
