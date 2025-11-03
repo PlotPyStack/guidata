@@ -163,17 +163,17 @@ def _extract_git_information(repo_path: str) -> tuple[str, str, str] | None:
 
     # Get branch name
     branch = subprocess.check_output(
-        ["git", "rev-parse", "--abbrev-ref", "HEAD"], text=True
+        ["git", "rev-parse", "--abbrev-ref", "HEAD"], text=True, encoding="utf-8"
     ).strip()
 
     # Get short commit hash
     commit = subprocess.check_output(
-        ["git", "rev-parse", "--short", "HEAD"], text=True
+        ["git", "rev-parse", "--short", "HEAD"], text=True, encoding="utf-8"
     ).strip()
 
     # Get commit message (first line only, truncated if needed)
     message = subprocess.check_output(
-        ["git", "log", "-1", "--pretty=%B"], text=True
+        ["git", "log", "-1", "--pretty=%B"], text=True, encoding="utf-8"
     ).strip()
 
     if len(message.splitlines()) > 1:
