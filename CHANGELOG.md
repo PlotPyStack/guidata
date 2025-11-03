@@ -1,15 +1,5 @@
 # Changelog #
 
-## Version 3.13.3 ##
-
-🛠️ Bug fixes:
-
-* **Git report utility**: Fixed UnicodeDecodeError on Windows when commit messages contain non-ASCII characters
-  * The `guidata.utils.gitreport` module now explicitly uses UTF-8 encoding when reading Git command output
-  * Previously, on Windows systems with cp1252 default encoding, Git commit messages containing Unicode characters (emoji, accented characters, etc.) would cause a `UnicodeDecodeError`
-  * Fixed by adding `encoding="utf-8"` parameter to all `subprocess.check_output()` calls in `_extract_git_information()`
-  * This ensures proper decoding of Git output which is always UTF-8 encoded, regardless of the system's default encoding
-
 ## Version 3.13.2 ##
 
 ✨ New features:
@@ -31,6 +21,12 @@
   * Affects both `DictItem` (dictionary editor) and `FloatArrayItem` (array editor)
 
 🛠️ Bug fixes:
+
+* **Git report utility**: Fixed UnicodeDecodeError on Windows when commit messages contain non-ASCII characters
+  * The `guidata.utils.gitreport` module now explicitly uses UTF-8 encoding when reading Git command output
+  * Previously, on Windows systems with cp1252 default encoding, Git commit messages containing Unicode characters (emoji, accented characters, etc.) would cause a `UnicodeDecodeError`
+  * Fixed by adding `encoding="utf-8"` parameter to all `subprocess.check_output()` calls in `_extract_git_information()`
+  * This ensures proper decoding of Git output which is always UTF-8 encoded, regardless of the system's default encoding
 
 * **DataSet.to_html()**: Improved color contrast for dark mode
   * Changed title and comment color from standard blue (#0000FF) to a lighter shade (#5294e2)
