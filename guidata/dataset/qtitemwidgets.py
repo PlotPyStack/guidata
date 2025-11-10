@@ -18,6 +18,7 @@ Example: ChoiceWidget <--> ChoiceItem, ImageChoiceItem
 from __future__ import annotations
 
 import datetime
+import inspect
 import os
 import os.path as osp
 import sys
@@ -1555,14 +1556,24 @@ class ButtonWidget(AbstractDataSetWidget):
         """
         self.parent_layout.update_dataitems()
         callback = self.item.get_prop_value("display", "callback")
-        # Pass auto-apply trigger function as optional 5th parameter
-        self.cb_value = callback(
-            self.item.instance,
-            self.item.item,
-            self.cb_value,
-            self.button.parent(),
-            self._trigger_auto_apply,
-        )
+        # Pass auto-apply trigger function as optional 5th parameter, only if callback
+        # takes 5 parameters:
+        sig = inspect.signature(callback)
+        if len(sig.parameters) < 5:
+            self.cb_value = callback(
+                self.item.instance,
+                self.item.item,
+                self.cb_value,
+                self.button.parent(),
+            )
+        else:
+            self.cb_value = callback(
+                self.item.instance,
+                self.item.item,
+                self.cb_value,
+                self.button.parent(),
+                self._trigger_auto_apply,
+            )
         self.set()
         self.parent_layout.update_widgets()
         self.notify_value_change()

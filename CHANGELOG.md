@@ -1,5 +1,18 @@
 # Changelog #
 
+## Version 3.13.3 ##
+
+🛠️ Bug fixes:
+
+* **ButtonItem callbacks**: Fixed critical regression breaking callbacks with 4 parameters
+  * In v3.13.2, the auto-apply feature unconditionally passed a 5th parameter (`trigger_auto_apply`) to all ButtonItem callbacks
+  * This broke all existing callbacks expecting only 4 parameters (instance, item, value, parent)
+  * Now uses `inspect.signature()` to check callback parameter count at runtime
+  * Callbacks with fewer than 5 parameters receive only the standard 4 arguments
+  * Callbacks with 5+ parameters receive the additional `trigger_auto_apply` function
+  * Maintains full backward compatibility while supporting the new auto-apply feature
+  * Fixes `TypeError: callback() takes 4 positional arguments but 5 were given`
+
 ## Version 3.13.2 ##
 
 ✨ New features:
