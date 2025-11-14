@@ -294,6 +294,17 @@ class IconBrowserWindow(QW.QMainWindow):
 
         toolbar.addSeparator()
 
+        refresh_action = qth.create_action(
+            self,
+            "Refresh",
+            triggered=lambda: self.open_folder(self.current_folder)
+            if self.current_folder
+            else None,
+            icon=qth.get_std_icon("BrowserReload"),
+            tip="Refresh the current folder",
+        )
+        toolbar.addAction(refresh_action)
+
         # Set icon size action
         size_action = qth.create_action(
             self,
