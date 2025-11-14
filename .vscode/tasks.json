@@ -388,5 +388,30 @@
                 "🧹 Clean Up",
             ],
         },
+        {
+            "label": "🖼️ Icon Browser",
+            "command": "${command:python.interpreterPath}",
+            "args": [
+                "-m",
+                "guidata.widgets.iconbrowser",
+                "${workspaceFolder}/guidata/data/icons",
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}",
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true,
+            },
+            "presentation": {
+                "clear": true,
+                "echo": true,
+                "focus": false,
+                "panel": "dedicated",
+                "reveal": "always",
+                "showReuseMessage": true,
+            },
+            "type": "shell",
+        },
     ],
 }

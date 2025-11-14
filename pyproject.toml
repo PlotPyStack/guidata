@@ -43,6 +43,7 @@ dynamic = ["version"]
 
 [project.gui-scripts]
 guidata-tests = "guidata.tests:run"
+giconbrowser = "guidata.widgets.iconbrowser:main"
 
 [project.scripts]
 gtrans = "guidata.utils.translations:main"
