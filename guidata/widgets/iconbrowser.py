@@ -149,17 +149,27 @@ class IconGridWidget(QW.QWidget):
         icon_label.setAlignment(QC.Qt.AlignCenter)
 
         # Load and set icon
-        pixmap = QG.QPixmap(icon_path)
-        if not pixmap.isNull():
-            scaled_pixmap = pixmap.scaled(
-                self.icon_size,
-                self.icon_size,
-                QC.Qt.KeepAspectRatio,
-                QC.Qt.SmoothTransformation,
-            )
-            icon_label.setPixmap(scaled_pixmap)
+        if icon_path.lower().endswith(".svg"):
+            # For SVG files, use QIcon which renders them properly at any size
+            icon = QG.QIcon(icon_path)
+            pixmap = icon.pixmap(self.icon_size, self.icon_size)
+            if not pixmap.isNull():
+                icon_label.setPixmap(pixmap)
+            else:
+                icon_label.setText("Error")
         else:
-            icon_label.setText("Error")
+            # For raster images, use QPixmap
+            pixmap = QG.QPixmap(icon_path)
+            if not pixmap.isNull():
+                scaled_pixmap = pixmap.scaled(
+                    self.icon_size,
+                    self.icon_size,
+                    QC.Qt.KeepAspectRatio,
+                    QC.Qt.SmoothTransformation,
+                )
+                icon_label.setPixmap(scaled_pixmap)
+            else:
+                icon_label.setText("Error")
 
         # Filename label
         filename = osp.basename(icon_path)
