@@ -283,6 +283,8 @@ def clean_documentation_files(project_root: Path, lib_name: str, mod_name: str) 
     remove_if_exists(project_root / "doc" / "auto_examples")
     remove_if_exists(project_root / "doc" / "sg_execution_times.rst")
     remove_glob_pattern(f"{mod_name}/data/doc/{lib_name}*.pdf", project_root)
+    first_part = lib_name.split("-")[0]
+    remove_glob_pattern(f"{mod_name}/data/doc/{first_part}*.pdf", project_root)
 
 
 def clean_wix_installer_files(project_root: Path, lib_name: str, mod_name: str) -> None:
