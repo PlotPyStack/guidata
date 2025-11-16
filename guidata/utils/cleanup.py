@@ -106,6 +106,11 @@ def get_mod_name(project_root: Path) -> str:
     if (project_root / mod_name).exists():
         return mod_name
 
+    # Try the first part before hyphen
+    first_part = lib_name.split("-")[0]
+    if (project_root / first_part).exists():
+        return first_part
+
     # Otherwise return the lib_name as is
     return lib_name
 
@@ -125,14 +130,22 @@ def remove_if_exists(path: Path) -> None:
             path.unlink()
 
 
-def remove_glob_pattern(pattern: str, search_root: Path) -> None:
+def remove_glob_pattern(
+    pattern: str, search_root: Path, case_sensitive: bool = True
+) -> None:
     """Remove files matching a glob pattern.
 
     Args:
         pattern: Glob pattern to match files/directories.
         search_root: Root directory to search from.
+        case_sensitive: Whether the glob matching should be case sensitive.
     """
-    matches = list(search_root.glob(pattern))
+    if not case_sensitive:
+        pattern = f"**/{pattern.lower()}"
+        matches = [p for p in search_root.rglob("*") if p.match(pattern)]
+        print(f"    Searching for pattern (case insensitive): {pattern}")
+    else:
+        matches = list(search_root.glob(pattern))
 
     if matches:
         print(f"    Removing {len(matches)} items matching pattern: {pattern}")
@@ -202,7 +215,7 @@ def clean_coverage_files(project_root: Path) -> None:
     remove_if_exists(project_root / ".pytest_cache")
 
     # Remove .coverage.* files
-    remove_glob_pattern(".coverage.*", project_root)
+    remove_glob_pattern("**/.coverage.*", project_root)
 
 
 def clean_profile_files(project_root: Path) -> None:
@@ -265,18 +278,20 @@ def clean_documentation_files(project_root: Path, lib_name: str, mod_name: str) 
         mod_name: The main module name.
     """
     print("  Cleaning documentation files...")
+    remove_if_exists(project_root / "doc" / "_download")
     remove_if_exists(project_root / "doc" / "changelog.md")
     remove_if_exists(project_root / "doc" / "auto_examples")
     remove_if_exists(project_root / "doc" / "sg_execution_times.rst")
     remove_glob_pattern(f"{mod_name}/data/doc/{lib_name}*.pdf", project_root)
 
 
-def clean_wix_installer_files(project_root: Path, lib_name: str) -> None:
+def clean_wix_installer_files(project_root: Path, lib_name: str, mod_name: str) -> None:
     """Remove WiX installer related files.
 
     Args:
         project_root: The root directory of the project.
         lib_name: The library name from pyproject.toml.
+        mod_name: The main module name.
     """
     print("  Cleaning WiX installer files...")
     wix_dir = project_root / "wix"
@@ -285,7 +300,8 @@ def clean_wix_installer_files(project_root: Path, lib_name: str) -> None:
         remove_if_exists(wix_dir / "obj")
         remove_glob_pattern("*.bmp", wix_dir)
         remove_glob_pattern("*.wixpdb", wix_dir)
-        remove_glob_pattern(f"{lib_name}*.wxs", wix_dir)
+        remove_glob_pattern(f"{lib_name}*.wxs", wix_dir, case_sensitive=False)
+        remove_glob_pattern(f"{mod_name}*.wxs", wix_dir, case_sensitive=False)
 
 
 def clean_empty_directories(project_root: Path) -> None:
@@ -390,7 +406,7 @@ def run_cleanup(project_root: Path | str | None = None) -> None:
             clean_log_files(project_root)
             clean_localization_files(project_root, mod_name)
             clean_documentation_files(project_root, lib_name, mod_name)
-            clean_wix_installer_files(project_root, lib_name)
+            clean_wix_installer_files(project_root, lib_name, mod_name)
             clean_empty_directories(project_root)
 
             print("🆗 Cleanup completed successfully!")
