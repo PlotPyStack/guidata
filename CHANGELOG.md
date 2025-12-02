@@ -1,5 +1,18 @@
 # Changelog #
 
+## Version 3.13.4 ##
+
+🛠️ Bug fixes:
+
+* **BoolItem numpy compatibility**: Fixed `numpy.bool_` type conversion issue
+  * `BoolItem` now ensures all assigned values are converted to Python `bool` type
+  * Added `__set__` override to convert `numpy.bool_` values to native Python `bool`
+  * Fixes compatibility issues with Qt APIs that strictly require Python `bool` (e.g., `QAction.setChecked()`)
+  * Prevents `TypeError: setChecked(self, a0: bool): argument 1 has unexpected type 'numpy.bool'`
+  * Affects applications using `BoolItem` values with Qt widgets after HDF5 deserialization
+  * Maintains backward compatibility as `bool(bool)` is a no-op
+  * This closes [Issue #96](https://github.com/PlotPyStack/guidata/issues/96) - `BoolItem`: `numpy.bool_` compatibility fix
+
 ## Version 3.13.3 ##
 
 🛠️ Bug fixes:

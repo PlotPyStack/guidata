@@ -8,7 +8,7 @@ user interfaces for easy dataset editing and display. It also provides helpers
 and application development tools for Qt.
 """
 
-__version__ = "3.13.3"
+__version__ = "3.13.4"
 
 
 # Dear (Debian, RPM, ...) package makers, please feel free to customize the
