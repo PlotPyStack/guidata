@@ -14,6 +14,13 @@
   * Supports PNG, SVG, ICO, JPG, GIF, and BMP formats
   * Responsive grid layout adapts to window resizing
   * Useful for developers managing icons for their applications and libraries
+  * Refresh action to toolbar for reloading current folder after external changes
+
+* **Cleanup utility enhancements**: Improved the `guidata.utils.cleanup` module
+  * Added case sensitivity option for glob patterns (default: case-insensitive matching)
+  * Improved module name detection from `pyproject.toml` when name differs from directory name
+  * Enhanced documentation cleanup to support removing PDF files with library name prefix
+  * These improvements make the cleanup utility more robust and flexible for different project structures
 
 🛠️ Bug fixes:
 
