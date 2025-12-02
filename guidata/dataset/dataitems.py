@@ -653,6 +653,21 @@ class BoolItem(DataItem):
         statement defined in the base item `deserialize` method"""
         return reader.read_bool()
 
+    def __set__(self, instance: DataSet, value: bool | None) -> None:
+        """Set data item's value, ensuring it's a Python bool
+
+        This override ensures that numpy.bool_ values are converted to Python bool,
+        which is necessary for compatibility with Qt APIs that strictly require
+        Python bool type (e.g., QAction.setChecked()).
+
+        Args:
+            instance: instance of the DataSet
+            value: value to set (will be converted to Python bool if not None)
+        """
+        if value is not None:
+            value = bool(value)
+        super().__set__(instance, value)
+
 
 class DateItem(DataItem):
     """DataSet data item
