@@ -53,6 +53,7 @@ gclean = "guidata.utils.cleanup:main"
 qt = ["PyQt5 > 5.15.5"]
 dev = ["build", "babel", "Coverage", "pylint", "ruff", "pre-commit"]
 doc = [
+    "PyQt5",
     "pillow",
     "pandas",
     "sphinx",
