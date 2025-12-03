@@ -42,6 +42,6 @@ Table of contents
    autodoc/index
    dev/index
    reference/index
-   changelog
+   release_notes/index
 
 * :ref:`genindex`
