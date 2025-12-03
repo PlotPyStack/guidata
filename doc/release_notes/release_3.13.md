@@ -1,7 +1,7 @@
 
 # Version 3.13 #
 
-## Version 3.13.4 ##
+## Version 3.13.4 (2025-12-03) ##
 
 🛠️ Bug fixes:
 
@@ -16,7 +16,7 @@
 
 * Fix documentation build error due to the fact that Qt is needed for some parts of the building process
 
-## guidata Version 3.13.3 (2024-11-10) ##
+## guidata Version 3.13.3 (2025-11-10) ##
 
 🛠️ Bug fixes:
 
@@ -29,7 +29,7 @@
   * Maintains full backward compatibility while supporting the new auto-apply feature
   * Fixes `TypeError: callback() takes 4 positional arguments but 5 were given`
 
-## guidata Version 3.13.2 (2024-11-03) ##
+## guidata Version 3.13.2 (2025-11-03) ##
 
 ✨ New features:
 
@@ -71,7 +71,7 @@
 
 * Fix the `AboutInfo.about` method: renamed parameter `addinfos` to `addinfo` for consistency
 
-## guidata Version 3.13.1 (2024-10-28) ##
+## guidata Version 3.13.1 (2025-10-28) ##
 
 🛠️ Bug fixes:
 
@@ -86,7 +86,7 @@
   * Image paths in generated RST files now include the subdirectory path
   * Added new `_get_example_subdirectory()` helper function to extract subdirectory from source file path and avoid code duplication
 
-## guidata Version 3.13.0 (2024-10-24) ##
+## guidata Version 3.13.0 (2025-10-24) ##
 
 ✨ New features:
 
