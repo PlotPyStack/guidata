@@ -22,6 +22,8 @@
   * Enhanced documentation cleanup to support removing PDF files with library name prefix
   * These improvements make the cleanup utility more robust and flexible for different project structures
 
+## Version 3.13.4 ##
+
 🛠️ Bug fixes:
 
 * **BoolItem numpy compatibility**: Fixed `numpy.bool_` type conversion issue
