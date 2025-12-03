@@ -491,7 +491,7 @@ class BaseArrayModel(QAbstractTableModel, Generic[AnyArrayHandler, AnySupportedA
                 return ""
             try:
                 return self._format % value
-            except (TypeError, ValueError, ZeroDivisionError):
+            except TypeError:
                 self.readonly = True
                 return repr(value)
         elif role == Qt.ItemDataRole.TextAlignmentRole:
@@ -508,7 +508,7 @@ class BaseArrayModel(QAbstractTableModel, Generic[AnyArrayHandler, AnySupportedA
                 hue = float(np.abs(hue))
                 color = QColor.fromHsvF(hue, self.sat, self.val, self.alp)
                 return color
-            except (TypeError, ValueError, ZeroDivisionError):
+            except TypeError:
                 return None
         elif role == Qt.ItemDataRole.FontRole:
             return get_font(CONF, "arrayeditor", "font")
