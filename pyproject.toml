@@ -12,8 +12,7 @@ name = "guidata"
 authors = [{ name = "Codra", email = "p.raybaut@codra.fr" }]
 description = "Automatic GUI generation for easy dataset editing and display"
 readme = "README.md"
-license = "BSD-3-Clause"
-license-files = ["LICENSE"]
+license = { file = "LICENSE" }
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
