@@ -1,6 +1,16 @@
 
 # Version 3.13 #
 
+## Version 3.13.5 ##
+
+🛠️ Bug fixes:
+
+* Translation file generation: Ignore POT-Creation-Date and Last-Translator headers to reduce unnecessary diffs
+  * Added `_cleanup_po_file()` helper function to remove the `POT-Creation-Date` and `Last-Translator` headers from generated `.po` files
+  * This prevents spurious diffs in version control when regeneration occurs at different times
+  * Integrated cleanup step into `generate_translation_files()` after `.po` file creation
+  * Ensures cleaner translation file management and reduces noise in commit history
+
 ## Version 3.13.4 (2025-12-03) ##
 
 🛠️ Bug fixes:
