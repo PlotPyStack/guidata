@@ -52,38 +52,11 @@ from __future__ import annotations
 import argparse
 import locale
 import os
-import re
 import subprocess
 import sys
 import typing
 
 PYBABEL_ARGS = [sys.executable, "-m", "babel.messages.frontend"]
-
-# Header lines to remove from .po files to avoid unnecessary merge conflicts
-# when cherry-picking commits between branches
-PO_HEADERS_TO_REMOVE = [
-    "POT-Creation-Date",
-    "Last-Translator",
-]
-
-
-def _cleanup_po_file(po_file: str) -> None:
-    """Remove volatile header lines from a .po file to avoid merge conflicts.
-
-    Args:
-        po_file: Path to the .po file to clean up.
-    """
-    with open(po_file, "r", encoding="utf-8") as f:
-        content = f.read()
-
-    # Build a regex pattern to match and remove the header lines
-    for header in PO_HEADERS_TO_REMOVE:
-        # Match the header line in the msgstr block (e.g., "POT-Creation-Date: ...\n")
-        pattern = rf'"{header}:[^"]*\\n"\n'
-        content = re.sub(pattern, "", content)
-
-    with open(po_file, "w", encoding="utf-8") as f:
-        f.write(content)
 
 
 def get_default_language_code() -> str:
@@ -213,13 +186,9 @@ def scan_translations(
                     "--init-missing",
                     "--no-wrap",
                     "--update-header-comment",
-                    "--ignore-pot-creation-date",
                 ],
                 check=True,
             )
-            # Clean up the .po file to remove volatile headers
-            po_file = os.path.join(translation_dir, code, "LC_MESSAGES", f"{name}.po")
-            _cleanup_po_file(po_file)
     except subprocess.CalledProcessError as e:
         print("Error: Translation file generation failed.")
         print(e.stderr)
