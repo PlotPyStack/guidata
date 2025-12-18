@@ -289,45 +289,6 @@ def compile_translations(
         raise RuntimeError(f"Compilation failed: {e.stderr}") from e
 
 
-def cleanup_doc_translations(
-    directory: typing.Union[str, os.PathLike],
-    locale_dir: str = "doc/locale",
-) -> None:
-    """Clean up Sphinx documentation translation files.
-
-    This function removes volatile header lines (POT-Creation-Date, Last-Translator)
-    from all .po files in the specified locale directory to avoid unnecessary merge
-    conflicts when cherry-picking commits between branches.
-
-    Args:
-        directory: The root directory of the project.
-        locale_dir: The relative path to the locale directory (default: "doc/locale").
-
-    Raises:
-        FileNotFoundError: The locale directory does not exist.
-    """
-    locale_path = os.path.join(directory, locale_dir)
-    if not os.path.exists(locale_path):
-        print(f"Error: Locale directory {locale_path} does not exist.")
-        raise FileNotFoundError(f"Locale directory {locale_path} does not exist.")
-
-    # Find all .po files in the locale directory
-    po_files = []
-    for root, _, files in os.walk(locale_path):
-        for file in files:
-            if file.endswith(".po"):
-                po_files.append(os.path.join(root, file))
-
-    if not po_files:
-        print(f"No .po files found in {locale_path}")
-        return
-
-    print(f"Cleaning up {len(po_files)} .po files in {locale_path}...")
-    for po_file in po_files:
-        _cleanup_po_file(po_file)
-    print("Cleanup completed successfully.")
-
-
 def _get_def(option: str) -> str | None:
     """Get the default value from environment variables or return None."""
     return os.environ.get(f"I18N_{option.upper()}")
@@ -375,19 +336,6 @@ def main():
         help="Language codes to translate (space-separated, e.g., 'fr it')",
     )
 
-    cleanup_doc_parser = subparsers.add_parser(
-        "cleanup-doc", help="Clean up Sphinx documentation translation files"
-    )
-    cleanup_doc_parser.add_argument(
-        "--directory", required=True, help="Project root directory"
-    )
-    cleanup_doc_parser.add_argument(
-        "--locale-dir",
-        required=False,
-        default="doc/locale",
-        help="Relative path to the locale directory",
-    )
-
     args = parser.parse_args()
 
     if args.command == "compile":
@@ -399,8 +347,6 @@ def main():
             args.copyright_holder,
             args.languages,
         )
-    elif args.command == "cleanup-doc":
-        cleanup_doc_translations(args.directory, args.locale_dir)
     else:
         parser.print_help()
         raise ValueError(f"Unknown command: {args.command}. Use 'scan' or 'compile'.")
