@@ -1,25 +1,6 @@
 
 # Version 3.13 #
 
-## Version 3.13.5 ##
-
-🛠️ Bug fixes:
-
-* Translation file generation: Ignore POT-Creation-Date and Last-Translator headers to reduce unnecessary diffs
-  * Added `_cleanup_po_file()` helper function to remove the `POT-Creation-Date` and `Last-Translator` headers from generated `.po` files
-  * This prevents spurious diffs in version control when regeneration occurs at different times
-  * Integrated cleanup step into `generate_translation_files()` after `.po` file creation
-  * Ensures cleaner translation file management and reduces noise in commit history
-
-✨ New features:
-
-* New `cleanup-doc` command for Sphinx documentation translation files
-  * Added `cleanup_doc_translations()` function to clean up `.po` files in `doc/locale/` directories
-  * Removes `POT-Creation-Date` and `Last-Translator` headers from all Sphinx-generated translation files
-  * Usage: `python -m guidata.utils.translations cleanup-doc --directory .`
-  * Helps avoid merge conflicts when cherry-picking commits between branches (e.g., `release` ↔ `develop`)
-  * Optional `--locale-dir` argument to specify custom locale directory path (defaults to `doc/locale`)
-
 ## Version 3.13.4 (2025-12-03) ##
 
 🛠️ Bug fixes:
