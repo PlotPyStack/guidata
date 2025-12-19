@@ -17,6 +17,8 @@ It finally copies the generated files to the `dist/` directory.
 
 from __future__ import annotations
 
+import argparse
+import os
 import shutil
 import subprocess
 import sys
@@ -24,12 +26,17 @@ import tempfile
 from pathlib import Path
 
 
-def run_secure_build(root_path: str | None = None) -> None:
+def run_secure_build(
+    root_path: str | None = None, prebuild_command: str | None = None
+) -> None:
     """Run a secure build of the Python package.
 
     Args:
         root_path: Path to the root directory of the Git repository. If None,
          the function will take the current working directory as the root.
+        prebuild_command: Optional command to run before building. This is useful
+         for compiling translations or other pre-build tasks. The command is
+         executed in the temporary build directory.
 
     This function performs the following steps:
 
@@ -37,8 +44,9 @@ def run_secure_build(root_path: str | None = None) -> None:
     2. Creates a tar archive of the current HEAD of the Git repository.
     3. Extracts the contents of the tar archive into the temporary directory.
     4. Checks for the presence of `pyproject.toml` in the extracted files.
-    5. Runs the build process using `build` to create source distribution and wheels.
-    6. Copies the generated files to the `dist/` directory in repository root.
+    5. Runs the optional prebuild command if provided.
+    6. Runs the build process using `build` to create source distribution and wheels.
+    7. Copies the generated files to the `dist/` directory in repository root.
 
     Raises:
         RuntimeError: If the current directory is not a Git repository and no
@@ -91,7 +99,34 @@ def run_secure_build(root_path: str | None = None) -> None:
         for path in sorted(build_root.iterdir()):
             print(f" - {path.name}")
 
-        # Step 4 : run the package build
+        # Step 4 : run the optional prebuild command
+        if prebuild_command:
+            # Replace 'python' with the current interpreter to avoid PATH issues
+            if prebuild_command.startswith("python "):
+                prebuild_command = f'"{sys.executable}" {prebuild_command[7:]}'
+            elif prebuild_command.startswith("python3 "):
+                prebuild_command = f'"{sys.executable}" {prebuild_command[8:]}'
+
+            # Prepare environment with absolute PYTHONPATH (relative paths break in
+            # temp directory)
+            env = os.environ.copy()
+            if "PYTHONPATH" in env:
+                pythonpath_entries = env["PYTHONPATH"].split(os.pathsep)
+                abs_entries = [
+                    str(Path(entry).resolve()) for entry in pythonpath_entries
+                ]
+                env["PYTHONPATH"] = os.pathsep.join(abs_entries)
+
+            print(f"🔧 Running prebuild command: {prebuild_command}")
+            subprocess.run(
+                prebuild_command,
+                cwd=build_root,
+                check=True,
+                shell=True,
+                env=env,
+            )
+
+        # Step 5 : run the package build
         print("🔨 Building the package...")
         subprocess.run(
             [sys.executable, "-m", "build", "--sdist", "--wheel"],
@@ -99,7 +134,7 @@ def run_secure_build(root_path: str | None = None) -> None:
             check=True,
         )
 
-        # Step 5 : copy the artifacts to dist/
+        # Step 6 : copy the artifacts to dist/
         print(f"📦 Copying built packages to {dist_dir}...")
         build_dist = build_root / "dist"
         dist_dir.mkdir(exist_ok=True)
@@ -110,4 +145,22 @@ def run_secure_build(root_path: str | None = None) -> None:
 
 
 if __name__ == "__main__":
-    run_secure_build()
+    parser = argparse.ArgumentParser(
+        description="Securely build Python packages from a Git repository."
+    )
+    parser.add_argument(
+        "--prebuild",
+        type=str,
+        default=None,
+        help="Command to run before building (e.g., to compile translations). "
+        "The command is executed in the temporary build directory.",
+    )
+    parser.add_argument(
+        "root_path",
+        nargs="?",
+        default=None,
+        help="Path to the root directory of the Git repository. "
+        "If not provided, the current working directory is used.",
+    )
+    args = parser.parse_args()
+    run_secure_build(root_path=args.root_path, prebuild_command=args.prebuild)

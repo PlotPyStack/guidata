@@ -4,6 +4,14 @@
 
 ✨ New features:
 
+* **Secure build utility**: Added `--prebuild` option to run commands before package build
+  * New `--prebuild` command-line argument for `guidata.utils.securebuild`
+  * Executes custom commands in the temporary build directory before `python -m build`
+  * Useful for compiling translations or other pre-build tasks in the clean clone environment
+  * Automatically replaces `python` with the current interpreter to avoid PATH issues on Windows
+  * Converts relative PYTHONPATH entries to absolute paths for correct module resolution
+  * Usage: `python -m guidata.utils.securebuild --prebuild "python -m guidata.utils.translations compile --name myapp --directory ."`
+
 * New `cleanup-doc` command for Sphinx documentation translation files
   * Added `cleanup_doc_translations()` function to clean up `.po` files in `doc/locale/` directories
   * Removes `POT-Creation-Date` and `Last-Translator` headers from all Sphinx-generated translation files
