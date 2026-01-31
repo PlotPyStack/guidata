@@ -4,6 +4,12 @@
 
 ✨ New features:
 
+* **Jupyter notebook HTML representation**: Added rich HTML display support for DataSet and LabeledEnum objects
+  * New `_repr_html_()` method on `DataSet` class for styled HTML table rendering in Jupyter notebooks
+  * New `_repr_html_()` method on `LabeledEnum` class for formatted display of enum values with labels
+  * CSS styling with `.guidata-dataset-table` class for consistent visual appearance
+  * Automatically called by Jupyter when displaying objects as cell output
+
 * **Secure build utility**: Added `--prebuild` option to run commands before package build
   * New `--prebuild` command-line argument for `guidata.utils.securebuild`
   * Executes custom commands in the temporary build directory before `python -m build`

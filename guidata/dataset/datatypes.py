@@ -82,6 +82,29 @@ from guidata.userconfig import UserConfig
 
 DEBUG_DESERIALIZE = False
 
+# CSS styling for HTML tables in Jupyter notebooks
+DATASET_TABLE_CSS = """
+<style>
+    .guidata-dataset-table {
+        border-collapse: collapse;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+                     'Helvetica Neue', Arial, sans-serif;
+        font-size: 13px;
+        margin: 10px 0;
+    }
+    .guidata-dataset-table td {
+        border: 1px solid #dee2e6;
+        padding: 8px 12px;
+    }
+    .guidata-dataset-table tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+    .guidata-dataset-table tr:hover {
+        background-color: #e9ecef;
+    }
+</style>
+"""
+
 if TYPE_CHECKING:
     from qtpy.QtCore import QSize
     from qtpy.QtWidgets import QDialog, QWidget
@@ -1845,6 +1868,17 @@ class DataSet(metaclass=DataSetMeta):
 
         html += "</table>"
         return html
+
+    def _repr_html_(self) -> str:
+        """Return HTML representation for Jupyter notebook display.
+
+        This method is automatically called by Jupyter when displaying the object
+        as a cell output, providing a rich HTML rendering of the dataset.
+
+        Returns:
+            HTML representation of the dataset with styling.
+        """
+        return DATASET_TABLE_CSS + self.to_html()
 
     def serialize(self, writer: HDF5Writer | JSONWriter | INIWriter) -> None:
         """Serialize the dataset
