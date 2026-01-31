@@ -233,6 +233,7 @@ class IconBrowserWindow(QW.QMainWindow):
             init_folder: Initial folder to open
         """
         super().__init__(parent)
+        self.setObjectName("iconbrowser")
         qth.win32_fix_title_bar_background(self)
         self.setWindowTitle("Icon Browser")
         self.setWindowIcon(qth.get_std_icon("FileDialogListView"))

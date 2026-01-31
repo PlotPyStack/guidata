@@ -41,6 +41,47 @@ This library aims to provide these features thanks to automatic graphical user
 interface generation for data set editing and display. Widgets inside GUIs are
 automatically generated depending on each data item type.
 
+Jupyter Notebook and Interactive Python Support
+------------------------------------------------
+
+:mod:`guidata` provides enhanced support for interactive Python environments:
+
+**Rich HTML display in Jupyter notebooks:**
+
+DataSet objects and LabeledEnum values automatically render as styled HTML tables
+when displayed in Jupyter notebooks. This is powered by the ``_repr_html_()`` method,
+which Jupyter calls automatically when displaying objects as cell output.
+
+.. code-block:: python
+
+    import guidata.dataset as gds
+
+    class Parameters(gds.DataSet):
+        """Processing parameters"""
+        threshold = gds.FloatItem("Threshold", default=0.5)
+        enabled = gds.BoolItem("Enable processing", default=True)
+
+    params = Parameters()
+    params  # Displays as a styled HTML table in Jupyter
+
+**Interactive attribute discovery:**
+
+When working in a Python shell or notebook, ``repr(dataset)`` (or simply typing
+the variable name) shows attribute names instead of labels, making it easy to
+discover the programmatic names needed to access or modify dataset items:
+
+.. code-block:: python
+
+    >>> params = Parameters()
+    >>> params  # Shows attribute names for programmatic access
+    Processing parameters:
+        threshold: 0.5 (FloatItem)
+        enabled: True (BoolItem)
+    >>> print(params)  # Shows user-friendly labels
+    Processing parameters:
+        Threshold: 0.5
+        Enable processing: ☑
+
 The :mod:`guidata` library provides the following modules:
 
 * :py:mod:`guidata.dataset`: data set definition and manipulation

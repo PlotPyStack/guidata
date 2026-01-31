@@ -61,3 +61,36 @@ Import wizard
    :start-after: guitest:
 
 .. image:: images/screenshots/importwizard.png
+
+Icon browser
+------------
+
+The icon browser is a utility widget for browsing and exploring icon collections
+in directories. It is useful for developers managing icons for their applications
+and libraries.
+
+**Features:**
+
+* Browse icon collections with tree view for folder navigation
+* Adjustable thumbnail sizes (16-256 pixels) via toolbar
+* Single-click on icons to open file location in system file explorer
+* Support for PNG, SVG, ICO, JPG, GIF, and BMP formats
+* Responsive grid layout that adapts to window size
+* Refresh action to reload current folder after external changes
+
+**Command-line usage:**
+
+.. code-block:: console
+
+    $ # Launch with folder selection dialog
+    $ giconbrowser
+
+    $ # Launch with a specific folder
+    $ giconbrowser /path/to/icons
+
+**Programmatic usage:**
+
+.. literalinclude:: ../guidata/tests/widgets/test_iconbrowser.py
+   :start-after: guitest:
+
+.. image:: images/screenshots/iconbrowser.png
