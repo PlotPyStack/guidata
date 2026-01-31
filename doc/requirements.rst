@@ -76,6 +76,9 @@ Optional modules for building the documentation:
     * - Name
       - Version
       - Summary
+    * - PyQt5
+      - 
+      - Python bindings for the Qt cross platform application toolkit
     * - pillow
       - 
       - Python Imaging Library (fork)
