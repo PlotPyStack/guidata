@@ -178,6 +178,27 @@ class LabeledEnum(str, Enum):
         return hash(self._value_)
 
 
+# Add _repr_html_ after class definition to avoid Enum member name restrictions
+def _labeled_enum_repr_html(self) -> str:
+    """Return HTML representation for Jupyter notebook display.
+
+    This method is automatically called by Jupyter when displaying the object
+    as a cell output, providing a styled representation of the enum value.
+
+    Returns:
+        HTML representation of the enum value with styling.
+    """
+    enum_class = self.__class__.__name__
+    return (
+        f'<span style="color: #5294e2; font-family: monospace;">'
+        f"{enum_class}.<b>{self.name}</b></span> "
+        f'(<code>{self._value_!r}</code>: "{self.label}")'
+    )
+
+
+LabeledEnum._repr_html_ = _labeled_enum_repr_html
+
+
 class NumericTypeItem(DataItem):
     """Numeric data item
 

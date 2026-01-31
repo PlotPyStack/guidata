@@ -29,4 +29,11 @@ Console and code editor
 
 .. autoclass:: guidata.widgets.codeeditor.CodeEditor
 
+Utilities
+^^^^^^^^^
+
+.. autoclass:: guidata.widgets.iconbrowser.IconBrowserWindow
+
+.. autofunction:: guidata.widgets.iconbrowser.main
+
 """

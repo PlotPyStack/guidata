@@ -82,6 +82,29 @@ from guidata.userconfig import UserConfig
 
 DEBUG_DESERIALIZE = False
 
+# CSS styling for HTML tables in Jupyter notebooks
+DATASET_TABLE_CSS = """
+<style>
+    .guidata-dataset-table {
+        border-collapse: collapse;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+                     'Helvetica Neue', Arial, sans-serif;
+        font-size: 13px;
+        margin: 10px 0;
+    }
+    .guidata-dataset-table td {
+        border: 1px solid #dee2e6;
+        padding: 8px 12px;
+    }
+    .guidata-dataset-table tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+    .guidata-dataset-table tr:hover {
+        background-color: #e9ecef;
+    }
+</style>
+"""
+
 if TYPE_CHECKING:
     from qtpy.QtCore import QSize
     from qtpy.QtWidgets import QDialog, QWidget
@@ -1583,6 +1606,14 @@ class DataSet(metaclass=DataSetMeta):
         """Return string representation of the data set"""
         return self.to_string(debug=False)
 
+    def __repr__(self) -> str:
+        """Return detailed representation showing attribute names.
+
+        This is useful in interactive Python sessions to discover
+        the attribute names needed to access/modify dataset items.
+        """
+        return self.to_string(debug=True)
+
     def check(self) -> list[str]:
         """Check the dataset item values
 
@@ -1835,16 +1866,34 @@ class DataSet(metaclass=DataSetMeta):
             # Get string representation of value
             value_str = item.get_string_value(self)
 
+            # Get attribute name for programmatic access
+            attr_name = item._name
+
             html += (
                 f'<tr><td style="text-align: right; vertical-align: top;">{label}:</td>'
             )
             html += (
-                f'<td style="text-align: left; padding-left: 10px;">'
-                f"{value_str}</td></tr>"
+                f'<td style="text-align: left; padding-left: 10px;">{value_str}</td>'
+            )
+            html += (
+                f'<td style="text-align: left; padding-left: 15px; '
+                f'color: #888; font-family: monospace; font-size: 0.9em;">'
+                f"({attr_name})</td></tr>"
             )
 
         html += "</table>"
         return html
+
+    def _repr_html_(self) -> str:
+        """Return HTML representation for Jupyter notebook display.
+
+        This method is automatically called by Jupyter when displaying the object
+        as a cell output, providing a rich HTML rendering of the dataset.
+
+        Returns:
+            HTML representation of the dataset with styling.
+        """
+        return DATASET_TABLE_CSS + self.to_html()
 
     def serialize(self, writer: HDF5Writer | JSONWriter | INIWriter) -> None:
         """Serialize the dataset
