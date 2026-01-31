@@ -9,6 +9,12 @@
   * New `_repr_html_()` method on `LabeledEnum` class for formatted display of enum values with labels
   * CSS styling with `.guidata-dataset-table` class for consistent visual appearance
   * Automatically called by Jupyter when displaying objects as cell output
+  * HTML representation now includes attribute names in a third column for easier programmatic access
+
+* **Interactive Python experience**: Improved DataSet representation in Python interpreters
+  * New `__repr__()` method on `DataSet` class shows attribute names instead of labels
+  * Makes it easy to discover attribute names when working interactively in a Python shell or notebook
+  * `print(dataset)` still shows user-friendly labels, while `repr(dataset)` or just typing the variable shows attribute names
 
 * **Secure build utility**: Added `--prebuild` option to run commands before package build
   * New `--prebuild` command-line argument for `guidata.utils.securebuild`

@@ -1606,6 +1606,14 @@ class DataSet(metaclass=DataSetMeta):
         """Return string representation of the data set"""
         return self.to_string(debug=False)
 
+    def __repr__(self) -> str:
+        """Return detailed representation showing attribute names.
+
+        This is useful in interactive Python sessions to discover
+        the attribute names needed to access/modify dataset items.
+        """
+        return self.to_string(debug=True)
+
     def check(self) -> list[str]:
         """Check the dataset item values
 
@@ -1858,12 +1866,19 @@ class DataSet(metaclass=DataSetMeta):
             # Get string representation of value
             value_str = item.get_string_value(self)
 
+            # Get attribute name for programmatic access
+            attr_name = item._name
+
             html += (
                 f'<tr><td style="text-align: right; vertical-align: top;">{label}:</td>'
             )
             html += (
-                f'<td style="text-align: left; padding-left: 10px;">'
-                f"{value_str}</td></tr>"
+                f'<td style="text-align: left; padding-left: 10px;">{value_str}</td>'
+            )
+            html += (
+                f'<td style="text-align: left; padding-left: 15px; '
+                f'color: #888; font-family: monospace; font-size: 0.9em;">'
+                f"({attr_name})</td></tr>"
             )
 
         html += "</table>"
