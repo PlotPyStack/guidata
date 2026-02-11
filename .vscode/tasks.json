@@ -265,7 +265,7 @@
             "label": "📊 Coverage full",
             "type": "shell",
             "windows": {
-                "command": "${command:python.interpreterPath} -m coverage combine && ${command:python.interpreterPath} -m coverage html && start htmlcov\\index.html",
+                "command": "${command:python.interpreterPath} -m coverage combine; if ($?) { ${command:python.interpreterPath} -m coverage html; if ($?) { start htmlcov\\index.html } }",
             },
             "linux": {
                 "command": "${command:python.interpreterPath} -m coverage combine && ${command:python.interpreterPath} -m coverage html && xdg-open htmlcov/index.html",
