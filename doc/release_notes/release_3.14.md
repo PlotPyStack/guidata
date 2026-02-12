@@ -2,6 +2,10 @@
 
 ## guidata Version 3.14.0 ##
 
+Add support for Python 3.14.
+
+## guidata Version 3.14.0 ##
+
 ✨ New features:
 
 * **Jupyter notebook HTML representation**: Added rich HTML display support for DataSet and LabeledEnum objects
