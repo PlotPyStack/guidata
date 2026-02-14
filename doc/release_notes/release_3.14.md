@@ -1,5 +1,20 @@
 # Version 3.14 #
 
+## guidata Version 3.14.1 ##
+
+🛠️ Bug fixes:
+
+* **PySide6 compatibility**: Added `is_qobject_valid()` utility function to safely check if a `QObject`'s underlying C++ object is still valid
+  * With PySide6, accessing methods on a deleted C++ object causes a segfault instead of raising `RuntimeError` (as PyQt does)
+  * Uses `shiboken.isValid()` on PySide2/PySide6 and `objectName()` try/except on PyQt5/PyQt6
+  * Updated `close_widgets_and_quit()` to use `is_qobject_valid()` instead of a bare try/except for widget validity checks
+  * Updated `close_dialog_and_quit()` to check widget validity before and after `processEvents()`, preventing segfaults when Qt deletes widgets during event processing
+
+♻️ Code improvements:
+
+* Refactored refresh action lambda in `IconBrowserWindow` for improved readability
+* Simplified widget name retrieval in `close_widgets_and_quit()` function
+
 ## guidata Version 3.14.0 ##
 
 ✨ New features:
