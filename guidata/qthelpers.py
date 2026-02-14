@@ -62,6 +62,7 @@ from contextlib import contextmanager
 from datetime import datetime
 from typing import TYPE_CHECKING, Generator, Iterable, Literal
 
+from qtpy import PYSIDE2, PYSIDE6
 from qtpy import QtCore as QC
 from qtpy import QtGui as QG
 from qtpy import QtWidgets as QW
@@ -625,6 +626,37 @@ def show_std_icons() -> None:
     sys.exit(app.exec())
 
 
+def is_qobject_valid(obj: QC.QObject) -> bool:
+    """Check if a QObject's underlying C++ object is still valid.
+
+    With PySide6, accessing methods on a deleted C++ object causes a segfault
+    instead of raising RuntimeError (as PyQt does). This utility provides a
+    safe cross-binding check.
+
+    Args:
+        obj: The QObject to check
+
+    Returns:
+        True if the object is valid, False otherwise
+    """
+    if obj is None:
+        return False
+    if PYSIDE2 or PYSIDE6:
+        try:
+            from qtpy.shiboken import isValid  # type: ignore[attr-defined]
+
+            return isValid(obj)
+        except ImportError:
+            return True  # Assume valid if shiboken is not available
+    else:
+        # PyQt5/PyQt6: try accessing the object to check validity
+        try:
+            obj.objectName()
+            return True
+        except RuntimeError:
+            return False
+
+
 def close_widgets_and_quit(screenshot: bool = False) -> None:
     """Close Qt top level widgets and quit Qt event loop
 
@@ -632,6 +664,8 @@ def close_widgets_and_quit(screenshot: bool = False) -> None:
         screenshot (bool): If True, save a screenshot of each widget
     """
     for widget in QW.QApplication.instance().topLevelWidgets():
+        if not is_qobject_valid(widget):
+            continue
         try:
             wname = widget.objectName()
         except RuntimeError:
@@ -649,12 +683,18 @@ def close_dialog_and_quit(widget, screenshot: bool = False) -> None:
     Args:
         widget (QDialog): Dialog to close
     """
+    if not is_qobject_valid(widget):
+        return
     try:  # Workaround for pytest
         wname = widget.objectName()
         if screenshot and wname and widget.isVisible():  # pragma: no cover
             grab_save_window(widget, wname.lower())
         else:
             QW.QApplication.processEvents()
+        # Re-check validity after processEvents, as the widget may have been
+        # deleted by Qt during event processing (common with PySide6)
+        if not is_qobject_valid(widget):
+            return
         if execenv.accept_dialogs:
             widget.accept()
         else:
