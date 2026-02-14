@@ -298,9 +298,9 @@ class IconBrowserWindow(QW.QMainWindow):
         refresh_action = qth.create_action(
             self,
             "Refresh",
-            triggered=lambda: self.open_folder(self.current_folder)
-            if self.current_folder
-            else None,
+            triggered=lambda: (
+                self.open_folder(self.current_folder) if self.current_folder else None
+            ),
             icon=qth.get_std_icon("BrowserReload"),
             tip="Refresh the current folder",
         )
