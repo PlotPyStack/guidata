@@ -2,7 +2,8 @@
 
 ## guidata Version 3.14.1 ##
 
-<<<<<<< HEAD
+* Added official support for Python 3.14
+
 🛠️ Bug fixes:
 
 * **PySide6 compatibility**: Added `is_qobject_valid()` utility function to safely check if a `QObject`'s underlying C++ object is still valid
@@ -15,9 +16,6 @@
 
 * Refactored refresh action lambda in `IconBrowserWindow` for improved readability
 * Simplified widget name retrieval in `close_widgets_and_quit()` function
-=======
-Added official support for Python 3.14
->>>>>>> origin/master
 
 ## guidata Version 3.14.0 ##
 
