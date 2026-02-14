@@ -666,11 +666,7 @@ def close_widgets_and_quit(screenshot: bool = False) -> None:
     for widget in QW.QApplication.instance().topLevelWidgets():
         if not is_qobject_valid(widget):
             continue
-        try:
-            wname = widget.objectName()
-        except RuntimeError:
-            # Widget has been deleted
-            continue
+        wname = widget.objectName()
         if screenshot and wname and widget.isVisible():  # pragma: no cover
             grab_save_window(widget, wname.lower())
         assert widget.close()
