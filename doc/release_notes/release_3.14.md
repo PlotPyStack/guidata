@@ -1,5 +1,9 @@
 # Version 3.14 #
 
+## guidata Version 3.14.1 ##
+
+Added official support for Python 3.14
+
 ## guidata Version 3.14.0 ##
 
 ✨ New features:
