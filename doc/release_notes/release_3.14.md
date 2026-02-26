@@ -1,5 +1,11 @@
 # Version 3.14 #
 
+## guidata Version 3.14.3 ##
+
+🛠️ Bug fixes:
+
+* **PyQt6 compatibility**: Fixed `RuntimeError: wrapped C/C++ object has been deleted` when closing dialogs in automated tests with PyQt6 — `exec_dialog()` now checks object validity before calling `deleteLater()`, since Qt may already have destroyed the C++ object during `exec()`
+
 ## guidata Version 3.14.2 ##
 
 🛠️ Bug fixes:

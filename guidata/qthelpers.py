@@ -772,7 +772,7 @@ def exec_dialog(dlg: QW.QDialog) -> int:
         )
     delete_later = not dlg.testAttribute(QC.Qt.WA_DeleteOnClose)
     result = dlg.exec()
-    if delete_later:
+    if delete_later and is_qobject_valid(dlg):
         dlg.deleteLater()
     return result
 
