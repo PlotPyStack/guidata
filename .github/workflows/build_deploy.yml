@@ -8,11 +8,14 @@ permissions:
   contents: read
 
 jobs:
-  test:
-    uses: ./.github/workflows/test.yml
+  test-pyqt5:
+    uses: ./.github/workflows/test_pyqt5.yml
+
+  test-pyqt6:
+    uses: ./.github/workflows/test_pyqt6.yml
 
   deploy:
-    needs: test
+    needs: [test-pyqt5, test-pyqt6]
 
     runs-on: ubuntu-latest
 
