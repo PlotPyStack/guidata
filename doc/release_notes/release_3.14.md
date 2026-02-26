@@ -1,5 +1,11 @@
 # Version 3.14 #
 
+## guidata Version 3.14.2 ##
+
+🛠️ Bug fixes:
+
+* **Old QtPy compatibility**: Fixed `ImportError` when using QtPy < 2.0.0 (guidata supports QtPy >= 1.9) — the `PYSIDE6` constant was not available before QtPy 2.0.0
+
 ## guidata Version 3.14.1 ##
 
 * Added official support for Python 3.14

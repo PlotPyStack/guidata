@@ -62,7 +62,14 @@ from contextlib import contextmanager
 from datetime import datetime
 from typing import TYPE_CHECKING, Generator, Iterable, Literal
 
-from qtpy import PYSIDE2, PYSIDE6
+from qtpy import PYSIDE2
+
+try:
+    from qtpy import PYSIDE6
+except ImportError:
+    # PYSIDE6 was added in QtPy 2.0.0, but guidata supports QtPy >= 1.9
+    PYSIDE6 = False
+
 from qtpy import QtCore as QC
 from qtpy import QtGui as QG
 from qtpy import QtWidgets as QW
