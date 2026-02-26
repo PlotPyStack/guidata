@@ -1297,7 +1297,7 @@ class MultipleChoiceWidget(AbstractDataSetWidget):
     def set(self) -> None:
         """Update data item value from widget contents"""
         _choices = self.item.get_prop_value("data", "choices")
-        choices = [_choices[i][0] for i in self.value()]
+        choices = tuple(_choices[i][0] for i in self.value())
         self.item.set(choices)
 
     def value(self) -> list[int]:

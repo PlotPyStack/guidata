@@ -5,6 +5,7 @@
 🛠️ Bug fixes:
 
 * **Old QtPy compatibility**: Fixed `ImportError` when using QtPy < 2.0.0 (guidata supports QtPy >= 1.9) — the `PYSIDE6` constant was not available before QtPy 2.0.0
+* **MultipleChoiceItem validation**: Fixed `DataItemValidationError` when accepting a dialog containing a `MultipleChoiceItem` with validation enabled — the widget was passing a list instead of the expected tuple, causing a validation failure when closing the dialog
 
 ## guidata Version 3.14.1 ##
 

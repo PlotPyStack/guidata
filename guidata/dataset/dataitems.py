@@ -1242,9 +1242,9 @@ class MultipleChoiceItem(ChoiceItem):
         """Override DataItem method"""
         if not self.get_prop("data", "check_value", True):
             return True
-        if not isinstance(value, tuple):
+        if not isinstance(value, (tuple, list)):
             if raise_exception:
-                raise ValueError(f"Invalid value '{value}' (expecting tuple)")
+                raise ValueError(f"Invalid value '{value}' (expecting tuple or list)")
             return False
         for val in value:
             if val not in [v for v, _k, _i in self.get_prop("data", "choices", [])]:
