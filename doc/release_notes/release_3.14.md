@@ -1,17 +1,12 @@
 # Version 3.14 #
 
-## guidata Version 3.14.3 ##
-
-🛠️ Bug fixes:
-
-* **PyQt6 compatibility**: Fixed `RuntimeError: wrapped C/C++ object has been deleted` when closing dialogs in automated tests with PyQt6 — `exec_dialog()` now checks object validity before calling `deleteLater()`, since Qt may already have destroyed the C++ object during `exec()`
-
 ## guidata Version 3.14.2 ##
 
 🛠️ Bug fixes:
 
 * **Old QtPy compatibility**: Fixed `ImportError` when using QtPy < 2.0.0 (guidata supports QtPy >= 1.9) — the `PYSIDE6` constant was not available before QtPy 2.0.0
-* **MultipleChoiceItem validation**: Fixed `DataItemValidationError` when accepting a dialog containing a `MultipleChoiceItem` with validation enabled — the widget was passing a list instead of the expected tuple, causing a validation failure when closing the dialog
+* **MultipleChoiceItem validation**: Fixed `DataItemValidationError` when accepting a dialog containing a `MultipleChoiceItem` with validation enabled — the widget was passing a list instead of the expected tuple, causing a validation failure when closing the dialog (fixes [Issue #98](https://github.com/PlotPyStack/guidata/issues/98))
+* **PyQt6 compatibility**: Fixed `RuntimeError: wrapped C/C++ object has been deleted` when closing dialogs in automated tests with PyQt6 — `exec_dialog()` now checks object validity before calling `deleteLater()`, since Qt may already have destroyed the C++ object during `exec()`
 
 ## guidata Version 3.14.1 ##
 
