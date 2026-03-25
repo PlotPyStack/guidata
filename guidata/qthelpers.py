@@ -235,6 +235,22 @@ def set_color_mode(mode: Literal["light", "dark", "auto"] | None = None):
             "QToolTip { "
             "color: white; background-color: #2a82da; border: 1px solid white;"
             " }"
+            "QToolButton#qt_toolbar_ext_button {"
+            "background-color: qlineargradient("
+            "x1:0, y1:0, x2:0, y2:1, stop:0 #6a6a6a, stop:1 #4a4a4a);"
+            "border: 1px solid #2c2c2c;"
+            "border-radius: 4px;"
+            "}"
+            "QToolButton#qt_toolbar_ext_button:hover {"
+            "background-color: qlineargradient("
+            "x1:0, y1:0, x2:0, y2:1, stop:0 #7a7a7a, stop:1 #5a5a5a);"
+            "border: 1px solid #2a82da;"
+            "}"
+            "QToolButton#qt_toolbar_ext_button:pressed {"
+            "background-color: qlineargradient("
+            "x1:0, y1:0, x2:0, y2:1, stop:0 #3e3e3e, stop:1 #4a4a4a);"
+            "border: 1px solid #1a1a1a;"
+            "}"
         )
     elif DEFAULT_STYLES is not None:
         style, palette, stylesheet = DEFAULT_STYLES
