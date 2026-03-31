@@ -112,5 +112,5 @@ class DockableConsole(Console, DockableWidgetMixin):
 
     def show_console(self):
         """Show the console widget."""
-        self.dockwidget.raise_()
         self.dockwidget.show()
+        self.dockwidget.raise_()

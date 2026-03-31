@@ -30,6 +30,7 @@ class DockableWidgetMixin:
 
     def __init__(self):
         self._isvisible = False
+        self._was_closed_while_floating = False
         self.dockwidget: QDockWidget | None = None
         self._allowed_areas = self.ALLOWED_AREAS
         self._location = self.LOCATION
@@ -96,10 +97,21 @@ class DockableWidgetMixin:
             enable (bool): Dockwidget visibility state
         """
         if enable:
+            if self._was_closed_while_floating:
+                # The dock was closed while floating (via the X button on the
+                # floating window). Re-dock it so it reappears inside the main
+                # window instead of as a potentially hidden floating window.
+                # Clear the flag first to avoid recursion since setFloating
+                # may trigger additional visibilityChanged signals.
+                self._was_closed_while_floating = False
+                self.dockwidget.setFloating(False)
             self.dockwidget.raise_()
             widget = self.get_focus_widget()  # pylint: disable=assignment-from-none
             if widget is not None:
                 widget.setFocus()
+        else:
+            if self.dockwidget.isFloating():
+                self._was_closed_while_floating = True
         self._isvisible = enable and self.dockwidget.isVisible()
 
 
