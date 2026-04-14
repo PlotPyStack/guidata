@@ -7,6 +7,8 @@
             "label": "🧽 Ruff Formatter",
             "command": "${command:python.interpreterPath}",
             "args": [
+                "scripts/run_with_env.py",
+                "${command:python.interpreterPath}",
                 "-m",
                 "ruff",
                 "format",
@@ -35,6 +37,8 @@
             "label": "🔦 Ruff Linter",
             "command": "${command:python.interpreterPath}",
             "args": [
+                "scripts/run_with_env.py",
+                "${command:python.interpreterPath}",
                 "-m",
                 "ruff",
                 "check",
@@ -85,6 +89,8 @@
             "label": "🔦 Pylint",
             "command": "${command:python.interpreterPath}",
             "args": [
+                "scripts/run_with_env.py",
+                "${command:python.interpreterPath}",
                 "-m",
                 "pylint",
                 "guidata",
@@ -119,6 +125,8 @@
             "label": "🚀 Pytest",
             "command": "${command:python.interpreterPath}",
             "args": [
+                "scripts/run_with_env.py",
+                "${command:python.interpreterPath}",
                 "-m",
                 "pytest",
                 "--ff",
@@ -147,6 +155,8 @@
             "label": "🔎 Scan translations",
             "command": "${command:python.interpreterPath}",
             "args": [
+                "scripts/run_with_env.py",
+                "${command:python.interpreterPath}",
                 "-m",
                 "guidata.utils.translations",
                 "scan",
@@ -178,6 +188,8 @@
             "label": "📚 Compile translations",
             "command": "${command:python.interpreterPath}",
             "args": [
+                "scripts/run_with_env.py",
+                "${command:python.interpreterPath}",
                 "-m",
                 "guidata.utils.translations",
                 "compile",
@@ -207,6 +219,8 @@
             "label": "Generate requirements",
             "command": "${command:python.interpreterPath}",
             "args": [
+                "scripts/run_with_env.py",
+                "${command:python.interpreterPath}",
                 "-m",
                 "guidata.utils.genreqs",
                 "all",
@@ -236,6 +250,8 @@
             "type": "shell",
             "command": "${command:python.interpreterPath}",
             "args": [
+                "scripts/run_with_env.py",
+                "${command:python.interpreterPath}",
                 "-m",
                 "coverage",
                 "run",
@@ -265,13 +281,13 @@
             "label": "📊 Coverage full",
             "type": "shell",
             "windows": {
-                "command": "${command:python.interpreterPath} -m coverage combine; if ($?) { ${command:python.interpreterPath} -m coverage html; if ($?) { start htmlcov\\index.html } }",
+                "command": "${command:python.interpreterPath} scripts/run_with_env.py ${command:python.interpreterPath} -m coverage combine; if ($?) { ${command:python.interpreterPath} scripts/run_with_env.py ${command:python.interpreterPath} -m coverage html; if ($?) { start htmlcov\\index.html } }",
             },
             "linux": {
-                "command": "${command:python.interpreterPath} -m coverage combine && ${command:python.interpreterPath} -m coverage html && xdg-open htmlcov/index.html",
+                "command": "${command:python.interpreterPath} scripts/run_with_env.py ${command:python.interpreterPath} -m coverage combine && ${command:python.interpreterPath} scripts/run_with_env.py ${command:python.interpreterPath} -m coverage html && xdg-open htmlcov/index.html",
             },
             "osx": {
-                "command": "${command:python.interpreterPath} -m coverage combine && ${command:python.interpreterPath} -m coverage html && open htmlcov/index.html",
+                "command": "${command:python.interpreterPath} scripts/run_with_env.py ${command:python.interpreterPath} -m coverage combine && ${command:python.interpreterPath} scripts/run_with_env.py ${command:python.interpreterPath} -m coverage html && open htmlcov/index.html",
             },
             "options": {
                 "cwd": "${workspaceFolder}",
@@ -293,6 +309,8 @@
             "type": "shell",
             "command": "${command:python.interpreterPath}",
             "args": [
+                "scripts/run_with_env.py",
+                "${command:python.interpreterPath}",
                 "-m",
                 "guidata.utils.cleanup"
             ],
@@ -316,6 +334,8 @@
             "label": "📚 Build documentation",
             "command": "${command:python.interpreterPath}",
             "args": [
+                "scripts/run_with_env.py",
+                "${command:python.interpreterPath}",
                 "-m",
                 "sphinx",
                 "build",
@@ -368,6 +388,8 @@
             "type": "shell",
             "command": "${command:python.interpreterPath}",
             "args": [
+                "scripts/run_with_env.py",
+                "${command:python.interpreterPath}",
                 "-m",
                 "guidata.utils.securebuild",
             ],
@@ -392,6 +414,8 @@
             "label": "🖼️ Icon Browser",
             "command": "${command:python.interpreterPath}",
             "args": [
+                "scripts/run_with_env.py",
+                "${command:python.interpreterPath}",
                 "-m",
                 "guidata.widgets.iconbrowser",
                 "${workspaceFolder}/guidata/data/icons",
