@@ -1,5 +1,17 @@
 # Version 3.14 #
 
+## guidata Version 3.14.3 ##
+
+🛠️ Bug fixes:
+
+* **Dockable console**: Fixed floating dock widget that could not be reopened after closing — when a dock widget was closed while floating (via the window's X button), it now automatically re-docks inside the main window when re-shown, instead of remaining hidden as a floating window
+* **Dark mode toolbar overflow button**: Fixed toolbar overflow button (the `>>` chevron) being invisible in dark mode — added proper QSS styling with gradient backgrounds and hover/pressed states for the `qt_toolbar_ext_button`
+
+♻️ Internal changes:
+
+* **Development environment**: Added `scripts/run_with_env.py` utility to run commands within multiple Python environment contexts (WinPython, venv, etc.), with `.env` file support for `PYTHONPATH` configuration
+* **Translation file cleanup**: Enhanced PO file cleanup to remove additional headers (`PO-Revision-Date`, `Generated-By`, `Project-Id-Version`, `Report-Msgid-Bugs-To`, `Language-Team`) that cause unnecessary diffs in version control. Also cleanup the POT template file after extraction.
+
 ## guidata Version 3.14.2 ##
 
 🛠️ Bug fixes:
