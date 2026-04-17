@@ -18,6 +18,10 @@
       * `python -m guidata.utils.translations --help`
       * or `guidata-translations --help`
 
+* Development environment:
+  * Historically, the default Python interpreter for development was handled by the `PPSTACK_PYTHONEXE` environment variable, for example to run VS Code tasks with the correct Python interpreter.
+  * This approach has been replaced by relying on the virtual environment management as provided by VS Code itself, which is more standard and compatible with various tools.
+
 🛠️ Bug fixes:
 
 * [Issue #88](https://github.com/PlotPyStack/guidata/issues/88) - `DictItem` default value persists across dataset instances (missing `deepcopy`)
