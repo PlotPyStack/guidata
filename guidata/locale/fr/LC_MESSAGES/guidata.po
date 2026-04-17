@@ -1,14 +1,12 @@
 # French translations for guidata.
-# Copyright (C) 2025 CEA, Codra, Pierre Raybaut
+# Copyright (C) 2026 CEA, Codra, Pierre Raybaut
 # This file is distributed under the same license as the guidata project.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: guidata 3.10.0\n"
 "Report-Msgid-Bugs-To: p.raybaut@codra.fr\n"
-"POT-Creation-Date: 2025-09-19 11:57+0200\n"
 "PO-Revision-Date: 2025-06-17 15:47+0200\n"
-"Last-Translator: Christophe Debonnel <c.debonnel@codra.fr>\n"
 "Language: fr\n"
 "Language-Team: fr <p.raybaut@codra.fr>\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
@@ -134,6 +132,33 @@ msgstr "Gaussienne"
 msgid "2D ramp"
 msgstr "Rampe 2D"
 
+msgid "Gaussian filter"
+msgstr "Filtre gaussien"
+
+msgid "Median filter"
+msgstr "Filtre médian"
+
+msgid "Sobel edge detection"
+msgstr "Détection de contours Sobel"
+
+msgid "Laplacian filter"
+msgstr "Filtre Laplacien"
+
+msgid "Bilateral filter"
+msgstr "Filtre bilatéral"
+
+msgid "Otsu's method"
+msgstr "Méthode d'Otsu"
+
+msgid "Adaptive mean"
+msgstr "Moyenne adaptative"
+
+msgid "Global threshold"
+msgstr "Seuil global"
+
+msgid "Triangle algorithm"
+msgstr "Algorithme du triangle"
+
 msgid "An apple"
 msgstr "Une pomme"
 
@@ -142,6 +167,24 @@ msgstr "Une banane"
 
 msgid "A cherry"
 msgstr "Une cerise"
+
+msgid "Linear interpolation"
+msgstr "Interpolation linéaire"
+
+msgid "Spline interpolation"
+msgstr "Interpolation spline"
+
+msgid "PCHIP interpolation"
+msgstr "Interpolation PCHIP"
+
+msgid "Fast processing"
+msgstr "Traitement rapide"
+
+msgid "Accurate processing"
+msgstr "Traitement précis"
+
+msgid "Balanced processing"
+msgstr "Traitement équilibré"
 
 msgid "Project website"
 msgstr "Site web du projet"
@@ -733,4 +776,3 @@ msgstr "Instance :"
 
 msgid "Text editor"
 msgstr "Éditeur de texte"
-
