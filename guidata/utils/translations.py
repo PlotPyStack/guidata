@@ -63,7 +63,12 @@ PYBABEL_ARGS = [sys.executable, "-m", "babel.messages.frontend"]
 # when cherry-picking commits between branches
 PO_HEADERS_TO_REMOVE = [
     "POT-Creation-Date",
+    "PO-Revision-Date",
     "Last-Translator",
+    "Generated-By",
+    "Project-Id-Version",
+    "Report-Msgid-Bugs-To",
+    "Language-Team",
 ]
 
 
@@ -181,6 +186,7 @@ def scan_translations(
             check=True,
         )
         print(f"Extraction completed successfully. Output file: {catalog_template}")
+        _cleanup_po_file(catalog_template)
     except subprocess.CalledProcessError as e:
         print("Error: Extraction failed.")
         print(e.stderr)
