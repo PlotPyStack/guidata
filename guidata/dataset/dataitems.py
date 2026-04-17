@@ -88,6 +88,12 @@ Other items
 
 .. autoclass:: guidata.dataset.FontFamilyItem
     :members:
+
+Enum support
+^^^^^^^^^^^^
+
+.. autoclass:: guidata.dataset.LabeledEnum
+    :members:
 """
 
 from __future__ import annotations

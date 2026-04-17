@@ -17,12 +17,18 @@
 ```
 guidata/
 ├── dataset/        # Core DataSet system (items, types, serialization)
+│   ├── autodoc.py      # Sphinx extension for DataSet auto-documentation
+│   └── conv.py         # JSON/dict conversion utilities
 ├── widgets/        # Ready-to-use Qt widgets (console, editors, browsers)
+│   └── iconbrowser.py  # Icon browser widget (giconbrowser CLI)
 ├── io/             # HDF5, JSON, INI serialization
 ├── utils/          # CLI tools (translations, build, cleanup)
 ├── config.py       # Configuration and translation setup
 ├── configtools.py  # Image/icon path management
+├── env.py          # Execution environment management
+├── guitest.py      # GUI test runner helpers
 ├── qthelpers.py    # Qt utility functions
+├── userconfig.py   # User configuration (INI-based)
 └── tests/          # pytest suite
 ```
 
@@ -79,11 +85,15 @@ class ProcessingParams(gds.DataSet):
 | `StringItem`, `TextItem` | Single/multi-line text |
 | `BoolItem` | Checkbox |
 | `ChoiceItem`, `MultipleChoiceItem` | Single/multiple selection |
+| `ImageChoiceItem` | Choice with image icons |
 | `ColorItem`, `FontFamilyItem` | Color/font pickers |
 | `FileOpenItem`, `FileSaveItem`, `DirectoryItem` | Path selection |
+| `FilesOpenItem` | Multiple file selection |
 | `DateItem`, `DateTimeItem` | Date/time pickers |
 | `FloatArrayItem` | NumPy array editor |
 | `DictItem` | Dictionary editor |
+| `ButtonItem` | Button triggering a callback |
+| `LabeledEnum` | Enum base class for labeled choices |
 
 ### DataSet Groups and Tabs
 
@@ -176,8 +186,12 @@ def create_widget(parent: QWidget | None = None) -> DataSetEditGroupBox:
 | `guidata/dataset/dataitems.py` | Item definitions (IntItem, etc.) |
 | `guidata/dataset/datatypes.py` | DataSet base class |
 | `guidata/dataset/qtwidgets.py` | Qt widget generation |
-| `guidata/dataset/io.py` | Serialization support |
+| `guidata/dataset/qtitemwidgets.py` | Item-to-widget mapping |
+| `guidata/dataset/conv.py` | JSON/dict conversion (`dataset_to_json`, etc.) |
+| `guidata/dataset/autodoc.py` | Sphinx auto-documentation extension |
+| `guidata/io/` | HDF5, JSON, INI format implementations |
 | `guidata/config.py` | Configuration, `_()` function |
+| `guidata/env.py` | Execution environment management |
 | `guidata/qthelpers.py` | Qt utilities |
 | `guidata/utils/translations.py` | Translation CLI |
 
