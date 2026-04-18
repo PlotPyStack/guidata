@@ -307,9 +307,9 @@ class ContentsWidget(QWidget):
 class PreviewTableModel(QAbstractTableModel):
     """Import wizard preview table model"""
 
-    def __init__(self, data=[], parent=None):
+    def __init__(self, data=None, parent=None):
         QAbstractTableModel.__init__(self, parent)
-        self._data = data
+        self._data = list(data) if data is not None else []
 
     def rowCount(self, parent=QModelIndex()):
         """Return row count"""
