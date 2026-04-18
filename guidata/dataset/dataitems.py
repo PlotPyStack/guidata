@@ -98,6 +98,7 @@ Enum support
 
 from __future__ import annotations
 
+import ast
 import datetime
 import os
 import re
@@ -995,7 +996,17 @@ class FilesOpenItem(FileSaveItem):
 
     def from_string(self, value: Any) -> list[str]:  # type:ignore
         """Override DataItem method"""
-        value = eval(value) if value.endswith("']") or value.endswith('"]') else [value]
+        if value is None:
+            return []
+        if not isinstance(value, str):
+            return [self.add_extension(str(value))]
+        if value.endswith("']") or value.endswith('"]'):
+            try:
+                value = ast.literal_eval(value)
+            except (ValueError, SyntaxError):
+                value = [value]
+        else:
+            value = [value]
         return [self.add_extension(path) for path in value]
 
     def serialize(
@@ -1005,7 +1016,10 @@ class FilesOpenItem(FileSaveItem):
     ) -> None:
         """Serialize this item"""
         value = self.get_value(instance)
-        if value is not None and not isinstance(value, (tuple, list)):
+        if value is None:
+            writer.write_sequence([])
+            return
+        if not isinstance(value, (tuple, list)):
             value = [value]
         writer.write_sequence([fname.encode("utf-8") for fname in value])
 
