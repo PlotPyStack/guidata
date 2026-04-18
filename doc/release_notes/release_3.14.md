@@ -4,6 +4,9 @@
 
 🛠️ Bug fixes:
 
+* **`FilesOpenItem`**: Fixed `AttributeError` raised when calling `from_string(None)` and `TypeError` raised when serializing an item whose value was never set — `None` values are now handled gracefully (empty list / empty sequence)
+* **`FilesOpenItem`**: Replaced unsafe `eval()` call with `ast.literal_eval()` when parsing list-literal strings — eliminates an arbitrary code execution risk when reading list-of-paths values from configuration files or command-line arguments
+* **`PreviewTableModel` (import wizard)**: Fixed mutable default argument bug where multiple `PreviewTableModel` instances shared the same underlying data list, causing cross-instance mutations
 * **Dockable console**: Fixed floating dock widget that could not be reopened after closing — when a dock widget was closed while floating (via the window's X button), it now automatically re-docks inside the main window when re-shown, instead of remaining hidden as a floating window
 * **Dark mode toolbar overflow button**: Fixed toolbar overflow button (the `>>` chevron) being invisible in dark mode — added proper QSS styling with gradient backgrounds and hover/pressed states for the `qt_toolbar_ext_button`
 
