@@ -171,7 +171,7 @@ def test_all_items():
         prm.filter_method = "sobel"  # Set by invariant key
         execenv.print(f"Set by key 'sobel': {prm.filter_method!r}")
 
-        prm.filter_method = "Median filter"  # Set by UI label
+        prm.filter_method = _("Median filter")  # Set by UI label
         execenv.print(f"Set by label 'Median filter': {prm.filter_method!r}")
 
         prm.filter_method = 0  # Set by index

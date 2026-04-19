@@ -138,8 +138,8 @@ class TestCheck(unittest.TestCase):
         """Test LabeledEnum structure and properties"""
         # Test that LabeledEnum has correct structure
         self.assertEqual(InterpolationMethod.LINEAR.value, "linear")
-        self.assertEqual(InterpolationMethod.LINEAR.label, "Linear interpolation")
-        self.assertEqual(str(InterpolationMethod.LINEAR), "Linear interpolation")
+        self.assertEqual(InterpolationMethod.LINEAR.label, _("Linear interpolation"))
+        self.assertEqual(str(InterpolationMethod.LINEAR), _("Linear interpolation"))
 
         # Test enum without explicit label uses value as label
         self.assertEqual(InterpolationMethod.NEAREST.value, "nearest")
@@ -174,7 +174,7 @@ class TestCheck(unittest.TestCase):
         self.assertEqual(e.interpolation, InterpolationMethod.LINEAR)
 
         # Test setting with label strings (UI display)
-        e.interpolation = "Spline interpolation"
+        e.interpolation = _("Spline interpolation")
         self.assertEqual(e.interpolation, InterpolationMethod.SPLINE)
 
         # Test setting with indices
@@ -196,7 +196,7 @@ class TestCheck(unittest.TestCase):
         # But __get__ should return the enum member
         self.assertEqual(e.interpolation, InterpolationMethod.SPLINE)
         self.assertEqual(e.interpolation.value, "spline")
-        self.assertEqual(e.interpolation.label, "Spline interpolation")
+        self.assertEqual(e.interpolation.label, _("Spline interpolation"))
 
     def test_labeled_enum_choices_structure(self):
         """Test that LabeledEnum generates correct choices structure"""
@@ -205,9 +205,9 @@ class TestCheck(unittest.TestCase):
 
         # Should be [(name, label, None), ...]
         expected_choices = [
-            ("LINEAR", "Linear interpolation", None),
-            ("SPLINE", "Spline interpolation", None),
-            ("PCHIP", "PCHIP interpolation", None),
+            ("LINEAR", _("Linear interpolation"), None),
+            ("SPLINE", _("Spline interpolation"), None),
+            ("PCHIP", _("PCHIP interpolation"), None),
             ("NEAREST", "nearest", None),  # Uses key as label
         ]
         self.assertEqual(choices, expected_choices)
