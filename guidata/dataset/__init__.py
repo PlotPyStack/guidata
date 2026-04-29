@@ -13,6 +13,11 @@ from .conv import (
     dataset_to_json,
     json_to_dataset,
 )
+from .jsonschema import (
+    dataset_to_schema,
+    dataset_to_schema_with_values,
+    resolve_dynamic_choices,
+)
 from .dataitems import (
     BoolItem,
     ButtonItem,
