@@ -58,11 +58,11 @@ from __future__ import annotations
 from typing import Any, Callable
 
 __all__ = [
-    "set_handler",
+    "clear_all_handlers",
+    "clear_handler",
     "get_handler",
     "has_handler",
-    "clear_handler",
-    "clear_all_handlers",
+    "set_handler",
 ]
 
 
