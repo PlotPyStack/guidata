@@ -315,9 +315,15 @@ class GroupWidget(AbstractDataSetWidget):
         )
         self.group.setLayout(self.layout)
 
-    def get(self) -> None:
-        """Update widget contents from data item value"""
-        self.edit.update_widgets()
+    def get(self, except_this_one: AbstractDataSetWidget | None = None) -> None:
+        """Update widget contents from data item value
+
+        Args:
+            except_this_one: widget to skip when refreshing nested widgets
+             (forwarded to `update_widgets` so that the currently-edited
+             widget is not overwritten while the user is typing).
+        """
+        self.edit.update_widgets(except_this_one=except_this_one)
 
     def set(self) -> None:
         """Update data item value from widget contents"""
@@ -396,10 +402,21 @@ class TabGroupWidget(AbstractDataSetWidget):
                 raise
             self.widgets.append(widget)
 
-    def get(self) -> None:
-        """Update widget contents from data item value"""
+    def get(self, except_this_one: AbstractDataSetWidget | None = None) -> None:
+        """Update widget contents from data item value
+
+        Args:
+            except_this_one: widget to skip when refreshing nested widgets
+             (forwarded to children so that the currently-edited widget is
+             not overwritten while the user is typing).
+        """
         for widget in self.widgets:
-            widget.get()
+            if widget is except_this_one:
+                continue
+            if isinstance(widget, (GroupWidget, TabGroupWidget)):
+                widget.get(except_this_one=except_this_one)
+            else:
+                widget.get()
 
     def set(self) -> None:
         """Update data item value from widget contents"""
@@ -448,12 +465,31 @@ def _display_callback(widget: AbstractDataSetWidget, value):
     if widget.contains_computed_items() or cb is not None:
         top_level_layout = widget.retrieve_top_level_layout()
         if widget.build_mode:
+            # During widget refresh cascades, only persist this widget's
+            # current value to the dataset. Do NOT trigger another sibling
+            # refresh, otherwise the cascade re-enters here from each
+            # `setText` call (via `textChanged` -> `line_edit_changed`) and
+            # ends up overwriting whichever widget the user is currently
+            # typing in (e.g. typing "5" in `dx` becomes "5.0" because
+            # `xmin`'s recomputed `setText` re-triggers a refresh of `dx`).
             widget.set()
-        else:
-            top_level_layout.update_dataitems()
+            return
+        top_level_layout.update_dataitems()
         if cb is not None:
             cb(widget.item.instance, widget.item.item, value)
-        top_level_layout.update_widgets(except_this_one=widget)
+        # Set `build_mode` on all sibling widgets while we refresh them, so
+        # the cascading `setText` calls below do not re-enter this function
+        # and recursively call `update_widgets` with a different
+        # `except_this_one`.
+        all_widgets = top_level_layout.get_terminal_widgets()
+        previous_modes = [(w, w.build_mode) for w in all_widgets]
+        for w in all_widgets:
+            w.build_mode = True
+        try:
+            top_level_layout.update_widgets(except_this_one=widget)
+        finally:
+            for w, mode in previous_modes:
+                w.build_mode = mode
 
 
 class LineEditWidget(AbstractDataSetWidget):

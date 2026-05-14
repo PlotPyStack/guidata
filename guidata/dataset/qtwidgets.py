@@ -498,10 +498,19 @@ class DataSetEditLayout(Generic[AnyDataSet]):
         """Refresh the content of all widgets
 
         Args:
-            except_this_one: widget to skip
+            except_this_one: widget to skip (recursively, including widgets
+             nested in `GroupWidget` or `TabGroupWidget` containers)
         """
         for widget in self.widgets:
-            if widget is not except_this_one:
+            if widget is except_this_one:
+                continue
+            if isinstance(widget, (GroupWidget, TabGroupWidget)):
+                # Forward `except_this_one` so that the currently-edited widget
+                # is preserved even when nested inside a group/tab container
+                # (otherwise typing into a nested field would re-render it from
+                # the model on every keystroke, e.g. "5" -> "5.0").
+                widget.get(except_this_one=except_this_one)
+            else:
                 widget.get()
 
     def widget_value_changed(self) -> None:
