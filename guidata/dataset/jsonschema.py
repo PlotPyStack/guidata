@@ -223,6 +223,34 @@ def resolve_dynamic_choices(
     return [_choice_entry(item, c) for c in raw]
 
 
+def resolve_dataset_active(instance: gdt.DataSet) -> dict[str, bool]:
+    """Evaluate ``display.active`` for every named item of *instance*.
+
+    Use this whenever a value participating in an ``active`` callable or
+    :class:`~guidata.dataset.datatypes.ItemProperty` changes; the
+    frontend should call this with a fresh instance carrying the latest
+    user edits (see :func:`resolve_dynamic_choices`).
+
+    Args:
+        instance: A :class:`DataSet` instance providing the state.
+
+    Returns:
+        Mapping ``{item_name: bool}``. Items without a name (separators,
+        end-of-group markers, ...) are skipped.
+    """
+    result: dict[str, bool] = {}
+    for item in instance.get_items():
+        name = item.get_name()
+        if not name:
+            continue
+        try:
+            value = item.get_prop_value("display", instance, "active", True)
+        except Exception:  # pylint: disable=broad-except
+            value = True
+        result[name] = bool(value)
+    return result
+
+
 # ---------------------------------------------------------------------------
 # Layout traversal (groups & tabs)
 # ---------------------------------------------------------------------------
@@ -567,11 +595,29 @@ def _add_common_keys(item: gdt.DataItem, prop: dict[str, Any], order: int) -> No
             pass
     if item.get_prop("display", "readonly", False):
         prop["readOnly"] = True
+    # ``set_computed(...)`` flags an item as derived from other fields
+    # (e.g. ``ImageObj.xmin``).  ``ComputedProp`` already raises on
+    # direct set and ``set_computed`` also toggles ``display.readonly``;
+    # surface the ``computed`` flag explicitly so consumers can render
+    # a discreet hint distinct from a regular read-only item.
+    if item.get_prop("data", "computed", None) is not None:
+        prop["readOnly"] = True
+        prop["x-guidata-computed"] = True
     hide = item.get_prop("display", "hide", False)
     if hide is True:
         # Only static booleans are surfaced; callable/computed ``hide``
         # props would require runtime evaluation against an instance.
         prop["x-guidata-hide"] = True
+    # ``display.active`` may be a static bool, a callable or an
+    # :class:`ItemProperty` (e.g. ``GetAttrProp`` / ``NotProp``).  We
+    # surface the static bool when possible and otherwise flag the item
+    # as dynamically active so consumers know to re-evaluate the state
+    # against an instance via :func:`resolve_dataset_active`.
+    active = item.get_prop("display", "active", True)
+    if active is False:
+        prop["x-guidata-active"] = False
+    elif active is not True:
+        prop["x-guidata-active-dynamic"] = True
     prop["x-guidata-name"] = name
     prop["x-guidata-order"] = order
     if item.get_prop("data", "allow_none", False):
