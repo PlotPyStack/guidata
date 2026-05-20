@@ -20,8 +20,30 @@ import argparse
 import os
 import re
 import shutil
+import subprocess
 import sys
 from pathlib import Path
+
+
+def _git_tracked_files(project_root: Path) -> set[Path]:
+    """Return the set of git-tracked file paths under ``project_root``.
+
+    Returns an empty set if the directory is not a git working tree or git
+    is unavailable; callers should treat that as "nothing is protected".
+    """
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(project_root), "ls-files", "-z"],
+            capture_output=True,
+            check=True,
+        )
+    except (OSError, subprocess.CalledProcessError):
+        return set()
+    return {
+        (project_root / rel.decode("utf-8")).resolve()
+        for rel in result.stdout.split(b"\x00")
+        if rel
+    }
 
 
 def get_project_root(start_path: Path | str | None = None) -> Path:
@@ -131,7 +153,10 @@ def remove_if_exists(path: Path) -> None:
 
 
 def remove_glob_pattern(
-    pattern: str, search_root: Path, case_sensitive: bool = True
+    pattern: str,
+    search_root: Path,
+    case_sensitive: bool = True,
+    protected: set[Path] | None = None,
 ) -> None:
     """Remove files matching a glob pattern.
 
@@ -139,6 +164,8 @@ def remove_glob_pattern(
         pattern: Glob pattern to match files/directories.
         search_root: Root directory to search from.
         case_sensitive: Whether the glob matching should be case sensitive.
+        protected: Set of resolved paths that must never be deleted (e.g.
+         git-tracked files that share an extension with generated artefacts).
     """
     if not case_sensitive:
         pattern = f"**/{pattern.lower()}"
@@ -146,6 +173,9 @@ def remove_glob_pattern(
         print(f"    Searching for pattern (case insensitive): {pattern}")
     else:
         matches = list(search_root.glob(pattern))
+
+    if protected:
+        matches = [m for m in matches if m.resolve() not in protected]
 
     if matches:
         print(f"    Removing {len(matches)} items matching pattern: {pattern}")
@@ -298,12 +328,17 @@ def clean_wix_installer_files(project_root: Path, lib_name: str, mod_name: str) 
     print("  Cleaning WiX installer files...")
     wix_dir = project_root / "wix"
     if wix_dir.exists():
+        tracked = _git_tracked_files(project_root)
         remove_if_exists(wix_dir / "bin")
         remove_if_exists(wix_dir / "obj")
-        remove_glob_pattern("*.bmp", wix_dir)
-        remove_glob_pattern("*.wixpdb", wix_dir)
-        remove_glob_pattern(f"{lib_name}*.wxs", wix_dir, case_sensitive=False)
-        remove_glob_pattern(f"{mod_name}*.wxs", wix_dir, case_sensitive=False)
+        remove_glob_pattern("*.bmp", wix_dir, protected=tracked)
+        remove_glob_pattern("*.wixpdb", wix_dir, protected=tracked)
+        remove_glob_pattern(
+            f"{lib_name}*.wxs", wix_dir, case_sensitive=False, protected=tracked
+        )
+        remove_glob_pattern(
+            f"{mod_name}*.wxs", wix_dir, case_sensitive=False, protected=tracked
+        )
 
 
 def clean_empty_directories(project_root: Path) -> None:
