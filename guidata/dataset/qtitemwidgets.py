@@ -641,6 +641,13 @@ class CheckBoxWidget(AbstractDataSetWidget):
         super().__init__(item, parent_layout)
         self.checkbox = QCheckBox(self.item.get_prop_value("display", "text"))
         self.checkbox.setToolTip(item.get_help())
+        if not self.item.get_prop_value("display", "text"):
+            # When checkbox text is empty, the widget's natural height is smaller
+            # than other input widgets (QComboBox, QLineEdit), causing visual
+            # clipping in mixed-widget grid layouts (especially at high DPI).
+            # Align minimum height to a standard input widget height.
+            ref_height = QLineEdit().sizeHint().height()
+            self.checkbox.setMinimumHeight(ref_height)
         self.group = self.checkbox
 
         self.store = self.item.get_prop("display", "store", None)
