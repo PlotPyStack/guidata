@@ -46,7 +46,6 @@ from qtpy.QtWidgets import (
     QPushButton,
     QRadioButton,
     QSlider,
-    QStyle,
     QTabWidget,
     QTextEdit,
     QVBoxLayout,
