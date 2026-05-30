@@ -24,6 +24,7 @@ from guidata.dataset.jsonschema import (
     SCHEMA_VERSION,
     dataset_to_schema,
     dataset_to_schema_with_values,
+    resolve_dataset_active,
     resolve_dynamic_choices,
 )
 
@@ -442,3 +443,78 @@ def test_resolve_dynamic_choices_on_non_choice_raises():
 
     with pytest.raises(KeyError):
         resolve_dynamic_choices(P(), "n")
+
+
+# ---------------------------------------------------------------------------
+# Conditional editability (display.active) and computed items
+# ---------------------------------------------------------------------------
+
+
+def test_static_active_false_is_flagged():
+    class P(gds.DataSet):
+        a = gds.BoolItem("A", default=True).set_prop("display", active=False)
+        b = gds.IntItem("B", default=1)
+
+    props = dataset_to_schema(P)["properties"]
+    assert props["a"]["x-guidata-active"] is False
+    assert "x-guidata-active-dynamic" not in props["a"]
+    # Active-by-default items carry no active flag at all.
+    assert "x-guidata-active" not in props["b"]
+    assert "x-guidata-active-dynamic" not in props["b"]
+
+
+def test_dynamic_active_is_flagged():
+    _uniform = gds.GetAttrProp("uniform")
+
+    class P(gds.DataSet):
+        uniform = gds.BoolItem("Uniform", default=True).set_prop(
+            "display", store=_uniform
+        )
+        x0 = gds.FloatItem("X0", default=0.0).set_prop("display", active=_uniform)
+        xc = gds.FloatItem("XC", default=0.0).set_prop(
+            "display", active=gds.NotProp(_uniform)
+        )
+
+    props = dataset_to_schema(P)["properties"]
+    assert props["x0"]["x-guidata-active-dynamic"] is True
+    assert "x-guidata-active" not in props["x0"]
+    assert props["xc"]["x-guidata-active-dynamic"] is True
+
+
+def test_computed_item_is_read_only():
+    class P(gds.DataSet):
+        n = gds.IntItem("N", default=3)
+        twice = gds.IntItem("Twice").set_computed("_compute_twice")
+
+        def _compute_twice(self):
+            return self.n * 2
+
+    prop = dataset_to_schema(P)["properties"]["twice"]
+    assert prop["readOnly"] is True
+    assert prop["x-guidata-computed"] is True
+
+
+def test_resolve_dataset_active_static_and_dynamic():
+    _uniform = gds.GetAttrProp("uniform")
+
+    class P(gds.DataSet):
+        ro = gds.BoolItem("RO", default=True).set_prop("display", active=False)
+        uniform = gds.BoolItem("Uniform", default=True).set_prop(
+            "display", store=_uniform
+        )
+        x0 = gds.FloatItem("X0", default=0.0).set_prop("display", active=_uniform)
+        xc = gds.FloatItem("XC", default=0.0).set_prop(
+            "display", active=gds.NotProp(_uniform)
+        )
+
+    p = P()
+    p.uniform = True
+    active = resolve_dataset_active(p)
+    assert active["ro"] is False
+    assert active["x0"] is True
+    assert active["xc"] is False
+
+    p.uniform = False
+    active = resolve_dataset_active(p)
+    assert active["x0"] is False
+    assert active["xc"] is True
