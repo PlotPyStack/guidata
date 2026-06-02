@@ -5,6 +5,14 @@
 🛠️ Bug fixes:
 
 * **`DataSetEditGroupBox` / computed items**: Fixed input field corruption when typing into a `LineEditWidget` whose `DataSet` contains other items declared via `set_computed(...)` (or any `display.callback`) — typing multiple characters in a row (e.g. `52` after selecting all) was silently truncated and re-interpreted between keystrokes (producing `5.02` instead of `52`, or `0.0.25` instead of `0.25`). The reactive update of computed siblings was recursively re-entering the same callback with a different exclusion target and overwriting the field the user was editing. Bug introduced in v3.13.0 (commit `0af365e`, "Add support for computed properties in datasets") (fixes [Issue #104](https://github.com/PlotPyStack/guidata/issues/104))
+* **High-DPI display scaling**: Enabled automatic high-DPI scaling attributes (`AA_EnableHighDpiScaling`, `AA_UseHighDpiPixmaps`, `HighDpiScaleFactorRoundingPolicy.PassThrough`) before `QApplication` creation in `qapplication()` — on Qt5, UI elements were not scaled on high-DPI monitors (150%/200%/300% Windows display scaling), making text and widgets appear disproportionately small. Qt6 already enables these by default, so the calls are no-ops there. This single change resolves a large portion of visible symptoms downstream (PlotPy, PythonQwt, DataLab) (partial fix for [Issue #101](https://github.com/PlotPyStack/guidata/issues/101))
+* **`CheckBoxWidget` clipping**: Fixed checkbox visual clipping when the checkbox text is empty — in mixed-widget grid layouts (especially at high DPI), the checkbox's natural height was smaller than other input widgets (`QComboBox`, `QLineEdit`), causing it to be cut off. The minimum height is now aligned to a standard input widget height
+* **`gbuild` CLI command**: Fixed `gbuild` entry point referencing a `main` function that did not exist in `securebuild.py` — running the `gbuild` command after installing guidata raised an `AttributeError`. The argument parsing code was moved from a top-level `if __name__` block into a proper `main()` function (fixes [Issue #99](https://github.com/PlotPyStack/guidata/issues/99))
+* **Cleanup utility (`gclean`)**: Fixed `clean_wix_installer_files` removing git-tracked files (e.g. `.bmp`, `.wxs` templates) when their extension matched generated artefact patterns — tracked files are now excluded from glob-based removal
+
+♻️ Internal changes:
+
+* **Debug environment variable**: Renamed debug environment variable from `DEBUG` to `GUIDATA_DEBUG` to avoid collisions with unrelated tooling or third-party conventions that also use the generic `DEBUG` name
 
 ## guidata Version 3.14.3 ##
 
