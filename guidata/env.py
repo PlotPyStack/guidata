@@ -17,7 +17,7 @@ import sys
 from contextlib import contextmanager
 from typing import Any, Generator
 
-DEBUG = os.environ.get("DEBUG", "").lower() in ("1", "true")
+DEBUG = os.environ.get("GUIDATA_DEBUG", "").lower() in ("1", "true")
 PARSE = os.environ.get("GUIDATA_PARSE_ARGS", "").lower() in ("1", "true")
 
 
