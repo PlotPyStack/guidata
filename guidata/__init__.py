@@ -19,6 +19,31 @@ DATAPATH = LOCALEPATH = ""
 import guidata.config  # noqa: E402, F401
 
 
+def _configure_high_dpi():
+    """Configure high-DPI scaling attributes before QApplication creation.
+
+    Must be called before QApplication is instantiated.
+    Under Qt6 these attributes are enabled by default (the calls are no-ops).
+    """
+    from qtpy.QtCore import Qt
+    from qtpy.QtWidgets import QApplication
+
+    # Qt.AA_EnableHighDpiScaling: opt-in to automatic scaling on Qt 5.6+
+    if hasattr(Qt, "AA_EnableHighDpiScaling"):
+        QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
+
+    # Qt.AA_UseHighDpiPixmaps: render QIcon/QPixmap at device pixel ratio
+    if hasattr(Qt, "AA_UseHighDpiPixmaps"):
+        QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
+
+    # HighDpiScaleFactorRoundingPolicy.PassThrough: avoid rounding artefacts
+    # on fractional scaling factors (e.g. 125%, 150%)
+    if hasattr(Qt, "HighDpiScaleFactorRoundingPolicy"):
+        QApplication.setHighDpiScaleFactorRoundingPolicy(
+            Qt.HighDpiScaleFactorRoundingPolicy.PassThrough
+        )
+
+
 def qapplication():
     """
     Return QApplication instance
@@ -28,6 +53,7 @@ def qapplication():
 
     app = QApplication.instance()
     if not app:
+        _configure_high_dpi()
         app = QApplication([])
         install_translator(app)
         from guidata import qthelpers

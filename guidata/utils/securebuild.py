@@ -144,7 +144,8 @@ def run_secure_build(
         print(f"\n✅ Packages generated in: {dist_dir}")
 
 
-if __name__ == "__main__":
+def main() -> None:
+    """Main function to parse arguments and run secure build."""
     parser = argparse.ArgumentParser(
         description="Securely build Python packages from a Git repository."
     )
@@ -164,3 +165,7 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
     run_secure_build(root_path=args.root_path, prebuild_command=args.prebuild)
+
+
+if __name__ == "__main__":
+    main()

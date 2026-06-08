@@ -240,11 +240,11 @@ msgstr "les tableaux %s"
 msgid "%s are currently not supported"
 msgstr "Attention: %s ne sont pas pris en charge"
 
-msgid "NumPy array"
-msgstr "Tableau NumPy"
-
 msgid "Array editor"
 msgstr "Éditeur de tableaux"
+
+msgid "NumPy array"
+msgstr "Tableau NumPy"
 
 msgid "Record array fields:"
 msgstr "Champs:"
@@ -368,14 +368,14 @@ msgstr "Attribut"
 msgid "elements"
 msgstr "éléments"
 
+msgid "Value"
+msgstr "Valeur"
+
 msgid "Type"
 msgstr "Type"
 
 msgid "Size"
 msgstr "Taille"
-
-msgid "Value"
-msgstr "Valeur"
 
 msgid "Warning"
 msgstr "Avertissement"
@@ -629,12 +629,12 @@ msgstr "Le format ({}) est incorrect"
 msgid "Format ({}) should start with '%'"
 msgstr "Le format ({}) ne doit pas commencer par '%'"
 
+msgid "CSV Files"
+msgstr "Fichiers CSV"
+
 #, fuzzy
 msgid "Export dataframe"
 msgstr "DataFrame"
-
-msgid "CSV Files"
-msgstr "Fichiers CSV"
 
 msgid "Import as"
 msgstr "Importer en tant que"
