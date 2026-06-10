@@ -28,6 +28,8 @@ Public API
 
 .. autofunction:: resolve_dynamic_choices
 
+.. autofunction:: resolve_dataset_callbacks
+
 Output format
 -------------
 
@@ -179,6 +181,7 @@ def dataset_to_schema_with_values(instance: gdt.DataSet) -> dict[str, Any]:
         non-group item in the class.
     """
     schema = dataset_to_schema(type(instance))
+    _apply_display_callbacks(instance)
     values: dict[str, Any] = {}
     for item in instance.get_items():
         if isinstance(item, (gdt.BeginGroup, gdt.EndGroup, gdt.SeparatorItem)):
@@ -188,6 +191,27 @@ def dataset_to_schema_with_values(instance: gdt.DataSet) -> dict[str, Any]:
             continue
         values[name] = _serialise_value(item, item.get_value(instance))
     return {"schema": schema, "values": values}
+
+
+def _apply_display_callbacks(instance: gdt.DataSet) -> None:
+    """Run every item's ``display`` callback once against *instance*.
+
+    This populates read-only fields computed from siblings (e.g.
+    ``ArithmeticParam.operation``) so the very first schema snapshot
+    already carries the derived value.  Callbacks mutate *instance* in
+    place; failures are swallowed so schema generation never breaks.
+    """
+    for item in instance.get_items():
+        try:
+            callback = item.get_prop_value("display", instance, "callback", None)
+        except Exception:  # pylint: disable=broad-except
+            callback = None
+        if callback is None:
+            continue
+        try:
+            callback(instance, item, item.get_value(instance))
+        except Exception:  # pylint: disable=broad-except
+            pass
 
 
 def resolve_dynamic_choices(
@@ -221,6 +245,50 @@ def resolve_dynamic_choices(
         )
     raw = item.get_prop_value("data", instance, "choices")
     return [_choice_entry(item, c) for c in raw]
+
+
+def resolve_dataset_callbacks(instance: gdt.DataSet, item_name: str) -> dict[str, Any]:
+    """Run *item_name*'s ``display`` callback and return the new values.
+
+    Use this helper when a property's schema carries
+    ``"x-guidata-has-callback": true``. The frontend should call it
+    whenever that item changes, after pushing the user-edited values into
+    a fresh instance via :func:`guidata.dataset.update_dataset` (see
+    :func:`resolve_dynamic_choices`).
+
+    The guidata callback signature is ``callback(instance, item, value)``;
+    it mutates *instance* in place (typically recomputing a read-only
+    sibling such as ``ArithmeticParam.operation``). This function then
+    re-serialises every named item so the caller can refresh the whole
+    form, mirroring the Qt ``update_widgets`` cascade.
+
+    Args:
+        instance: The :class:`DataSet` instance providing the current
+            state. It is mutated in place by the callback.
+        item_name: Name of the item whose callback to run.
+
+    Returns:
+        A JSON-serialisable mapping of property name → value for every
+        non-group item, reflecting the post-callback state. Empty when
+        the item carries no ``display`` callback.
+
+    Raises:
+        KeyError: If *item_name* is not an item of *instance*.
+    """
+    item = _get_item(instance, item_name)
+    callback = item.get_prop_value("display", instance, "callback", None)
+    if callback is None:
+        return {}
+    callback(instance, item, item.get_value(instance))
+    values: dict[str, Any] = {}
+    for other in instance.get_items():
+        if isinstance(other, (gdt.BeginGroup, gdt.EndGroup, gdt.SeparatorItem)):
+            continue
+        name = other.get_name()
+        if not name:
+            continue
+        values[name] = _serialise_value(other, other.get_value(instance))
+    return values
 
 
 def resolve_dataset_active(instance: gdt.DataSet) -> dict[str, bool]:
@@ -618,6 +686,13 @@ def _add_common_keys(item: gdt.DataItem, prop: dict[str, Any], order: int) -> No
         prop["x-guidata-active"] = False
     elif active is not True:
         prop["x-guidata-active-dynamic"] = True
+    # A ``display`` callback recomputes sibling items live when this one
+    # changes (e.g. ``ArithmeticParam`` operator/factor/constant updating
+    # the read-only ``operation`` preview).  Flag it so the frontend can
+    # round-trip through :func:`resolve_dataset_callbacks` on edit,
+    # mirroring the Qt ``_display_callback`` cascade.
+    if item.get_prop("display", "callback", None) is not None:
+        prop["x-guidata-has-callback"] = True
     prop["x-guidata-name"] = name
     prop["x-guidata-order"] = order
     if item.get_prop("data", "allow_none", False):

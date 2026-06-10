@@ -17,6 +17,7 @@ from .jsonschema import (
     dataset_to_schema,
     dataset_to_schema_with_values,
     resolve_dynamic_choices,
+    resolve_dataset_callbacks,
 )
 from .dataitems import (
     BoolItem,

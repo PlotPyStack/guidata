@@ -25,6 +25,7 @@ from guidata.dataset.jsonschema import (
     dataset_to_schema,
     dataset_to_schema_with_values,
     resolve_dataset_active,
+    resolve_dataset_callbacks,
     resolve_dynamic_choices,
 )
 
@@ -518,3 +519,38 @@ def test_resolve_dataset_active_static_and_dynamic():
     active = resolve_dataset_active(p)
     assert active["x0"] is False
     assert active["xc"] is True
+
+
+def test_display_callback_flag_and_resolution():
+    """A ``display`` callback is flagged and re-runnable off-GUI."""
+
+    def _update(instance, _item, _value):
+        instance.preview = f"{instance.a} + {instance.b}"
+
+    class P(gds.DataSet):
+        a = gds.IntItem("A", default=1).set_prop("display", callback=_update)
+        b = gds.IntItem("B", default=2).set_prop("display", callback=_update)
+        preview = gds.StringItem("Preview", default="").set_prop(
+            "display", active=False
+        )
+
+    props = dataset_to_schema(P)["properties"]
+    assert props["a"]["x-guidata-has-callback"] is True
+    assert props["b"]["x-guidata-has-callback"] is True
+    assert "x-guidata-has-callback" not in props["preview"]
+    assert props["preview"]["x-guidata-active"] is False
+
+    # The computed preview is populated on the very first snapshot, even
+    # before any edit (initial display-callback pass).
+    payload = dataset_to_schema_with_values(P())
+    assert payload["values"]["preview"] == "1 + 2"
+
+    p = P()
+    update_dataset(p, {"a": 4, "b": 7, "preview": ""})
+    values = resolve_dataset_callbacks(p, "a")
+    assert values["preview"] == "4 + 7"
+    assert values["a"] == 4
+    assert values["b"] == 7
+
+    # An item without a callback yields an empty mapping (no-op).
+    assert resolve_dataset_callbacks(P(), "preview") == {}
