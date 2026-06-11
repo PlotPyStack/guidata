@@ -521,6 +521,43 @@ def test_resolve_dataset_active_static_and_dynamic():
     assert active["xc"] is True
 
 
+def test_resolve_dataset_active_store_valueprop():
+    """A ``store``/``ValueProp`` group greys out its members off-GUI.
+
+    ``ValueProp`` holds its value on the *property object* itself, not on
+    the dataset instance.  In the Qt UI that value is pushed by the
+    controlling checkbox widget's ``do_store`` callback; headless schema
+    generation never builds the widget, so the gated siblings must still
+    resolve their ``active`` against the controlling item's *value* (synced
+    via ``update_dataset``), not the stale class-level default.
+    """
+    prop = gds.ValueProp(False)
+
+    class P(gds.DataSet):
+        enable = gds.BoolItem("Enable", default=False).set_prop("display", store=prop)
+        gated = gds.FloatItem("Gated", default=1.0).set_prop("display", active=prop)
+
+    # The gated item is baked inactive on open (default disabled) and flagged
+    # dynamic so the frontend re-evaluates it on edit.
+    payload = dataset_to_schema_with_values(P())
+    props = payload["schema"]["properties"]
+    assert props["gated"]["x-guidata-active-dynamic"] is True
+    assert props["gated"]["x-guidata-active"] is False
+
+    # Off by default -> gated item inactive.
+    assert resolve_dataset_active(P()) == {"enable": True, "gated": False}
+
+    # Toggling the controlling boolean through ``update_dataset`` (no Qt
+    # widget) enables the gated item...
+    p = P()
+    update_dataset(p, {"enable": True})
+    assert resolve_dataset_active(p)["gated"] is True
+
+    # ...and toggling it back disables it again (no stale store state).
+    update_dataset(p, {"enable": False})
+    assert resolve_dataset_active(p)["gated"] is False
+
+
 def test_display_callback_flag_and_resolution():
     """A ``display`` callback is flagged and re-runnable off-GUI."""
 

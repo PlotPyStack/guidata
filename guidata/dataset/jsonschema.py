@@ -182,6 +182,17 @@ def dataset_to_schema_with_values(instance: gdt.DataSet) -> dict[str, Any]:
     """
     schema = dataset_to_schema(type(instance))
     _apply_display_callbacks(instance)
+    # Bake the per-instance ``display.active`` state into the schema so the
+    # very first render already greys out inactive widgets (e.g. an optional
+    # parameter group gated by a controlling checkbox via ``store`` /
+    # ``ValueProp``) without waiting for a frontend round-trip.  Only inactive
+    # items are flagged; active items stay editable by default, and dynamic
+    # ones keep their ``x-guidata-active-dynamic`` marker so the frontend
+    # re-evaluates them via :func:`resolve_dataset_active` on every edit.
+    properties = schema.get("properties", {})
+    for name, is_active in resolve_dataset_active(instance).items():
+        if not is_active and name in properties:
+            properties[name]["x-guidata-active"] = False
     values: dict[str, Any] = {}
     for item in instance.get_items():
         if isinstance(item, (gdt.BeginGroup, gdt.EndGroup, gdt.SeparatorItem)):
@@ -306,6 +317,7 @@ def resolve_dataset_active(instance: gdt.DataSet) -> dict[str, bool]:
         Mapping ``{item_name: bool}``. Items without a name (separators,
         end-of-group markers, ...) are skipped.
     """
+    _sync_store_props(instance)
     result: dict[str, bool] = {}
     for item in instance.get_items():
         name = item.get_name()
@@ -317,6 +329,33 @@ def resolve_dataset_active(instance: gdt.DataSet) -> dict[str, bool]:
             value = True
         result[name] = bool(value)
     return result
+
+
+def _sync_store_props(instance: gdt.DataSet) -> None:
+    """Replay the Qt ``do_store`` step for every ``display.store`` item.
+
+    guidata's ``store`` / :class:`~guidata.dataset.datatypes.ValueProp`
+    mechanism (used to gate optional parameter groups, e.g. a controlling
+    checkbox enabling a set of sibling items) holds its value on the
+    *property object* itself, not on the dataset instance.  In the Qt UI
+    that value is pushed by the checkbox widget's ``do_store`` callback
+    whenever the user toggles it.  Headless schema generation never builds
+    those widgets, so the stored value stays at its class-level default and
+    every ``active=ValueProp(...)`` sibling would resolve against stale
+    state.  Replaying ``store.set(instance, item, value)`` here keeps the
+    non-Qt ``active`` resolution faithful to the Qt UI.
+    """
+    for item in instance.get_items():
+        try:
+            store = item.get_prop("display", "store", None)
+        except Exception:  # pylint: disable=broad-except
+            store = None
+        if store is None:
+            continue
+        try:
+            store.set(instance, item, item.get_value(instance))
+        except Exception:  # pylint: disable=broad-except
+            pass
 
 
 # ---------------------------------------------------------------------------
