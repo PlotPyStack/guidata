@@ -19,6 +19,48 @@ DATAPATH = LOCALEPATH = ""
 import guidata.config  # noqa: E402, F401
 
 
+def _configure_fontdir():
+    """Provide Qt with a valid font directory in headless (offscreen) mode.
+
+    Recent PyQt5 wheels (>= 5.15.11) no longer ship the ``Qt5/lib/fonts``
+    directory, so Qt's minimal/offscreen font backend warns at startup with
+    "QFontDatabase: Cannot find font directory ..." and loads *no* fonts
+    (``QFontDatabase().families()`` is empty), which also degrades text-metric
+    based layout in tests.
+
+    To fix this at the source (rather than silencing the warning), point Qt at
+    the operating system's font directory via ``QT_QPA_FONTDIR``. This is read
+    only by Qt's basic font database (used by the ``offscreen``/``minimal``
+    platform plugins); on a normal desktop session, and on Linux (fontconfig)
+    or macOS (CoreText), the variable is ignored, so this is safe everywhere.
+
+    Scope is intentionally restricted to the offscreen platform to avoid
+    altering font resolution in regular GUI sessions. No-op if the variable is
+    already set or if no OS font directory is found.
+
+    Must be called before QApplication is instantiated.
+    """
+    import os
+    import sys
+
+    if os.environ.get("QT_QPA_PLATFORM") != "offscreen":
+        return
+    if os.environ.get("QT_QPA_FONTDIR"):
+        return
+
+    if sys.platform == "win32":
+        candidates = [os.path.join(os.environ.get("WINDIR", r"C:\Windows"), "Fonts")]
+    elif sys.platform == "darwin":
+        candidates = ["/System/Library/Fonts", "/Library/Fonts"]
+    else:
+        candidates = ["/usr/share/fonts", "/usr/local/share/fonts"]
+
+    for fontdir in candidates:
+        if os.path.isdir(fontdir):
+            os.environ["QT_QPA_FONTDIR"] = fontdir
+            break
+
+
 def _configure_high_dpi():
     """Configure high-DPI scaling attributes before QApplication creation.
 
@@ -53,6 +95,7 @@ def qapplication():
 
     app = QApplication.instance()
     if not app:
+        _configure_fontdir()
         _configure_high_dpi()
         app = QApplication([])
         install_translator(app)
