@@ -3,7 +3,7 @@
 
 # Inspired from https://pytest-qt.readthedocs.io/en/latest/troubleshooting.html#github-actions
 
-name: Build, install and test
+name: Build, install and test with PyQt5
 
 on:
   push:
