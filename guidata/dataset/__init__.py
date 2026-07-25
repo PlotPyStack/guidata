@@ -8,6 +8,7 @@
 from .conv import (
     create_dataset_from_dict,
     create_dataset_from_func,
+    DataSetJSONValidationError,
     restore_dataset,
     update_dataset,
     dataset_to_json,
