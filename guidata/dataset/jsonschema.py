@@ -84,6 +84,7 @@ import datetime
 import inspect
 import mimetypes
 import os
+from collections.abc import Collection
 from typing import TYPE_CHECKING, Any
 
 import guidata.dataset.dataitems as gdi
@@ -169,16 +170,22 @@ def dataset_to_schema(dataset_cls: type[gdt.DataSet]) -> dict[str, Any]:
     return schema
 
 
-def dataset_to_schema_with_values(instance: gdt.DataSet) -> dict[str, Any]:
+def dataset_to_schema_with_values(
+    instance: gdt.DataSet,
+    *,
+    exclude_value_kinds: Collection[str] | None = None,
+) -> dict[str, Any]:
     """Return both the schema and the current values of *instance*.
 
     Args:
         instance: A :class:`DataSet` instance.
+        exclude_value_kinds: Optional ``x-guidata-kind`` values whose items
+            remain in the schema but are omitted from the values mapping.
 
     Returns:
         ``{"schema": <schema>, "values": <values>}`` where ``values`` is
-        a JSON-serialisable mapping of property name → value for every
-        non-group item in the class.
+        a JSON-serialisable mapping of property name → value for non-group
+        items whose kind is not excluded.
     """
     schema = dataset_to_schema(type(instance))
     _apply_display_callbacks(instance)
@@ -199,6 +206,9 @@ def dataset_to_schema_with_values(instance: gdt.DataSet) -> dict[str, Any]:
             continue
         name = item.get_name()
         if not name:
+            continue
+        kind = properties.get(name, {}).get("x-guidata-kind")
+        if exclude_value_kinds is not None and kind in exclude_value_kinds:
             continue
         values[name] = _serialise_value(item, item.get_value(instance))
     return {"schema": schema, "values": values}

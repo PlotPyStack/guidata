@@ -390,6 +390,27 @@ def test_schema_is_json_serialisable_for_every_kind():
     json.dumps(payload)  # must not raise
 
 
+def test_schema_values_can_exclude_item_kinds_before_serialisation():
+    class UnserialisableArray(np.ndarray):
+        def tolist(self):
+            raise AssertionError("excluded arrays must not be serialised")
+
+    class P(gds.DataSet):
+        n = gds.IntItem("N", default=1)
+        array = gds.FloatArrayItem("Array", default=np.array([1.0]))
+
+    assert dataset_to_schema_with_values(P())["values"]["array"] == [1.0]
+
+    instance = P()
+    instance.array = np.array([1.0]).view(UnserialisableArray)
+    payload = dataset_to_schema_with_values(
+        instance, exclude_value_kinds={"float_array"}
+    )
+
+    assert "array" in payload["schema"]["properties"]
+    assert payload["values"] == {"n": 1}
+
+
 # ---------------------------------------------------------------------------
 # Round-trip with update_dataset
 # ---------------------------------------------------------------------------
