@@ -1653,9 +1653,24 @@ class DataSet(metaclass=DataSetMeta):
         Returns:
             Dialog exit code.
         """
+        # Allow alternate UI backends (e.g. browser/React) to override the
+        # Qt dialog. See :mod:`guidata.dataset.backends`.
+        # pylint: disable=import-outside-toplevel
+        from guidata.dataset.backends import get_handler
+
+        handler = get_handler("edit_dataset")
+        if handler is not None:
+            return handler(
+                self,
+                parent=parent,
+                apply=apply,
+                wordwrap=wordwrap,
+                size=size,
+                object_name=object_name,
+            )
+
         # Importing those modules here avoids Qt dependency when
         # guidata is used without Qt
-        # pylint: disable=import-outside-toplevel
         from guidata.dataset.qtwidgets import DataSetEditDialog
         from guidata.qthelpers import exec_dialog
 
@@ -1671,6 +1686,53 @@ class DataSet(metaclass=DataSetMeta):
 
         return exec_dialog(dlg)
 
+    async def edit_async(
+        self,
+        parent: QWidget | None = None,
+        apply: Callable | None = None,
+        wordwrap: bool = True,
+        size: QSize | tuple[int, int] | None = None,
+        object_name: str | None = None,
+    ) -> int:
+        """Asynchronous variant of :meth:`edit`.
+
+        Backends that cannot block the calling thread (e.g. browser/React
+        backends running inside a JavaScript event loop) should register an
+        ``"edit_dataset_async"`` handler that returns an awaitable. When no
+        async handler is registered, this method falls back to the
+        synchronous :meth:`edit`.
+
+        Args:
+            parent: parent widget (default is None, meaning no parent)
+            apply: apply callback (default is None)
+            wordwrap: if True, comment text is wordwrapped
+            size: dialog size (QSize object or integer tuple (width, height))
+            object_name: object name for the dialog
+
+        Returns:
+            Dialog exit code.
+        """
+        # pylint: disable=import-outside-toplevel
+        from guidata.dataset.backends import get_handler
+
+        handler = get_handler("edit_dataset_async")
+        if handler is not None:
+            return await handler(
+                self,
+                parent=parent,
+                apply=apply,
+                wordwrap=wordwrap,
+                size=size,
+                object_name=object_name,
+            )
+        return self.edit(
+            parent=parent,
+            apply=apply,
+            wordwrap=wordwrap,
+            size=size,
+            object_name=object_name,
+        )
+
     def view(
         self,
         parent: QWidget | None = None,
@@ -1684,9 +1746,16 @@ class DataSet(metaclass=DataSetMeta):
             wordwrap: if True, comment text is wordwrapped
             size: dialog size (QSize object or integer tuple (width, height))
         """
+        # Allow alternate UI backends to override the Qt dialog.
+        # pylint: disable=import-outside-toplevel
+        from guidata.dataset.backends import get_handler
+
+        handler = get_handler("view_dataset")
+        if handler is not None:
+            return handler(self, parent=parent, wordwrap=wordwrap, size=size)
+
         # Importing those modules here avoids Qt dependency when
         # guidata is used without Qt
-        # pylint: disable=import-outside-toplevel
         from guidata.dataset.qtwidgets import DataSetShowDialog
         from guidata.qthelpers import exec_dialog
 
@@ -2102,6 +2171,20 @@ class DataSetGroup:
         # pylint: disable=import-outside-toplevel
 
         assert mode in self.ALLOWED_MODES
+
+        # Allow alternate UI backends (e.g. browser/React) to override.
+        from guidata.dataset.backends import get_handler
+
+        handler = get_handler("edit_dataset_group")
+        if handler is not None:
+            return handler(
+                self,
+                parent=parent,
+                apply=apply,
+                wordwrap=wordwrap,
+                size=size,
+                mode=mode,
+            )
 
         from guidata.dataset.qtwidgets import (
             DataSetGroupEditDialog,

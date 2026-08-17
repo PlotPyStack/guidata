@@ -82,6 +82,29 @@ discover the programmatic names needed to access or modify dataset items:
         Threshold: 0.5
         Enable processing: ☑
 
+Non-Qt frontends (web, CLI, …)
+------------------------------
+
+While the default rendering of a :class:`~guidata.dataset.DataSet` relies on
+Qt, :mod:`guidata` also exposes two UI-framework-agnostic extension points so
+that the same parameter declarations can drive non-Qt frontends (typically a
+browser/React UI driven by Pyodide):
+
+* :mod:`guidata.dataset.jsonschema` converts any :class:`DataSet` subclass into
+  a `JSON Schema 2020-12` document augmented with ``x-guidata-*`` keywords
+  describing groups, tabs, units, choice labels, dynamic choices and the
+  layout tree. Frontends consume the schema to render the form, and post the
+  edited values back to Python.
+* :mod:`guidata.dataset.backends` provides a small handler registry consulted
+  by :meth:`DataSet.edit`, :meth:`DataSet.view` and :meth:`DataSetGroup.edit`
+  before falling back to the Qt dialogs. Applications can register handlers
+  to plug an alternate UI without touching the Qt path used by existing
+  applications. A coroutine variant, :meth:`DataSet.edit_async`, is also
+  available for event loops that cannot block the calling thread.
+
+When no handler is registered, behaviour is identical to previous releases:
+existing Qt applications observe no difference.
+
 The :mod:`guidata` library provides the following modules:
 
 * :py:mod:`guidata.dataset`: data set definition and manipulation

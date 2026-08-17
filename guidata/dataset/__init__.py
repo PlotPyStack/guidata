@@ -8,10 +8,18 @@
 from .conv import (
     create_dataset_from_dict,
     create_dataset_from_func,
+    DataSetJSONValidationError,
     restore_dataset,
     update_dataset,
     dataset_to_json,
     json_to_dataset,
+)
+from .jsonschema import (
+    dataset_to_schema,
+    dataset_to_schema_with_values,
+    resolve_dynamic_choices,
+    resolve_dataset_callbacks,
+    resolve_dataset_active,
 )
 from .dataitems import (
     BoolItem,
