@@ -1,5 +1,11 @@
 # Version 3.15 #
 
+## guidata Version 3.15.1 ##
+
+🛠 Bug fixes:
+
+* **Dark-mode detection on macOS** — upgraded the embedded `darkdetect` package to 0.8.0, removing its dependency on the `distutils` module removed in Python 3.12 and restoring guidata imports on macOS with Python 3.12 and later ([Issue #111](https://github.com/PlotPyStack/guidata/issues/111)).
+
 ## guidata Version 3.15.0 ##
 
 ✨ New features:

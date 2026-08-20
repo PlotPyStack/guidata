@@ -75,6 +75,7 @@ include = ["guidata*"]
 
 [tool.setuptools.package-data]
 "*" = ["*.png", "*.svg", "*.mo", "*.cfg", "*.toml"]
+"guidata.external.darkdetect" = ["LICENSE"]
 
 [tool.setuptools.dynamic]
 version = { attr = "guidata.__version__" }

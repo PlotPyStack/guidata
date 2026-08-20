@@ -4,20 +4,32 @@
 #  Distributed under the terms of the 3-clause BSD License.
 # -----------------------------------------------------------------------------
 
-__version__ = "0.5.2"  # Patched (see pull request below)
+__version__ = "0.8.0"
 
 import sys
 import platform
 
-if sys.platform == "darwin":
-    from distutils.version import LooseVersion as V
 
-    if V(platform.mac_ver()[0]) < V("10.14"):
-        from ._dummy import *
+def macos_supported_version():
+    sysver = platform.mac_ver()[0]  # typically 10.14.2 or 12.3
+    major = int(sysver.split(".")[0])
+    if major < 10:
+        return False
+    elif major >= 11:
+        return True
     else:
+        minor = int(sysver.split(".")[1])
+        if minor < 14:
+            return False
+        else:
+            return True
+
+
+if sys.platform == "darwin":
+    if macos_supported_version():
         from ._mac_detect import *
-    del V
-# Patch: https://github.com/albertosottile/darkdetect/pull/21
+    else:
+        from ._dummy import *
 elif (
     sys.platform == "win32"
     and platform.release().isdigit()
