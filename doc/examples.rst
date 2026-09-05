@@ -48,6 +48,32 @@ Embedding guidata objects in GUI layouts
 
 .. image:: images/screenshots/editgroupbox.png
 
+Local automatic sliders
+~~~~~~~~~~~~~~~~~~~~~~~
+
+An embedded ``DataSetEditLayout`` can opt into sliders without changing shared
+``DataItem`` declarations or other forms::
+
+   editor = DataSetEditLayout(
+      parent, parameters, grid, change_callback=parameters_changed,
+      auto_sliders=True, slider_steps=1000,
+   )
+
+The policy is inherited by nested groups and tabs. Editable numeric items need
+finite, ordered, representable bounds; otherwise they remain text-only. Integer
+parity is respected, and ranges crossing zero for ``nonzero`` items are not
+automatically given sliders. For floats, a usable positive ``step`` is used when
+practical, otherwise ``slider_steps`` specifies the normalized resolution. The
+text field retains its exact value independently of the slider thumb.
+
+``slider=True`` retains its existing behavior. Set
+``item.set_prop("display", auto_slider=False)`` to exclude an item from the local
+automatic policy. No bounds are inferred. The optional layout callback
+``slider_callback(pressed)`` receives ``True`` at drag start and ``False`` at
+release; value changes still use the existing ``change_callback``. Neither
+callback automatically validates, accepts or applies the form. Use
+``check_all_values()`` before ``accept_changes()`` when collecting a draft.
+
 Data item groups and group selection
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

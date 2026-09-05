@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import datetime
 import inspect
+import math
 import os
 import os.path as osp
 import sys
@@ -965,7 +966,17 @@ class SliderWidget(HLayoutMixin, LineEditWidget):
     ) -> None:
         super().__init__(item, parent_layout)
         self.slider = self.vmin = self.vmax = None
-        if item.get_prop_value("display", "slider"):
+        self._auto_slider = (
+            parent_layout.auto_sliders
+            and item.get_prop_value("display", "auto_slider", True)
+            and not item.get_prop_value("display", "slider")
+        )
+        self._slider_step = 1
+        self._slider_steps = parent_layout.slider_steps
+        self._auto_slider_usable = False
+        if self._auto_slider:
+            self._refresh_auto_slider()
+        elif item.get_prop_value("display", "slider"):
             self.vmin = item.get_prop_value("data", "min")
             self.vmax = item.get_prop_value("data", "max")
             assert self.vmin is not None and self.vmax is not None, (
@@ -976,11 +987,110 @@ class SliderWidget(HLayoutMixin, LineEditWidget):
             self.setup_slider(item)
             self.slider.valueChanged.connect(self.value_changed)  # type:ignore
             self.group.addWidget(self.slider)
+            self._connect_slider_gesture()
+
+    def _connect_slider_gesture(self) -> None:
+        """Forward gestures without changing the value notification mechanism."""
+        callback = self.parent_layout.slider_callback
+        if callback is not None:
+            self.slider.sliderPressed.connect(lambda: callback(True))
+            self.slider.sliderReleased.connect(lambda: callback(False))
+
+    def _refresh_auto_slider(self) -> None:
+        """Resolve a safe local slider range without modifying the data item."""
+        lower = self.item.get_prop_value("data", "min")
+        upper = self.item.get_prop_value("data", "max")
+        try:
+            finite_range = (
+                isinstance(lower, (int, float))
+                and isinstance(upper, (int, float))
+                and math.isfinite(lower)
+                and math.isfinite(upper)
+                and lower < upper
+                and math.isfinite(upper - lower)
+            )
+        except OverflowError:
+            finite_range = False
+        usable = (
+            not self.is_readonly()
+            and not isinstance(
+                self.item.get_prop("data", "computed", None), ComputedProp
+            )
+            and finite_range
+        )
+        if usable and self.item.get_prop_value("data", "nonzero", False):
+            usable = not lower <= 0 <= upper
+        if usable and self.DATA_TYPE is int:
+            usable = (
+                isinstance(lower, int)
+                and isinstance(upper, int)
+                and -(2**31) <= lower < upper < 2**31
+                and upper - lower < 2**31
+            )
+            parity = self.item.get_prop_value("data", "even", None)
+            self._slider_step = 1 if parity is None else 2
+            if usable and parity is not None:
+                remainder = 0 if parity else 1
+                lower += (remainder - lower) % 2
+                upper -= (upper - remainder) % 2
+                usable = lower < upper
+        if usable:
+            self.vmin, self.vmax = lower, upper
+            if self.DATA_TYPE is float:
+                step = self.item.get_prop_value("data", "step", None)
+                count = (upper - lower) / step if step and step > 0 else math.inf
+                self._slider_steps = (
+                    math.ceil(count)
+                    if math.isfinite(count) and 1 <= count <= 100000
+                    else self.parent_layout.slider_steps
+                )
+                self._slider_step = (
+                    step
+                    if math.isfinite(count) and 1 <= count <= 100000
+                    else (upper - lower) / self._slider_steps
+                )
+                usable = (
+                    self._slider_step > 0
+                    and lower + self._slider_step > lower
+                    and upper - self._slider_step < upper
+                )
+            else:
+                self._slider_steps = (upper - lower) // self._slider_step
+        self._auto_slider_usable = usable
+        if usable:
+            if self.slider is None:
+                self.slider = QSlider(Qt.Horizontal)
+                self.slider.valueChanged.connect(self.value_changed)
+                self.group.addWidget(self.slider)
+                self._connect_slider_gesture()
+            self.slider.blockSignals(True)
+            self.slider.setRange(0, min(self._slider_steps, 2**31 - 1))
+            self.slider.blockSignals(False)
+        if self.slider is not None:
+            self.slider.setVisible(usable)
+            self.slider.setEnabled(usable and bool(self.is_active()))
+
+    def get(self) -> None:
+        """Refresh bounds as well as the numeric value."""
+        if self._auto_slider:
+            self._refresh_auto_slider()
+        super().get()
 
     def value_to_slider(self, value):
+        if self._auto_slider:
+            if value <= self.vmin:
+                return 0
+            if value >= self.vmax:
+                return self._slider_steps
+            return max(
+                0,
+                min(self._slider_steps, round((value - self.vmin) / self._slider_step)),
+            )
         return value
 
     def slider_to_value(self, value):
+        if self._auto_slider:
+            return min(self.vmax, self.vmin + value * self._slider_step)
         return value
 
     def setup_slider(self, item):
@@ -989,7 +1099,12 @@ class SliderWidget(HLayoutMixin, LineEditWidget):
     def update(self, value):
         """Reimplement LineEditWidget method"""
         LineEditWidget.update(self, value)
-        if self.slider is not None and isinstance(value, self.DATA_TYPE):
+        if (
+            self.slider is not None
+            and (not self._auto_slider or self._auto_slider_usable)
+            and isinstance(value, self.DATA_TYPE)
+            and math.isfinite(value)
+        ):
             self.slider.blockSignals(True)
             self.slider.setValue(self.value_to_slider(value))
             self.slider.blockSignals(False)
@@ -1004,6 +1119,9 @@ class SliderWidget(HLayoutMixin, LineEditWidget):
         """Update the visual status of the widget and enables/disables it if
         necessary"""
         super().set_state()
+        if self._auto_slider:
+            self._refresh_auto_slider()
+            return
         if self.slider is not None:
             if self.is_readonly():  # Widget does not support readonly mode, disable it
                 self.slider.setDisabled(True)
@@ -1017,9 +1135,13 @@ class FloatSliderWidget(SliderWidget):
     DATA_TYPE: type = float
 
     def value_to_slider(self, value):
+        if self._auto_slider:
+            return super().value_to_slider(value)
         return int((value - self.vmin) * 100 / (self.vmax - self.vmin))
 
     def slider_to_value(self, value):
+        if self._auto_slider:
+            return float(super().slider_to_value(value))
         return value * (self.vmax - self.vmin) / 100 + self.vmin
 
     def setup_slider(self, item):

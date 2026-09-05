@@ -301,6 +301,9 @@ class DataSetEditLayout(Generic[AnyDataSet]):
         first_line: first line of grid layout
         change_callback: function called when any widget's value has changed
         group_widget: group widget associated with this layout, if any
+        auto_sliders: add sliders to editable bounded numeric items (default False)
+        slider_callback: optional callback receiving True/False at drag start/end
+        slider_steps: normalized float slider resolution when no usable step exists
     """
 
     _widget_factory: dict[Any, Any] = {}
@@ -324,6 +327,9 @@ class DataSetEditLayout(Generic[AnyDataSet]):
         first_line: int = 0,
         change_callback: Callable | None = None,
         group_widget: GroupWidget | None = None,
+        auto_sliders: bool = False,
+        slider_callback: Callable[[bool], None] | None = None,
+        slider_steps: int = 1000,
     ) -> None:
         self.parent = parent
         self.instance = instance
@@ -331,6 +337,19 @@ class DataSetEditLayout(Generic[AnyDataSet]):
         self.first_line = first_line
         self.change_callback = change_callback
         self.group_widget = group_widget
+        self.auto_sliders = (
+            group_widget.parent_layout.auto_sliders if group_widget else auto_sliders
+        )
+        self.slider_callback = (
+            group_widget.parent_layout.slider_callback
+            if group_widget
+            else slider_callback
+        )
+        self.slider_steps = (
+            group_widget.parent_layout.slider_steps if group_widget else slider_steps
+        )
+        if not isinstance(self.slider_steps, int) or not 1 <= self.slider_steps < 2**31:
+            raise ValueError("slider_steps must be a positive Qt-representable integer")
         self.widgets: list[AbstractDataSetWidget] = []
         # self.linenos = {}  # prochaine ligne à remplir par colonne
         self.items_pos: dict[DataItem, list[int]] = {}
