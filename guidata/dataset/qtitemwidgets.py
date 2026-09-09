@@ -29,8 +29,8 @@ from typing import TYPE_CHECKING, Any, Protocol
 
 import numpy as np
 from qtpy.compat import getexistingdirectory
-from qtpy.QtCore import QSize, Qt
-from qtpy.QtGui import QColor, QIcon, QPixmap
+from qtpy.QtCore import QPointF, QSignalBlocker, QSize, Qt
+from qtpy.QtGui import QColor, QIcon, QPainter, QPen, QPixmap
 from qtpy.QtWidgets import (
     QAbstractButton,
     QCheckBox,
@@ -1742,6 +1742,596 @@ class ButtonWidget(AbstractDataSetWidget):
         self.set()
         self.parent_layout.update_widgets()
         self.notify_value_change()
+
+
+def _range_fraction(value: float, lower: float, upper: float) -> float:
+    """Return the position of a finite value in a finite range."""
+    value = min(max(value, lower), upper)
+    width = upper - lower
+    offset = value - lower
+    if math.isfinite(width) and math.isfinite(offset):
+        return offset / width
+    scale = max(abs(value), abs(lower), abs(upper))
+    if scale == 0.0:
+        return 0.0
+    return (value / scale - lower / scale) / (upper / scale - lower / scale)
+
+
+def _range_value(lower: float, upper: float, fraction: float) -> float:
+    """Interpolate within a finite range without overflowing its width."""
+    width = upper - lower
+    if math.isfinite(width):
+        value = lower + fraction * width
+    else:
+        scale = max(abs(lower), abs(upper))
+        value = (lower / scale + fraction * (upper / scale - lower / scale)) * scale
+    return min(max(value, lower), upper)
+
+
+def _half_span(lower: float, upper: float) -> float:
+    """Return half a finite range width without overflowing."""
+    width = upper - lower
+    return 0.5 * width if math.isfinite(width) else 0.5 * upper - 0.5 * lower
+
+
+def _bounded_add(value: float, offset: float) -> float:
+    """Add finite values and clamp overflow to the finite float range."""
+    result = value + offset
+    if math.isfinite(result):
+        return result
+    return math.copysign(sys.float_info.max, offset)
+
+
+def _width_ratio(
+    lower: float, upper: float, reference_lower: float, reference_upper: float
+) -> float:
+    """Return the ratio of two finite range widths without overflowing."""
+    width = upper - lower
+    reference_width = reference_upper - reference_lower
+    if math.isfinite(width) and math.isfinite(reference_width):
+        scale = max(width, reference_width)
+        scaled_reference = reference_width / scale
+        if scaled_reference == 0.0:
+            return math.inf
+        return (width / scale) / scaled_reference
+    scale = max(abs(lower), abs(upper), abs(reference_lower), abs(reference_upper))
+    width = upper / scale - lower / scale
+    reference_width = reference_upper / scale - reference_lower / scale
+    if reference_width == 0.0:
+        return math.inf
+    return width / reference_width
+
+
+def _finite_range(value: Any) -> tuple[float, float] | None:
+    """Return a finite ordered payload pair, or None for unavailable context."""
+    if (
+        isinstance(value, (list, tuple))
+        and len(value) == 2
+        and all(
+            isinstance(bound, (int, float)) and math.isfinite(bound) for bound in value
+        )
+        and value[0] < value[1]
+    ):
+        return float(value[0]), float(value[1])
+    return None
+
+
+class _HistogramCanvas(QWidget):
+    """Draw a fixed histogram and its selected range or transfer function."""
+
+    def __init__(self, presentation: str) -> None:
+        super().__init__()
+        self.presentation = presentation
+        self.payload: dict[str, Any] = {}
+        self.minimum = 0.0
+        self.maximum = 1.0
+        self.setMinimumHeight(96)
+
+    def set_data(self, payload: dict[str, Any], minimum: float, maximum: float) -> None:
+        """Set display data and schedule a repaint."""
+        self.payload = payload
+        self.minimum = minimum
+        self.maximum = maximum
+        self.update()
+
+    def paintEvent(self, event) -> None:  # noqa: N802
+        """Paint the histogram and transfer function."""
+        del event
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.Antialiasing)
+        bounds = self.rect().adjusted(1, 1, -1, -1)
+        painter.fillRect(bounds, self.palette().base())
+        painter.setPen(QPen(self.palette().mid().color(), 1))
+        painter.drawRect(bounds)
+
+        counts = self.payload.get("counts", [])
+        domain = self.payload.get("domain", [0.0, 1.0])
+        if len(domain) != 2 or not domain[0] < domain[1]:
+            painter.end()
+            return
+        domain_min, domain_max = map(float, domain)
+        y_max = float(self.payload.get("y_max", max(counts, default=1)) or 1)
+        if counts:
+            bar_width = bounds.width() / len(counts)
+            painter.setPen(QPen(self.palette().mid().color(), 1))
+            for index, count in enumerate(counts):
+                height = min(max(float(count) / y_max, 0.0), 1.0) * bounds.height()
+                x = bounds.left() + (index + 0.5) * bar_width
+                painter.drawLine(
+                    QPointF(x, bounds.bottom()), QPointF(x, bounds.bottom() - height)
+                )
+
+        if self.minimum < self.maximum and self.presentation == "range":
+            left = (
+                bounds.left()
+                + _range_fraction(self.minimum, domain_min, domain_max) * bounds.width()
+            )
+            right = (
+                bounds.left()
+                + _range_fraction(self.maximum, domain_min, domain_max) * bounds.width()
+            )
+            color = self.palette().highlight().color()
+            color.setAlpha(45)
+            painter.fillRect(
+                int(left),
+                bounds.top(),
+                max(1, int(right - left)),
+                bounds.height(),
+                color,
+            )
+            painter.setPen(QPen(self.palette().highlight().color(), 2))
+            for position in (left, right):
+                painter.drawLine(
+                    QPointF(position, bounds.top()), QPointF(position, bounds.bottom())
+                )
+        elif self.minimum < self.maximum:
+            points = []
+            for x_value in (domain_min, self.minimum, self.maximum, domain_max):
+                clipped_x = min(max(x_value, domain_min), domain_max)
+                fraction_x = _range_fraction(clipped_x, domain_min, domain_max)
+                fraction_y = min(
+                    max(_range_fraction(clipped_x, self.minimum, self.maximum), 0.0),
+                    1.0,
+                )
+                points.append(
+                    QPointF(
+                        bounds.left() + fraction_x * bounds.width(),
+                        bounds.bottom() - fraction_y * bounds.height(),
+                    )
+                )
+            painter.setPen(QPen(self.palette().highlight().color(), 2))
+            for start, end in zip(points, points[1:]):
+                painter.drawLine(start, end)
+        painter.end()
+
+
+class HistogramRangeWidget(AbstractDataSetWidget):
+    """Edit two linked floats through a histogram-backed range display."""
+
+    _RANGE_STEPS = 1000
+    _PERCENT_STEPS = 100
+
+    def __init__(
+        self, item: "DataItemVariable", parent_layout: "DataSetEditLayout"
+    ) -> None:
+        super().__init__(item, parent_layout)
+        self.range_items = item.item.get_range_items(item.instance)
+        self.presentation = item.item.get_presentation()
+        self._minimum = 0.0
+        self._maximum = 1.0
+        self.group = QWidget()
+        layout = QVBoxLayout(self.group)
+        layout.setContentsMargins(0, 0, 0, 0)
+        self.canvas = _HistogramCanvas(self.presentation)
+        self.canvas.setToolTip(item.get_help())
+        layout.addWidget(QLabel(item.get_prop_value("display", "label")))
+        layout.addWidget(self.canvas)
+        self.minimum_slider, self.minimum_edit = self._add_range_control(
+            layout, _("Minimum")
+        )
+        self.maximum_slider, self.maximum_edit = self._add_range_control(
+            layout, _("Maximum")
+        )
+        self.brightness_slider, self.brightness_value = self._add_percent_control(
+            layout, _("Brightness")
+        )
+        self.contrast_slider, self.contrast_value = self._add_percent_control(
+            layout, _("Contrast")
+        )
+        button_layout = QHBoxLayout()
+        self.auto_button = QPushButton(_("Auto"))
+        self.reset_button = QPushButton(_("Reset"))
+        button_layout.addWidget(self.auto_button)
+        button_layout.addWidget(self.reset_button)
+        button_layout.addStretch(1)
+        layout.addLayout(button_layout)
+
+        self.minimum_slider.valueChanged.connect(self._minimum_slider_changed)
+        self.maximum_slider.valueChanged.connect(self._maximum_slider_changed)
+        self.brightness_slider.valueChanged.connect(self._brightness_changed)
+        self.contrast_slider.valueChanged.connect(self._contrast_changed)
+        self.minimum_edit.editingFinished.connect(self._minimum_edited)
+        self.maximum_edit.editingFinished.connect(self._maximum_edited)
+        self.auto_button.clicked.connect(lambda: self._apply_named_range("auto_range"))
+        self.reset_button.clicked.connect(
+            lambda: self._apply_named_range("reset_range")
+        )
+        for slider in (
+            self.minimum_slider,
+            self.maximum_slider,
+            self.brightness_slider,
+            self.contrast_slider,
+        ):
+            self._connect_slider_gesture(slider)
+
+    def _add_range_control(
+        self, parent: QVBoxLayout, label: str
+    ) -> tuple[QSlider, QLineEdit]:
+        row = QHBoxLayout()
+        linked = self.range_items[0 if label == _("Minimum") else 1]
+        unit = linked.get_prop_value("display", self.item.instance, "unit", "")
+        row.addWidget(QLabel(f"{label} ({unit})" if unit else label))
+        slider = QSlider(Qt.Horizontal)
+        slider.setRange(0, self._RANGE_STEPS)
+        row.addWidget(slider, 1)
+        edit = QLineEdit()
+        edit.setMaximumWidth(100)
+        row.addWidget(edit)
+        parent.addLayout(row)
+        return slider, edit
+
+    def _add_percent_control(
+        self, parent: QVBoxLayout, label: str
+    ) -> tuple[QSlider, QLabel]:
+        row = QHBoxLayout()
+        row.addWidget(QLabel(label))
+        slider = QSlider(Qt.Horizontal)
+        slider.setRange(0, self._PERCENT_STEPS)
+        row.addWidget(slider, 1)
+        value = QLabel()
+        value.setMinimumWidth(28)
+        value.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        row.addWidget(value)
+        parent.addLayout(row)
+        if self.presentation != "brightness_contrast":
+            for index in range(row.count()):
+                row.itemAt(index).widget().hide()
+        return slider, value
+
+    def _connect_slider_gesture(self, slider: QSlider) -> None:
+        callback = self.parent_layout.slider_callback
+        if callback is not None:
+            slider.sliderPressed.connect(lambda: callback(True))
+            slider.sliderReleased.connect(lambda: callback(False))
+
+    def _payload(self) -> dict[str, Any]:
+        payload = self.item.get()
+        if (
+            not isinstance(payload, dict)
+            or _finite_range(payload.get("domain")) is None
+        ):
+            return {}
+        counts = payload.get("counts", [])
+        if not isinstance(counts, (list, tuple)) or not all(
+            isinstance(count, (int, float)) and math.isfinite(count) and count >= 0
+            for count in counts
+        ):
+            return {}
+        for name in ("minimum_width", "y_max"):
+            value = payload.get(name, 1.0)
+            if (
+                not isinstance(value, (int, float))
+                or not math.isfinite(value)
+                or value <= 0
+            ):
+                return {}
+        return payload
+
+    def is_active(self) -> bool:
+        """Include linked fields in the composite's editability contract."""
+        return super().is_active() and all(
+            item.get_prop_value("display", self.item.instance, "active", True)
+            for item in self.range_items
+        )
+
+    def is_readonly(self) -> bool:
+        """Never write readonly or computed linked fields."""
+        return (
+            self.READ_ONLY
+            or super().is_readonly()
+            or any(
+                item.get_prop_value("display", self.item.instance, "readonly", False)
+                or isinstance(item.get_prop("data", "computed", None), ComputedProp)
+                for item in self.range_items
+            )
+        )
+
+    def _can_edit(self) -> bool:
+        return (
+            self._payload().get("active") is True
+            and self.is_active()
+            and not self.is_readonly()
+        )
+
+    def _field_names(self) -> tuple[str, str]:
+        return (
+            self.item.item.get_prop("data", "minimum_field"),
+            self.item.item.get_prop("data", "maximum_field"),
+        )
+
+    def _range(self) -> tuple[float, float]:
+        return self._minimum, self._maximum
+
+    def _domain(self) -> tuple[float, float]:
+        domain = self._payload().get("domain", [0.0, 1.0])
+        return float(domain[0]), float(domain[1])
+
+    def _minimum_width(self) -> float:
+        payload = self._payload()
+        width = float(payload.get("minimum_width", 0.0))
+        domain_min, domain_max = self._domain()
+        if not math.isfinite(width) or width <= 0:
+            width = max(math.ulp(domain_min), math.ulp(domain_max))
+        return width
+
+    def _increase(self, value: float) -> float | None:
+        candidate = value + self._minimum_width()
+        if math.isfinite(candidate) and candidate > value:
+            return candidate
+        candidate = math.nextafter(value, math.inf)
+        return candidate if math.isfinite(candidate) else None
+
+    def _decrease(self, value: float) -> float | None:
+        candidate = value - self._minimum_width()
+        if math.isfinite(candidate) and candidate < value:
+            return candidate
+        candidate = math.nextafter(value, -math.inf)
+        return candidate if math.isfinite(candidate) else None
+
+    def _set_range(self, minimum: float, maximum: float) -> None:
+        if self.build_mode or not self._can_edit():
+            self._sync_controls()
+            return
+        if not math.isfinite(minimum) or not math.isfinite(maximum):
+            self._sync_controls()
+            return
+        minimum_width = self._minimum_width()
+        width = maximum - minimum
+        if maximum <= minimum or (math.isfinite(width) and width < minimum_width):
+            expanded_maximum = self._increase(minimum)
+            if expanded_maximum is None:
+                self._sync_controls()
+                return
+            maximum = expanded_maximum
+        if (minimum, maximum) == self._range():
+            self._sync_controls()
+            return
+        self._minimum = minimum
+        self._maximum = maximum
+        self._sync_controls()
+        if self.check():
+            _display_callback(self, self.value())
+            if (
+                self.contains_computed_items()
+                or self.item.get_prop_value("display", "callback", None) is not None
+            ):
+                self.get()
+        self.notify_value_change()
+
+    def _minimum_slider_changed(self, position: int) -> None:
+        if self.build_mode:
+            return
+        domain_min, domain_max = self._domain()
+        minimum = _range_value(domain_min, domain_max, position / self._RANGE_STEPS)
+        _, maximum = self._range()
+        if maximum <= minimum:
+            maximum = self._increase(minimum)
+            if maximum is None:
+                self._sync_controls()
+                return
+        self._set_range(minimum, maximum)
+
+    def _maximum_slider_changed(self, position: int) -> None:
+        if self.build_mode:
+            return
+        domain_min, domain_max = self._domain()
+        maximum = _range_value(domain_min, domain_max, position / self._RANGE_STEPS)
+        minimum, _ = self._range()
+        if minimum >= maximum:
+            minimum = self._decrease(maximum)
+            if minimum is None:
+                self._sync_controls()
+                return
+        self._set_range(minimum, maximum)
+
+    def _brightness_changed(self, position: int) -> None:
+        if self.build_mode:
+            return
+        domain_min, domain_max = self._domain()
+        minimum, maximum = self._range()
+        center = _range_value(
+            domain_min, domain_max, 1.0 - position / self._PERCENT_STEPS
+        )
+        half_width = _half_span(minimum, maximum)
+        self._set_range(
+            _bounded_add(center, -half_width),
+            _bounded_add(center, half_width),
+        )
+
+    def _contrast_changed(self, position: int) -> None:
+        if self.build_mode:
+            return
+        domain_min, domain_max = self._domain()
+        minimum, maximum = self._range()
+        center = 0.5 * minimum + 0.5 * maximum
+        domain_half_width = _half_span(domain_min, domain_max)
+        if position == 0:
+            half_width = sys.float_info.max
+        elif position <= 50:
+            half_width = domain_half_width * (50.0 / position)
+        elif position >= self._PERCENT_STEPS:
+            half_width = 0.5 * self._minimum_width()
+        else:
+            half_width = domain_half_width * ((self._PERCENT_STEPS - position) / 50.0)
+        self._set_range(
+            _bounded_add(center, -half_width),
+            _bounded_add(center, half_width),
+        )
+
+    def _minimum_edited(self) -> None:
+        try:
+            minimum = float(self.minimum_edit.text())
+        except ValueError:
+            self._sync_controls()
+            return
+        _, maximum = self._range()
+        if maximum <= minimum:
+            maximum = self._increase(minimum)
+            if maximum is None:
+                self._sync_controls()
+                return
+        self._set_range(minimum, maximum)
+
+    def _maximum_edited(self) -> None:
+        try:
+            maximum = float(self.maximum_edit.text())
+        except ValueError:
+            self._sync_controls()
+            return
+        minimum, _ = self._range()
+        if minimum >= maximum:
+            minimum = self._decrease(maximum)
+            if minimum is None:
+                self._sync_controls()
+                return
+        self._set_range(minimum, maximum)
+
+    def _apply_named_range(self, name: str) -> None:
+        values = _finite_range(self._payload().get(name))
+        if values is not None:
+            self._set_range(*values)
+
+    def _sync_controls(self) -> None:
+        minimum, maximum = self._range()
+        domain_min, domain_max = self._domain()
+        center = 0.5 * minimum + 0.5 * maximum
+        brightness = round(
+            self._PERCENT_STEPS
+            * (1.0 - _range_fraction(center, domain_min, domain_max))
+        )
+        width_ratio = _width_ratio(minimum, maximum, domain_min, domain_max)
+        if width_ratio <= 0.0:
+            contrast = float(self._PERCENT_STEPS)
+        elif width_ratio < 1.0:
+            contrast = self._PERCENT_STEPS - 50.0 * width_ratio
+        else:
+            contrast = 50.0 / width_ratio
+        minimum_position = round(
+            self._RANGE_STEPS * _range_fraction(minimum, domain_min, domain_max)
+        )
+        maximum_position = round(
+            self._RANGE_STEPS * _range_fraction(maximum, domain_min, domain_max)
+        )
+        controls = (
+            (self.minimum_slider, minimum_position),
+            (self.maximum_slider, maximum_position),
+            (self.brightness_slider, round(brightness)),
+            (self.contrast_slider, round(contrast)),
+        )
+        for control, value in controls:
+            with QSignalBlocker(control):
+                control.setValue(min(max(value, control.minimum()), control.maximum()))
+        self.minimum_edit.setText(f"{minimum:.17g}")
+        self.maximum_edit.setText(f"{maximum:.17g}")
+        style = (
+            _get_readonly_stylesheet()
+            if self.check()
+            else "background-color:rgb(255, 175, 90);"
+        )
+        self.minimum_edit.setStyleSheet(style)
+        self.maximum_edit.setStyleSheet(style)
+        self.brightness_value.setText(str(min(max(round(brightness), 0), 100)))
+        self.contrast_value.setText(str(min(max(round(contrast), 0), 100)))
+        self.canvas.set_data(self._payload(), minimum, maximum)
+        self.auto_button.setVisible(
+            _finite_range(self._payload().get("auto_range")) is not None
+        )
+        self.reset_button.setVisible(
+            _finite_range(self._payload().get("reset_range")) is not None
+        )
+
+    def get(self) -> None:
+        """Refresh controls from the linked fields and transient payload."""
+        previous_mode = self.build_mode
+        self.build_mode = True
+        try:
+            minimum_field, maximum_field = self._field_names()
+            self._minimum = float(getattr(self.item.instance, minimum_field))
+            self._maximum = float(getattr(self.item.instance, maximum_field))
+            self._sync_controls()
+            self.set_state()
+        finally:
+            self.build_mode = previous_mode
+
+    def set(self) -> None:
+        """Commit both linked fields atomically."""
+        if not self._can_edit() or not self.check():
+            return
+        minimum_field, maximum_field = self._field_names()
+        setattr(self.item.instance, minimum_field, self._minimum)
+        setattr(self.item.instance, maximum_field, self._maximum)
+
+    def value(self) -> dict[str, Any]:
+        """Return the unchanged transient rendering payload."""
+        return self._payload()
+
+    def check(self) -> bool:
+        """Validate both linked fields, including those hidden from the form."""
+        if not self.is_active() or self.is_readonly():
+            return True
+        minimum, maximum = self._range()
+        return (
+            math.isfinite(minimum)
+            and math.isfinite(maximum)
+            and minimum < maximum
+            and self.range_items[0].check_value(minimum)
+            and self.range_items[1].check_value(maximum)
+        )
+
+    def place_on_grid(
+        self,
+        layout: "QGridLayout",
+        row: int,
+        label_column: int,
+        widget_column: int,
+        row_span: int = 1,
+        column_span: int = 1,
+    ) -> None:
+        """Span the full form width."""
+        del widget_column
+        layout.addWidget(self.group, row, label_column, row_span, column_span + 1)
+
+    def set_state(self) -> None:
+        """Disable all controls when the payload reports no usable data."""
+        self.group.setEnabled(self._can_edit())
+
+
+class HistogramRangeShowWidget(HistogramRangeWidget):
+    """Read-only histogram-backed range renderer."""
+
+    READ_ONLY = True
+
+    def get(self) -> None:
+        """Refresh the renderer and keep every control disabled."""
+        super().get()
+        self.group.setEnabled(False)
+
+    def set(self) -> None:
+        """Do not commit values from a read-only renderer."""
+
+    def set_state(self) -> None:
+        """Keep the complete renderer disabled."""
+        self.group.setEnabled(False)
 
 
 class DataSetWidget(AbstractDataSetWidget):

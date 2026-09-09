@@ -86,6 +86,9 @@ Other items
 .. autoclass:: guidata.dataset.DictItem
     :members:
 
+.. autoclass:: guidata.dataset.HistogramRangeItem
+    :members:
+
 .. autoclass:: guidata.dataset.FontFamilyItem
     :members:
 
@@ -1529,6 +1532,94 @@ class DictItem(DataItem):
         """Reads value from the reader object, inside the try...except
         statement defined in the base item `deserialize` method"""
         return reader.read_dict()
+
+
+class HistogramRangeItem(DataItem):
+    """Histogram-backed editor for two distinct FloatItem fields in one dataset.
+
+    The item value is a JSON-compatible rendering payload. It is deliberately
+    transient: only the linked minimum and maximum fields belong to the
+    persistent dataset state.
+
+    Set ``display.presentation`` to ``"brightness_contrast"`` to enable the
+    brightness/contrast controls and linear transfer display. The default
+    ``"range"`` presentation only selects an interval. Linked fields should be
+    hidden from the ordinary form; their validation and readonly properties
+    still apply. The histogram domain does not constrain their values.
+
+    The payload describes uniformly spaced bins: ``counts`` and optional
+    ``bin_edges`` (one more edge than counts), a finite ordered ``domain``, and
+    optional positive ``y_max`` and ``minimum_width``. Rounded physical edges
+    may coincide for very narrow domains. ``active`` enables editing;
+    ``auto_range`` and ``reset_range`` optionally supply button targets.
+    An empty payload disables editing until context is provided. Extra keys
+    are allowed, but no image objects or computation callbacks belong here.
+
+    A ``display.callback(instance, item, value)`` receives the unchanged payload;
+    both edited bounds are available on the working instance. Like other
+    guidata live callbacks, it updates the working dataset before acceptance.
+    Hosts needing transactional cancellation must edit a copy of their data.
+
+    Args:
+        label: Item label
+        minimum: Name of the linked minimum field
+        maximum: Name of the linked maximum field
+        default: Initial rendering payload
+        help: Text shown in the tooltip
+    """
+
+    type: type[dict[str, Any]] = dict
+
+    def __init__(
+        self,
+        label: str,
+        minimum: str,
+        maximum: str,
+        default: dict[str, Any] | None = None,
+        help: str = "",
+    ) -> None:
+        super().__init__(label, default=default or {}, help=help, check=False)
+        self.set_prop(
+            "data",
+            transient=True,
+            minimum_field=minimum,
+            maximum_field=maximum,
+        )
+        self.set_prop("display", presentation="range")
+
+    def get_presentation(self) -> str:
+        """Return the validated portable presentation name."""
+        presentation = self.get_prop("display", "presentation", "range")
+        if presentation not in ("range", "brightness_contrast"):
+            raise ValueError(f"Unknown histogram presentation: {presentation!r}")
+        return presentation
+
+    def get_range_items(self, instance: DataSet) -> tuple[FloatItem, FloatItem]:
+        """Resolve and validate the two linked fields without changing them."""
+        minimum = self.get_prop("data", "minimum_field")
+        maximum = self.get_prop("data", "maximum_field")
+        items = {item.get_name(): item for item in instance.get_items()}
+        if minimum == maximum or any(
+            not isinstance(items.get(name), FloatItem) for name in (minimum, maximum)
+        ):
+            raise ValueError(
+                "HistogramRangeItem requires two distinct FloatItem fields"
+            )
+        return items[minimum], items[maximum]
+
+    def serialize(
+        self,
+        instance: DataSet,
+        writer: HDF5Writer | JSONWriter | INIWriter,
+    ) -> None:
+        """Skip the renderer payload when persisting the dataset."""
+
+    def deserialize(
+        self,
+        instance: DataSet,
+        reader: HDF5Reader | JSONReader | INIReader,
+    ) -> None:
+        """Keep the current renderer payload when loading persisted values."""
 
 
 class ButtonItem(DataItem):

@@ -70,7 +70,7 @@ intended widget. Kinds emitted by this module:
 
 ``int``, ``float``, ``bool``, ``string``, ``text``, ``choice``,
 ``multiple_choice``, ``image_choice``, ``color``, ``date``, ``datetime``,
-``file``, ``float_array``, ``dict``.
+``file``, ``float_array``, ``dict``, ``histogram_range``.
 
 Items not supported (raise :class:`NotImplementedError`):
 ``ButtonItem`` (callbacks cannot cross JSON), and conditional visibility
@@ -140,6 +140,9 @@ def dataset_to_schema(dataset_cls: type[gdt.DataSet]) -> dict[str, Any]:
     # Use a transient instance to obtain the title/comment computed by
     # ``DataSetMeta`` from the docstring, without paying for it twice.
     instance = dataset_cls()
+    for item in instance.get_items():
+        if isinstance(item, gdi.HistogramRangeItem):
+            item.get_range_items(instance)
     title = instance.get_title()
     comment = instance.get_comment()
 
@@ -455,7 +458,9 @@ def _item_to_property(item: gdt.DataItem, order: int) -> dict[str, Any]:
         )
 
     # Dispatch in MRO-friendly order (most specific first).
-    if isinstance(item, gdi.FloatArrayItem):
+    if isinstance(item, gdi.HistogramRangeItem):
+        prop = _histogram_range_to_property(item)
+    elif isinstance(item, gdi.FloatArrayItem):
         prop = _float_array_to_property(item)
     elif isinstance(item, gdi.DictItem):
         prop = _dict_to_property(item)
@@ -514,6 +519,8 @@ def _numeric_to_property(item: gdi.NumericTypeItem, kind: str) -> dict[str, Any]
         "type": json_type,
         "x-guidata-kind": kind,
     }
+    if item.get_prop("data", "check_value", True) is False:
+        prop["x-guidata-check-value"] = False
     minv = item.get_prop("data", "min", None)
     maxv = item.get_prop("data", "max", None)
     if minv is not None:
@@ -684,6 +691,21 @@ def _dict_to_property(item: gdi.DictItem) -> dict[str, Any]:
         "type": "object",
         "additionalProperties": True,
         "x-guidata-kind": "dict",
+    }
+
+
+def _histogram_range_to_property(
+    item: gdi.HistogramRangeItem,
+) -> dict[str, Any]:
+    """Return the portable contract for a histogram-backed range editor."""
+    return {
+        "type": "object",
+        "additionalProperties": True,
+        "x-guidata-kind": "histogram_range",
+        "x-guidata-transient": True,
+        "x-guidata-minimum-field": item.get_prop("data", "minimum_field"),
+        "x-guidata-maximum-field": item.get_prop("data", "maximum_field"),
+        "x-guidata-histogram-presentation": item.get_presentation(),
     }
 
 

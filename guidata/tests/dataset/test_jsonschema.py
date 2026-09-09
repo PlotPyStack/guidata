@@ -64,6 +64,75 @@ def test_float_item_with_step_and_slider():
     assert prop["x-guidata-slider"] is True
 
 
+@pytest.mark.parametrize("presentation", ["range", "brightness_contrast"])
+def test_histogram_range_item_schema_and_transient_value(presentation):
+    class P(gds.DataSet):
+        minimum = gds.FloatItem("Minimum", default=0.0)
+        maximum = gds.FloatItem("Maximum", default=255.0)
+        histogram = gds.HistogramRangeItem(
+            "Brightness and contrast", "minimum", "maximum"
+        )
+
+    instance = P()
+    if presentation != "range":
+        P.histogram.set_prop("display", presentation=presentation)
+    instance.histogram = {
+        "counts": [1, 2],
+        "bin_edges": [0.0, 127.5, 255.0],
+        "domain": [0.0, 255.0],
+    }
+    snapshot = dataset_to_schema_with_values(instance)
+    prop = snapshot["schema"]["properties"]["histogram"]
+    assert prop["x-guidata-kind"] == "histogram_range"
+    assert prop["x-guidata-transient"] is True
+    assert prop["x-guidata-minimum-field"] == "minimum"
+    assert prop["x-guidata-maximum-field"] == "maximum"
+    assert prop["x-guidata-histogram-presentation"] == presentation
+    assert snapshot["values"]["histogram"] == instance.histogram
+
+
+@pytest.mark.parametrize(
+    "minimum,maximum",
+    [
+        ("missing", "upper"),
+        ("lower", "lower"),
+        ("text", "upper"),
+        ("histogram", "upper"),
+        ("integer", "upper"),
+    ],
+)
+def test_histogram_range_rejects_invalid_links(minimum, maximum):
+    class Invalid(gds.DataSet):
+        lower = gds.FloatItem("Lower")
+        upper = gds.FloatItem("Upper")
+        text = gds.StringItem("Text")
+        integer = gds.IntItem("Integer")
+        histogram = gds.HistogramRangeItem("Range", minimum, maximum)
+
+    with pytest.raises(ValueError, match="distinct FloatItem"):
+        dataset_to_schema(Invalid)
+
+
+def test_histogram_range_empty_context_and_unknown_presentation():
+    class Interval(gds.DataSet):
+        lower = gds.FloatItem("Lower", default=0.0, min=1.0, check=False)
+        upper = gds.FloatItem("Upper", default=2.0)
+        histogram = gds.HistogramRangeItem("Range", "lower", "upper")
+
+    instance = Interval()
+    snapshot = dataset_to_schema_with_values(instance)
+    assert snapshot["values"]["histogram"] == {}
+    assert snapshot["schema"]["properties"]["lower"]["x-guidata-check-value"] is False
+    instance.histogram = {"output_range": [0, 1], "extension": "caller-owned"}
+    assert (
+        dataset_to_schema_with_values(instance)["values"]["histogram"]
+        == instance.histogram
+    )
+    Interval.histogram.set_prop("display", presentation="unknown")
+    with pytest.raises(ValueError, match="Unknown histogram presentation"):
+        dataset_to_schema(Interval)
+
+
 def test_nonzero_flag():
     class P(gds.DataSet):
         n = gds.IntItem("N", default=1, nonzero=True)

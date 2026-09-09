@@ -772,3 +772,20 @@ msgstr "Instance :"
 msgid "Text editor"
 msgstr "Éditeur de texte"
 
+msgid "Minimum"
+msgstr "Minimum"
+
+msgid "Maximum"
+msgstr "Maximum"
+
+msgid "Brightness"
+msgstr "Luminosité"
+
+msgid "Contrast"
+msgstr "Contraste"
+
+msgid "Auto"
+msgstr "Auto"
+
+msgid "Reset"
+msgstr "Réinitialiser"

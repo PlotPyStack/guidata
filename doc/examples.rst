@@ -74,6 +74,46 @@ release; value changes still use the existing ``change_callback``. Neither
 callback automatically validates, accepts or applies the form. Use
 ``check_all_values()`` before ``accept_changes()`` when collecting a draft.
 
+Histogram-backed interval selection
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``HistogramRangeItem`` edits two distinct ``FloatItem`` fields in the same dataset.
+Its default presentation is a generic interval, suitable for measurements such as
+durations. The caller supplies histogram counts and range proposals; guidata does
+not inspect source arrays or choose an automatic range.
+
+The following tested dataset has bounded durations in seconds and a live dependent
+field. Import ``guidata.dataset as gds`` before using it:
+
+.. literalinclude:: ../guidata/tests/dataset/test_histogram_range_item.py
+   :pyobject: DurationRange
+
+Call ``DurationRange().edit()`` to display it. The hidden numeric fields retain
+their constraints, including ``nonzero`` and the ``check=False`` opt-out. A window
+outside those constraints stays visible but cannot be accepted. The histogram's
+``domain`` is only a drawing/slider domain, not an additional numeric constraint.
+If either linked field is read-only or inactive, the entire composite is disabled.
+
+The histogram payload is transient: only the linked numeric values are serialized.
+After loading a dataset, restore its histogram context before enabling editing.
+An empty context leaves the saved bounds visible and the controls disabled.
+Auto and Reset appear only when the caller supplies finite ordered proposals.
+
+The callback receives ``(instance, item, payload)`` once per valid changed pair.
+Both bounds are already on the working dataset, and dependent fields are refreshed.
+Without callbacks or computed fields, edits remain local until acceptance. With
+live dependencies, guidata updates the working dataset before acceptance, just as
+for ordinary items. Applications requiring transactional Cancel must edit a copy;
+the dialog cannot undo arbitrary callback side effects.
+
+For image applications, explicitly select the brightness/contrast presentation::
+
+   DurationRange.histogram.set_prop("display", presentation="brightness_contrast")
+
+This adds brightness/contrast controls and a linear transfer overlay. It changes
+only rendering metadata, never the stored parameters. The JSON Schema exporter
+emits ``x-guidata-histogram-presentation`` so portable renderers use the same mode.
+
 Data item groups and group selection
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

@@ -570,6 +570,7 @@ from guidata.dataset.dataitems import (  # noqa: E402
     FilesOpenItem,
     FloatArrayItem,
     FloatItem,
+    HistogramRangeItem,
     ImageChoiceItem,
     IntItem,
     MultipleChoiceItem,
@@ -591,6 +592,8 @@ from guidata.dataset.qtitemwidgets import (  # noqa: E402
     FloatArrayWidget,
     FloatSliderWidget,
     GroupWidget,
+    HistogramRangeShowWidget,
+    HistogramRangeWidget,
     LineEditWidget,
     MultipleChoiceWidget,
     SeparatorWidget,
@@ -624,6 +627,7 @@ DataSetEditLayout.register(ChoiceItem, ChoiceWidget)
 DataSetEditLayout.register(ImageChoiceItem, ChoiceWidget)
 DataSetEditLayout.register(MultipleChoiceItem, MultipleChoiceWidget)
 DataSetEditLayout.register(FloatArrayItem, FloatArrayWidget)
+DataSetEditLayout.register(HistogramRangeItem, HistogramRangeWidget)
 DataSetEditLayout.register(ButtonItem, ButtonWidget)
 DataSetEditLayout.register(DictItem, ButtonWidget)
 DataSetEditLayout.register(SeparatorItem, SeparatorWidget)
@@ -801,6 +805,7 @@ DataSetShowLayout.register(ChoiceItem, DataSetShowWidget)
 DataSetShowLayout.register(ImageChoiceItem, DataSetShowWidget)
 DataSetShowLayout.register(MultipleChoiceItem, DataSetShowWidget)
 DataSetShowLayout.register(FloatArrayItem, DataSetShowWidget)
+DataSetShowLayout.register(HistogramRangeItem, HistogramRangeShowWidget)
 DataSetShowLayout.register(DictItem, DataSetShowWidget)
 DataSetShowLayout.register(SeparatorItem, SeparatorWidget)
 
