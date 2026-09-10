@@ -36,6 +36,7 @@ from .dataitems import (
     FloatArrayItem,
     FloatItem,
     FontFamilyItem,
+    HistogramRangeItem,
     ImageChoiceItem,
     IntItem,
     LabeledEnum,

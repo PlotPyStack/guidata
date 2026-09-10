@@ -77,6 +77,24 @@ msgstr "Valeur minimale du tableau"
 msgid "Largest element in array"
 msgstr "Valeur maximale du tableau"
 
+msgid "Minimum"
+msgstr "Minimum"
+
+msgid "Maximum"
+msgstr "Maximum"
+
+msgid "Brightness"
+msgstr "Luminosité"
+
+msgid "Contrast"
+msgstr "Contraste"
+
+msgid "Auto"
+msgstr "Auto"
+
+msgid "Reset"
+msgstr "Réinitialiser"
+
 msgid "Some required entries are incorrect"
 msgstr "Les champs surlignés n'ont pas été remplis correctement."
 

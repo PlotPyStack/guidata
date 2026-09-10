@@ -14,6 +14,7 @@ This script shows how to save in and then reload data from a JSON file.
 
 import os
 
+import guidata.dataset as gds
 from guidata.env import execenv
 from guidata.io import JSONReader, JSONWriter
 from guidata.qthelpers import qt_app_context
@@ -45,6 +46,34 @@ def test_loadsave_json():
         #     assert_datasets_equal(p1, p2, "Parameters do not match after HDF5 I/O")
 
         execenv.print("OK")
+
+
+def test_transient_item_is_not_serialized():
+    """Transient items are skipped by JSON serialization and deserialization."""
+
+    class ParametersWithTransientItem(gds.DataSet):
+        """Dataset holding a transient rendering payload beside persisted bounds."""
+
+        minimum = gds.FloatItem("Minimum", default=0.0)
+        maximum = gds.FloatItem("Maximum", default=1.0)
+        histogram = gds.HistogramRangeItem(
+            "Brightness and contrast", "minimum", "maximum"
+        )
+
+    source = ParametersWithTransientItem()
+    source.minimum = 0.25
+    source.maximum = 0.75
+    source.histogram = {"counts": [1, 2, 3]}
+
+    restored = gds.json_to_dataset(
+        gds.dataset_to_json(source),
+        strict=True,
+        expected_class=ParametersWithTransientItem,
+    )
+
+    assert restored.minimum == 0.25
+    assert restored.maximum == 0.75
+    assert restored.histogram == {}
 
 
 if __name__ == "__main__":

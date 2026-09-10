@@ -24,6 +24,10 @@ Create dataset classes
 Serialize datasets as JSON
 --------------------------
 
+Items whose ``data.transient`` property is ``True`` are omitted from the
+serialized output and left untouched when loading: they carry presentation
+context supplied by the host application, not dataset state.
+
 .. autofunction:: guidata.dataset.dataset_to_json
 
 .. autofunction:: guidata.dataset.json_to_dataset
@@ -396,11 +400,13 @@ def _resolve_dataset_class(
 
 
 def _dataset_items(dataset_class: type[gdt.DataSet]) -> dict[str, gdt.DataItem]:
-    """Return persisted DataItems, excluding structural and callback items."""
+    """Return persisted DataItems, excluding structural and transient items."""
     return {
         item.get_name(): item
         for item in dataset_class._items
-        if item.get_name() and not isinstance(item, _NON_SERIALIZED_ITEM_TYPES)
+        if item.get_name()
+        and not isinstance(item, _NON_SERIALIZED_ITEM_TYPES)
+        and not item.get_prop("data", "transient", False)
     }
 
 
