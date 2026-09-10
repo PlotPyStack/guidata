@@ -49,7 +49,11 @@ def test_loadsave_json():
 
 
 def test_transient_item_is_not_serialized():
+    """Transient items are skipped by JSON serialization and deserialization."""
+
     class ParametersWithTransientItem(gds.DataSet):
+        """Dataset holding a transient rendering payload beside persisted bounds."""
+
         minimum = gds.FloatItem("Minimum", default=0.0)
         maximum = gds.FloatItem("Maximum", default=1.0)
         histogram = gds.HistogramRangeItem(

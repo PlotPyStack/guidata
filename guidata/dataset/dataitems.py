@@ -1547,10 +1547,10 @@ class HistogramRangeItem(DataItem):
     hidden from the ordinary form; their validation and readonly properties
     still apply. The histogram domain does not constrain their values.
 
-    The payload describes uniformly spaced bins: ``counts`` and optional
-    ``bin_edges`` (one more edge than counts), a finite ordered ``domain``, and
-    optional positive ``y_max`` and ``minimum_width``. Rounded physical edges
-    may coincide for very narrow domains. ``active`` enables editing;
+    The payload describes ``counts`` spread uniformly over a finite ordered
+    ``domain``, plus optional positive ``y_max`` and ``minimum_width``. Bin
+    positions are always derived from ``domain``: non-uniform bin edges are not
+    supported, so callers must rebin beforehand. ``active`` enables editing;
     ``auto_range`` and ``reset_range`` optionally supply button targets.
     An empty payload disables editing until context is provided. Extra keys
     are allowed, but no image objects or computation callbacks belong here.

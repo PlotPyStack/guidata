@@ -1,4 +1,15 @@
-"""Local automatic sliders preserve exact values and parameter declarations."""
+# -*- coding: utf-8 -*-
+#
+# Licensed under the terms of the BSD 3-Clause
+# (see guidata/LICENSE for details)
+
+"""Local automatic sliders preserve exact values and parameter declarations.
+
+Run this script directly to visually check which bounded items receive a
+slider, and that dragging never truncates the value shown in the text field.
+"""
+
+# guitest: show
 
 from __future__ import annotations
 
@@ -7,6 +18,7 @@ from qtpy.QtWidgets import QGridLayout, QWidget
 
 import guidata.dataset as gds
 from guidata.dataset.qtwidgets import DataSetEditLayout
+from guidata.env import execenv
 from guidata.qthelpers import qt_app_context
 
 
@@ -188,3 +200,24 @@ def test_authored_sliders_and_nonzero_fallback():
         assert editor.widgets[1].slider is None
         assert editor.widgets[2].slider is None
         parent.close()
+
+
+def test_auto_sliders():
+    """Show a form opting into the local automatic slider policy."""
+    with qt_app_context(exec_loop=True):
+        window = QWidget()
+        window.setWindowTitle("Automatic sliders (local layout policy)")
+        DataSetEditLayout(
+            window,
+            Parameters(),
+            QGridLayout(window),
+            auto_sliders=True,
+            slider_steps=1000,
+        )
+        window.resize(560, 320)
+        window.show()
+        execenv.print("OK")
+
+
+if __name__ == "__main__":
+    test_auto_sliders()

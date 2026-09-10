@@ -24,6 +24,10 @@ Create dataset classes
 Serialize datasets as JSON
 --------------------------
 
+Items whose ``data.transient`` property is ``True`` are omitted from the
+serialized output and left untouched when loading: they carry presentation
+context supplied by the host application, not dataset state.
+
 .. autofunction:: guidata.dataset.dataset_to_json
 
 .. autofunction:: guidata.dataset.json_to_dataset

@@ -1,4 +1,15 @@
-"""Tests for the portable histogram-backed range editor."""
+# -*- coding: utf-8 -*-
+#
+# Licensed under the terms of the BSD 3-Clause
+# (see guidata/LICENSE for details)
+
+"""Tests for the portable histogram-backed range editor.
+
+Run this script directly to visually check both presentations, the live
+dependent field and the disabled state when no rendering context is supplied.
+"""
+
+# guitest: show
 
 from __future__ import annotations
 
@@ -7,11 +18,12 @@ import math
 import pytest
 from qtpy.QtCore import Qt
 from qtpy.QtTest import QTest
-from qtpy.QtWidgets import QGridLayout, QWidget
+from qtpy.QtWidgets import QGridLayout, QGroupBox, QHBoxLayout, QWidget
 
 import guidata.dataset as gds
 from guidata.dataset.qtitemwidgets import HistogramRangeWidget
 from guidata.dataset.qtwidgets import DataSetEditLayout, DataSetShowLayout
+from guidata.env import execenv
 from guidata.qthelpers import qt_app_context
 
 
@@ -42,7 +54,6 @@ def make_parameters() -> Parameters:
     param = Parameters()
     param.histogram = {
         "counts": [1, 4, 2, 1],
-        "bin_edges": [0.0, 63.75, 127.5, 191.25, 255.0],
         "domain": [0.0, 255.0],
         "y_max": 4,
         "minimum_width": 1.0,
@@ -490,3 +501,49 @@ def test_histogram_range_invalid_context_is_inert(payload):
         layout.accept_changes()
         assert (param.minimum, param.maximum) == (0.0, 255.0)
         parent.close()
+
+
+@pytest.mark.parametrize("factory", [make_parameters, DurationRange])
+def test_histogram_range_canvas_paints_every_branch(factory):
+    """Rendering covers both presentations, an empty selection and a bad domain."""
+    with qt_app_context():
+        parent = QWidget()
+        param = factory()
+        layout = DataSetEditLayout(parent, param, QGridLayout(parent))
+        widget = next(
+            item for item in layout.widgets if isinstance(item, HistogramRangeWidget)
+        )
+        canvas = widget.canvas
+        canvas.resize(200, 100)
+
+        for payload, minimum, maximum in (
+            (widget._payload(), *widget._range()),
+            (widget._payload(), 1.0, 1.0),
+            ({"domain": [1.0, 0.0]}, 0.0, 1.0),
+        ):
+            canvas.set_data(payload, minimum, maximum)
+            assert not canvas.grab().isNull()
+        parent.close()
+
+
+def test_histogram_range_item():
+    """Show every presentation and the unavailable-context state side by side."""
+    with qt_app_context(exec_loop=True):
+        window = QWidget()
+        window.setWindowTitle("Histogram-backed range editor")
+        columns = QHBoxLayout(window)
+        for title, param in (
+            ("Range presentation", DurationRange()),
+            ("Brightness/contrast presentation", make_parameters()),
+            ("Unavailable rendering context", Parameters()),
+        ):
+            group = QGroupBox(title)
+            DataSetEditLayout(group, param, QGridLayout(group))
+            columns.addWidget(group)
+        window.resize(1100, 500)
+        window.show()
+        execenv.print("OK")
+
+
+if __name__ == "__main__":
+    test_histogram_range_item()

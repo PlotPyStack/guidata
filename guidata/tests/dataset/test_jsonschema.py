@@ -78,7 +78,7 @@ def test_histogram_range_item_schema_and_transient_value(presentation):
         P.histogram.set_prop("display", presentation=presentation)
     instance.histogram = {
         "counts": [1, 2],
-        "bin_edges": [0.0, 127.5, 255.0],
+        "source_id": "caller-specific extra key",
         "domain": [0.0, 255.0],
     }
     snapshot = dataset_to_schema_with_values(instance)

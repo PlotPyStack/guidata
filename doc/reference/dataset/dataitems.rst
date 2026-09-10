@@ -5,10 +5,10 @@
 Histogram range context
 -----------------------
 
-``HistogramRangeItem`` consumes a plain mapping with uniformly spaced histogram
-``counts``, a finite ordered ``domain`` pair, and an ``active`` boolean. Optional
-``bin_edges`` has one more entry than ``counts``; adjacent edges may coincide after
-float rounding. Optional ``y_max`` and ``minimum_width`` must be positive and finite.
+``HistogramRangeItem`` consumes a plain mapping with histogram ``counts``, a finite
+ordered ``domain`` pair, and an ``active`` boolean. Bins are always drawn uniformly
+across ``domain``: non-uniform bin edges are not supported, so callers must rebin
+beforehand. Optional ``y_max`` and ``minimum_width`` must be positive and finite.
 Optional ``auto_range`` and ``reset_range`` are finite ordered pairs. Additional
 keys are preserved for the caller. An empty mapping represents unavailable context.
 
