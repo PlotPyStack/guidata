@@ -1067,7 +1067,9 @@ class SliderWidget(HLayoutMixin, LineEditWidget):
             self.slider.setRange(0, min(self._slider_steps, 2**31 - 1))
             self.slider.blockSignals(False)
         if self.slider is not None:
-            self.slider.setVisible(usable)
+            # Showing a slider before its layout is installed opens it as a window
+            if not usable or self.slider.parentWidget() is not None:
+                self.slider.setVisible(usable)
             self.slider.setEnabled(usable and bool(self.is_active()))
 
     def get(self) -> None:

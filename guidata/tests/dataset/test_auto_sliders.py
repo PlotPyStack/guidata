@@ -14,7 +14,8 @@ slider, and that dragging never truncates the value shown in the text field.
 from __future__ import annotations
 
 import pytest
-from qtpy.QtWidgets import QGridLayout, QWidget
+from qtpy.QtCore import QEvent, QObject
+from qtpy.QtWidgets import QApplication, QGridLayout, QWidget
 
 import guidata.dataset as gds
 from guidata.dataset.qtwidgets import DataSetEditLayout
@@ -72,6 +73,43 @@ def test_auto_sliders_are_local_and_preserve_precision():
         assert not Parameters.value.get_prop("display", "slider")
         parent.close()
         other_parent.close()
+
+
+class WindowShowRecorder(QObject):
+    """Record the top-level windows shown while it is installed."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.windows: list[str] = []
+
+    def eventFilter(self, obj: QObject, event: QEvent) -> bool:
+        """Record shown windows without filtering the event."""
+        if event.type() == QEvent.Show and isinstance(obj, QWidget) and obj.isWindow():
+            self.windows.append(type(obj).__name__)
+        return False
+
+
+def test_building_auto_sliders_shows_no_window():
+    """Sliders must not flash as windows before their layout is installed."""
+    with qt_app_context():
+        recorder = WindowShowRecorder()
+        QApplication.instance().installEventFilter(recorder)
+        try:
+            parent = QWidget()
+            editor = DataSetEditLayout(
+                parent, Parameters(), QGridLayout(parent), auto_sliders=True
+            )
+        finally:
+            QApplication.instance().removeEventFilter(recorder)
+        assert recorder.windows == []
+        parent.show()
+        sliders = [
+            widget.slider
+            for widget in editor.get_terminal_widgets()
+            if getattr(widget, "slider", None) is not None
+        ]
+        assert sliders and all(slider.isVisibleTo(parent) for slider in sliders)
+        parent.close()
 
 
 def test_gestures_and_refresh_do_not_change_values():
