@@ -529,10 +529,31 @@ class LineEditWidget(AbstractDataSetWidget):
                 # state changed from empty string to None
                 self.line_edit_changed(value)
 
+    def parse_text(self, text: str | None) -> tuple[Any, bool]:
+        """Convert widget text into an item value and validate it
+
+        Non-empty text converted to None could not be parsed (e.g. "abc" for a
+        numeric item): it is invalid, even for optional items, which only accept
+        None from an empty field.
+
+        Args:
+            text: Widget text, or None for a None item value
+
+        Returns:
+            Tuple of the item value and its validity
+        """
+        if text is None:
+            value = None
+        else:
+            value = self.item.from_string(str(text))
+            if value is None and str(text).strip():
+                return value, False
+        return value, self.item.check_value(value)
+
     def line_edit_changed(self, qvalue: str | None) -> None:
         """QLineEdit validator"""
-        value = self.item.from_string(str(qvalue)) if qvalue is not None else None
-        if not self.item.check_value(value):
+        value, valid = self.parse_text(qvalue)
+        if not valid:
             self.edit.setStyleSheet("background-color:rgb(255, 175, 90);")
         else:
             self.edit.setStyleSheet(_get_readonly_stylesheet())
@@ -541,6 +562,7 @@ class LineEditWidget(AbstractDataSetWidget):
         self.notify_value_change()
 
     def update(self, value: Any) -> None:
+        """Update the display callback with the given value"""
         cb = self.item.get_prop_value("display", "value_callback", None)
         if cb is not None:
             cb(value)
@@ -559,8 +581,7 @@ class LineEditWidget(AbstractDataSetWidget):
         Returns:
             True if item value is valid
         """
-        value = self.item.from_string(str(self.edit.text()))
-        return self.item.check_value(value)
+        return self.parse_text(str(self.edit.text()))[1]
 
     def set_state(self):
         """Update the visual status of the widget and modify the widget to readonly if
