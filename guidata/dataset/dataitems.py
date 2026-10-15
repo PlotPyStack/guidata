@@ -284,6 +284,8 @@ class NumericTypeItem(DataItem):
         """Override DataItem method"""
         if not self.get_prop("data", "check_value", True):
             return True
+        if value is None and self.get_prop("data", "allow_none", False):
+            return True
         if not isinstance(value, self.type):
             if raise_exception:
                 raise TypeError(f"Expected {self.type}, got {type(value)}")
@@ -475,6 +477,9 @@ class IntItem(NumericTypeItem):
         valid = super().check_value(value, raise_exception=raise_exception)
         if not valid:
             return False
+        if value is None:
+            # Only reached for optional items (``allow_none=True``)
+            return True
         even = self.get_prop("data", "even")
         if even is not None:
             is_even = value // 2 == value / 2.0
