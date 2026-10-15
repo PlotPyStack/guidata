@@ -80,3 +80,59 @@ def test_empty_optional_numeric_fields_are_valid_in_form() -> None:
             assert dataset.optional_float is None
         finally:
             dialog.deleteLater()
+
+
+def _get_widget(layout: DataSetEditLayout, name: str):
+    """Return the terminal widget of the data item named ``name``"""
+    return next(
+        widget
+        for widget in layout.get_terminal_widgets()
+        if widget.item.item.get_name() == name
+    )
+
+
+@pytest.mark.parametrize("name", ["optional_int", "optional_float"])
+@pytest.mark.parametrize("text", ["abc", "1/0", "1e"])
+def test_malformed_optional_numeric_input_is_invalid(name: str, text: str) -> None:
+    """Malformed nonempty input in an optional numeric field blocks the form"""
+    with qt_app_context():
+        dialog = QW.QDialog()
+        dataset = _OptionalNumbersDataSet()
+        layout = DataSetEditLayout(dialog, dataset, QW.QGridLayout(dialog))
+        try:
+            widget = _get_widget(layout, name)
+            widget.edit.setText(text)
+            assert widget.check() is False
+            assert layout.check_all_values() is False
+            widget.edit.setText("   ")
+            assert widget.check() is True
+            assert layout.check_all_values() is True
+        finally:
+            dialog.deleteLater()
+
+
+def test_display_callback_ignores_malformed_optional_numeric_input() -> None:
+    """Only empty or valid input triggers the display callback"""
+    values = []
+
+    class _CallbackDataSet(DataSet):
+        """Dataset with an optional numeric item having a display callback"""
+
+        value = IntItem("Value", default=None, allow_none=True).set_prop(
+            "display", callback=lambda _instance, _item, value: values.append(value)
+        )
+
+    with qt_app_context():
+        dialog = QW.QDialog()
+        dataset = _CallbackDataSet()
+        layout = DataSetEditLayout(dialog, dataset, QW.QGridLayout(dialog))
+        try:
+            widget = _get_widget(layout, "value")
+            values.clear()
+            widget.edit.setText("abc")
+            assert not values
+            widget.edit.setText("3")
+            widget.edit.setText("")
+            assert values == [3, None]
+        finally:
+            dialog.deleteLater()
