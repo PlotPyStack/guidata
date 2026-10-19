@@ -1086,6 +1086,9 @@ class SliderWidget(HLayoutMixin, LineEditWidget):
                 self._connect_slider_gesture()
             self.slider.blockSignals(True)
             self.slider.setRange(0, min(self._slider_steps, 2**31 - 1))
+            value = self.item.from_string(str(self.edit.text()))
+            if isinstance(value, self.DATA_TYPE) and math.isfinite(value):
+                self.slider.setValue(self.value_to_slider(value))
             self.slider.blockSignals(False)
         if self.slider is not None:
             # Showing a slider before its layout is installed opens it as a window
@@ -1884,7 +1887,12 @@ class _HistogramCanvas(QWidget):
                     QPointF(x, bounds.bottom()), QPointF(x, bounds.bottom() - height)
                 )
 
-        if self.minimum < self.maximum and self.presentation == "range":
+        finite_selection = (
+            math.isfinite(self.minimum)
+            and math.isfinite(self.maximum)
+            and self.minimum < self.maximum
+        )
+        if finite_selection and self.presentation == "range":
             left = (
                 bounds.left()
                 + _range_fraction(self.minimum, domain_min, domain_max) * bounds.width()
@@ -1907,7 +1915,7 @@ class _HistogramCanvas(QWidget):
                 painter.drawLine(
                     QPointF(position, bounds.top()), QPointF(position, bounds.bottom())
                 )
-        elif self.minimum < self.maximum:
+        elif finite_selection:
             points = []
             for x_value in (domain_min, self.minimum, self.maximum, domain_max):
                 clipped_x = min(max(x_value, domain_min), domain_max)
@@ -2111,7 +2119,13 @@ class HistogramRangeWidget(AbstractDataSetWidget):
         candidate = math.nextafter(value, -math.inf)
         return candidate if math.isfinite(candidate) else None
 
-    def _set_range(self, minimum: float, maximum: float) -> None:
+    def _set_range(
+        self,
+        minimum: float,
+        maximum: float,
+        *,
+        preserve_maximum: bool = False,
+    ) -> None:
         if self.build_mode or not self._can_edit():
             self._sync_controls()
             return
@@ -2121,11 +2135,18 @@ class HistogramRangeWidget(AbstractDataSetWidget):
         minimum_width = self._minimum_width()
         width = maximum - minimum
         if maximum <= minimum or (math.isfinite(width) and width < minimum_width):
-            expanded_maximum = self._increase(minimum)
-            if expanded_maximum is None:
-                self._sync_controls()
-                return
-            maximum = expanded_maximum
+            if preserve_maximum:
+                reduced_minimum = self._decrease(maximum)
+                if reduced_minimum is None:
+                    self._sync_controls()
+                    return
+                minimum = reduced_minimum
+            else:
+                expanded_maximum = self._increase(minimum)
+                if expanded_maximum is None:
+                    self._sync_controls()
+                    return
+                maximum = expanded_maximum
         if (minimum, maximum) == self._range():
             self._sync_controls()
             return
@@ -2147,11 +2168,8 @@ class HistogramRangeWidget(AbstractDataSetWidget):
         domain_min, domain_max = self._domain()
         minimum = _range_value(domain_min, domain_max, position / self._RANGE_STEPS)
         _, maximum = self._range()
-        if maximum <= minimum:
-            maximum = self._increase(minimum)
-            if maximum is None:
-                self._sync_controls()
-                return
+        if not math.isfinite(maximum):
+            maximum = domain_max
         self._set_range(minimum, maximum)
 
     def _maximum_slider_changed(self, position: int) -> None:
@@ -2160,18 +2178,17 @@ class HistogramRangeWidget(AbstractDataSetWidget):
         domain_min, domain_max = self._domain()
         maximum = _range_value(domain_min, domain_max, position / self._RANGE_STEPS)
         minimum, _ = self._range()
-        if minimum >= maximum:
-            minimum = self._decrease(maximum)
-            if minimum is None:
-                self._sync_controls()
-                return
-        self._set_range(minimum, maximum)
+        if not math.isfinite(minimum):
+            minimum = domain_min
+        self._set_range(minimum, maximum, preserve_maximum=True)
 
     def _brightness_changed(self, position: int) -> None:
         if self.build_mode:
             return
         domain_min, domain_max = self._domain()
         minimum, maximum = self._range()
+        if not (math.isfinite(minimum) and math.isfinite(maximum)):
+            minimum, maximum = domain_min, domain_max
         center = _range_value(
             domain_min, domain_max, 1.0 - position / self._PERCENT_STEPS
         )
@@ -2186,6 +2203,8 @@ class HistogramRangeWidget(AbstractDataSetWidget):
             return
         domain_min, domain_max = self._domain()
         minimum, maximum = self._range()
+        if not (math.isfinite(minimum) and math.isfinite(maximum)):
+            minimum, maximum = domain_min, domain_max
         center = 0.5 * minimum + 0.5 * maximum
         domain_half_width = _half_span(domain_min, domain_max)
         if position == 0:
@@ -2208,11 +2227,11 @@ class HistogramRangeWidget(AbstractDataSetWidget):
             self._sync_controls()
             return
         _, maximum = self._range()
-        if maximum <= minimum:
-            maximum = self._increase(minimum)
-            if maximum is None:
-                self._sync_controls()
-                return
+        if minimum == self._minimum:
+            self._sync_controls()
+            return
+        if not math.isfinite(maximum):
+            _, maximum = self._domain()
         self._set_range(minimum, maximum)
 
     def _maximum_edited(self) -> None:
@@ -2222,12 +2241,12 @@ class HistogramRangeWidget(AbstractDataSetWidget):
             self._sync_controls()
             return
         minimum, _ = self._range()
-        if minimum >= maximum:
-            minimum = self._decrease(maximum)
-            if minimum is None:
-                self._sync_controls()
-                return
-        self._set_range(minimum, maximum)
+        if maximum == self._maximum:
+            self._sync_controls()
+            return
+        if not math.isfinite(minimum):
+            minimum, _ = self._domain()
+        self._set_range(minimum, maximum, preserve_maximum=True)
 
     def _apply_named_range(self, name: str) -> None:
         values = _finite_range(self._payload().get(name))
@@ -2237,23 +2256,31 @@ class HistogramRangeWidget(AbstractDataSetWidget):
     def _sync_controls(self) -> None:
         minimum, maximum = self._range()
         domain_min, domain_max = self._domain()
-        center = 0.5 * minimum + 0.5 * maximum
-        brightness = round(
-            self._PERCENT_STEPS
-            * (1.0 - _range_fraction(center, domain_min, domain_max))
-        )
-        width_ratio = _width_ratio(minimum, maximum, domain_min, domain_max)
-        if width_ratio <= 0.0:
-            contrast = float(self._PERCENT_STEPS)
-        elif width_ratio < 1.0:
-            contrast = self._PERCENT_STEPS - 50.0 * width_ratio
+        if math.isfinite(minimum) and math.isfinite(maximum):
+            center = 0.5 * minimum + 0.5 * maximum
+            brightness = round(
+                self._PERCENT_STEPS
+                * (1.0 - _range_fraction(center, domain_min, domain_max))
+            )
+            width_ratio = _width_ratio(minimum, maximum, domain_min, domain_max)
+            if width_ratio <= 0.0:
+                contrast = float(self._PERCENT_STEPS)
+            elif width_ratio < 1.0:
+                contrast = self._PERCENT_STEPS - 50.0 * width_ratio
+            else:
+                contrast = 50.0 / width_ratio
         else:
-            contrast = 50.0 / width_ratio
-        minimum_position = round(
-            self._RANGE_STEPS * _range_fraction(minimum, domain_min, domain_max)
+            brightness = 50
+            contrast = 50.0
+        minimum_position = (
+            round(self._RANGE_STEPS * _range_fraction(minimum, domain_min, domain_max))
+            if math.isfinite(minimum)
+            else (self._RANGE_STEPS if minimum > 0 else 0)
         )
-        maximum_position = round(
-            self._RANGE_STEPS * _range_fraction(maximum, domain_min, domain_max)
+        maximum_position = (
+            round(self._RANGE_STEPS * _range_fraction(maximum, domain_min, domain_max))
+            if math.isfinite(maximum)
+            else (0 if maximum < 0 else self._RANGE_STEPS)
         )
         controls = (
             (self.minimum_slider, minimum_position),
@@ -2289,8 +2316,10 @@ class HistogramRangeWidget(AbstractDataSetWidget):
         self.build_mode = True
         try:
             minimum_field, maximum_field = self._field_names()
-            self._minimum = float(getattr(self.item.instance, minimum_field))
-            self._maximum = float(getattr(self.item.instance, maximum_field))
+            raw_min = getattr(self.item.instance, minimum_field)
+            raw_max = getattr(self.item.instance, maximum_field)
+            self._minimum = math.nan if raw_min is None else float(raw_min)
+            self._maximum = math.nan if raw_max is None else float(raw_max)
             self._sync_controls()
             self.set_state()
         finally:
@@ -2310,7 +2339,7 @@ class HistogramRangeWidget(AbstractDataSetWidget):
 
     def check(self) -> bool:
         """Validate both linked fields, including those hidden from the form."""
-        if not self.is_active() or self.is_readonly():
+        if not self._can_edit():
             return True
         minimum, maximum = self._range()
         return (

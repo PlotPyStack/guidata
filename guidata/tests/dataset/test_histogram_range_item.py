@@ -171,15 +171,19 @@ def test_histogram_range_widget_is_read_only_inside_show_group():
 
 
 def test_histogram_range_widget_honors_inactive_payload():
-    """A constant or empty source disables the complete editor."""
+    """A constant or empty source disables the complete editor without blocking OK."""
     with qt_app_context():
         parent = QWidget()
         param = make_parameters()
+        param.minimum = 5.0
+        param.maximum = 5.0
         param.histogram["active"] = False
         editor = DataSetEditLayout(parent, param, QGridLayout(parent))
         widget = editor.widgets[0]
         assert isinstance(widget, HistogramRangeWidget)
         assert not widget.group.isEnabled()
+        assert widget.check()
+        assert editor.check_all_values()
         parent.close()
 
 
@@ -189,13 +193,15 @@ def test_histogram_range_widget_requires_rendering_context():
         parent = QWidget()
         param = Parameters()
         param.minimum = 10.0
-        param.maximum = 20.0
+        param.maximum = 10.0
         editor = DataSetEditLayout(parent, param, QGridLayout(parent))
         widget = editor.widgets[0]
         assert isinstance(widget, HistogramRangeWidget)
         assert widget.minimum_edit.text() == "10"
-        assert widget.maximum_edit.text() == "20"
+        assert widget.maximum_edit.text() == "10"
         assert not widget.group.isEnabled()
+        assert widget.check()
+        assert editor.check_all_values()
         parent.close()
 
 
@@ -519,10 +525,85 @@ def test_histogram_range_canvas_paints_every_branch(factory):
         for payload, minimum, maximum in (
             (widget._payload(), *widget._range()),
             (widget._payload(), 1.0, 1.0),
+            (widget._payload(), -math.inf, math.inf),
             ({"domain": [1.0, 0.0]}, 0.0, 1.0),
         ):
             canvas.set_data(payload, minimum, maximum)
             assert not canvas.grab().isNull()
+        parent.close()
+
+
+def test_histogram_range_widget_maximum_respects_minimum_width():
+    """Lowering maximum within minimum_width pushes minimum down instead of snapping."""
+    with qt_app_context():
+        parent = QWidget()
+        param = make_parameters()
+        param.minimum = 20.0
+        param.maximum = 50.0
+        param.histogram.update(domain=[0.0, 100.0], minimum_width=10.0)
+        editor = DataSetEditLayout(parent, param, QGridLayout(parent))
+        widget = editor.widgets[0]
+        assert isinstance(widget, HistogramRangeWidget)
+
+        widget.maximum_edit.setText("25")
+        widget.maximum_edit.editingFinished.emit()
+        assert widget._range() == (15.0, 25.0)
+
+        widget.maximum_slider.setValue(200)
+        assert widget._range() == (10.0, 20.0)
+
+        param.histogram["minimum_width"] = 0.04
+        widget._set_range(0.10, 0.20)
+        widget.maximum_edit.setText("0.11")
+        widget.maximum_edit.editingFinished.emit()
+        assert widget._range() == (0.07, 0.11)
+        parent.close()
+
+
+@pytest.mark.parametrize(
+    "bounds",
+    [
+        (None, None),
+        (math.nan, 10.0),
+        (-math.inf, math.inf),
+    ],
+)
+def test_histogram_range_widget_handles_non_finite_and_none_bounds(bounds):
+    """Non-finite or None initial bounds do not crash sync and remain recoverable."""
+
+    class OptionalRange(gds.DataSet):
+        minimum = gds.FloatItem(
+            "Minimum", default=bounds[0], allow_none=True, check=False
+        ).set_prop("display", hide=True)
+        maximum = gds.FloatItem(
+            "Maximum", default=bounds[1], allow_none=True, check=False
+        ).set_prop("display", hide=True)
+        histogram = gds.HistogramRangeItem(
+            "Range",
+            "minimum",
+            "maximum",
+            default={
+                "counts": [1, 2, 1],
+                "domain": [0.0, 10.0],
+                "minimum_width": 0.5,
+                "active": True,
+                "auto_range": [2.0, 8.0],
+            },
+        ).set_prop("display", presentation="brightness_contrast")
+
+    with qt_app_context():
+        parent = QWidget()
+        param = OptionalRange()
+        editor = DataSetEditLayout(parent, param, QGridLayout(parent))
+        widget = editor.widgets[0]
+        assert isinstance(widget, HistogramRangeWidget)
+        assert not widget.check()
+        assert not editor.check_all_values()
+
+        widget.minimum_slider.setValue(100)
+        assert widget._range() == (1.0, 10.0)
+        assert widget.check()
+        assert editor.check_all_values()
         parent.close()
 
 

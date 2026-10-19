@@ -208,17 +208,42 @@ def test_dynamic_bounds_and_extreme_values():
         field.build_mode = False
         assert field.slider.value() == 43
         assert float(field.edit.text()) == param.value
+        param.upper = 20.0
+        field.get()
+        assert field.slider.value() == 21
+        assert float(field.edit.text()) == param.value
         param.locked = True
         field.set_state()
         assert field.slider.isHidden()
         param.locked = False
         field.set_state()
         assert not field.slider.isHidden()
+        assert field.slider.value() == 21
         param.upper = None
         field.get()
         assert field.slider.isHidden()
         assert float(field.edit.text()) == param.value
         parent.close()
+
+        locked_parent = QWidget()
+        locked_param = Dynamic()
+        locked_param.lower, locked_param.upper = 0.0, 10.0
+        locked_param.value = 5.0
+        locked_param.locked = True
+        locked_editor = DataSetEditLayout(
+            locked_parent,
+            locked_param,
+            QGridLayout(locked_parent),
+            auto_sliders=True,
+            slider_steps=200,
+        )
+        locked_field = locked_editor.widgets[0]
+        assert locked_field.slider is None
+        locked_param.locked = False
+        locked_field.set_state()
+        assert locked_field.slider is not None
+        assert locked_field.slider.value() == 100
+        locked_parent.close()
 
 
 def test_authored_sliders_and_nonzero_fallback():
