@@ -6,7 +6,7 @@
 
 ### Technology Stack
 
-- **Python**: 3.9+ (`from __future__ import annotations`)
+- **Python**: 3.10+ (`from __future__ import annotations`)
 - **Core**: NumPy (≥1.22), h5py (≥3.6), QtPy (≥1.9)
 - **GUI**: Qt via QtPy (PyQt5/PyQt6/PySide6)
 - **Testing**: pytest

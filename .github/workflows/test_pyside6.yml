@@ -22,7 +22,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.9", "3.11", "3.14"]
+        python-version: ["3.10", "3.11", "3.14"]
 
     steps:
     - uses: actions/checkout@v7
@@ -36,7 +36,8 @@ jobs:
         /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -screen 0 1920x1200x24 -ac +extension GLX
         python -m pip install --upgrade pip
         python -m pip install ruff pytest
-        pip install PySide6
+        # PySide6 6.12.0 drops a reference to None on each void call: fatal before Python 3.12
+        pip install "PySide6!=6.12.0; python_version < '3.12'" "PySide6; python_version >= '3.12'"
         pip install .
     - name: Lint with Ruff
       run: ruff check --output-format=github guidata
