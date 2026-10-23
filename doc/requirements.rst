@@ -8,7 +8,7 @@ The `guidata` package requires the following Python modules:
       - Version
       - Summary
     * - Python
-      - >=3.9, <4
+      - >=3.10, <4
       - Python programming language
     * - h5py
       - >= 3.6

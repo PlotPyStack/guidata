@@ -1,5 +1,9 @@
 # Version 3.16 #
 
+## Unreleased ##
+
+* Python 3.10 or later is now required. Python 3.9 users must keep an earlier compatible release.
+
 ## guidata Version 3.16.0 ##
 
 ✨ New features:
