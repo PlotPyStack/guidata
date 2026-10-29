@@ -4,6 +4,10 @@
 
 * Python 3.10 or later is now required. Python 3.9 users must keep an earlier compatible release.
 
+🛠 Bug fixes:
+
+* **Application startup blocked by a corrupted translation file** — when a `.mo` translation catalog was corrupted or unreadable (e.g. truncated during installation), importing guidata failed with an error such as `OSError: Bad magic number`. The same applied to any application relying on `guidata.configtools.get_translation`, like PlotPy, Sigima or DataLab, so the application could not start at all. The interface now falls back to English, and a `RuntimeWarning` identifies the faulty catalog (fixes [Issue #119](https://github.com/PlotPyStack/guidata/issues/119)).
+
 ## guidata Version 3.16.0 ##
 
 ✨ New features:

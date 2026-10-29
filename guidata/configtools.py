@@ -39,6 +39,7 @@ from __future__ import annotations
 import gettext
 import os
 import os.path as osp
+import struct
 import sys
 import warnings
 from collections.abc import Callable
@@ -83,6 +84,13 @@ def get_module_data_path(modname: str, relpath: str | None = None) -> str:
 def get_translation(modname: str, dirname: str | None = None) -> Callable[[str], str]:
     """Return translation callback for module *modname*
 
+    If no translation catalog is available for the current language, the
+    returned callback leaves strings untranslated (English). If a catalog exists
+    but is corrupted or unreadable, the callback also leaves strings
+    untranslated, and a :class:`RuntimeWarning` is emitted instead of raising
+    an exception: a translation problem never prevents the application from
+    starting.
+
     Args:
         modname (str): module name
         dirname (str): module directory
@@ -98,7 +106,19 @@ def get_translation(modname: str, dirname: str | None = None) -> Callable[[str],
         if lang is not None:
             os.environ["LANG"] = lang
     modlocpath = get_module_locale_path(dirname)
-    return gettext.translation(modname, modlocpath, fallback=True).gettext
+    try:
+        translation = gettext.translation(modname, modlocpath, fallback=True)
+    except (OSError, struct.error, ValueError, LookupError) as exc:
+        # `fallback=True` only covers missing catalogs: a corrupted or unreadable
+        # catalog must not prevent the application from starting
+        warnings.warn(
+            f"Unable to load {modname!r} translations from {modlocpath!r} "
+            f"({type(exc).__name__}: {exc}): falling back to English",
+            RuntimeWarning,
+            stacklevel=2,
+        )
+        translation = gettext.NullTranslations()
+    return translation.gettext
 
 
 def get_module_locale_path(modname: str) -> str:
