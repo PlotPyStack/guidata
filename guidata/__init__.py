@@ -86,6 +86,73 @@ def _configure_high_dpi():
         )
 
 
+#: Widget classes which may receive a specific font from the Qt platform theme
+#: (see ``QApplicationPrivate::initializeWidgetFontHash`` in Qt 5.15)
+_QT5_THEME_FONT_CLASSES = (
+    "QMenu",
+    "QMenuBar",
+    "QMenuItem",
+    "QMessageBox",
+    "QLabel",
+    "QTipLabel",
+    "QTitleBar",
+    "QStatusBar",
+    "QMdiSubWindowTitleBar",
+    "QDockWidgetTitle",
+    "QPushButton",
+    "QCheckBox",
+    "QRadioButton",
+    "QToolButton",
+    "QAbstractItemView",
+    "QListView",
+    "QHeaderView",
+    "QListBox",
+    "QComboMenuItem",
+    "QComboLineEdit",
+    "QSmallFont",
+    "QMiniFont",
+)
+
+
+def _configure_default_font(app) -> None:
+    """Use the Windows message font as default font with Qt5 on Windows.
+
+    Qt5 takes its default font from the legacy ``DEFAULT_GUI_FONT`` stock object
+    ("MS Shell Dlg 2", 8pt), whose pixel size ignores the display scaling: with a
+    scaling factor of 125%, widgets using the default font show text which is not
+    scaled (labels, buttons, dataset editors, ...), unlike menus or status bars.
+    Qt6 uses the message font of the system instead (typically "Segoe UI", 9pt,
+    see QTBUG-58610), which follows the display scaling and the Windows text size
+    setting. This function applies the Qt6 behavior to Qt5.
+
+    Must be called right after QApplication creation, before creating widgets.
+
+    Args:
+        app: QApplication instance
+    """
+    import sys
+
+    from qtpy import QT5
+    from qtpy.QtWidgets import QApplication
+
+    if not QT5 or sys.platform != "win32":
+        return
+    default_font = app.font()
+    message_font = app.font("QMessageBox")
+    if message_font == default_font:
+        return
+    # Setting the application font clears the fonts set by the platform theme for
+    # specific widget classes (menus, status bar, item views, ...): restore them.
+    class_fonts = {}
+    for class_name in _QT5_THEME_FONT_CLASSES:
+        font = app.font(class_name)
+        if font != default_font:
+            class_fonts[class_name] = font
+    QApplication.setFont(message_font)
+    for class_name, font in class_fonts.items():
+        QApplication.setFont(font, class_name)
+
+
 def qapplication():
     """
     Return QApplication instance
@@ -98,6 +165,7 @@ def qapplication():
         _configure_fontdir()
         _configure_high_dpi()
         app = QApplication([])
+        _configure_default_font(app)
         install_translator(app)
         from guidata import qthelpers
 
