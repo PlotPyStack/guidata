@@ -4,6 +4,10 @@
 
 * Python 3.10 or later is now required. Python 3.9 users must keep an earlier compatible release.
 
+✨ New features:
+
+* **`get_pixmap` — sharp images with display scaling** — the new `guidata.configtools.get_pixmap` function loads an image as a pixmap at the resolution of the display: when the display scaling is greater than 100% (e.g. 125%, 150%), the high-resolution variants of the image following Qt's `@Nx` naming convention (e.g. `logo@2x.png` next to `logo.png`) are used, so that the image remains sharp instead of being upscaled. `get_image_label` (and thus `get_image_layout`) now relies on it.
+
 🛠 Bug fixes:
 
 * **Application startup blocked by a corrupted translation file** — when a `.mo` translation catalog was corrupted or unreadable (e.g. truncated during installation), importing guidata failed with an error such as `OSError: Bad magic number`. The same applied to any application relying on `guidata.configtools.get_translation`, like PlotPy, Sigima or DataLab, so the application could not start at all. The interface now falls back to English, and a `RuntimeWarning` identifies the faulty catalog (fixes [Issue #119](https://github.com/PlotPyStack/guidata/issues/119)).
