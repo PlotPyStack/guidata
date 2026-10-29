@@ -14,6 +14,8 @@ Access configured options
 
 .. autofunction:: get_image_file_path
 
+.. autofunction:: get_pixmap
+
 .. autofunction:: get_image_label
 
 .. autofunction:: get_image_layout
@@ -253,6 +255,64 @@ def get_icon(name: str, default: str = "not_found.png") -> QG.QIcon:
         return icon
 
 
+def get_pixmap(
+    name: str,
+    default: str | None = "not_found.png",
+    device_pixel_ratio: float | None = None,
+) -> QG.QPixmap:
+    """
+    Construct a QPixmap from the image file with specified name, taking into
+    account the device pixel ratio (high-DPI displays, display scaling).
+
+    The pixmap has the logical size of the image file. When the device pixel ratio
+    is greater than 1, the high-resolution variants of the image following Qt's
+    ``@Nx`` naming convention (e.g. ``logo@2x.png`` next to ``logo.png``) are used,
+    if any: the smallest variant covering the device pixel ratio (or the largest
+    one) is resampled to the device resolution, so that the image remains sharp.
+    Without variants, the image is returned as is (and is upscaled by Qt).
+
+    Args:
+        name: name of the image (or absolute path to the image file)
+        default: default image name. Defaults to "not_found.png". If None,
+         a RuntimeError is raised when the image is not found.
+        device_pixel_ratio: device pixel ratio. Defaults to None (i.e. the highest
+         device pixel ratio of the screens, like for icons)
+
+    Returns:
+        Pixmap
+    """
+    # Importing Qt here because this module should be independent from it
+    from qtpy import QtCore as QC  # pylint: disable=import-outside-toplevel
+    from qtpy import QtGui as QG  # pylint: disable=import-outside-toplevel
+
+    path = get_image_file_path(name, default)
+    pixmap = QG.QPixmap(path)
+    if device_pixel_ratio is None:
+        device_pixel_ratio = QG.QGuiApplication.instance().devicePixelRatio()
+    if pixmap.isNull() or device_pixel_ratio <= 1.0:
+        return pixmap
+    root, ext = osp.splitext(path)
+    source_path = None
+    for factor in range(2, 10):
+        variant_path = f"{root}@{factor}x{ext}"
+        if osp.isfile(variant_path):
+            source_path = variant_path
+            if factor >= device_pixel_ratio:
+                break
+    source = QG.QPixmap() if source_path is None else QG.QPixmap(source_path)
+    if source.isNull():
+        return pixmap
+    size = QC.QSize(
+        round(pixmap.width() * device_pixel_ratio),
+        round(pixmap.height() * device_pixel_ratio),
+    )
+    hidpi_pixmap = source.scaled(
+        size, QC.Qt.IgnoreAspectRatio, QC.Qt.SmoothTransformation
+    )
+    hidpi_pixmap.setDevicePixelRatio(device_pixel_ratio)
+    return hidpi_pixmap
+
+
 def get_image_label(name, default="not_found.png") -> QW.QLabel:
     """
     Construct a QLabel from the file with specified name
@@ -266,12 +326,10 @@ def get_image_label(name, default="not_found.png") -> QW.QLabel:
         QW.QLabel: label
     """
     # Importing Qt here because this module should be independent from it
-    from qtpy import QtGui as QG  # pylint: disable=import-outside-toplevel
     from qtpy import QtWidgets as QW  # pylint: disable=import-outside-toplevel
 
     label = QW.QLabel()
-    pixmap = QG.QPixmap(get_image_file_path(name, default))
-    label.setPixmap(pixmap)
+    label.setPixmap(get_pixmap(name, default))
     return label
 
 
