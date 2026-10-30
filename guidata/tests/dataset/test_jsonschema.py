@@ -681,3 +681,21 @@ def test_display_callback_flag_and_resolution():
 
     # An item without a callback yields an empty mapping (no-op).
     assert resolve_dataset_callbacks(P(), "preview") == {}
+
+
+def test_dict_item_editor_callback_is_not_reactive():
+    """The ``DictItem`` editor callback is not exposed as a reactive callback.
+
+    ``DictItem`` uses its ``display`` callback to open the Qt dictionary
+    editor (with a different signature): it must neither be flagged nor run
+    by the off-GUI callback resolution.
+    """
+
+    class P(gds.DataSet):
+        meta = gds.DictItem("Meta", default={"k": 1})
+
+    props = dataset_to_schema(P)["properties"]
+    assert "x-guidata-has-callback" not in props["meta"]
+    payload = dataset_to_schema_with_values(P())
+    assert payload["values"]["meta"] == {"k": 1}
+    assert resolve_dataset_callbacks(P(), "meta") == {}

@@ -84,7 +84,7 @@ import datetime
 import inspect
 import mimetypes
 import os
-from collections.abc import Collection
+from collections.abc import Callable, Collection
 from typing import TYPE_CHECKING, Any
 
 import guidata.dataset.dataitems as gdi
@@ -227,7 +227,7 @@ def _apply_display_callbacks(instance: gdt.DataSet) -> None:
     """
     for item in instance.get_items():
         try:
-            callback = item.get_prop_value("display", instance, "callback", None)
+            callback = _get_reactive_callback(item, instance)
         except Exception:  # pylint: disable=broad-except
             callback = None
         if callback is None:
@@ -294,13 +294,14 @@ def resolve_dataset_callbacks(instance: gdt.DataSet, item_name: str) -> dict[str
     Returns:
         A JSON-serialisable mapping of property name → value for every
         non-group item, reflecting the post-callback state. Empty when
-        the item carries no ``display`` callback.
+        the item carries no reactive ``display`` callback (e.g. a
+        :class:`DictItem`, whose callback opens the Qt dictionary editor).
 
     Raises:
         KeyError: If *item_name* is not an item of *instance*.
     """
     item = _get_item(instance, item_name)
-    callback = item.get_prop_value("display", instance, "callback", None)
+    callback = _get_reactive_callback(item, instance)
     if callback is None:
         return {}
     callback(instance, item, item.get_value(instance))
@@ -762,7 +763,7 @@ def _add_common_keys(item: gdt.DataItem, prop: dict[str, Any], order: int) -> No
     # the read-only ``operation`` preview).  Flag it so the frontend can
     # round-trip through :func:`resolve_dataset_callbacks` on edit,
     # mirroring the Qt ``_display_callback`` cascade.
-    if item.get_prop("display", "callback", None) is not None:
+    if _get_reactive_callback(item) is not None:
         prop["x-guidata-has-callback"] = True
     prop["x-guidata-name"] = name
     prop["x-guidata-order"] = order
@@ -841,3 +842,28 @@ def _get_item(instance: gdt.DataSet, name: str) -> gdt.DataItem:
         if item.get_name() == name:
             return item
     raise KeyError(name)
+
+
+def _get_reactive_callback(
+    item: gdt.DataItem, instance: gdt.DataSet | None = None
+) -> Callable[..., Any] | None:
+    """Return the reactive ``display`` callback of *item*, if any.
+
+    A reactive callback has the ``callback(instance, item, value)`` signature
+    and recomputes sibling items when *item* changes. The ``display`` callback
+    of a :class:`DictItem` is not reactive: it opens the Qt dictionary editor
+    from a button, with a different signature, so it is ignored.
+
+    Args:
+        item: The data item.
+        instance: The :class:`DataSet` instance used to evaluate the callback
+            property, or ``None`` to return the property declared on *item*.
+
+    Returns:
+        The reactive callback, or ``None``.
+    """
+    if isinstance(item, gdi.DictItem):
+        return None
+    if instance is None:
+        return item.get_prop("display", "callback", None)
+    return item.get_prop_value("display", instance, "callback", None)
