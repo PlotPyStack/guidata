@@ -807,17 +807,16 @@ class DateTimeWidget(AbstractDataSetWidget):
         self.dateedit = self.group = QDateTimeEdit()
         self.dateedit.setCalendarPopup(True)
         self.dateedit.setToolTip(item.get_help())
-        self.dateedit.dateTimeChanged.connect(  # type:ignore
-            lambda value: self.notify_value_change()
-        )
+        self.dateedit.dateTimeChanged.connect(self.date_changed)  # type:ignore
         fmt = self.item.get_prop("display", "format", None)
         if fmt:
             qt_fmt = convert_date_format(fmt)
             self.dateedit.setDisplayFormat(qt_fmt)
 
-    def date_changed(self, value):
-        """Date changed"""
-        _display_callback(self, value)
+    def date_changed(self, _value) -> None:
+        """Date/time changed (the ``QDateTime`` argument is ignored: the callback
+        receives the Python value of the widget)"""
+        _display_callback(self, self.value())
         self.notify_value_change()
 
     def get(self) -> None:
