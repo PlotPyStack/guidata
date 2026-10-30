@@ -114,6 +114,7 @@ class AboutInfo:
             Text about this package
         """
         auth, year, org = self.author, self.year, self.organization
+        author, organization = auth, org
         if html:
             author = f"<a href='https://github.com/{auth.replace(' ', '')}'>{auth}</a>"
             organization = f"<a href='https://github.com/{org}'>{org}</a>"
