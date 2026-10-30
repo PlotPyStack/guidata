@@ -645,14 +645,13 @@ msgstr "Le format ({}) est incorrect"
 
 #, python-brace-format
 msgid "Format ({}) should start with '%'"
-msgstr "Le format ({}) ne doit pas commencer par '%'"
+msgstr "Le format ({}) doit commencer par '%'"
 
 msgid "CSV Files"
 msgstr "Fichiers CSV"
 
-#, fuzzy
 msgid "Export dataframe"
-msgstr "DataFrame"
+msgstr "Exporter le DataFrame"
 
 msgid "Import as"
 msgstr "Importer en tant que"
