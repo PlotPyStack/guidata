@@ -16,3 +16,7 @@
 * **Date/time callback never called** — the `display` callback of a `DateTimeItem` was never called when the date or time was changed in a dataset editor, so that the values computed from it were not updated. The callback is now called on each change, with the new value of the item (a `datetime.datetime` object), like for the other items (fixes [Issue #123](https://github.com/PlotPyStack/guidata/issues/123)).
 * **Plain-text "about" information** — `guidata.widgets.about.about(html=False)` (and `AboutInfo.about(html=False)`) failed with `UnboundLocalError` instead of returning the information about the package as plain text (fixes [Issue #123](https://github.com/PlotPyStack/guidata/issues/123)).
 * **French translations of the DataFrame editor** — when entering a number format not starting with `%`, the French error message stated the opposite of the actual rule ("must not start with '%'"), and the title of the export dialog box was shown in English. Both are now correctly translated (fixes [Issue #123](https://github.com/PlotPyStack/guidata/issues/123)).
+
+ℹ️ Other changes:
+
+* **Documentation** — `guidata.dataset.resolve_dataset_active`, which evaluates the active state of the items of a dataset for JSON Schema based frontends, is now documented in the API reference.

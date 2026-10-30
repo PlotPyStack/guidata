@@ -30,6 +30,8 @@ Public API
 
 .. autofunction:: resolve_dataset_callbacks
 
+.. autofunction:: resolve_dataset_active
+
 Output format
 -------------
 
