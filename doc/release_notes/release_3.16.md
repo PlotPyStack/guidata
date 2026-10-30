@@ -1,18 +1,5 @@
 # Version 3.16 #
 
-## Unreleased ##
-
-* Python 3.10 or later is now required. Python 3.9 users must keep an earlier compatible release.
-
-✨ New features:
-
-* **`get_pixmap` — sharp images with display scaling** — the new `guidata.configtools.get_pixmap` function loads an image as a pixmap at the resolution of the display: when the display scaling is greater than 100% (e.g. 125%, 150%), the high-resolution variants of the image following Qt's `@Nx` naming convention (e.g. `logo@2x.png` next to `logo.png`) are used, so that the image remains sharp instead of being upscaled. `get_image_label` (and thus `get_image_layout`) now relies on it.
-
-🛠 Bug fixes:
-
-* **Text not scaled with display scaling on Windows (Qt5)** — with a Windows display scaling greater than 100% (e.g. 125%), the text of most widgets (labels, buttons, data set editors, ...) kept the size it has at 100%, while menus and status bars were scaled, because Qt5 derives its default font from a legacy system font which ignores the display scaling. Applications created with `guidata.qapplication` (or `qt_app_context`) now use the message font of the system as default font (typically "Segoe UI", 9pt), like with Qt6: the text follows the display scaling and the Windows text size setting.
-* **Application startup blocked by a corrupted translation file** — when a `.mo` translation catalog was corrupted or unreadable (e.g. truncated during installation), importing guidata failed with an error such as `OSError: Bad magic number`. The same applied to any application relying on `guidata.configtools.get_translation`, like PlotPy, Sigima or DataLab, so the application could not start at all. The interface now falls back to English, and a `RuntimeWarning` identifies the faulty catalog (fixes [Issue #119](https://github.com/PlotPyStack/guidata/issues/119)).
-
 ## guidata Version 3.16.0 ##
 
 ✨ New features:
