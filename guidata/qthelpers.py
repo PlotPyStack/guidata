@@ -592,20 +592,29 @@ def get_std_icon(name: str, size: int | None = None) -> QG.QIcon:
     Get standard platform icon
     Call 'show_std_icons()' for details
 
+    The icon keeps all the resolutions provided by the platform, so that it stays
+    sharp with display scaling: the widget showing the icon sets its display size
+    (e.g. with ``setIconSize``).
+
     Args:
         name (str): Icon name
-        size (int or None): Size
+        size (int or None): Deprecated and ignored. Freezing the icon to a single
+         size made it blurry when shown larger or with display scaling.
 
     Returns:
         QIcon: Icon
     """
+    if size is not None:
+        warnings.warn(
+            "The 'size' argument of get_std_icon is deprecated and ignored: "
+            "the icon keeps all its resolutions, set the display size on the widget "
+            "showing it instead",
+            DeprecationWarning,
+            stacklevel=2,
+        )
     if not name.startswith("SP_"):
         name = "SP_" + name
-    icon = QW.QWidget().style().standardIcon(getattr(QW.QStyle, name))
-    if size is None:
-        return icon
-    else:
-        return QG.QIcon(icon.pixmap(size, size))
+    return QW.QWidget().style().standardIcon(getattr(QW.QStyle, name))
 
 
 class ShowStdIcons(QW.QWidget):
