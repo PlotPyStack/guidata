@@ -845,7 +845,7 @@ class BaseTableView(QTableView):
             self, _("Copy"), icon=get_icon("editcopy.svg"), triggered=self.copy
         )
         self.edit_action = create_action(
-            self, _("Edit"), icon=get_icon("edit.svg"), triggered=self.edit_item
+            self, _("Edit"), icon=get_icon("guidata:edit.svg"), triggered=self.edit_item
         )
         self.plot_action = create_action(
             self,
@@ -890,7 +890,10 @@ class BaseTableView(QTableView):
         self.minmax_action.setChecked(minmax)
         self.toggle_minmax(minmax)
         self.rename_action = create_action(
-            self, _("Rename"), icon=get_icon("rename.svg"), triggered=self.rename_item
+            self,
+            _("Rename"),
+            icon=get_icon("guidata:rename.svg"),
+            triggered=self.rename_item,
         )
         self.duplicate_action = create_action(
             self,

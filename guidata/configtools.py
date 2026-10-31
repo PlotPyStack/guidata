@@ -34,6 +34,19 @@ Add image paths
 .. autofunction:: add_image_path
 
 .. autofunction:: add_image_module_path
+
+Image names
+^^^^^^^^^^^
+
+Images are designated by their file name (e.g. ``"apply.svg"``), searched in the
+registered image paths: the paths registered last are searched first, so that the
+images of an application take precedence over the images with the same name of the
+libraries it depends on. When several image files match a name, an
+:class:`ImageNameConflictWarning` is emitted: the ``"module:filename"`` syntax (e.g.
+``"guidata:apply.svg"``) designates an image explicitly among the paths registered
+for a module with :func:`add_image_module_path`.
+
+.. autoclass:: ImageNameConflictWarning
 """
 
 from __future__ import annotations
@@ -56,7 +69,17 @@ if TYPE_CHECKING:
 
     from guidata.userconfig import UserConfig
 
-IMG_PATH = []
+IMG_PATH: list[str] = []
+IMG_MODULE_PATH: dict[str, list[str]] = {}
+
+
+class ImageNameConflictWarning(UserWarning):
+    """Warning emitted when several image files match the requested image name.
+
+    The image of the path registered last is used: designate the image explicitly
+    with the ``"module:filename"`` syntax (see :func:`get_image_file_path`) to remove
+    the ambiguity.
+    """
 
 
 def get_module_data_path(modname: str, relpath: str | None = None) -> str:
@@ -138,39 +161,143 @@ def get_module_locale_path(modname: str) -> str:
     return localepath
 
 
+def _get_image_dirs(path: str, subfolders: bool) -> list[str]:
+    """Return an image path and, optionally, its subfolders
+
+    Args:
+        path: image path
+        subfolders: include subfolders
+
+    Returns:
+        Image path, followed by its subfolders if requested
+    """
+    if not isinstance(path, str):
+        path = decode_fs_string(path)
+    paths = [path]
+    if subfolders:
+        for fileobj in os.listdir(path):
+            pth = osp.join(path, fileobj)
+            if osp.isdir(pth):
+                paths.append(pth)
+    return paths
+
+
+def _register_image_dirs(paths: list[str]) -> None:
+    """Register image paths before the paths registered so far
+
+    Args:
+        paths: image paths
+    """
+    IMG_PATH[:] = paths + [pth for pth in IMG_PATH if pth not in paths]
+
+
 def add_image_path(path: str, subfolders: bool = True) -> None:
-    """Append image path (opt. with its subfolders) to global list IMG_PATH
+    """Register image path (opt. with its subfolders) in global list IMG_PATH
+
+    The paths registered last are searched first: the images of an application,
+    registered after the libraries it depends on, take precedence over the library
+    images with the same name.
 
     Args:
         path (str): image path
         subfolders (bool): include subfolders
     """
-    if not isinstance(path, str):
-        path = decode_fs_string(path)
-    global IMG_PATH
-    IMG_PATH.append(path)
-    if subfolders:
-        for fileobj in os.listdir(path):
-            pth = osp.join(path, fileobj)
-            if osp.isdir(pth):
-                IMG_PATH.append(pth)
+    _register_image_dirs(_get_image_dirs(path, subfolders))
 
 
 def add_image_module_path(modname: str, relpath: str, subfolders: bool = True) -> None:
     """
-    Appends image data path relative to a module name.
+    Register image data path relative to a module name.
     Used to add module local data that resides in a module directory
     but will be shipped under sys.prefix / share/ ...
 
     modname must be the name of an already imported module as found in
     sys.modules
 
+    The paths registered last are searched first (see :func:`add_image_path`).
+    The images of these paths may also be designated explicitly with the
+    ``"modname:filename"`` syntax (see :func:`get_image_file_path`): the image file
+    names should therefore be unique among the paths registered for a module.
+
     Args:
         modname (str): module name
         relpath (str): relative path to module data directory
         subfolders (bool): include subfolders
     """
-    add_image_path(get_module_data_path(modname, relpath=relpath), subfolders)
+    paths = _get_image_dirs(get_module_data_path(modname, relpath=relpath), subfolders)
+    _register_image_dirs(paths)
+    module_paths = IMG_MODULE_PATH.setdefault(modname, [])
+    module_paths.extend(pth for pth in paths if pth not in module_paths)
+
+
+def _split_module_name(name: str) -> tuple[str | None, str]:
+    """Split an image name into module name and file name
+
+    Args:
+        name: image name, optionally qualified with the ``"module:filename"`` syntax
+
+    Returns:
+        Module name (None if the image name is not qualified) and file name
+    """
+    module, sep, filename = name.partition(":")
+    if (
+        sep
+        and not osp.isabs(name)
+        and all(part.isidentifier() for part in module.split("."))
+    ):
+        return module, filename
+    return None, name
+
+
+def _find_image_files(name: str) -> list[str]:
+    """Return the image files matching an image name, by decreasing precedence
+
+    Args:
+        name: image name, optionally qualified with the ``"module:filename"`` syntax
+
+    Returns:
+        Absolute paths of the matching image files
+    """
+    if osp.isabs(name):
+        return [name] if osp.isfile(name) else []
+    module, filename = _split_module_name(name)
+    paths = IMG_PATH if module is None else IMG_MODULE_PATH.get(module, [])
+    found: list[str] = []
+    for pth in paths:
+        full_path = osp.abspath(osp.join(pth, filename))
+        if osp.isfile(full_path) and all(
+            osp.normcase(full_path) != osp.normcase(fpath) for fpath in found
+        ):
+            found.append(full_path)
+    return found
+
+
+_WARNED_IMAGE_NAMES: set[str] = set()
+
+
+def _warn_image_name_conflict(name: str, paths: list[str]) -> None:
+    """Warn (once per image name) that several image files match an image name
+
+    Args:
+        name: image name
+        paths: absolute paths of the matching image files, by decreasing precedence
+    """
+    if name in _WARNED_IMAGE_NAMES:
+        return
+    _WARNED_IMAGE_NAMES.add(name)
+    module = "module"
+    for modname, module_paths in IMG_MODULE_PATH.items():
+        if osp.normcase(osp.dirname(paths[0])) in map(osp.normcase, module_paths):
+            module = modname
+            break
+    _module, filename = _split_module_name(name)
+    example = f"{module}:{osp.basename(filename)}"
+    warnings.warn(
+        f"Several image files match {name!r}: {', '.join(paths)}. Using {paths[0]}. "
+        f"Designate the image explicitly (e.g. {example!r}) to remove this ambiguity.",
+        ImageNameConflictWarning,
+        stacklevel=3,
+    )
 
 
 def get_image_file_path(name: str, default: str = "not_found.svg") -> str:
@@ -178,12 +305,19 @@ def get_image_file_path(name: str, default: str = "not_found.svg") -> str:
     Return the absolute path to image with specified name
     name, default: filenames with extensions
 
+    The image paths registered last are searched first (see :func:`add_image_path`).
+    When several image files match the name, the first one is returned and an
+    :class:`ImageNameConflictWarning` is emitted (once per name): the image may be
+    designated explicitly with the ``"module:filename"`` syntax, e.g.
+    ``"guidata:apply.svg"``, which searches only the paths registered for this module
+    with :func:`add_image_module_path`.
+
     When a ``.png`` image is not found, the ``.svg`` image with the same name is
     returned, if any: icons were formerly provided as PNG files, so that code
     requesting their former names keeps working.
 
     Args:
-        name (str): name of the image
+        name (str): name of the image (optionally ``"module:filename"``)
         default (str): default image name. Defaults to "not_found.svg".
 
     Raises:
@@ -192,10 +326,11 @@ def get_image_file_path(name: str, default: str = "not_found.svg") -> str:
     Returns:
         str: absolute path to image
     """
-    for pth in IMG_PATH:
-        full_path = osp.join(pth, name)
-        if osp.isfile(full_path):
-            return osp.abspath(full_path)
+    found = _find_image_files(name)
+    if found:
+        if len(found) > 1:
+            _warn_image_name_conflict(name, found)
+        return found[0]
     root, ext = osp.splitext(name)
     if ext.lower() == ".png":
         try:
@@ -208,7 +343,7 @@ def get_image_file_path(name: str, default: str = "not_found.svg") -> str:
         except RuntimeError:
             raise RuntimeError("Image file %r not found" % name)
     else:
-        raise RuntimeError()
+        raise RuntimeError("Image file %r not found" % name)
 
 
 ICON_CACHE = {}

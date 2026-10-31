@@ -94,7 +94,7 @@ def test_get_pixmap_svg(tmp_path) -> None:
 def test_get_pixmap_icon() -> None:
     """Test that guidata's SVG icons are rendered at the device resolution"""
     with qt_app_context():
-        pixmap = get_pixmap("apply.svg", default=None, device_pixel_ratio=2.0)
+        pixmap = get_pixmap("guidata:apply.svg", default=None, device_pixel_ratio=2.0)
         assert pixmap.size() == QC.QSize(32, 32)
         assert pixmap.devicePixelRatio() == pytest.approx(2.0)
 

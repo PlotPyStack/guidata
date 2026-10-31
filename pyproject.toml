@@ -83,6 +83,8 @@ version = { attr = "guidata.__version__" }
 [tool.pytest.ini_options]
 addopts = "guidata --import-mode=importlib"
 # addopts = "guidata --import-mode=importlib --show-windows"  # Disable offscreen mode
+# Ambiguous image names must be designated explicitly ("module:filename")
+filterwarnings = ["error::guidata.configtools.ImageNameConflictWarning"]
 
 [tool.ruff]
 exclude = [".git", ".vscode", "build", "dist", "guidata/external","venv*",".venv*"]
