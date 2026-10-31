@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <!-- SPDX-License-Identifier: BSD-3-Clause -->
+  <title>Reload</title>
+  <desc>Two clockwise arrows for SP_BrowserReload.</desc>
+  <path d="M5 13A11.5 11.5 0 0 1 25 8" fill="none" stroke="#379448" stroke-width="4" stroke-linecap="round"/>
+  <path d="M28 3V13H18Z" fill="#379448"/>
+  <path d="M27 19A11.5 11.5 0 0 1 7 24" fill="none" stroke="#379448" stroke-width="4" stroke-linecap="round"/>
+  <path d="M4 29V19H14Z" fill="#379448"/>
+</svg>

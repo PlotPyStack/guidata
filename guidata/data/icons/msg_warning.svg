@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <!-- SPDX-License-Identifier: BSD-3-Clause -->
+  <title>Warning</title>
+  <desc>Scalable warning symbol for SP_MessageBoxWarning.</desc>
+  <path d="M14.3 3.4C15.1 2 16.9 2 17.7 3.4L29.8 25C30.7 26.6 29.5 28.5 27.7 28.5H4.3C2.5 28.5 1.3 26.6 2.2 25Z" fill="#ffd34f" stroke="#a97716" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M14 10H18L17.4 20H14.6Z" fill="#332b1d"/>
+  <circle cx="16" cy="24" r="2" fill="#332b1d"/>
+</svg>
