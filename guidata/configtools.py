@@ -44,7 +44,9 @@ images of an application take precedence over the images with the same name of t
 libraries it depends on. When several image files match a name, an
 :class:`ImageNameConflictWarning` is emitted: the ``"module:filename"`` syntax (e.g.
 ``"guidata:apply.svg"``) designates an image explicitly among the paths registered
-for a module with :func:`add_image_module_path`.
+for a module with :func:`add_image_module_path`. If the image is not found there,
+the part after the colon is taken as a path relative to the directory of the
+module's package (``"package:path"`` syntax, e.g. ``"my_plugin:icons/logo.svg"``).
 
 .. autoclass:: ImageNameConflictWarning
 """
@@ -52,6 +54,7 @@ for a module with :func:`add_image_module_path`.
 from __future__ import annotations
 
 import gettext
+import importlib
 import os
 import os.path as osp
 import struct
@@ -249,11 +252,32 @@ def _split_module_name(name: str) -> tuple[str | None, str]:
     return None, name
 
 
+def _get_package_dir(module: str) -> str | None:
+    """Return the directory of a module's package (importing the module if needed)
+
+    Args:
+        module: module name
+
+    Returns:
+        Directory of the package (or of the module), or None if the module cannot
+        be imported or has no location
+    """
+    try:
+        mod = sys.modules.get(module) or importlib.import_module(module)
+    except ImportError:
+        return None
+    if getattr(mod, "__file__", None) is not None:
+        return osp.dirname(osp.abspath(mod.__file__))
+    paths = list(getattr(mod, "__path__", []))  # Namespace package
+    return osp.abspath(paths[0]) if paths else None
+
+
 def _find_image_files(name: str) -> list[str]:
     """Return the image files matching an image name, by decreasing precedence
 
     Args:
-        name: image name, optionally qualified with the ``"module:filename"`` syntax
+        name: image name, optionally qualified with the ``"module:filename"`` (or
+         ``"module:path"``) syntax
 
     Returns:
         Absolute paths of the matching image files
@@ -269,6 +293,13 @@ def _find_image_files(name: str) -> list[str]:
             osp.normcase(full_path) != osp.normcase(fpath) for fpath in found
         ):
             found.append(full_path)
+    if not found and module is not None:
+        parts = filename.replace("\\", "/").split("/")
+        package_dir = _get_package_dir(module)
+        if package_dir is not None and all(part not in ("", "..") for part in parts):
+            full_path = osp.join(package_dir, *parts)
+            if osp.isfile(full_path):
+                found.append(full_path)
     return found
 
 
@@ -310,7 +341,9 @@ def get_image_file_path(name: str, default: str = "not_found.svg") -> str:
     :class:`ImageNameConflictWarning` is emitted (once per name): the image may be
     designated explicitly with the ``"module:filename"`` syntax, e.g.
     ``"guidata:apply.svg"``, which searches only the paths registered for this module
-    with :func:`add_image_module_path`.
+    with :func:`add_image_module_path`. If the image is not found there, the part
+    after the colon is taken as a path relative to the directory of the module's
+    package (``"package:path"`` syntax, e.g. ``"my_plugin:icons/logo.svg"``).
 
     When a ``.png`` image is not found, the ``.svg`` image with the same name is
     returned, if any: icons were formerly provided as PNG files, so that code
