@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <!-- SPDX-License-Identifier: BSD-3-Clause -->
+  <title>Open folder</title>
+  <desc>Open folder for SP_DirOpenIcon.</desc>
+  <path d="M3 6H12L15 9H27V25H3Z" fill="#e3b248" stroke="#a87920" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M6 11H24V20H6Z" fill="#fff3cf"/>
+  <path d="M3 27L8 14H30L25 27Z" fill="#ffd56a" stroke="#a87920" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M9.5 16H27" fill="none" stroke="#ffedb0" stroke-width="2"/>
+</svg>

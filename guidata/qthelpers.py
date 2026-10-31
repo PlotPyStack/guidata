@@ -587,19 +587,36 @@ def mimedata2url(
         return pathlist
 
 
-def get_std_icon(name: str, size: int | None = None) -> QG.QIcon:
+#: SVG replacements of the standard icons which the platform only provides at low
+#: resolution (e.g. 16 pixels for ``SP_DirOpenIcon`` on Windows)
+STD_ICON_REPLACEMENTS = {
+    "SP_DirOpenIcon": "guidata:folder_open.svg",
+    "SP_DirClosedIcon": "guidata:folder_closed.svg",
+    "SP_DirIcon": "guidata:folder_closed.svg",
+    "SP_BrowserReload": "guidata:reload.svg",
+    "SP_MessageBoxInformation": "guidata:msg_information.svg",
+    "SP_MessageBoxWarning": "guidata:msg_warning.svg",
+    "SP_MessageBoxCritical": "guidata:msg_critical.svg",
+}
+
+
+def get_std_icon(name: str, size: int | None = None, native: bool = False) -> QG.QIcon:
     """
     Get standard platform icon
     Call 'show_std_icons()' for details
 
     The icon keeps all the resolutions provided by the platform, so that it stays
     sharp with display scaling: the widget showing the icon sets its display size
-    (e.g. with ``setIconSize``).
+    (e.g. with ``setIconSize``). The standard icons which the platform only
+    provides at low resolution (see ``STD_ICON_REPLACEMENTS``: folders, reload,
+    information, warning and error icons) are replaced by guidata's SVG icons.
 
     Args:
         name (str): Icon name
         size (int or None): Deprecated and ignored. Freezing the icon to a single
          size made it blurry when shown larger or with display scaling.
+        native (bool): if True, always return the platform icon (no SVG
+         replacement)
 
     Returns:
         QIcon: Icon
@@ -614,6 +631,11 @@ def get_std_icon(name: str, size: int | None = None) -> QG.QIcon:
         )
     if not name.startswith("SP_"):
         name = "SP_" + name
+    if not native and name in STD_ICON_REPLACEMENTS:
+        # pylint: disable=import-outside-toplevel
+        from guidata.configtools import get_icon
+
+        return get_icon(STD_ICON_REPLACEMENTS[name])
     return QW.QWidget().style().standardIcon(getattr(QW.QStyle, name))
 
 
@@ -636,7 +658,7 @@ class ShowStdIcons(QW.QWidget):
                 if cindex == 0:
                     col_layout = QW.QVBoxLayout()
                 icon_layout = QW.QHBoxLayout()
-                icon = get_std_icon(child)
+                icon = get_std_icon(child, native=True)
                 label = QW.QLabel()
                 label.setPixmap(icon.pixmap(32, 32))
                 icon_layout.addWidget(label)

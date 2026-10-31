@@ -24,8 +24,8 @@ from qtpy import QtGui as QG
 from qtpy import QtWidgets as QW
 
 import guidata
-from guidata.configtools import get_pixmap
-from guidata.qthelpers import get_std_icon, qt_app_context
+from guidata.configtools import get_icon, get_pixmap
+from guidata.qthelpers import STD_ICON_REPLACEMENTS, get_std_icon, qt_app_context
 
 
 def _create_image(path: str, width: int, height: int, color: str) -> None:
@@ -110,6 +110,22 @@ def test_std_icon_keeps_resolutions() -> None:
         assert sized_icon.pixmap(QC.QSize(48, 48)).width() == (
             icon.pixmap(QC.QSize(48, 48)).width()
         )
+
+
+@pytest.mark.parametrize("name", sorted(STD_ICON_REPLACEMENTS))
+def test_std_icon_svg_replacements(name: str) -> None:
+    """Test that low-resolution standard icons are replaced by sharp SVG icons, also
+    when requested with ``get_icon``, and that ``native=True`` returns the platform
+    icon"""
+    with qt_app_context():
+        expected = get_icon(STD_ICON_REPLACEMENTS[name]).pixmap(QC.QSize(48, 48))
+        for icon in (get_std_icon(name), get_std_icon(name[3:]), get_icon(name[3:])):
+            pixmap = icon.pixmap(QC.QSize(48, 48))
+            assert pixmap.width() >= 48
+            assert pixmap.toImage() == expected.toImage()
+        native = get_std_icon(name, native=True).pixmap(QC.QSize(48, 48))
+        assert not native.isNull()
+        assert native.toImage() != expected.toImage()
 
 
 def test_get_pixmap_default_ratio(tmp_path) -> None:

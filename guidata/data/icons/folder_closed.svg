@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <!-- SPDX-License-Identifier: BSD-3-Clause -->
+  <title>Folder</title>
+  <desc>Closed folder for SP_DirClosedIcon and SP_DirIcon.</desc>
+  <path d="M3 6H12L15 9H27C28.1 9 29 9.9 29 11V25C29 26.1 28.1 27 27 27H5C3.9 27 3 26.1 3 25Z" fill="#e3b248" stroke="#a87920" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M3 12H29V25C29 26.1 28.1 27 27 27H5C3.9 27 3 26.1 3 25Z" fill="#ffd56a" stroke="#a87920" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M5 14H27" fill="none" stroke="#ffedb0" stroke-width="2"/>
+</svg>

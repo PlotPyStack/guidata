@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <!-- SPDX-License-Identifier: BSD-3-Clause -->
+  <title>Information</title>
+  <desc>Scalable information symbol for SP_MessageBoxInformation.</desc>
+  <circle cx="16" cy="16" r="14" fill="#1689cf" stroke="#0966a2" stroke-width="2"/>
+  <circle cx="16" cy="8" r="2" fill="#fff"/>
+  <path d="M12 13H18V24H20V26H12V24H14V15H12Z" fill="#fff"/>
+</svg>
