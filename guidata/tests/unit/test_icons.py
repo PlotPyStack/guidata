@@ -179,6 +179,41 @@ def test_guidata_qualified_name() -> None:
     assert path == osp.join(root, "apply.svg")
 
 
+@pytest.mark.parametrize(
+    "name, relpath",
+    [
+        # Path relative to an image path registered by the module
+        ("guidata:editors/editcopy.svg", "data/icons/editors/editcopy.svg"),
+        # Path relative to the package directory ("package:path" syntax)
+        ("guidata:data/icons/editors/editcopy.svg", "data/icons/editors/editcopy.svg"),
+        ("guidata.dataset:__init__.py", "dataset/__init__.py"),
+    ],
+)
+def test_package_relative_path(name: str, relpath: str) -> None:
+    """Test that "module:path" also designates paths relative to the image paths
+    registered by the module, or to the directory of the module's package"""
+    path = configtools.get_image_file_path(name, default=None)
+    expected = osp.join(osp.dirname(guidata.__file__), *relpath.split("/"))
+    assert osp.normcase(path) == osp.normcase(expected)
+
+
+def test_package_relative_path_unregistered_module(tmp_path, monkeypatch) -> None:
+    """Test the "package:path" syntax with a package which registered no image path,
+    and its limits (unknown package, paths outside the package)"""
+    package = tmp_path / "icon_test_pkg"
+    _create_images(str(package / "__init__.py"), str(package / "icons" / "logo.svg"))
+    monkeypatch.syspath_prepend(str(tmp_path))
+    path = configtools.get_image_file_path("icon_test_pkg:icons/logo.svg", None)
+    assert path == str(package / "icons" / "logo.svg")
+    for name in (
+        "icon_test_pkg:logo.svg",
+        "icon_test_pkg:../icon_test_pkg/icons/logo.svg",
+        "__unknown_test_pkg__:icons/logo.svg",
+    ):
+        with pytest.raises(RuntimeError):
+            configtools.get_image_file_path(name, default=None)
+
+
 def test_absolute_path(tmp_path) -> None:
     """Test that absolute paths are not taken for module-qualified names"""
     path = str(tmp_path / "image.svg")
