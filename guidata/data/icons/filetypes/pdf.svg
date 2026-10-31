@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+<title>filetypes/pdf</title>
+<desc>Hand-authored vector reconstruction. Explicit geometric primitives and curves; no raster tracing.</desc>
+<defs>
+<linearGradient id="paper" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0" stop-color="#ffffff"/>
+<stop offset="1" stop-color="#ededf1"/>
+</linearGradient>
+</defs>
+<g transform="scale(2 2)">
+<rect x="1.35" y="0.85" width="10.8" height="14.3" fill="url(#paper)" stroke="#a4a4ae" stroke-width="0.7"/>
+<path d="M2.15 1.55 L11.55 1.55" fill="none" stroke="#fff" stroke-width="0.45"/>
+<g transform="translate(.25 .25) scale(.92 .96875)">
+<path d="M8.5 2.4 C6.7 .4 7.8 7.5 10.3 9.4 C12.3 11 16 12 15 10.9 C13.5 9.4 6.1 10.3 3.2 12.3 C.3 14.3 2.4 14.8 4.3 12.8 C6.7 10.2 8.5 4.6 8.5 2.4 Z" fill="none" stroke="#f35162" stroke-width="0.6" stroke-linejoin="round"/>
+</g>
+</g>
+</svg>

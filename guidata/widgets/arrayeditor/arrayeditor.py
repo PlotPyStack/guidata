@@ -193,7 +193,7 @@ class ArrayEditor(QDialog, Generic[AnySupportedArray]):
 
         self.layout = QGridLayout()
         self.setLayout(self.layout)
-        self.setWindowIcon(get_icon("arredit.png"))
+        self.setWindowIcon(get_icon("arredit.svg"))
         if add_title_suffix:
             title = (
                 str(title) + " - " + _("NumPy array") if title else _("Array editor")

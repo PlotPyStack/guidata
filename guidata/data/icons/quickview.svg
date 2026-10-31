@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+<title>quickview</title>
+<desc>Hand-authored vector reconstruction. Explicit geometric primitives and curves; no raster tracing.</desc>
+<defs>
+<linearGradient id="blue" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#a5ddff"/>
+<stop offset="0.5" stop-color="#238edc"/>
+<stop offset="1" stop-color="#0860a8"/>
+</linearGradient>
+</defs>
+<path d="M1.1 7.8 Q7.2 .7 14.9 8.7 Q8 15.2 1.1 7.8 Z" fill="#f8fafb" stroke="#4d5259" stroke-width="0.75"/>
+<ellipse cx="7.8" cy="8.1" rx="2.7" ry="3.1" fill="url(#blue)" stroke="#45779e" stroke-width="0.5"/>
+<ellipse cx="7.8" cy="8.2" rx="1.05" ry="1.8" fill="#172c46"/>
+<circle cx="7" cy="6.9" r="0.65" fill="#fff"/>
+<path d="M1.4 5.2 Q4.4 .1 7.6 2.4 L14.5 7.3" fill="none" stroke="#717981" stroke-width="1.05" stroke-linecap="round"/>
+</svg>

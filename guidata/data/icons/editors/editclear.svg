@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+<!-- Based on Crystal Project artwork, Copyright (c) 2006-2007 Everaldo Coelho. License: LGPL-2.1-or-later. Modified: SVG reconstruction from the original PNG, 2026. See LICENSES.txt. -->
+<title>editors/editclear</title>
+<desc>Hand-authored vector reconstruction. Explicit geometric primitives and curves; no raster tracing.</desc>
+
+<g transform="scale(2 2)">
+<path d="M10.6 1 L12 1.8 L7.7 9.2 L6.3 8.4 Z" fill="#ac7a3e" stroke="#805526" stroke-width="0.45"/>
+<path d="M5.9 8 L8.1 9.2 L9.7 14.2 Q5.7 16 1.4 12.7 Z" fill="#efd060" stroke="#b18a2b" stroke-width="0.6"/>
+<path d="M5.3 8.3 L8.5 9.8" fill="none" stroke="#c64035" stroke-width="1.4"/>
+<path d="M5.5 10 L3.3 13.2 M6.5 10.5 L5.2 14 M7.5 11 L7.3 14.3" fill="none" stroke="#b18a2b" stroke-width="0.55"/>
+</g>
+</svg>

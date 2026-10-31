@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+<title>file</title>
+<desc>Hand-authored vector reconstruction. Explicit geometric primitives and curves; no raster tracing.</desc>
+<defs>
+<linearGradient id="bluepaper" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#ffffff"/>
+<stop offset="1" stop-color="#d5eafd"/>
+</linearGradient>
+</defs>
+<path d="M3 0.8 H10 L13 3.8 V15.200000000000001 H3 Z" fill="url(#bluepaper)" stroke="#6aabe1" stroke-width="0.65"/>
+<path d="M10 0.8 V3.8 H13" fill="none" stroke="#6aabe1" stroke-width="0.6"/>
+<path d="M3.7 1.6 L9.6 1.6" fill="none" stroke="#fff" stroke-width="0.5"/>
+</svg>

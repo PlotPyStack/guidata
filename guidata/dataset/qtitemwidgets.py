@@ -941,7 +941,7 @@ class ColorWidget(HLayoutMixin, LineEditWidget):
             bitmap.fill(color)
             icon = QIcon(bitmap)
         else:
-            icon = get_icon("not_found.png")
+            icon = get_icon("not_found.svg")
         self.button.setIcon(icon)
 
     def select_color(self) -> None:
@@ -1202,7 +1202,7 @@ class FileWidget(HLayoutMixin, LineEditWidget):
         self.filedialog = filedialog
         self.button = QPushButton(_("Browse..."))
         fmt = item.get_prop_value("data", "formats")
-        self.button.setIcon(get_icon("%s.png" % fmt[0].lower(), default="FileIcon"))
+        self.button.setIcon(get_icon("%s.svg" % fmt[0].lower(), default="FileIcon"))
         self.button.clicked.connect(self.select_file)  # type:ignore
         self.group.addWidget(self.button)
         self.basedir = item.get_prop_value("data", "basedir")
@@ -1549,20 +1549,20 @@ class FloatArrayWidget(AbstractDataSetWidget):
         self.groupbox.setLayout(self.layout)
 
         self.first_line, self.dim_label = get_image_layout(
-            "shape.png", _("Number of rows x Number of columns")
+            "shape.svg", _("Number of rows x Number of columns")
         )
-        edit_button = QPushButton(get_icon("arredit.png"), "")
+        edit_button = QPushButton(get_icon("arredit.svg"), "")
         edit_button.setToolTip(_("Edit array contents"))
         edit_button.setMaximumWidth(32)
         self.first_line.addWidget(edit_button)
         self.layout.addLayout(self.first_line, 0, 0)
 
         self.min_line, self.min_label = get_image_layout(
-            "min.png", _("Smallest element in array")
+            "min.svg", _("Smallest element in array")
         )
         self.layout.addLayout(self.min_line, 1, 0)
         self.max_line, self.max_label = get_image_layout(
-            "max.png", _("Largest element in array")
+            "max.svg", _("Largest element in array")
         )
         self.layout.addLayout(self.max_line, 2, 0)
 
@@ -1570,7 +1570,7 @@ class FloatArrayWidget(AbstractDataSetWidget):
         self.arr = np.array([])  # le tableau si il a été modifié
         self.instance = None
 
-        self.dtype_line, self.dtype_label = get_image_layout("dtype.png", "")
+        self.dtype_line, self.dtype_label = get_image_layout("dtype.svg", "")
         self.first_line.insertSpacing(2, 5)
         self.first_line.insertLayout(3, self.dtype_line)
 

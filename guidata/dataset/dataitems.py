@@ -1488,7 +1488,7 @@ class DictItem(DataItem):
             label, default=default, help=help, check=check, allow_none=allow_none
         )
         self.set_prop("display", callback=self.__dictedit)
-        self.set_prop("display", icon="dictedit.png")
+        self.set_prop("display", icon="dictedit.svg")
 
     @staticmethod
     # pylint: disable=unused-argument

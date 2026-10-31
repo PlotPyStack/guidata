@@ -173,14 +173,18 @@ def add_image_module_path(modname: str, relpath: str, subfolders: bool = True) -
     add_image_path(get_module_data_path(modname, relpath=relpath), subfolders)
 
 
-def get_image_file_path(name: str, default: str = "not_found.png") -> str:
+def get_image_file_path(name: str, default: str = "not_found.svg") -> str:
     """
     Return the absolute path to image with specified name
     name, default: filenames with extensions
 
+    When a ``.png`` image is not found, the ``.svg`` image with the same name is
+    returned, if any: icons were formerly provided as PNG files, so that code
+    requesting their former names keeps working.
+
     Args:
         name (str): name of the image
-        default (str): default image name. Defaults to "not_found.png".
+        default (str): default image name. Defaults to "not_found.svg".
 
     Raises:
         RuntimeError: if image file not found
@@ -192,6 +196,12 @@ def get_image_file_path(name: str, default: str = "not_found.png") -> str:
         full_path = osp.join(pth, name)
         if osp.isfile(full_path):
             return osp.abspath(full_path)
+    root, ext = osp.splitext(name)
+    if ext.lower() == ".png":
+        try:
+            return get_image_file_path(root + ".svg", None)
+        except RuntimeError:
+            pass
     if default is not None:
         try:
             return get_image_file_path(default, None)
@@ -218,14 +228,14 @@ def get_std_icon(name: str) -> QG.QIcon | None:
         return None
 
 
-def get_icon(name: str, default: str = "not_found.png") -> QG.QIcon:
+def get_icon(name: str, default: str = "not_found.svg") -> QG.QIcon:
     """
     Construct a QIcon from the file with specified name
     name, default: filenames with extensions or standard Qt icon names
 
     Args:
         name (str): name of the icon
-        default (str): default icon name. Defaults to "not_found.png".
+        default (str): default icon name. Defaults to "not_found.svg".
 
     Returns:
         QG.QIcon: icon
@@ -257,7 +267,7 @@ def get_icon(name: str, default: str = "not_found.png") -> QG.QIcon:
 
 def get_pixmap(
     name: str,
-    default: str | None = "not_found.png",
+    default: str | None = "not_found.svg",
     device_pixel_ratio: float | None = None,
 ) -> QG.QPixmap:
     """
@@ -265,15 +275,16 @@ def get_pixmap(
     account the device pixel ratio (high-DPI displays, display scaling).
 
     The pixmap has the logical size of the image file. When the device pixel ratio
-    is greater than 1, the high-resolution variants of the image following Qt's
-    ``@Nx`` naming convention (e.g. ``logo@2x.png`` next to ``logo.png``) are used,
-    if any: the smallest variant covering the device pixel ratio (or the largest
-    one) is resampled to the device resolution, so that the image remains sharp.
-    Without variants, the image is returned as is (and is upscaled by Qt).
+    is greater than 1, SVG images are rendered at the device resolution, and the
+    high-resolution variants of raster images following Qt's ``@Nx`` naming
+    convention (e.g. ``logo@2x.png`` next to ``logo.png``) are used, if any: the
+    smallest variant covering the device pixel ratio (or the largest one) is
+    resampled to the device resolution, so that the image remains sharp.
+    Without variants, a raster image is returned as is (and is upscaled by Qt).
 
     Args:
         name: name of the image (or absolute path to the image file)
-        default: default image name. Defaults to "not_found.png". If None,
+        default: default image name. Defaults to "not_found.svg". If None,
          a RuntimeError is raised when the image is not found.
         device_pixel_ratio: device pixel ratio. Defaults to None (i.e. the highest
          device pixel ratio of the screens, like for icons)
@@ -291,7 +302,20 @@ def get_pixmap(
         device_pixel_ratio = QG.QGuiApplication.instance().devicePixelRatio()
     if pixmap.isNull() or device_pixel_ratio <= 1.0:
         return pixmap
+    size = QC.QSize(
+        round(pixmap.width() * device_pixel_ratio),
+        round(pixmap.height() * device_pixel_ratio),
+    )
     root, ext = osp.splitext(path)
+    if ext.lower() == ".svg":
+        reader = QG.QImageReader(path)
+        reader.setScaledSize(size)
+        image = reader.read()
+        if image.isNull():
+            return pixmap
+        hidpi_pixmap = QG.QPixmap.fromImage(image)
+        hidpi_pixmap.setDevicePixelRatio(device_pixel_ratio)
+        return hidpi_pixmap
     source_path = None
     for factor in range(2, 10):
         variant_path = f"{root}@{factor}x{ext}"
@@ -302,10 +326,6 @@ def get_pixmap(
     source = QG.QPixmap() if source_path is None else QG.QPixmap(source_path)
     if source.isNull():
         return pixmap
-    size = QC.QSize(
-        round(pixmap.width() * device_pixel_ratio),
-        round(pixmap.height() * device_pixel_ratio),
-    )
     hidpi_pixmap = source.scaled(
         size, QC.Qt.IgnoreAspectRatio, QC.Qt.SmoothTransformation
     )
@@ -313,14 +333,14 @@ def get_pixmap(
     return hidpi_pixmap
 
 
-def get_image_label(name, default="not_found.png") -> QW.QLabel:
+def get_image_label(name, default="not_found.svg") -> QW.QLabel:
     """
     Construct a QLabel from the file with specified name
     name, default: filenames with extensions
 
     Args:
         name (str): name of the icon
-        default (str): default icon name. Defaults to "not_found.png".
+        default (str): default icon name. Defaults to "not_found.svg".
 
     Returns:
         QW.QLabel: label

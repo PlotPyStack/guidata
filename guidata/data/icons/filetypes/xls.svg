@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+<title>filetypes/xls</title>
+<desc>Hand-authored vector reconstruction. Explicit geometric primitives and curves; no raster tracing.</desc>
+<defs>
+<linearGradient id="paper" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0" stop-color="#ffffff"/>
+<stop offset="1" stop-color="#ededf1"/>
+</linearGradient>
+</defs>
+<g transform="scale(2 2)">
+<g transform="translate(1.6 .25) scale(.8 .96875)">
+<rect x="0.8" y="0.6" width="14.4" height="14.8" fill="url(#paper)" stroke="#a4a4ae" stroke-width="0.7"/>
+<path d="M1.6 1.3 L14.6 1.3" fill="none" stroke="#fff" stroke-width="0.45"/>
+<rect x="2" y="2" width="12" height="11.5" fill="#f5f5f5" stroke="#b4b4b4" stroke-width="0.4"/>
+<path d="M4 2 L4 13.5" fill="none" stroke="#b6b6b6" stroke-width="0.4"/>
+<path d="M6 2 L6 13.5" fill="none" stroke="#b6b6b6" stroke-width="0.4"/>
+<path d="M8 2 L8 13.5" fill="none" stroke="#b6b6b6" stroke-width="0.4"/>
+<path d="M10 2 L10 13.5" fill="none" stroke="#b6b6b6" stroke-width="0.4"/>
+<path d="M12 2 L12 13.5" fill="none" stroke="#b6b6b6" stroke-width="0.4"/>
+<path d="M2 4 L14 4" fill="none" stroke="#b6b6b6" stroke-width="0.4"/>
+<path d="M2 6 L14 6" fill="none" stroke="#b6b6b6" stroke-width="0.4"/>
+<path d="M2 8 L14 8" fill="none" stroke="#b6b6b6" stroke-width="0.4"/>
+<path d="M2 10 L14 10" fill="none" stroke="#b6b6b6" stroke-width="0.4"/>
+<path d="M2 12 L14 12" fill="none" stroke="#b6b6b6" stroke-width="0.4"/>
+<ellipse cx="11" cy="11.5" rx="3.1" ry="2" fill="#e9b700" stroke="#c09816" stroke-width="0.35"/>
+<path d="M11 11.5 L11 9.5 A3.1 2 0 0 1 14.1 11.5 Z" fill="#33be35" stroke="#398b2d" stroke-width="0.3"/>
+<path d="M11 11.5 L8.1 12.2 A3.1 2 0 0 1 11 9.5 Z" fill="#f23437" stroke="#b72127" stroke-width="0.3"/>
+</g>
+</g>
+</svg>

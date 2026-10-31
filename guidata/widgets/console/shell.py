@@ -138,27 +138,27 @@ class ShellBaseWidget(ConsoleBaseWidget, SaveHistoryMixin, BrowseHistoryMixin):
             self,
             _("Cut"),
             shortcut=keybinding("Cut"),
-            icon=get_icon("editcut.png"),
+            icon=get_icon("editcut.svg"),
             triggered=self.cut,
         )
         self.copy_action = create_action(
             self,
             _("Copy"),
             shortcut=keybinding("Copy"),
-            icon=get_icon("editcopy.png"),
+            icon=get_icon("editcopy.svg"),
             triggered=self.copy,
         )
         paste_action = create_action(
             self,
             _("Paste"),
             shortcut=keybinding("Paste"),
-            icon=get_icon("editpaste.png"),
+            icon=get_icon("editpaste.svg"),
             triggered=self.paste,
         )
         save_action = create_action(
             self,
             _("Save history log..."),
-            icon=get_icon("filesave.png"),
+            icon=get_icon("filesave.svg"),
             tip=_(
                 "Save current history log (i.e. all inputs and outputs) in a text file"
             ),
@@ -168,14 +168,14 @@ class ShellBaseWidget(ConsoleBaseWidget, SaveHistoryMixin, BrowseHistoryMixin):
             self,
             _("Delete"),
             shortcut=keybinding("Delete"),
-            icon=get_icon("editdelete.png"),
+            icon=get_icon("editdelete.svg"),
             triggered=self.delete,
         )
         selectall_action = create_action(
             self,
             _("Select All"),
             shortcut=keybinding("SelectAll"),
-            icon=get_icon("selectall.png"),
+            icon=get_icon("selectall.svg"),
             triggered=self.selectAll,
         )
         add_actions(
@@ -712,7 +712,7 @@ class PythonShellWidget(TracebackLinksMixin, ShellBaseWidget, GetHelpMixin):
         self.copy_without_prompts_action = create_action(
             self,
             _("Copy without prompts"),
-            icon=get_icon("copywop.png"),
+            icon=get_icon("copywop.svg"),
             triggered=self.copy_without_prompts,
         )
         actions = [self.copy_without_prompts_action]
@@ -720,14 +720,14 @@ class PythonShellWidget(TracebackLinksMixin, ShellBaseWidget, GetHelpMixin):
             clear_line_action = create_action(
                 self,
                 _("Clear line"),
-                icon=get_icon("editdelete.png"),
+                icon=get_icon("editdelete.svg"),
                 tip=_("Clear line"),
                 triggered=self.clear_line,
             )
             clear_action = create_action(
                 self,
                 _("Clear shell"),
-                icon=get_icon("editclear.png"),
+                icon=get_icon("editclear.svg"),
                 tip=_("Clear shell contents ('cls' command)"),
                 triggered=self.clear_terminal,
             )

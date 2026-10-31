@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+<title>filetypes/ps</title>
+<desc>Hand-authored vector reconstruction. Explicit geometric primitives and curves; no raster tracing.</desc>
+<defs>
+<linearGradient id="ink" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#59616c"/>
+<stop offset="1" stop-color="#10141c"/>
+</linearGradient>
+<linearGradient id="paper" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0" stop-color="#ffffff"/>
+<stop offset="1" stop-color="#ededf1"/>
+</linearGradient>
+<linearGradient id="silver" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#fafcfd"/>
+<stop offset="1" stop-color="#b8c0c8"/>
+</linearGradient>
+</defs>
+<g transform="scale(2 2)">
+<g transform="translate(1.6 .25) scale(.8 .96875)">
+<rect x="0.8" y="0.6" width="14.4" height="14.8" fill="url(#paper)" stroke="#a4a4ae" stroke-width="0.7"/>
+<path d="M1.6 1.3 L14.6 1.3" fill="none" stroke="#fff" stroke-width="0.45"/>
+<g transform="translate(1 2) scale(.875)">
+<rect x="4" y="1" width="8" height="6" fill="url(#paper)" stroke="#999" stroke-width="0.7"/>
+<path d="M2.5 6 H13.5 L15 8 V12 H1 V8 Z" fill="url(#silver)" stroke="#696969" stroke-width="0.7"/>
+<rect x="2" y="8.2" width="12" height="2.2" fill="url(#ink)" stroke="#454545" stroke-width="0.4"/>
+<circle cx="12.7" cy="7.3" r="0.45" fill="#69b63b"/>
+<path d="M4 10.5 H12 V15 H4 Z" fill="url(#paper)" stroke="#858585" stroke-width="0.7"/>
+<path d="M5 12 L11 12" fill="none" stroke="#c5c5c5" stroke-width="0.45"/>
+<path d="M5 13.2 L11 13.2" fill="none" stroke="#c5c5c5" stroke-width="0.45"/>
+</g>
+</g>
+</g>
+</svg>

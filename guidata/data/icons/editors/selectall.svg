@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+<title>editors/selectall</title>
+<desc>Hand-authored vector reconstruction. Explicit geometric primitives and curves; no raster tracing.</desc>
+<defs>
+<linearGradient id="paper" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0" stop-color="#ffffff"/>
+<stop offset="1" stop-color="#ededf1"/>
+</linearGradient>
+</defs>
+<g transform="scale(2 2)">
+<g transform="translate(1.28 .25) scale(.84 .96875)">
+<rect x="0.6" y="0.6" width="14.8" height="14.8" fill="url(#paper)" stroke="#a4a4ae" stroke-width="0.7"/>
+<path d="M1.4 1.3 L14.8 1.3" fill="none" stroke="#fff" stroke-width="0.45"/>
+<rect x="2" y="2.6" width="11.4" height="1.25" fill="#b9d1e4"/>
+<rect x="2" y="4.4" width="10" height="1.25" fill="#b9d1e4"/>
+<rect x="2" y="6.2" width="11" height="1.25" fill="#b9d1e4"/>
+<rect x="2" y="8" width="9.4" height="1.25" fill="#b9d1e4"/>
+<rect x="2" y="9.8" width="8" height="1.25" fill="#b9d1e4"/>
+<rect x="2" y="11.6" width="7" height="1.25" fill="#b9d1e4"/>
+<path d="M8.5 10.5 V14 M8 10.5 H9 M8 14 H9" fill="none" stroke="#6b6b6b" stroke-width="0.65"/>
+</g>
+</g>
+</svg>

@@ -106,13 +106,13 @@ class Parameters(gds.DataSet):
         gds.ImageChoiceItem(
             "MC type 2",
             [
-                ("rect", "first choice", "gif.png"),
-                ("ell", "second choice", "txt.png"),
-                ("qcq", "third choice", "html.png"),
+                ("rect", "first choice", "gif.svg"),
+                ("ell", "second choice", "txt.svg"),
+                ("qcq", "third choice", "html.svg"),
             ],
         )
         .set_pos(col=1)
-        .set_prop("display", icon="file.png")
+        .set_prop("display", icon="file.svg")
         .set_prop("display", size=(32, 32))
     )
     mchoice3 = gds.MultipleChoiceItem(

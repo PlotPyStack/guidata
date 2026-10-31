@@ -667,7 +667,7 @@ class DataFrameView(QTableView):
             self,
             _("Copy"),
             shortcut=keybinding("Copy"),
-            icon=get_icon("editcopy.png"),
+            icon=get_icon("editcopy.svg"),
             triggered=self.copy,
             context=Qt.WidgetShortcut,
         )
@@ -760,7 +760,7 @@ class DataFrameEditor(QDialog):
         """
         self.layout = QGridLayout()
         self.setLayout(self.layout)
-        self.setWindowIcon(get_icon("arredit.png"))
+        self.setWindowIcon(get_icon("arredit.svg"))
         if add_title_suffix:
             if title:
                 title = str(title) + " - %s" % data.__class__.__name__
