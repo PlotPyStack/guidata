@@ -57,7 +57,7 @@ from guidata.config import _
 from guidata.configtools import get_icon, get_image_file_path, get_image_layout
 from guidata.dataset.conv import restore_dataset, update_dataset
 from guidata.dataset.datatypes import ComputedProp, DataItemVariable
-from guidata.qthelpers import get_std_icon, is_dark_theme
+from guidata.qthelpers import is_dark_theme
 from guidata.utils.misc import convert_date_format
 from guidata.widgets.arrayeditor import ArrayEditor
 
@@ -1260,7 +1260,7 @@ class DirectoryWidget(HLayoutMixin, LineEditWidget):
     ) -> None:
         super().__init__(item, parent_layout)
         self.button = QPushButton(_("Browse..."))
-        self.button.setIcon(get_std_icon("DirOpenIcon"))
+        self.button.setIcon(get_icon("guidata:fileopen.svg"))
         self.button.clicked.connect(self.select_directory)  # type:ignore
         self.group.addWidget(self.button)
 

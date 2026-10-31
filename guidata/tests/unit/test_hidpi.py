@@ -25,7 +25,7 @@ from qtpy import QtWidgets as QW
 
 import guidata
 from guidata.configtools import get_pixmap
-from guidata.qthelpers import qt_app_context
+from guidata.qthelpers import get_std_icon, qt_app_context
 
 
 def _create_image(path: str, width: int, height: int, color: str) -> None:
@@ -97,6 +97,19 @@ def test_get_pixmap_icon() -> None:
         pixmap = get_pixmap("guidata:apply.svg", default=None, device_pixel_ratio=2.0)
         assert pixmap.size() == QC.QSize(32, 32)
         assert pixmap.devicePixelRatio() == pytest.approx(2.0)
+
+
+def test_std_icon_keeps_resolutions() -> None:
+    """Test that standard icons keep all their resolutions (the deprecated ``size``
+    argument used to freeze them, so that they were blurry when shown larger)"""
+    with qt_app_context():
+        icon = get_std_icon("DialogHelpButton")
+        with pytest.warns(DeprecationWarning, match="size"):
+            sized_icon = get_std_icon("DialogHelpButton", 16)
+        assert len(sized_icon.availableSizes()) == len(icon.availableSizes())
+        assert sized_icon.pixmap(QC.QSize(48, 48)).width() == (
+            icon.pixmap(QC.QSize(48, 48)).width()
+        )
 
 
 def test_get_pixmap_default_ratio(tmp_path) -> None:
