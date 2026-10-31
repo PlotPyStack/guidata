@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+<title>not_found</title>
+<desc>Hand-authored vector reconstruction. Explicit geometric primitives and curves; no raster tracing.</desc>
+
+<path d="M1 1 L15 15 M15 1 L1 15" fill="none" stroke="#ff7d13" stroke-width="1.5"/>
+</svg>

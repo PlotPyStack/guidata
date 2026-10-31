@@ -583,7 +583,7 @@ class ImportWizard(QDialog):
             title = _("Import wizard")
         self.setWindowTitle(title)
         if icon is None:
-            self.setWindowIcon(get_icon("fileimport.png"))
+            self.setWindowIcon(get_icon("fileimport.svg"))
         if contents_title is None:
             contents_title = _("Raw text")
 

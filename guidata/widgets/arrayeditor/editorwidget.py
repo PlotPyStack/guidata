@@ -337,7 +337,7 @@ class ArrayView(QTableView, Generic[ArrayModelType]):
         )
         insertion_dataset = InsertionDataSet(
             title=title,
-            icon="insert.png",
+            icon="insert.svg",
         )
 
         is_ok = insertion_dataset.edit()
@@ -376,7 +376,7 @@ class ArrayView(QTableView, Generic[ArrayModelType]):
         )
         deletion_dataset = DeletionDataSet(
             title=title,
-            icon="delete.png",
+            icon="delete.svg",
         )
         is_ok = deletion_dataset.edit()
         index_ = deletion_dataset.index_field
@@ -406,7 +406,7 @@ class ArrayView(QTableView, Generic[ArrayModelType]):
             self,
             _("Copy"),
             shortcut=keybinding("Copy"),
-            icon=get_icon("editcopy.png"),
+            icon=get_icon("editcopy.svg"),
             triggered=self.copy,
             context=Qt.ShortcutContext.WidgetShortcut,
         )
@@ -414,7 +414,7 @@ class ArrayView(QTableView, Generic[ArrayModelType]):
             self,
             _("Paste"),
             shortcut=keybinding("Paste"),
-            icon=get_icon("editpaste.png"),
+            icon=get_icon("editpaste.svg"),
             triggered=self.paste,
             context=Qt.ShortcutContext.WidgetShortcut,
         )
@@ -429,25 +429,25 @@ class ArrayView(QTableView, Generic[ArrayModelType]):
             insert_row_action = create_action(
                 self,
                 title=_("Insert row(s)"),
-                icon=get_icon("insert.png"),
+                icon=get_icon("insert.svg"),
                 triggered=self.insert_row,
             )
             insert_col_action = create_action(
                 self,
                 title=_("Insert column(s)"),
-                icon=get_icon("insert.png"),
+                icon=get_icon("insert.svg"),
                 triggered=self.insert_col,
             )
             remove_row_action = create_action(
                 self,
                 title=_("Remove row(s)"),
-                icon=get_icon("delete.png"),
+                icon=get_icon("delete.svg"),
                 triggered=self.remove_row,
             )
             remove_col_action = create_action(
                 self,
                 title=_("Remove column(s)"),
-                icon=get_icon("delete.png"),
+                icon=get_icon("delete.svg"),
                 triggered=self.remove_col,
             )
             actions = (
@@ -495,13 +495,13 @@ class ArrayView(QTableView, Generic[ArrayModelType]):
         insert_action = create_action(
             self,
             title=action_args[0][0],
-            icon=get_icon("insert.png"),
+            icon=get_icon("insert.svg"),
             triggered=action_args[0][1],
         )
         remove_action = create_action(
             self,
             title=action_args[1][0],
-            icon=get_icon("delete.png"),
+            icon=get_icon("delete.svg"),
             triggered=action_args[1][1],
         )
         actions = (

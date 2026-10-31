@@ -1,5 +1,11 @@
 # Version 3.17 #
 
+## guidata Version 3.17.1 ##
+
+🛠 Bug fixes:
+
+* **Blurry icons with display scaling** — the icons provided by guidata (array, dictionary and DataFrame editors, console, file types, ...) were 16×16 pixel PNG images, which looked blurry with a display scaling greater than 100% (e.g. 125%, 150%, 200%). They are now SVG images, which remain sharp at any display scaling. `get_pixmap` (and thus `get_image_label` and `get_image_layout`) renders SVG images at the resolution of the display. Applications requesting an icon by its former PNG name (e.g. `get_icon("apply.png")`) still get it: when a `.png` image is not found, the `.svg` image with the same name is used. The notices of the original artwork are provided in `guidata/data/icons/LICENSES.txt` (fixes [Issue #129](https://github.com/PlotPyStack/guidata/issues/129)).
+
 ## guidata Version 3.17.0 ##
 
 * Python 3.10 or later is now required. Python 3.9 users must keep an earlier compatible release.

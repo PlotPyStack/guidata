@@ -839,49 +839,49 @@ class BaseTableView(QTableView):
             self, _("Resize rows to contents"), triggered=self.resizeRowsToContents
         )
         self.paste_action = create_action(
-            self, _("Paste"), icon=get_icon("editpaste.png"), triggered=self.paste
+            self, _("Paste"), icon=get_icon("editpaste.svg"), triggered=self.paste
         )
         self.copy_action = create_action(
-            self, _("Copy"), icon=get_icon("editcopy.png"), triggered=self.copy
+            self, _("Copy"), icon=get_icon("editcopy.svg"), triggered=self.copy
         )
         self.edit_action = create_action(
-            self, _("Edit"), icon=get_icon("edit.png"), triggered=self.edit_item
+            self, _("Edit"), icon=get_icon("edit.svg"), triggered=self.edit_item
         )
         self.plot_action = create_action(
             self,
             _("Plot"),
-            icon=get_icon("plot.png"),
+            icon=get_icon("plot.svg"),
             triggered=lambda: self.plot_item("plot"),
         )
         self.plot_action.setVisible(False)
         self.hist_action = create_action(
             self,
             _("Histogram"),
-            icon=get_icon("hist.png"),
+            icon=get_icon("hist.svg"),
             triggered=lambda: self.plot_item("hist"),
         )
         self.hist_action.setVisible(False)
         self.imshow_action = create_action(
             self,
             _("Show image"),
-            icon=get_icon("imshow.png"),
+            icon=get_icon("imshow.svg"),
             triggered=self.imshow_item,
         )
         self.imshow_action.setVisible(False)
         self.save_array_action = create_action(
             self,
             _("Save array"),
-            icon=get_icon("filesave.png"),
+            icon=get_icon("filesave.svg"),
             triggered=self.save_array,
         )
         self.save_array_action.setVisible(False)
         self.insert_action = create_action(
-            self, _("Insert"), icon=get_icon("insert.png"), triggered=self.insert_item
+            self, _("Insert"), icon=get_icon("insert.svg"), triggered=self.insert_item
         )
         self.remove_action = create_action(
             self,
             _("Remove"),
-            icon=get_icon("editdelete.png"),
+            icon=get_icon("editdelete.svg"),
             triggered=self.remove_item,
         )
         self.minmax_action = create_action(
@@ -890,12 +890,12 @@ class BaseTableView(QTableView):
         self.minmax_action.setChecked(minmax)
         self.toggle_minmax(minmax)
         self.rename_action = create_action(
-            self, _("Rename"), icon=get_icon("rename.png"), triggered=self.rename_item
+            self, _("Rename"), icon=get_icon("rename.svg"), triggered=self.rename_item
         )
         self.duplicate_action = create_action(
             self,
             _("Duplicate"),
-            icon=get_icon("edit_add.png"),
+            icon=get_icon("edit_add.svg"),
             triggered=self.duplicate_item,
         )
         menu = QMenu(self)
@@ -1596,7 +1596,7 @@ class CollectionsEditor(QDialog):
 
         self.setWindowTitle(self.widget.get_title())
         if icon is None:
-            self.setWindowIcon(get_icon("dictedit.png"))
+            self.setWindowIcon(get_icon("dictedit.svg"))
         # Make the dialog act as a window
         self.setWindowFlags(Qt.Window)
 

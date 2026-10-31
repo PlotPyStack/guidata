@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+<!-- Copyright (c) 2008 Python Software Foundation. License: PSF-2.0. Python logo trademark notices apply. SVG reconstruction from the original PNG, 2026. See LICENSES.txt. -->
+<title>python</title>
+<desc>Hand-authored vector reconstruction. Explicit geometric primitives and curves; no raster tracing.</desc>
+<defs>
+<linearGradient id="pyblue" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0" stop-color="#6ca6d0"/>
+<stop offset="1" stop-color="#2b608a"/>
+</linearGradient>
+<linearGradient id="pygold" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0" stop-color="#ffe879"/>
+<stop offset="1" stop-color="#ffd343"/>
+</linearGradient>
+</defs>
+<path d="M8 1.2 C4.7 1.2 4.3 1.8 4.3 4 V5 H8 V5.7 H3.5 C1.8 5.7 1.2 6.8 1.2 8.7 C1.2 10.6 1.9 11.4 3.6 11.4 H4.2 V9.5 C4.2 7.9 5.1 7.2 6.7 7.2 H9.4 C10.8 7.2 11.7 6.4 11.7 5 V3.4 C11.7 1.8 10.3 1.2 8 1.2 Z" fill="url(#pyblue)"/>
+<path d="M8 14.8 C11.3 14.8 11.7 14.2 11.7 12 V11 H8 V10.3 H12.5 C14.2 10.3 14.8 9.2 14.8 7.3 C14.8 5.4 14.1 4.6 12.4 4.6 H11.8 V6.5 C11.8 8.1 10.9 8.8 9.3 8.8 H6.6 C5.2 8.8 4.3 9.6 4.3 11 V12.6 C4.3 14.2 5.7 14.8 8 14.8 Z" fill="url(#pygold)"/>
+<circle cx="6.1" cy="3" r="0.6" fill="#fff"/>
+<circle cx="9.9" cy="13" r="0.6" fill="#fff"/>
+</svg>

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+<title>filetypes/tar</title>
+<desc>Hand-authored vector reconstruction. Explicit geometric primitives and curves; no raster tracing.</desc>
+<defs>
+<linearGradient id="paper" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0" stop-color="#ffffff"/>
+<stop offset="1" stop-color="#ededf1"/>
+</linearGradient>
+<linearGradient id="sand" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0" stop-color="#f9e1a9"/>
+<stop offset="1" stop-color="#bb9451"/>
+</linearGradient>
+</defs>
+<g transform="scale(2 2)">
+<g transform="translate(1.6 .25) scale(.8 .96875)">
+<rect x="0.8" y="0.6" width="14.4" height="14.8" fill="url(#paper)" stroke="#a4a4ae" stroke-width="0.7"/>
+<path d="M1.6 1.3 L14.6 1.3" fill="none" stroke="#fff" stroke-width="0.45"/>
+<path d="M2.2 7 L9.2 5.5 L14.5 7.4 L7.6 9.1 Z" fill="#e4cd96" stroke="#b3985d" stroke-width="0.35"/>
+<path d="M2.2 7 L7.6 9.1 V14 L2.2 12.2 Z" fill="url(#sand)" stroke="#a48a53" stroke-width="0.35"/>
+<path d="M7.6 9.1 L14.5 7.4 V12.4 L7.6 14 Z" fill="#bca067" stroke="#a48a53" stroke-width="0.35"/>
+<path d="M5.1 6.4 L10.4 8.4 V10.3 L11.8 10 V8.1 L6.7 6 Z" fill="#f7e5b5"/>
+<path d="M9.6 11.3 L12.7 10.5 V12.1 L9.6 12.9 Z" fill="none" stroke="#826834" stroke-width="0.5"/>
+<path d="M10.4 11.7 L11.9 11.3" fill="none" stroke="#826834" stroke-width="0.5"/>
+</g>
+</g>
+</svg>

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+<title>shape</title>
+<desc>Hand-authored vector reconstruction. Explicit geometric primitives and curves; no raster tracing.</desc>
+
+<rect x="4" y="5" width="3" height="3" fill="#7175ff"/>
+<rect x="4" y="8.5" width="3" height="3" fill="#7175ff"/>
+<rect x="4" y="12" width="3" height="3" fill="#7175ff"/>
+<rect x="7.5" y="5" width="3" height="3" fill="#7175ff"/>
+<rect x="7.5" y="8.5" width="3" height="3" fill="#7175ff"/>
+<rect x="7.5" y="12" width="3" height="3" fill="#7175ff"/>
+<rect x="11" y="5" width="3" height="3" fill="#7175ff"/>
+<rect x="11" y="8.5" width="3" height="3" fill="#7175ff"/>
+<rect x="11" y="12" width="3" height="3" fill="#7175ff"/>
+<path d="M4 2.5 H14.5 M4.5 1 V4 M14 1 V4 M1.5 5 V15 M0 5.5 H3 M0 14.5 H3" fill="none" stroke="#4ea45a" stroke-width="0.8"/>
+</svg>

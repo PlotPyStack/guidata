@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+<title>xmin</title>
+<desc>Hand-authored vector reconstruction. Explicit geometric primitives and curves; no raster tracing.</desc>
+
+<g transform="rotate(180 8 8)">
+<path d="M10 3 H13 V13 H10" fill="none" stroke="#8181ff" stroke-width="2"/>
+<path d="M1 7 H8 V5 L11 8 L8 11 V9 H1 Z" fill="#4da05a"/>
+</g>
+</svg>

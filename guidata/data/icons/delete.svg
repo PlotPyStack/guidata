@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+<title>delete</title>
+<desc>Hand-authored vector reconstruction. Explicit geometric primitives and curves; no raster tracing.</desc>
+<defs>
+<linearGradient id="red" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#ffb09b"/>
+<stop offset="0.5" stop-color="#f25639"/>
+<stop offset="1" stop-color="#cc2d22"/>
+</linearGradient>
+</defs>
+<path d="M3.1 2.1 L8 5.9 L12.8 2.1 L14 3.8 L10.2 8 L14 12.7 L12.2 14.1 L8 10.1 L3.5 14 L1.8 12.3 L5.8 8 L1.8 3.7 Z" fill="url(#red)" stroke="#b34531" stroke-width="0.6" stroke-linejoin="round"/>
+<path d="M3 3.3 L8 7.5 L12.8 3.3" fill="none" stroke="#ffd4be" stroke-width="0.7"/>
+</svg>

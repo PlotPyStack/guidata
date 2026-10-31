@@ -253,7 +253,7 @@ def test_multiple_choice():
 
 def test_image_choice_graceful_fallback():
     """ImageChoiceItem with non-resolvable images falls back to the
-    guidata ``not_found.png`` placeholder rather than crashing."""
+    guidata ``not_found.svg`` placeholder rather than crashing."""
     bogus = "__not_a_real_image__.png"
 
     class P(gds.DataSet):

@@ -298,7 +298,7 @@ class TestMainView(QW.QSplitter):
         Returns:
             QPushButton: run button
         """
-        btn = QW.QPushButton(get_icon("apply.png"), _("Run this script"), self)
+        btn = QW.QPushButton(get_icon("apply.svg"), _("Run this script"), self)
         btn.setFont(font)
         btn.clicked.connect(self.run_current_script)
         return btn

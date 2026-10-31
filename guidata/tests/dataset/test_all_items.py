@@ -120,9 +120,9 @@ class Parameters(gds.DataSet):
     mchoice2 = gds.ImageChoiceItem(
         "Single choice 2",
         [
-            ("rect", "first choice", "gif.png"),
-            ("ell", "second choice", "txt.png"),
-            ("qcq", "third choice", "file.png"),
+            ("rect", "first choice", "gif.svg"),
+            ("ell", "second choice", "txt.svg"),
+            ("qcq", "third choice", "file.svg"),
         ],
     )
     _eg = gds.EndGroup("A sub group")

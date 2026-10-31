@@ -880,7 +880,7 @@ class DataSetEditGroupBox(DataSetShowGroupBox[AnyDataSet]):
         label: group box label (string)
         klass: guidata.DataSet class
         button_text: text of apply button (default: "Apply")
-        button_icon: icon of apply button (default: "apply.png")
+        button_icon: icon of apply button (default: "apply.svg")
         show_button: if True, show apply button (default: True)
         wordwrap: if True, comment text is wordwrapped
         kwargs: keyword arguments passed to DataSet constructor
@@ -907,7 +907,7 @@ class DataSetEditGroupBox(DataSetShowGroupBox[AnyDataSet]):
             if button_text is None:
                 button_text = _("Apply")
             if button_icon is None:
-                button_icon = get_icon("apply.png")
+                button_icon = get_icon("apply.svg")
             elif isinstance(button_icon, str):
                 button_icon = get_icon(button_icon)
             self.apply_button = applyb = QPushButton(button_icon, button_text, self)

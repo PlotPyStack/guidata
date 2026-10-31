@@ -115,7 +115,7 @@ class CompletionWidget(QListWidget):
         if any(types):
             for c, t in zip(completion_list, types):
                 icon = icons_map.get(t, "no_match")
-                self.addItem(QListWidgetItem(get_icon(icon + ".png"), c))
+                self.addItem(QListWidgetItem(get_icon(icon + ".svg"), c))
         else:
             self.addItems(completion_list)
 

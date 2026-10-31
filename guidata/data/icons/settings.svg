@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+<title>settings</title>
+<desc>Hand-authored vector reconstruction. Explicit geometric primitives and curves; no raster tracing.</desc>
+<defs>
+<linearGradient id="silver" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#fafcfd"/>
+<stop offset="1" stop-color="#b8c0c8"/>
+</linearGradient>
+<linearGradient id="steel" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#b6c4d0"/>
+<stop offset="1" stop-color="#4c667c"/>
+</linearGradient>
+</defs>
+<path d="M13.400 8.000 L14.574 8.587 L14.221 10.203 L12.910 10.248 L12.677 10.700 L13.400 11.795 L12.286 13.019 L11.128 12.402 L10.700 12.677 L10.779 13.986 L9.203 14.489 L8.508 13.376 L8.000 13.400 L7.413 14.574 L5.797 14.221 L5.752 12.910 L5.300 12.677 L4.205 13.400 L2.981 12.286 L3.598 11.128 L3.323 10.700 L2.014 10.779 L1.511 9.203 L2.624 8.508 L2.600 8.000 L1.426 7.413 L1.779 5.797 L3.090 5.752 L3.323 5.300 L2.600 4.205 L3.714 2.981 L4.872 3.598 L5.300 3.323 L5.221 2.014 L6.797 1.511 L7.492 2.624 L8.000 2.600 L8.587 1.426 L10.203 1.779 L10.248 3.090 L10.700 3.323 L11.795 2.600 L13.019 3.714 L12.402 4.872 L12.677 5.300 L13.986 5.221 L14.489 6.797 L13.376 7.492 Z" fill="url(#silver)" stroke="#8b92a2" stroke-width="0.55"/>
+<circle cx="8" cy="8" r="4.2" fill="url(#steel)" stroke="#a4aabf" stroke-width="0.5"/>
+<circle cx="8" cy="8" r="2.2" fill="#aeb6c9" stroke="#e1e3ed" stroke-width="0.55"/>
+<circle cx="8" cy="8" r="0.8" fill="#d8dbe7"/>
+</svg>

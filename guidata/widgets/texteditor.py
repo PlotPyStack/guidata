@@ -86,7 +86,7 @@ class TextEditor(QDialog):
         # Make the dialog act as a window
         self.setWindowFlags(Qt.Window)
 
-        self.setWindowIcon(get_icon("edit.png"))
+        self.setWindowIcon(get_icon("edit.svg"))
         self.setWindowTitle(
             _("Text editor") + "%s" % (" - " + str(title) if str(title) else "")
         )

@@ -77,9 +77,9 @@ class OtherDataSet(gds.DataSet):
     icon = gds.ChoiceItem(
         "Icon",
         (
-            ("python.png", "Python"),
+            ("python.svg", "Python"),
             ("guidata.svg", "guidata"),
-            ("settings.png", "Settings"),
+            ("settings.svg", "Settings"),
         ),
     )
     opacity = gds.FloatItem("Opacity", default=1.0, min=0.1, max=1)
@@ -98,7 +98,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
         win32_fix_title_bar_background(self)
-        self.setWindowIcon(get_icon("python.png"))
+        self.setWindowIcon(get_icon("python.svg"))
         self.setWindowTitle("Application example")
 
         # Instantiate dataset-related widgets:

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+<!-- Based on Crystal Project artwork, Copyright (c) 2006-2007 Everaldo Coelho. License: LGPL-2.1-or-later. Modified: SVG reconstruction from the original PNG, 2026. See LICENSES.txt. -->
+<title>filenew</title>
+<desc>Hand-authored vector reconstruction. Explicit geometric primitives and curves; no raster tracing.</desc>
+<defs>
+<linearGradient id="paper" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0" stop-color="#ffffff"/>
+<stop offset="1" stop-color="#ededf1"/>
+</linearGradient>
+</defs>
+<g transform="scale(1.5 1.5)">
+<rect x="2" y="1" width="12" height="14" fill="url(#paper)" stroke="#a4a4ae" stroke-width="0.7"/>
+<path d="M2.8 1.7 L13.4 1.7" fill="none" stroke="#fff" stroke-width="0.45"/>
+</g>
+</svg>

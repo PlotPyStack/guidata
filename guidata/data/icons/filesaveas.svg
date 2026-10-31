@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+<!-- Based on Crystal Project artwork, Copyright (c) 2006-2007 Everaldo Coelho. License: LGPL-2.1-or-later. Modified: SVG reconstruction from the original PNG, 2026. See LICENSES.txt. -->
+<title>filesaveas</title>
+<desc>Hand-authored vector reconstruction. Explicit geometric primitives and curves; no raster tracing.</desc>
+
+<g transform="scale(1.5 1.5)">
+<g transform="translate(-.5 -.5) scale(.92)">
+<g transform="scale(.6666666667)">
+<path d="M2.5 1.5 H18.5 L21.5 4.5 V22.5 H2.5 Z" fill="#475568" stroke="#273342" stroke-width="1"/>
+<rect x="6" y="2" width="10" height="7" fill="#dce3e9"/>
+<rect x="12" y="3" width="2" height="5" fill="#65778a"/>
+<rect x="6" y="14" width="12" height="8" fill="#fff"/>
+<rect x="8" y="16" width="8" height="1" fill="#b4bec9"/>
+<rect x="8" y="19" width="6" height="1" fill="#b4bec9"/>
+</g>
+</g>
+<path d="M7.5 13 L13.2 7.3 L15 9.1 L9.3 14.8 L6.8 15.5 Z" fill="#f3c755" stroke="#8d641c" stroke-width="0.6"/>
+<path d="M8.3 13.2 L13.7 7.8" fill="none" stroke="#fff2ad" stroke-width="0.6"/>
+<path d="M6.8 15.5 L7.5 13 L9.3 14.8 Z" fill="#f6e4c3" stroke="#8d641c" stroke-width="0.4"/>
+<path d="M6.8 15.5 L7.2 14.2 L8.1 15.1 Z" fill="#3c4249"/>
+</g>
+</svg>

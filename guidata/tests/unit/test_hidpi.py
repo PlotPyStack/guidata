@@ -6,10 +6,11 @@
 """
 High-DPI support tests
 
-Images must remain sharp with display scaling: ``get_pixmap`` builds pixmaps at the
-device resolution from the high-resolution variants of an image (``@Nx`` naming
-convention). With Qt5 on Windows, the default application font must follow the
-display scaling, like the message font of the system.
+Images must remain sharp with display scaling: ``get_pixmap`` renders SVG images at
+the device resolution, and builds pixmaps at the device resolution from the
+high-resolution variants of raster images (``@Nx`` naming convention). With Qt5 on
+Windows, the default application font must follow the display scaling, like the
+message font of the system.
 """
 
 from __future__ import annotations
@@ -67,6 +68,35 @@ def test_get_pixmap_without_variant(tmp_path) -> None:
         pixmap = get_pixmap(path, device_pixel_ratio=1.5)
         assert pixmap.size() == QC.QSize(40, 20)
         assert pixmap.devicePixelRatio() == 1.0
+
+
+def test_get_pixmap_svg(tmp_path) -> None:
+    """Test that an SVG image is rendered at the device resolution"""
+    path = tmp_path / "vector.svg"
+    path.write_text(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="20">'
+        '<rect width="20" height="20" fill="#ff0000"/>'
+        '<rect x="20" width="20" height="20" fill="#0000ff"/></svg>',
+        encoding="utf-8",
+    )
+    with qt_app_context():
+        for ratio, size in ((1.0, (40, 20)), (1.5, (60, 30)), (2.0, (80, 40))):
+            pixmap = get_pixmap(str(path), device_pixel_ratio=ratio)
+            assert pixmap.size() == QC.QSize(*size)
+            assert pixmap.devicePixelRatio() == pytest.approx(ratio)
+            image = pixmap.toImage()
+            # Sharp rendering: the boundary between the two halves is not blurred
+            last_red, first_blue = size[0] // 2 - 1, size[0] // 2
+            assert image.pixelColor(last_red, 0).name() == "#ff0000"
+            assert image.pixelColor(first_blue, 0).name() == "#0000ff"
+
+
+def test_get_pixmap_icon() -> None:
+    """Test that guidata's SVG icons are rendered at the device resolution"""
+    with qt_app_context():
+        pixmap = get_pixmap("apply.svg", default=None, device_pixel_ratio=2.0)
+        assert pixmap.size() == QC.QSize(32, 32)
+        assert pixmap.devicePixelRatio() == pytest.approx(2.0)
 
 
 def test_get_pixmap_default_ratio(tmp_path) -> None:

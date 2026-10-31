@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+<title>filetypes/jpg</title>
+<desc>Hand-authored vector reconstruction. Explicit geometric primitives and curves; no raster tracing.</desc>
+<defs>
+<linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#ffec9b"/>
+<stop offset="0.5" stop-color="#e5b34a"/>
+<stop offset="1" stop-color="#b58322"/>
+</linearGradient>
+<linearGradient id="paper" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0" stop-color="#ffffff"/>
+<stop offset="1" stop-color="#ededf1"/>
+</linearGradient>
+</defs>
+<g transform="scale(2 2)">
+<g transform="translate(1.6 .25) scale(.8 .96875)">
+<rect x="0.8" y="0.6" width="14.4" height="14.8" fill="url(#paper)" stroke="#a4a4ae" stroke-width="0.7"/>
+<path d="M1.6 1.3 L14.6 1.3" fill="none" stroke="#fff" stroke-width="0.45"/>
+<path d="M13.2 8.3 C11 5.8 5 5.8 2.2 8.8 C.2 11 3.4 13.9 7.8 13.5 C8.9 13.4 9.5 12.7 8.7 12 C8.2 11.5 9.1 10.6 10.2 11 C13.2 12 15.3 10.8 13.2 8.3 Z" fill="url(#gold)" stroke="#b08e39" stroke-width="0.4"/>
+<ellipse cx="4.1" cy="9" rx="1.25" ry="0.6" fill="#42a72e"/>
+<ellipse cx="7.1" cy="7.8" rx="1.1" ry="0.55" fill="#e36a30"/>
+<ellipse cx="11.6" cy="9.5" rx="1.2" ry="0.55" fill="#317fb3"/>
+<path d="M7.6 10.8 L14.5 3.6 L15.1 3.9 L8.5 11.5 Z" fill="#edca6b" stroke="#c79d3c" stroke-width="0.2"/>
+<path d="M7.6 10.8 Q5.8 10.8 6.3 12 Q7.4 12.5 8.5 11.5 Z" fill="#755630"/>
+</g>
+</g>
+</svg>
