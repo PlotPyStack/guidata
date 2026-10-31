@@ -376,7 +376,7 @@ class ArrayView(QTableView, Generic[ArrayModelType]):
         )
         deletion_dataset = DeletionDataSet(
             title=title,
-            icon="delete.svg",
+            icon="guidata:delete.svg",
         )
         is_ok = deletion_dataset.edit()
         index_ = deletion_dataset.index_field
@@ -441,13 +441,13 @@ class ArrayView(QTableView, Generic[ArrayModelType]):
             remove_row_action = create_action(
                 self,
                 title=_("Remove row(s)"),
-                icon=get_icon("delete.svg"),
+                icon=get_icon("guidata:delete.svg"),
                 triggered=self.remove_row,
             )
             remove_col_action = create_action(
                 self,
                 title=_("Remove column(s)"),
-                icon=get_icon("delete.svg"),
+                icon=get_icon("guidata:delete.svg"),
                 triggered=self.remove_col,
             )
             actions = (
@@ -501,7 +501,7 @@ class ArrayView(QTableView, Generic[ArrayModelType]):
         remove_action = create_action(
             self,
             title=action_args[1][0],
-            icon=get_icon("delete.svg"),
+            icon=get_icon("guidata:delete.svg"),
             triggered=action_args[1][1],
         )
         actions = (
@@ -692,7 +692,7 @@ class BaseArrayEditorWidget(QWidget):
         btn.setEnabled(utils.is_float(self._data.dtype))
         btn_layout.addWidget(btn)
         btn.clicked.connect(self.change_format)
-        btn = QPushButton(get_icon("resize.svg"), _("Resize"), self)
+        btn = QPushButton(get_icon("guidata:resize.svg"), _("Resize"), self)
         btn_layout.addWidget(btn)
         btn.clicked.connect(self.view.resize_to_contents)
         bgcolor = QCheckBox(_("Background color"))
@@ -705,7 +705,7 @@ class BaseArrayEditorWidget(QWidget):
         btn.setToolTip(_("Copy all array data to clipboard"))
         btn.clicked.connect(self.copy_all_to_clipboard)
         btn_layout.addWidget(btn)
-        btn = QPushButton(get_icon("export.svg"), _("Export"), self)
+        btn = QPushButton(get_icon("guidata:export.svg"), _("Export"), self)
         btn.setToolTip(_("Export array to a file"))
         btn_layout.addWidget(btn)
         btn.clicked.connect(self.export_array)

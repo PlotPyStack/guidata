@@ -793,7 +793,7 @@ class DataFrameEditor(QDialog):
         # disable format button for int type
         btn_layout.addWidget(btn)
         btn.clicked.connect(self.change_format)
-        btn = QPushButton(get_icon("resize.svg"), _("Resize"), self)
+        btn = QPushButton(get_icon("guidata:resize.svg"), _("Resize"), self)
         btn_layout.addWidget(btn)
         btn.clicked.connect(self.resize_to_contents)
 
@@ -816,7 +816,7 @@ class DataFrameEditor(QDialog):
         btn.setToolTip(_("Copy all array data to clipboard"))
         btn.clicked.connect(self.copy_all_to_clipboard)
         btn_layout.addWidget(btn)
-        btn = QPushButton(get_icon("export.svg"), _("Export"), self)
+        btn = QPushButton(get_icon("guidata:export.svg"), _("Export"), self)
         btn.setToolTip(_("Export array to a file"))
         btn_layout.addWidget(btn)
         btn.clicked.connect(self.export_dataframe)
