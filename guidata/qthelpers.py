@@ -458,16 +458,17 @@ def _refresh_toolbar_extension_icons(app: QW.QApplication) -> None:
     previous color scheme (e.g. hardly visible). Qt draws it again on a layout
     direction change.
 
+    The buttons are searched by Qt from the top-level widgets: only these widgets and
+    the buttons get a Python wrapper, whereas wrapping all the widgets of the
+    application (``allWidgets``) crashed the test suite with PySide6.
+
     Args:
         app: Application instance
     """
     event = QC.QEvent(QC.QEvent.LayoutDirectionChange)
-    for widget in app.allWidgets():
-        if (
-            isinstance(widget, QW.QToolButton)
-            and widget.objectName() == "qt_toolbar_ext_button"
-        ):
-            QC.QCoreApplication.sendEvent(widget, event)
+    for window in app.topLevelWidgets():
+        for button in window.findChildren(QW.QToolButton, "qt_toolbar_ext_button"):
+            QC.QCoreApplication.sendEvent(button, event)
 
 
 def set_color_mode(mode: Literal["light", "dark", "auto"] | None = None):
