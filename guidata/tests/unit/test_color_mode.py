@@ -87,6 +87,18 @@ def test_light_mode_with_dark_default_palette(
         assert _is_dark(qapp)
 
 
+def test_custom_dark_theme_relief_colors(qapp: QW.QApplication, monkeypatch) -> None:
+    """Test that the relief colors of guidata's dark theme (e.g. of sunken separator
+    lines) are dark: those of the light system palette were kept (white lines)"""
+    with monkeypatch.context() as mpatch:
+        mpatch.setattr(qth, "_apply_native_color_theme", lambda app, dark: False)
+        qth.set_color_mode(qth.DARK)
+        palette = qapp.palette()
+        for role in ("Light", "Midlight", "Mid", "Dark", "Shadow"):
+            color = palette.color(getattr(QG.QPalette, role))
+            assert color.lightness() < 128, f"{role} color: {color.name()}"
+
+
 def test_toolbar_extension_icon_refresh(qapp: QW.QApplication) -> None:
     """Test that the icon of toolbar extension buttons is drawn again when the color
     mode changes (Qt draws it only once, for the color scheme of that time)"""

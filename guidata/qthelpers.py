@@ -421,6 +421,16 @@ def _apply_custom_dark_theme(app: QW.QApplication) -> None:
     dpsc(QG.QPalette.Button, dark_color)
     dpsc(QG.QPalette.ButtonText, QC.Qt.white)
     dpsc(QG.QPalette.Disabled, QG.QPalette.ButtonText, disabled_color)
+    # Relief colors (e.g. sunken separator lines, table grids), as in the dark
+    # palette of the Fusion style: those of the light system palette would remain
+    mid_color = dark_color.darker(130)
+    shadow_color = dark_color.darker(150).darker(135)
+    dpsc(QG.QPalette.Light, dark_color.lighter(150))
+    dpsc(QG.QPalette.Midlight, mid_color.lighter(110))
+    dpsc(QG.QPalette.Mid, mid_color)
+    dpsc(QG.QPalette.Dark, dark_color.darker(150))
+    dpsc(QG.QPalette.Shadow, shadow_color)
+    dpsc(QG.QPalette.Disabled, QG.QPalette.Shadow, shadow_color.lighter(150))
     dpsc(QG.QPalette.BrightText, QC.Qt.red)
     dpsc(QG.QPalette.Link, QG.QColor(42, 130, 218))
     dpsc(QG.QPalette.Highlight, QG.QColor(42, 130, 218))
