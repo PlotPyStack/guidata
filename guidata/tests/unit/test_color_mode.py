@@ -41,6 +41,28 @@ def _is_dark(qapp: QW.QApplication) -> bool:
     return qapp.palette().color(QG.QPalette.Window).lightness() < 128
 
 
+def _icon_lightness(icon: QG.QIcon) -> float:
+    """Return the mean lightness of the opaque pixels of an icon"""
+    image = icon.pixmap(16, 16).toImage()
+    values = [
+        image.pixelColor(x, y).lightness()
+        for x in range(image.width())
+        for y in range(image.height())
+        if image.pixelColor(x, y).alpha() > 128
+    ]
+    assert values, "Empty icon"
+    return sum(values) / len(values)
+
+
+def _toolbar_extension_icon(qapp: QW.QApplication) -> QG.QIcon:
+    """Return the extension icon of a toolbar created with the current style"""
+    win = QW.QMainWindow()
+    button = win.addToolBar("Toolbar").findChild(
+        QW.QToolButton, "qt_toolbar_ext_button"
+    )
+    return button.icon()
+
+
 def test_palette_follows_color_mode(qapp: QW.QApplication) -> None:
     """Test that the application palette follows the color mode"""
     for mode in (qth.LIGHT, qth.DARK, qth.LIGHT, qth.AUTO, qth.DARK, qth.AUTO):
@@ -107,8 +129,29 @@ def test_style_without_dark_color_scheme(qapp: QW.QApplication) -> None:
     qth.set_color_mode(qth.DARK)
     if hints.colorScheme() != QC.Qt.ColorScheme.Dark:
         pytest.skip(f"Color scheme can't be set on '{qapp.platformName()}'")
-    assert qapp.style().name() == "fusion"
+    assert qapp.style().baseStyle().name() == "fusion"
+    assert qapp.style().objectName() == "fusion"
     assert _is_dark(qapp)
+    # The extension icon of new toolbars is visible with the dark palette:
+    assert _icon_lightness(_toolbar_extension_icon(qapp)) > 128
     qth.set_color_mode(qth.LIGHT)
     assert qapp.style().name() == "windowsvista"
     assert not _is_dark(qapp)
+
+
+def test_dark_fusion_toolbar_extension_icon(qapp: QW.QApplication) -> None:
+    """Test that the Fusion style for the dark color scheme draws the toolbar
+    extension icon with the palette text color (Fusion's icon is a fixed dark image)"""
+    fusion = QW.QStyleFactory.create("Fusion")
+    style = qth._DarkFusionStyle()
+    option = QW.QStyleOption()
+    option.palette = QG.QPalette(QG.QColor(45, 45, 45))
+    for standard_icon in (
+        QW.QStyle.SP_ToolBarHorizontalExtensionButton,
+        QW.QStyle.SP_ToolBarVerticalExtensionButton,
+    ):
+        assert _icon_lightness(fusion.standardIcon(standard_icon, option)) < 128
+        assert _icon_lightness(style.standardIcon(standard_icon, option)) > 128
+    # Other standard icons are those of the Fusion style:
+    other = QW.QStyle.SP_DialogSaveButton
+    assert not style.standardIcon(other, option).isNull()

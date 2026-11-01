@@ -214,15 +214,96 @@ def _supports_dark_color_scheme(style: QW.QStyle) -> bool:
     return _is_dark_palette(palette if polished is None else polished)
 
 
+def _create_toolbar_extension_icon(
+    color: QG.QColor, vertical: bool, mirrored: bool
+) -> QG.QIcon:
+    """Create the icon of toolbar extension buttons (shown when a toolbar overflows)
+
+    Args:
+        color: Color of the icon
+        vertical: True for a vertical toolbar (chevrons pointing down)
+        mirrored: True for a right-to-left layout (chevrons pointing left)
+
+    Returns:
+        Icon
+    """
+    icon = QG.QIcon()
+    for size in (16, 24, 32, 48, 64):
+        pixmap = QG.QPixmap(size, size)
+        pixmap.fill(QC.Qt.transparent)
+        painter = QG.QPainter(pixmap)
+        painter.setRenderHint(QG.QPainter.Antialiasing)
+        pen = QG.QPen(color, size / 10)
+        pen.setCapStyle(QC.Qt.RoundCap)
+        pen.setJoinStyle(QC.Qt.RoundJoin)
+        painter.setPen(pen)
+        for x0 in (0.27, 0.53):
+            points = []
+            for x, y in ((x0, 0.3), (x0 + 0.2, 0.5), (x0, 0.7)):
+                if mirrored:
+                    x = 1 - x
+                if vertical:
+                    x, y = y, x
+                points.append(QC.QPointF(x * size, y * size))
+            painter.drawPolyline(QG.QPolygonF(points))
+        painter.end()
+        icon.addPixmap(pixmap)
+    return icon
+
+
+class _DarkFusionStyle(QW.QProxyStyle):
+    """Fusion style for the dark color scheme, with a visible toolbar extension icon
+
+    The icon of toolbar extension buttons (shown when a toolbar overflows) is a fixed
+    dark image with the Fusion style, hardly visible with a dark palette: it is drawn
+    with the text color of the palette instead. Everything else is drawn by the
+    Fusion style.
+    """
+
+    def __init__(self) -> None:
+        # The proxy creates its base style: with PySide, a style passed to the
+        # constructor can't be used afterwards
+        super().__init__("Fusion")
+        # Code identifying the style by its object name sees the Fusion style:
+        self.setObjectName(self.baseStyle().objectName())
+
+    def standardIcon(
+        self,
+        standard_icon: QW.QStyle.StandardPixmap,
+        option: QW.QStyleOption | None = None,
+        widget: QW.QWidget | None = None,
+    ) -> QG.QIcon:
+        """Return standard icon, drawing the toolbar extension icon with the palette
+        text color
+
+        Args:
+            standard_icon: Standard icon
+            option: Style option
+            widget: Widget
+
+        Returns:
+            Icon
+        """
+        vertical = standard_icon == QW.QStyle.SP_ToolBarVerticalExtensionButton
+        if vertical or standard_icon == QW.QStyle.SP_ToolBarHorizontalExtensionButton:
+            palette = QW.QApplication.palette() if option is None else option.palette
+            rtl = option is not None and option.direction == QC.Qt.RightToLeft
+            color = palette.color(QG.QPalette.ButtonText)
+            return _create_toolbar_extension_icon(color, vertical, rtl and not vertical)
+        return super().standardIcon(standard_icon, option, widget)
+
+
 def _apply_native_color_theme(app: QW.QApplication, dark: bool) -> bool:
     """Apply color theme using Qt's native color scheme support (Qt >= 6.8)
 
     The color scheme is requested to Qt, so that Qt's official styles and palettes are
     used. The default style is kept if it supports the requested color scheme (e.g.
     "windows11" on Windows 11), otherwise the Fusion style is used (e.g. instead of
-    "windowsvista", which only supports the light color scheme). The style is set
-    only once: setting it repeatedly (each time destroying the previous one) was
-    observed to crash the application later.
+    "windowsvista", which only supports the light color scheme). With the dark color
+    scheme, the Fusion style draws the toolbar extension icon with the palette text
+    color (see `_DarkFusionStyle`). The style is set only once: setting it repeatedly
+    (each time destroying the previous one) was observed to crash the application
+    later.
 
     Args:
         app: Application instance
@@ -245,6 +326,8 @@ def _apply_native_color_theme(app: QW.QApplication, dark: bool) -> bool:
     style = QW.QStyleFactory.create(style_name)
     if dark and not _supports_dark_color_scheme(style):
         style = QW.QStyleFactory.create("Fusion")
+    if dark and style.name() == "fusion":
+        style = _DarkFusionStyle()
     app.setStyleSheet(stylesheet)
     app.setStyle(style)
     # An empty palette resets the application palette to the platform palette, which
