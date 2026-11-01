@@ -185,12 +185,305 @@ def get_foreground_color() -> QG.QColor:
     return QW.QApplication.instance().palette().color(QG.QPalette.Text)
 
 
+def _is_dark_palette(palette: QG.QPalette) -> bool:
+    """Return True if palette is dark (i.e. has a dark window background)
+
+    Args:
+        palette: Palette to check
+
+    Returns:
+        True if palette is dark
+    """
+    return palette.color(QG.QPalette.Window).lightness() < 128
+
+
+def _supports_dark_color_scheme(style: QW.QStyle) -> bool:
+    """Return True if style supports the dark color scheme
+
+    Some styles can't draw widgets with a dark palette (e.g. "windowsvista"): with the
+    dark color scheme, they replace the dark palette by a light one when polishing it.
+
+    Args:
+        style: Style to check (the dark color scheme must be requested to Qt)
+
+    Returns:
+        True if style supports the dark color scheme
+    """
+    palette = QG.QPalette(QG.QColor(45, 45, 45))
+    polished = style.polish(palette)  # PyQt returns the palette, PySide changes it
+    return _is_dark_palette(palette if polished is None else polished)
+
+
+def _create_toolbar_extension_icon(
+    color: QG.QColor, vertical: bool, mirrored: bool
+) -> QG.QIcon:
+    """Create the icon of toolbar extension buttons (shown when a toolbar overflows)
+
+    Args:
+        color: Color of the icon
+        vertical: True for a vertical toolbar (chevrons pointing down)
+        mirrored: True for a right-to-left layout (chevrons pointing left)
+
+    Returns:
+        Icon
+    """
+    icon = QG.QIcon()
+    for size in (16, 24, 32, 48, 64):
+        pixmap = QG.QPixmap(size, size)
+        pixmap.fill(QC.Qt.transparent)
+        painter = QG.QPainter(pixmap)
+        painter.setRenderHint(QG.QPainter.Antialiasing)
+        pen = QG.QPen(color, size / 10)
+        pen.setCapStyle(QC.Qt.RoundCap)
+        pen.setJoinStyle(QC.Qt.RoundJoin)
+        painter.setPen(pen)
+        for x0 in (0.27, 0.53):
+            points = []
+            for x, y in ((x0, 0.3), (x0 + 0.2, 0.5), (x0, 0.7)):
+                if mirrored:
+                    x = 1 - x
+                if vertical:
+                    x, y = y, x
+                points.append(QC.QPointF(x * size, y * size))
+            painter.drawPolyline(QG.QPolygonF(points))
+        painter.end()
+        icon.addPixmap(pixmap)
+    return icon
+
+
+class _DarkFusionStyle(QW.QProxyStyle):
+    """Fusion style for the dark color scheme, with a visible toolbar extension icon
+
+    The icon of toolbar extension buttons (shown when a toolbar overflows) is a fixed
+    dark image with the Fusion style, hardly visible with a dark palette: it is drawn
+    with the text color of the palette instead. Everything else is drawn by the
+    Fusion style.
+    """
+
+    def __init__(self) -> None:
+        # The proxy creates its base style: with PySide, a style passed to the
+        # constructor can't be used afterwards
+        super().__init__("Fusion")
+        # Code identifying the style by its object name sees the Fusion style:
+        self.setObjectName(self.baseStyle().objectName())
+
+    def standardIcon(
+        self,
+        standard_icon: QW.QStyle.StandardPixmap,
+        option: QW.QStyleOption | None = None,
+        widget: QW.QWidget | None = None,
+    ) -> QG.QIcon:
+        """Return standard icon, drawing the toolbar extension icon with the palette
+        text color
+
+        Args:
+            standard_icon: Standard icon
+            option: Style option
+            widget: Widget
+
+        Returns:
+            Icon
+        """
+        vertical = standard_icon == QW.QStyle.SP_ToolBarVerticalExtensionButton
+        if vertical or standard_icon == QW.QStyle.SP_ToolBarHorizontalExtensionButton:
+            palette = QW.QApplication.palette() if option is None else option.palette
+            rtl = option is not None and option.direction == QC.Qt.RightToLeft
+            color = palette.color(QG.QPalette.ButtonText)
+            return _create_toolbar_extension_icon(color, vertical, rtl and not vertical)
+        return super().standardIcon(standard_icon, option, widget)
+
+
+def _apply_native_color_theme(app: QW.QApplication, dark: bool) -> bool:
+    """Apply color theme using Qt's native color scheme support (Qt >= 6.8)
+
+    The color scheme is requested to Qt, so that Qt's official styles and palettes are
+    used. The default style is kept if it supports the requested color scheme (e.g.
+    "windows11" on Windows 11), otherwise the Fusion style is used (e.g. instead of
+    "windowsvista", which only supports the light color scheme). With the dark color
+    scheme, the Fusion style draws the toolbar extension icon with the palette text
+    color (see `_DarkFusionStyle`). The style is set only once: setting it repeatedly
+    (each time destroying the previous one) was observed to crash the application
+    later.
+
+    Args:
+        app: Application instance
+        dark: True to apply the dark theme, False to apply the light theme
+
+    Returns:
+        True if the theme has been applied, False if Qt can't apply the requested
+         color scheme (Qt < 6.8, or platform not supporting it, e.g. "offscreen")
+    """
+    hints = app.styleHints()
+    if not hasattr(hints, "setColorScheme"):
+        return False
+    scheme = QC.Qt.ColorScheme.Dark if dark else QC.Qt.ColorScheme.Light
+    hints.setColorScheme(scheme)
+    if hints.colorScheme() != scheme:
+        # The platform does not apply the color scheme (at least not immediately):
+        hints.setColorScheme(QC.Qt.ColorScheme.Unknown)
+        return False
+    style_name, _palette, stylesheet = DEFAULT_STYLES
+    style = QW.QStyleFactory.create(style_name)
+    if dark and not _supports_dark_color_scheme(style):
+        style = QW.QStyleFactory.create("Fusion")
+    if dark and style.name() == "fusion":
+        style = _DarkFusionStyle()
+    app.setStyleSheet(stylesheet)
+    app.setStyle(style)
+    # An empty palette resets the application palette to the platform palette, which
+    # follows the requested color scheme:
+    app.setPalette(QG.QPalette())
+    if _is_dark_palette(app.palette()) == dark:
+        return True
+    hints.setColorScheme(QC.Qt.ColorScheme.Unknown)
+    return False
+
+
+def _create_light_palette() -> QG.QPalette:
+    """Create Qt's default light palette (the one of the Fusion style)
+
+    Since Qt 6.5, the palettes provided by Qt follow the system color scheme: this
+    palette can't be retrieved from Qt when the system color scheme is dark and Qt
+    can't apply the light color scheme (Qt < 6.8).
+
+    Returns:
+        Light palette
+    """
+    palette = QG.QPalette()
+    for role_name, color, disabled_color in (
+        ("WindowText", "#000000", "#bebebe"),
+        ("Button", "#efefef", "#efefef"),
+        ("Light", "#ffffff", "#ffffff"),
+        ("Midlight", "#cacaca", "#cacaca"),
+        ("Dark", "#9f9f9f", "#bebebe"),
+        ("Mid", "#b8b8b8", "#b8b8b8"),
+        ("Text", "#000000", "#bebebe"),
+        ("BrightText", "#ffffff", "#ffffff"),
+        ("ButtonText", "#000000", "#bebebe"),
+        ("Base", "#ffffff", "#efefef"),
+        ("Window", "#efefef", "#efefef"),
+        ("Shadow", "#767676", "#b1b1b1"),
+        ("Highlight", "#308cc6", "#919191"),
+        ("HighlightedText", "#ffffff", "#ffffff"),
+        ("Link", "#0000ff", "#0000ff"),
+        ("LinkVisited", "#ff00ff", "#ff00ff"),
+        ("AlternateBase", "#f7f7f7", "#f7f7f7"),
+        ("ToolTipBase", "#ffffdc", "#ffffdc"),
+        ("ToolTipText", "#000000", "#000000"),
+        ("PlaceholderText", "#80000000", "#80000000"),
+    ):
+        role = getattr(QG.QPalette, role_name)
+        for group in (QG.QPalette.Active, QG.QPalette.Inactive):
+            palette.setColor(group, role, QG.QColor(color))
+        palette.setColor(QG.QPalette.Disabled, role, QG.QColor(disabled_color))
+    return palette
+
+
+def _apply_default_light_theme(app: QW.QApplication) -> None:
+    """Apply light theme by restoring the default style and palette
+
+    If the default palette is dark (it follows the system color scheme, e.g. with
+    Qt 6.7 on Windows 11 or with a dark desktop theme on Linux), Qt's default light
+    palette is used instead, with the Fusion style.
+
+    Args:
+        app: Application instance
+    """
+    style, palette, stylesheet = DEFAULT_STYLES
+    if _is_dark_palette(palette):
+        style, palette = "Fusion", _create_light_palette()
+    app.setStyle(QW.QStyleFactory.create(style))
+    app.setPalette(palette)
+    app.setStyleSheet(stylesheet)
+
+
+def _apply_custom_dark_theme(app: QW.QApplication) -> None:
+    """Apply guidata's dark theme (Fusion style with a custom dark palette)
+
+    Used when Qt can't apply the dark color scheme natively.
+
+    Args:
+        app: Application instance
+    """
+    app.setStyle(QW.QStyleFactory.create("Fusion"))
+    dark_palette = QG.QPalette()
+    dark_color = QG.QColor(50, 50, 50)
+    disabled_color = QG.QColor(127, 127, 127)
+    dpsc = dark_palette.setColor
+    dpsc(QG.QPalette.Window, dark_color)
+    dpsc(QG.QPalette.WindowText, QC.Qt.white)
+    dpsc(QG.QPalette.Base, QG.QColor(31, 31, 31))
+    dpsc(QG.QPalette.AlternateBase, dark_color)
+    dpsc(QG.QPalette.ToolTipBase, QC.Qt.white)
+    dpsc(QG.QPalette.ToolTipText, QC.Qt.white)
+    dpsc(QG.QPalette.Text, QC.Qt.white)
+    dpsc(QG.QPalette.Disabled, QG.QPalette.Text, disabled_color)
+    dpsc(QG.QPalette.Button, dark_color)
+    dpsc(QG.QPalette.ButtonText, QC.Qt.white)
+    dpsc(QG.QPalette.Disabled, QG.QPalette.ButtonText, disabled_color)
+    dpsc(QG.QPalette.BrightText, QC.Qt.red)
+    dpsc(QG.QPalette.Link, QG.QColor(42, 130, 218))
+    dpsc(QG.QPalette.Highlight, QG.QColor(42, 130, 218))
+    dpsc(QG.QPalette.HighlightedText, QC.Qt.black)
+    dpsc(QG.QPalette.Disabled, QG.QPalette.HighlightedText, disabled_color)
+    app.setPalette(dark_palette)
+    app.setStyleSheet(
+        "QToolTip { "
+        "color: white; background-color: #2a82da; border: 1px solid white;"
+        " }"
+        "QToolButton#qt_toolbar_ext_button {"
+        "background-color: qlineargradient("
+        "x1:0, y1:0, x2:0, y2:1, stop:0 #6a6a6a, stop:1 #4a4a4a);"
+        "border: 1px solid #2c2c2c;"
+        "border-radius: 4px;"
+        "}"
+        "QToolButton#qt_toolbar_ext_button:hover {"
+        "background-color: qlineargradient("
+        "x1:0, y1:0, x2:0, y2:1, stop:0 #7a7a7a, stop:1 #5a5a5a);"
+        "border: 1px solid #2a82da;"
+        "}"
+        "QToolButton#qt_toolbar_ext_button:pressed {"
+        "background-color: qlineargradient("
+        "x1:0, y1:0, x2:0, y2:1, stop:0 #3e3e3e, stop:1 #4a4a4a);"
+        "border: 1px solid #1a1a1a;"
+        "}"
+    )
+
+
+def _refresh_toolbar_extension_icons(app: QW.QApplication) -> None:
+    """Refresh the icon of toolbar extension buttons (shown when a toolbar overflows)
+
+    Qt draws this icon with the style when the toolbar is created, and does not draw
+    it again when the style or the color scheme changes: it would remain drawn for the
+    previous color scheme (e.g. hardly visible). Qt draws it again on a layout
+    direction change.
+
+    The buttons are searched by Qt from the top-level widgets: only these widgets and
+    the buttons get a Python wrapper, whereas wrapping all the widgets of the
+    application (``allWidgets``) crashed the test suite with PySide6.
+
+    Args:
+        app: Application instance
+    """
+    event = QC.QEvent(QC.QEvent.LayoutDirectionChange)
+    for window in app.topLevelWidgets():
+        for button in window.findChildren(QW.QToolButton, "qt_toolbar_ext_button"):
+            QC.QCoreApplication.sendEvent(button, event)
+
+
 def set_color_mode(mode: Literal["light", "dark", "auto"] | None = None):
     """Set color mode.
 
+    With Qt 6.8 or later, the color scheme is applied natively by Qt (official styles
+    and palettes, e.g. "windows11" style on Windows 11), whatever the system color
+    scheme. Otherwise (e.g. Qt 5), or if the platform does not support it, guidata's
+    dark theme (Fusion style with a custom dark palette) is used for the dark theme,
+    and the default style and palette are restored for the light theme (or Qt's
+    default light palette with the Fusion style, if the default palette is dark).
+
     Args:
         mode: Color mode ('light', 'dark' or 'auto'). If 'auto', the system color mode
-        is used. If None, the `QT_COLOR_MODE` environment variable is used.
+         is used. If None, the `QT_COLOR_MODE` environment variable is used.
     """
     global DEFAULT_STYLES, CURRENT_THEME
 
@@ -208,55 +501,13 @@ def set_color_mode(mode: Literal["light", "dark", "auto"] | None = None):
         # Store default palette to be able to restore it:
         DEFAULT_STYLES = app.style().objectName(), app.palette(), app.styleSheet()
 
-    if is_dark_theme():
-        app.setStyle(QW.QStyleFactory.create("Fusion"))
-        dark_palette = QG.QPalette()
-        dark_color = QG.QColor(50, 50, 50)
-        disabled_color = QG.QColor(127, 127, 127)
-        dpsc = dark_palette.setColor
-        dpsc(QG.QPalette.Window, dark_color)
-        dpsc(QG.QPalette.WindowText, QC.Qt.white)
-        dpsc(QG.QPalette.Base, QG.QColor(31, 31, 31))
-        dpsc(QG.QPalette.AlternateBase, dark_color)
-        dpsc(QG.QPalette.ToolTipBase, QC.Qt.white)
-        dpsc(QG.QPalette.ToolTipText, QC.Qt.white)
-        dpsc(QG.QPalette.Text, QC.Qt.white)
-        dpsc(QG.QPalette.Disabled, QG.QPalette.Text, disabled_color)
-        dpsc(QG.QPalette.Button, dark_color)
-        dpsc(QG.QPalette.ButtonText, QC.Qt.white)
-        dpsc(QG.QPalette.Disabled, QG.QPalette.ButtonText, disabled_color)
-        dpsc(QG.QPalette.BrightText, QC.Qt.red)
-        dpsc(QG.QPalette.Link, QG.QColor(42, 130, 218))
-        dpsc(QG.QPalette.Highlight, QG.QColor(42, 130, 218))
-        dpsc(QG.QPalette.HighlightedText, QC.Qt.black)
-        dpsc(QG.QPalette.Disabled, QG.QPalette.HighlightedText, disabled_color)
-        app.setPalette(dark_palette)
-        app.setStyleSheet(
-            "QToolTip { "
-            "color: white; background-color: #2a82da; border: 1px solid white;"
-            " }"
-            "QToolButton#qt_toolbar_ext_button {"
-            "background-color: qlineargradient("
-            "x1:0, y1:0, x2:0, y2:1, stop:0 #6a6a6a, stop:1 #4a4a4a);"
-            "border: 1px solid #2c2c2c;"
-            "border-radius: 4px;"
-            "}"
-            "QToolButton#qt_toolbar_ext_button:hover {"
-            "background-color: qlineargradient("
-            "x1:0, y1:0, x2:0, y2:1, stop:0 #7a7a7a, stop:1 #5a5a5a);"
-            "border: 1px solid #2a82da;"
-            "}"
-            "QToolButton#qt_toolbar_ext_button:pressed {"
-            "background-color: qlineargradient("
-            "x1:0, y1:0, x2:0, y2:1, stop:0 #3e3e3e, stop:1 #4a4a4a);"
-            "border: 1px solid #1a1a1a;"
-            "}"
-        )
-    elif DEFAULT_STYLES is not None:
-        style, palette, stylesheet = DEFAULT_STYLES
-        app.setStyle(QW.QStyleFactory.create(style))
-        app.setPalette(palette)
-        app.setStyleSheet(stylesheet)
+    dark = is_dark_theme()
+    if not _apply_native_color_theme(app, dark):
+        if dark:
+            _apply_custom_dark_theme(app)
+        else:
+            _apply_default_light_theme(app)
+    _refresh_toolbar_extension_icons(app)
 
     # Iterate over all top-level widgets:
     for widget in QW.QApplication.instance().topLevelWidgets():

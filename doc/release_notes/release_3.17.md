@@ -1,5 +1,12 @@
 # Version 3.17 #
 
+## guidata Version 3.17.2 ##
+
+🛠 Bug fixes:
+
+* **Light theme remaining dark** — with Qt 6.7 or later on Windows 11 in dark mode (or with a dark desktop theme on Linux), selecting the light color mode (`set_color_mode("light")`, e.g. in the settings of PlotPy or DataLab) kept a dark interface, slightly different from the dark theme: Qt 6 now derives its default palette from the system color scheme, and this dark palette was restored for the light theme. With Qt 6.8 or later, the color mode is now applied by Qt itself, whatever the system color scheme: the light and dark themes use Qt's official styles and palettes (e.g. the native "windows11" style on Windows 11, or the Fusion style when the default style does not support the dark color scheme, like "windowsvista" on Windows 10). With earlier Qt versions or on platforms where Qt can't apply the color mode, guidata's dark theme is unchanged, and the light theme uses Qt's default light palette when the system palette is dark (fixes [Issue #139](https://github.com/PlotPyStack/guidata/issues/139)).
+* **Toolbar overflow button drawn for the previous theme** — after switching between the light and dark themes, the button shown when a toolbar overflows (`»` or `···`) kept its icon drawn for the previous theme, so that it was hardly visible. Its icon is now drawn again for the new theme. With the dark theme applied natively with the Fusion style, this icon (a fixed dark image with this style) is drawn with the text color of the theme, so that it remains visible (fixes [Issue #139](https://github.com/PlotPyStack/guidata/issues/139)).
+
 ## guidata Version 3.17.1 ##
 
 🛠 Bug fixes:
