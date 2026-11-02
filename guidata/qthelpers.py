@@ -379,18 +379,68 @@ def _create_light_palette() -> QG.QPalette:
     return palette
 
 
+def _has_own_colors(palette: QG.QPalette) -> bool:
+    """Return True if a palette has colors of its own
+
+    A palette without colors of its own (e.g. the default palette of the application)
+    is resolved against the palette of the platform theme.
+
+    Args:
+        palette: Palette to check
+
+    Returns:
+        True if the palette has colors of its own
+    """
+    return any(
+        palette.isBrushSet(QG.QPalette.Active, getattr(QG.QPalette, role))
+        for role in ("Window", "WindowText", "Base", "Text", "Button", "ButtonText")
+    )
+
+
+def _is_system_color_scheme_dark(app: QW.QApplication) -> bool | None:
+    """Return True if the system color scheme is dark
+
+    Args:
+        app: Application instance
+
+    Returns:
+        True if the system color scheme is dark, False if it is light, None if it is
+        unknown (e.g. Qt < 6.5)
+    """
+    hints = app.styleHints()
+    if not hasattr(hints, "colorScheme"):
+        return None
+    scheme = hints.colorScheme()
+    if scheme == QC.Qt.ColorScheme.Dark:
+        return True
+    if scheme == QC.Qt.ColorScheme.Light:
+        return False
+    return None
+
+
 def _apply_default_light_theme(app: QW.QApplication) -> None:
     """Apply light theme by restoring the default style and palette
 
     If the default palette is dark (it follows the system color scheme, e.g. with
     Qt 6.7 on Windows 11 or with a dark desktop theme on Linux), Qt's default light
-    palette is used instead, with the Fusion style.
+    palette is used instead, with the Fusion style: some styles draw controls
+    according to the system color scheme (e.g. "windows11" with Qt 6.7), or can't draw
+    the dark palette (e.g. "windowsvista").
+
+    With Qt 6.5 or later, a default palette without colors of its own (the usual case)
+    follows the current system color scheme, which may have changed since the default
+    palette was stored: the system color scheme is then checked instead (see
+    `_on_system_color_scheme_changed`).
 
     Args:
         app: Application instance
     """
     style, palette, stylesheet = DEFAULT_STYLES
-    if _is_dark_palette(palette):
+    dark_default = _is_dark_palette(palette)
+    system_dark = _is_system_color_scheme_dark(app)
+    if system_dark is not None and not _has_own_colors(palette):
+        dark_default = system_dark
+    if dark_default:
         style, palette = "Fusion", _create_light_palette()
     app.setStyle(QW.QStyleFactory.create(style))
     app.setPalette(palette)
@@ -498,7 +548,7 @@ def set_color_mode(mode: Literal["light", "dark", "auto"] | None = None):
         mode: Color mode ('light', 'dark' or 'auto'). If 'auto', the system color mode
          is used. If None, the `QT_COLOR_MODE` environment variable is used.
     """
-    global DEFAULT_STYLES, CURRENT_THEME
+    global DEFAULT_STYLES, CURRENT_THEME, _SETTING_COLOR_MODE
 
     CURRENT_THEME = None
 
@@ -514,15 +564,73 @@ def set_color_mode(mode: Literal["light", "dark", "auto"] | None = None):
         # Store default palette to be able to restore it:
         DEFAULT_STYLES = app.style().objectName(), app.palette(), app.styleSheet()
 
-    dark = is_dark_theme()
-    native = _apply_native_color_theme(app, dark)
-    if not native:
-        if dark:
-            _apply_custom_dark_theme(app)
-        else:
-            _apply_default_light_theme(app)
-    _refresh_toolbar_extension_icons(app)
-    _update_title_bar_theme(app, native)
+    _SETTING_COLOR_MODE = True
+    try:
+        dark = is_dark_theme()
+        native = _apply_native_color_theme(app, dark)
+        if not native:
+            if dark:
+                _apply_custom_dark_theme(app)
+            else:
+                _apply_default_light_theme(app)
+        _refresh_toolbar_extension_icons(app)
+        _update_title_bar_theme(app, native)
+    finally:
+        _SETTING_COLOR_MODE = False
+    _connect_system_color_scheme_changed(app)
+
+
+#: True while the color mode is being set (see `set_color_mode`)
+_SETTING_COLOR_MODE = False
+
+#: Application whose system color scheme changes are followed (see
+#: `_connect_system_color_scheme_changed`)
+_SYSTEM_COLOR_SCHEME_APP: QW.QApplication | None = None
+
+
+def _connect_system_color_scheme_changed(app: QW.QApplication) -> None:
+    """Follow the system color scheme changes of the application (Qt 6.5 or later),
+    if not already done (see `_on_system_color_scheme_changed`)
+
+    Args:
+        app: Application instance
+    """
+    global _SYSTEM_COLOR_SCHEME_APP  # pylint: disable=global-statement
+    hints = app.styleHints()
+    if _SYSTEM_COLOR_SCHEME_APP is app or not hasattr(hints, "colorSchemeChanged"):
+        return
+    hints.colorSchemeChanged.connect(_on_system_color_scheme_changed)
+    _SYSTEM_COLOR_SCHEME_APP = app
+
+
+def _on_system_color_scheme_changed(*_args) -> None:
+    """Apply the light theme again when the system color scheme changes
+
+    When the color mode is not applied natively by Qt (e.g. Qt 6.5-6.7), the light
+    theme depends on the system color scheme (see `_apply_default_light_theme`): it
+    would turn dark when the system color scheme switches to dark. Qt emits the signal
+    connected to this function after having resolved the application palette against
+    the new system palette, and before notifying the windows of the change.
+
+    The dark theme has its own palette and style, and does not depend on the system
+    color scheme.
+    """
+    app = QW.QApplication.instance()
+    if (
+        _SETTING_COLOR_MODE
+        or _NATIVE_COLOR_SCHEME is not False
+        or app is None
+        or DEFAULT_STYLES is None
+        or is_dark_theme()
+    ):
+        return
+    try:
+        _apply_default_light_theme(app)
+        _refresh_toolbar_extension_icons(app)
+        _update_title_bar_theme(app, False)
+    except Exception as exc:  # pylint: disable=broad-except
+        # Called by Qt: an exception raised here would abort PyQt applications
+        warnings.warn(f"Light theme not applied again: {exc}", RuntimeWarning)
 
 
 # Window title bars on Windows

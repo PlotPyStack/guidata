@@ -87,6 +87,65 @@ def test_light_mode_with_dark_default_palette(
         assert _is_dark(qapp)
 
 
+def test_light_theme_after_system_color_scheme_change(
+    qapp: QW.QApplication, monkeypatch
+) -> None:
+    """Test that the light theme remains light when the system color scheme changes,
+    when Qt can't apply the color mode (e.g. Qt 6.5-6.7): the default palette (without
+    colors of its own) would follow the system color scheme, and some styles draw
+    controls according to it (e.g. "windows11" with Qt 6.7)"""
+    system = {"dark": False}
+    with monkeypatch.context() as mpatch:
+        mpatch.setattr(qth, "_apply_native_color_theme", lambda app, dark: False)
+        mpatch.setattr(qth, "_is_system_color_scheme_dark", lambda app: system["dark"])
+        qth.set_color_mode(qth.LIGHT)
+        style = qth.DEFAULT_STYLES[0]
+        default_palette = QG.QPalette()  # No color of its own
+        assert not qth._has_own_colors(default_palette)
+        qth.DEFAULT_STYLES = style, default_palette, ""
+        for dark in (True, False, True):
+            system["dark"] = dark
+            qth._on_system_color_scheme_changed()
+            expected_style = "fusion" if dark else style.lower()
+            assert qapp.style().objectName().lower() == expected_style, dark
+            if dark:
+                # Qt's default light palette (the system palette is dark)
+                assert not _is_dark(qapp)
+                assert qth._has_own_colors(qapp.palette())
+        # The dark theme does not depend on the system color scheme:
+        qth.set_color_mode(qth.DARK)
+        for dark in (False, True):
+            system["dark"] = dark
+            qth._on_system_color_scheme_changed()
+            assert _is_dark(qapp)
+        # Nor the color mode applied natively by Qt:
+        qth.set_color_mode(qth.LIGHT)
+        mpatch.setattr(qth, "_NATIVE_COLOR_SCHEME", True)
+        mpatch.setattr(qth, "_apply_default_light_theme", pytest.fail)
+        qth._on_system_color_scheme_changed()
+
+
+def test_system_color_scheme_change_signal(qapp: QW.QApplication, monkeypatch) -> None:
+    """Test that the light theme is applied again when Qt notifies a change of the
+    system color scheme (Qt 6.5 or later)"""
+    hints = qapp.styleHints()
+    if not hasattr(hints, "colorSchemeChanged"):
+        pytest.skip("No system color scheme notification with Qt < 6.5")
+    calls: list[QW.QApplication] = []
+    with monkeypatch.context() as mpatch:
+        mpatch.setattr(qth, "_apply_native_color_theme", lambda app, dark: False)
+        qth.set_color_mode(qth.LIGHT)
+        mpatch.setattr(qth, "_apply_default_light_theme", calls.append)
+        hints.colorSchemeChanged.emit(QC.Qt.ColorScheme.Dark)
+        assert calls == [qapp]
+        # Connected once, whatever the number of color mode changes:
+        mpatch.setattr(qth, "_apply_default_light_theme", lambda app: None)
+        qth.set_color_mode(qth.LIGHT)
+        mpatch.setattr(qth, "_apply_default_light_theme", calls.append)
+        hints.colorSchemeChanged.emit(QC.Qt.ColorScheme.Light)
+        assert calls == [qapp, qapp]
+
+
 def test_custom_dark_theme_relief_colors(qapp: QW.QApplication, monkeypatch) -> None:
     """Test that the relief colors of guidata's dark theme (e.g. of sunken separator
     lines) are dark: those of the light system palette were kept (white lines)"""
