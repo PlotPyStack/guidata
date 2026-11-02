@@ -491,6 +491,9 @@ def set_color_mode(mode: Literal["light", "dark", "auto"] | None = None):
     and the default style and palette are restored for the light theme (or Qt's
     default light palette with the Fusion style, if the default palette is dark).
 
+    On Windows, the title bar of all windows follows the color theme, including those
+    created afterwards (see :py:func:`win32_fix_title_bar_background`).
+
     Args:
         mode: Color mode ('light', 'dark' or 'auto'). If 'auto', the system color mode
          is used. If None, the `QT_COLOR_MODE` environment variable is used.
@@ -512,91 +515,404 @@ def set_color_mode(mode: Literal["light", "dark", "auto"] | None = None):
         DEFAULT_STYLES = app.style().objectName(), app.palette(), app.styleSheet()
 
     dark = is_dark_theme()
-    if not _apply_native_color_theme(app, dark):
+    native = _apply_native_color_theme(app, dark)
+    if not native:
         if dark:
             _apply_custom_dark_theme(app)
         else:
             _apply_default_light_theme(app)
     _refresh_toolbar_extension_icons(app)
-
-    # Iterate over all top-level widgets:
-    for widget in QW.QApplication.instance().topLevelWidgets():
-        win32_fix_title_bar_background(widget)
+    _update_title_bar_theme(app, native)
 
 
-def win32_fix_title_bar_background(widget: QW.QWidget) -> None:
-    """Fix window title bar background for Windows 10+ dark theme
+# Window title bars on Windows
+# ----------------------------
+# Windows draws the title bar of windows with its own color scheme, regardless of the
+# palette of the application: with guidata's dark theme, the title bars would remain
+# white. guidata gives every window with a title bar a title bar following its palette,
+# when its native window is created (see `_TitleBarThemeFilter`), and when the color
+# mode changes. New windows only need it with a dark palette: they have a light title
+# bar otherwise. With Qt 6.8 or later, when the color mode is applied natively by Qt,
+# Qt gives the new windows a title bar following the color scheme: only the existing
+# windows are given the new color mode by guidata.
+
+#: True if the color mode is applied natively by Qt (see `_apply_native_color_theme`),
+#: None if `set_color_mode` was not called (e.g. application creating its own
+#: QApplication instance)
+_NATIVE_COLOR_SCHEME: bool | None = None
+
+#: Application event filter giving windows a title bar following their palette
+_TITLE_BAR_FILTER: _TitleBarThemeFilter | None = None
+
+#: `DwmSetWindowAttribute` and `DwmGetWindowAttribute` functions of the Windows API
+#: (loaded when first used)
+_DWM_FUNCTIONS: tuple[Callable, Callable] | None = None
+
+#: `DWMWA_USE_IMMERSIVE_DARK_MODE` attribute of `DwmSetWindowAttribute`, and its
+#: value before Windows 10 20H1 (the attributes used by Qt 6 for the same purpose)
+_DWMWA_USE_IMMERSIVE_DARK_MODE = (20, 19)
+
+#: Window types with a title bar (popup menus, tooltips, splash screens, ... have none)
+_TITLE_BAR_WINDOW_TYPES = (QC.Qt.Window, QC.Qt.Dialog, QC.Qt.Tool)
+
+
+def _is_title_bar_theme_supported() -> bool:
+    """Return True if the title bar of windows may be given the color theme
+
+    It is supported with the native Windows platform (64-bit Python). With other
+    platforms (e.g. "offscreen"), window identifiers are not Windows handles.
+
+    Returns:
+        True if the title bar of windows may be given the color theme
+    """
+    return (
+        os.name == "nt"
+        and sys.maxsize > 2**32
+        and QG.QGuiApplication.platformName() == "windows"
+    )
+
+
+def _get_dwm_functions() -> tuple[Callable, Callable] | None:
+    """Return the `DwmSetWindowAttribute` and `DwmGetWindowAttribute` functions
+
+    Returns:
+        Functions, or None if they are not available
+    """
+    global _DWM_FUNCTIONS  # pylint: disable=global-statement
+
+    if _DWM_FUNCTIONS is None:
+        import ctypes  # pylint: disable=import-outside-toplevel
+        from ctypes import wintypes  # pylint: disable=import-outside-toplevel
+
+        try:
+            # A private instance of the library, whose function prototypes do not
+            # interfere with other users of `ctypes.windll.dwmapi`:
+            dwmapi = ctypes.WinDLL("dwmapi")
+            functions = (dwmapi.DwmSetWindowAttribute, dwmapi.DwmGetWindowAttribute)
+        except (OSError, AttributeError):
+            return None
+        for function in functions:
+            function.argtypes = (
+                wintypes.HWND,
+                wintypes.DWORD,
+                ctypes.c_void_p,
+                wintypes.DWORD,
+            )
+            function.restype = ctypes.c_long  # HRESULT (without raising an exception)
+        _DWM_FUNCTIONS = functions
+    return _DWM_FUNCTIONS
+
+
+def _set_win32_dark_title_bar(hwnd: int, dark: bool) -> bool:
+    """Set the title bar of a native window dark or light (Windows 10 or later)
 
     Args:
-        widget (QW.QWidget): Widget to fix
-    """
-    if os.name != "nt" or sys.maxsize == 2**31 - 1:
-        return
+        hwnd: Handle of the native window
+        dark: True for a dark title bar, False for a light one
 
-    # See Issue #84: SetWindowCompositionAttribute() is incompatible with
-    # QGraphicsEffect (e.g. QGraphicsDropShadowEffect) applied on the widget or
-    # any of its parents.
+    Returns:
+        True if the title bar has been set, False if Windows does not support it
+    """
+    import ctypes  # pylint: disable=import-outside-toplevel
+    from ctypes import wintypes  # pylint: disable=import-outside-toplevel
+
+    functions = _get_dwm_functions()
+    if functions is None:
+        return False
+    value = wintypes.BOOL(dark)
+    set_attribute = functions[0]
+    for attribute in _DWMWA_USE_IMMERSIVE_DARK_MODE:
+        size = ctypes.sizeof(value)
+        if set_attribute(hwnd, attribute, ctypes.byref(value), size) == 0:
+            return True
+    return False
+
+
+def _get_win32_dark_title_bar(hwnd: int) -> bool | None:
+    """Return True if the title bar of a native window is dark (Windows 10 or later)
+
+    Args:
+        hwnd: Handle of the native window
+
+    Returns:
+        True if the title bar is dark, False if it is light, None if unknown
+    """
+    import ctypes  # pylint: disable=import-outside-toplevel
+    from ctypes import wintypes  # pylint: disable=import-outside-toplevel
+
+    functions = _get_dwm_functions()
+    if functions is None:
+        return None
+    value = wintypes.BOOL()
+    get_attribute = functions[1]
+    for attribute in _DWMWA_USE_IMMERSIVE_DARK_MODE:
+        size = ctypes.sizeof(value)
+        if get_attribute(hwnd, attribute, ctypes.byref(value), size) == 0:
+            return bool(value.value)
+    return None
+
+
+def _has_themable_title_bar(widget: QW.QWidget) -> bool:
+    """Return True if widget is a window whose title bar may be given the color theme
+
+    Windows without a title bar (popup menus, tooltips, splash screens, frameless
+    windows, ...) are excluded, as well as widgets with a graphics effect.
+
+    Args:
+        widget: Widget to check
+
+    Returns:
+        True if the title bar of the widget may be given the color theme
+    """
+    if not widget.isWindow() or widget.windowType() not in _TITLE_BAR_WINDOW_TYPES:
+        return False
+    if widget.windowFlags() & QC.Qt.FramelessWindowHint:
+        return False
+    # See Issue #84: setting the title bar color is incompatible with QGraphicsEffect
+    # (e.g. QGraphicsDropShadowEffect) applied on the widget or any of its parents.
     # Qt performs its own offscreen rendering when a QGraphicsEffect is active,
     # preventing Windows from properly applying composition effects and potentially
     # causing rendering glitches or crashes.
-    # This check avoids applying system-level visual modifications in such cases.
     obj = widget
     while obj is not None:
-        if obj.graphicsEffect():
-            return
-        obj = obj.parent()
+        if obj.graphicsEffect() is not None:
+            return False
+        obj = obj.parentWidget()
+    return True
 
-    import ctypes
-    from ctypes import wintypes
 
-    class ACCENTPOLICY(ctypes.Structure):
-        _fields_ = [
-            ("AccentState", ctypes.c_uint),
-            ("AccentFlags", ctypes.c_uint),
-            ("GradientColor", ctypes.c_uint),
-            ("AnimationId", ctypes.c_uint),
-        ]
+def _apply_title_bar_theme(widget: QW.QWidget, if_changed: bool = False) -> None:
+    """Give a window a title bar following its palette, if its native window exists
 
-    class WINDOWCOMPOSITIONATTRIBDATA(ctypes.Structure):
-        _fields_ = [
-            ("Attribute", ctypes.c_int),
-            ("Data", ctypes.POINTER(ctypes.c_int)),
-            ("SizeOfData", ctypes.c_size_t),
-        ]
+    The native window is never created by this function: a window whose native window
+    does not exist yet is given the title bar by `_TitleBarThemeFilter` when Qt
+    creates its native window.
 
-    accent = ACCENTPOLICY()
-    data = WINDOWCOMPOSITIONATTRIBDATA()
-
-    dark = is_dark_theme()
-    if dark:
-        accent.AccentState = 3  # ACCENT_ENABLE_ACRYLICBLURBEHIND
-        data.Attribute = 26  # WCA_USEDARKMODECOLORS
-    else:
-        accent.AccentState = 0  # ACCENT_DISABLED
-        data.Attribute = 19  # WCA_ACCENT_POLICY
-
-    data.SizeOfData = ctypes.sizeof(accent)
-    data.Data = ctypes.cast(ctypes.pointer(accent), ctypes.POINTER(ctypes.c_int))
-
-    if not hasattr(ctypes.windll.user32, "SetWindowCompositionAttribute"):
-        # Windows 7 and 8 do not support this function, so we skip it
+    Args:
+        widget: Widget (other widgets than windows with a title bar are ignored)
+        if_changed: If True, the title bar is only set if it has another color
+    """
+    if not _has_themable_title_bar(widget):
         return
+    win_id = widget.effectiveWinId()  # Unlike `winId`, never creates a native window
+    hwnd = 0 if win_id is None else int(win_id)
+    if hwnd:
+        dark = _is_dark_palette(widget.palette())
+        if not if_changed or _get_win32_dark_title_bar(hwnd) is not dark:
+            _set_win32_dark_title_bar(hwnd, dark)
 
-    set_win_cpa = ctypes.windll.user32.SetWindowCompositionAttribute
-    set_win_cpa.argtypes = (wintypes.HWND, ctypes.POINTER(WINDOWCOMPOSITIONATTRIBDATA))
-    set_win_cpa.restype = ctypes.c_int
-    set_win_cpa(int(widget.winId()), data)
 
-    if not dark:
-        # Setting dark mode attribute to False (0) to ensure the default light mode
-        attribute_value = ctypes.c_int(0)
-        hwnd = wintypes.HWND(int(widget.winId()))
-        ctypes.windll.dwmapi.DwmSetWindowAttribute(
-            hwnd,
-            20,  # DWMWA_USE_IMMERSIVE_DARK_MODE, # Dark mode attribute
-            ctypes.byref(attribute_value),
-            ctypes.sizeof(attribute_value),
-        )
+def _apply_title_bar_theme_to_windows(
+    app: QW.QApplication, if_changed: bool = False
+) -> None:
+    """Give the existing windows a title bar following their palette
+
+    Args:
+        app: Application instance
+        if_changed: If True, a title bar is only set if it has another color
+    """
+    for widget in app.topLevelWidgets():
+        try:
+            _apply_title_bar_theme(widget, if_changed)
+        except RuntimeError:
+            # Underlying C++ object has been deleted
+            continue
+
+
+class _TitleBarThemeFilter(QC.QObject):
+    """Application event filter giving windows a title bar following their palette
+
+    Windows are given the title bar when Qt creates their native window (this also
+    applies to message boxes and input dialogs created by static methods, to floating
+    dock widgets, and to windows whose native window is created again, e.g. after
+    `setWindowFlags`). They are also given it again when Qt may have reset it: e.g.
+    Qt 6.5-6.7 sets the title bar according to the system color scheme when a window
+    receives a palette or theme change event, possibly after the color mode has been
+    applied (these events may be posted).
+
+    Args:
+        app: Application instance (parent of the filter)
+    """
+
+    CREATION_EVENT = QC.QEvent.WinIdChange
+    THEME_EVENTS = (
+        QC.QEvent.ApplicationPaletteChange,
+        # `QEvent.ThemeChange` is not exposed by PyQt5:
+        getattr(QC.QEvent, "ThemeChange", None) or QC.QEvent.Type(210),
+    )
+    #: Events processed by the filter (called for every event of the application:
+    #: other events must be discarded as fast as possible)
+    EVENT_TYPES = frozenset((CREATION_EVENT,) + THEME_EVENTS)
+    #: True if Qt may reset the title bar of windows: Qt 6.5-6.7 sets it according to
+    #: the system color scheme when a window processes a palette or theme change event
+    QT_RESETS_TITLE_BAR = int(QC.qVersion().split(".")[0]) >= 6
+    #: Delay (ms) before the title bars are given again after the last palette or theme
+    #: change event: when a title bar is changed several times in a short time (e.g.
+    #: reset by Qt, then set again), Windows may keep drawing a previous color
+    REFRESH_DELAY = 100
+
+    def __init__(self, app: QW.QApplication) -> None:
+        super().__init__(app)
+        # Restarted by each palette or theme change event, so that the title bars are
+        # given again once Qt has processed the last one
+        self.__refresh_timer = QC.QTimer(self)
+        self.__refresh_timer.setSingleShot(True)
+        self.__refresh_timer.setInterval(self.REFRESH_DELAY)
+        self.__refresh_timer.timeout.connect(self.__refresh)
+
+    def schedule_refresh(self) -> None:
+        """Give the existing windows a title bar following their palette, once the
+        pending events have been processed (see `REFRESH_DELAY`)"""
+        self.__refresh_timer.start()
+
+    def eventFilter(  # pylint: disable=invalid-name
+        self, obj: QC.QObject, event: QC.QEvent
+    ) -> bool:
+        """Give windows a title bar following their palette
+
+        Args:
+            obj: Object receiving the event
+            event: Event
+
+        Returns:
+            False (the event is always processed normally)
+        """
+        if event.type() in self.EVENT_TYPES:
+            try:
+                self.__process_event(obj, event.type())
+            except Exception:  # pylint: disable=broad-except
+                # The title bar is cosmetic: an error must never prevent the event
+                # from being processed (an exception raised here aborts PyQt
+                # applications)
+                pass
+        return False
+
+    def __process_event(self, obj: QC.QObject, event_type: QC.QEvent.Type) -> None:
+        """Process an event of `EVENT_TYPES`
+
+        Args:
+            obj: Object receiving the event
+            event_type: Event type
+        """
+        if event_type == self.CREATION_EVENT:
+            if obj.isWidgetType():
+                _apply_title_bar_theme(obj)
+        elif obj.isWindowType() or (obj.isWidgetType() and obj.isWindow()):
+            # The title bar is set by Qt when the native window (QWindow) processes
+            # the event, i.e. after this filter: it is given again afterwards
+            self.schedule_refresh()
+
+    def __refresh(self) -> None:
+        """Give the existing windows a title bar following their palette (only the
+        title bars which have another color, e.g. reset by Qt)"""
+        try:
+            app = QW.QApplication.instance()
+            if app is not None and _is_title_bar_theme_supported():
+                _apply_title_bar_theme_to_windows(app, if_changed=True)
+        except Exception:  # pylint: disable=broad-except
+            pass
+
+
+def _is_title_bar_filter_needed(app: QW.QApplication) -> bool:
+    """Return True if new windows must be given a title bar following their palette
+
+    New windows have a light title bar, unless Qt gives them a title bar following
+    their palette, e.g. when the color mode is applied natively by Qt (Qt 6.8 or
+    later). The filter giving them a title bar following their palette is thus only
+    needed with a dark palette, and when the color mode is not applied natively: being
+    called for every event of the application, it is not installed otherwise.
+
+    Args:
+        app: Application instance
+
+    Returns:
+        True if new windows must be given a title bar following their palette
+    """
+    return not _NATIVE_COLOR_SCHEME and _is_dark_palette(app.palette())
+
+
+def _install_title_bar_filter(app: QW.QApplication) -> None:
+    """Install the application event filter giving windows a title bar following
+    their palette (if not already installed)
+
+    Args:
+        app: Application instance
+    """
+    global _TITLE_BAR_FILTER  # pylint: disable=global-statement
+    flt = _TITLE_BAR_FILTER
+    if flt is not None and is_qobject_valid(flt) and flt.parent() is app:
+        return
+    _TITLE_BAR_FILTER = _TitleBarThemeFilter(app)
+    app.installEventFilter(_TITLE_BAR_FILTER)
+
+
+def _remove_title_bar_filter() -> None:
+    """Remove the application event filter giving windows a title bar following
+    their palette (if installed)"""
+    global _TITLE_BAR_FILTER  # pylint: disable=global-statement
+    flt, _TITLE_BAR_FILTER = _TITLE_BAR_FILTER, None
+    if flt is not None and is_qobject_valid(flt):
+        flt.parent().removeEventFilter(flt)
+        flt.deleteLater()
+
+
+def _update_title_bar_theme(app: QW.QApplication, native: bool) -> None:
+    """Give windows a title bar following the color theme, after it has been applied
+
+    Args:
+        app: Application instance
+        native: True if the color theme has been applied natively by Qt
+    """
+    global _NATIVE_COLOR_SCHEME  # pylint: disable=global-statement
+    _NATIVE_COLOR_SCHEME = native
+    if not _is_title_bar_theme_supported():
+        return
+    if _is_title_bar_filter_needed(app):
+        _install_title_bar_filter(app)
+        if _TitleBarThemeFilter.QT_RESETS_TITLE_BAR:
+            # Qt may reset the title bars when processing the palette change events,
+            # which may be posted: they are given once, after these events (changed
+            # several times in a short time, they may keep being drawn with a
+            # previous color)
+            _TITLE_BAR_FILTER.schedule_refresh()
+            return
+    else:
+        _remove_title_bar_filter()
+    # Existing windows: when the color scheme is applied natively, Qt sets their title
+    # bar according to their palette before it changes (e.g. a light title bar is kept
+    # when switching from light to dark)
+    _apply_title_bar_theme_to_windows(app)
+
+
+def win32_fix_title_bar_background(widget: QW.QWidget) -> None:
+    """Give a window a title bar following its palette (Windows 10 or later)
+
+    Windows draws the title bar of windows with its own color scheme, regardless of
+    the palette of the application: with a dark theme, the title bar would remain
+    white.
+
+    Once this function or :py:func:`set_color_mode` has been called, the windows of
+    the application are given a title bar following their palette when their native
+    window is created: calling this function is only needed in applications which
+    create their own QApplication instance and do not call
+    :py:func:`set_color_mode`.
+
+    New windows have a light title bar by default: they are only given a title bar
+    following their palette with a dark application palette, unless the color mode is
+    applied natively by Qt (Qt 6.8 or later), which then does it itself. This function
+    does nothing on other platforms or with 32-bit Python. It never creates the native
+    window of the widget: if it does not exist yet, the title bar is set when Qt
+    creates it.
+
+    Args:
+        widget: Window to fix (other widgets are ignored)
+    """
+    if not _is_title_bar_theme_supported():
+        return
+    app = QW.QApplication.instance()
+    if _is_title_bar_filter_needed(app):
+        _install_title_bar_filter(app)
+    _apply_title_bar_theme(widget)
 
 
 def create_action(
