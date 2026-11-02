@@ -533,8 +533,8 @@ def set_color_mode(mode: Literal["light", "dark", "auto"] | None = None):
 # when its native window is created (see `_TitleBarThemeFilter`), and when the color
 # mode changes. New windows only need it with a dark palette: they have a light title
 # bar otherwise. With Qt 6.8 or later, when the color mode is applied natively by Qt,
-# Qt gives the new windows a title bar following the color scheme: only the existing
-# windows are given the new color mode by guidata.
+# Qt gives the windows a title bar following the color scheme: title bars are then
+# left to Qt (also setting them makes Windows keep drawing a previous color).
 
 #: True if the color mode is applied natively by Qt (see `_apply_native_color_theme`),
 #: None if `set_color_mode` was not called (e.g. application creating its own
@@ -867,6 +867,13 @@ def _update_title_bar_theme(app: QW.QApplication, native: bool) -> None:
     _NATIVE_COLOR_SCHEME = native
     if not _is_title_bar_theme_supported():
         return
+    if native:
+        # Qt gives the windows a title bar following the color scheme, once it has
+        # processed the palette change events: also setting it, the title bar is set
+        # several times in a short time, and Windows may keep drawing a previous color
+        # (e.g. the dark title bar of the active window after switching to light)
+        _remove_title_bar_filter()
+        return
     if _is_title_bar_filter_needed(app):
         _install_title_bar_filter(app)
         if _TitleBarThemeFilter.QT_RESETS_TITLE_BAR:
@@ -878,9 +885,6 @@ def _update_title_bar_theme(app: QW.QApplication, native: bool) -> None:
             return
     else:
         _remove_title_bar_filter()
-    # Existing windows: when the color scheme is applied natively, Qt sets their title
-    # bar according to their palette before it changes (e.g. a light title bar is kept
-    # when switching from light to dark)
     _apply_title_bar_theme_to_windows(app)
 
 
@@ -898,16 +902,16 @@ def win32_fix_title_bar_background(widget: QW.QWidget) -> None:
     :py:func:`set_color_mode`.
 
     New windows have a light title bar by default: they are only given a title bar
-    following their palette with a dark application palette, unless the color mode is
-    applied natively by Qt (Qt 6.8 or later), which then does it itself. This function
-    does nothing on other platforms or with 32-bit Python. It never creates the native
-    window of the widget: if it does not exist yet, the title bar is set when Qt
-    creates it.
+    following their palette with a dark application palette. This function does
+    nothing when the color mode is applied natively by Qt (Qt 6.8 or later), which
+    then gives the windows a title bar following the color scheme, on other platforms,
+    or with 32-bit Python. It never creates the native window of the widget: if it
+    does not exist yet, the title bar is set when Qt creates it.
 
     Args:
         widget: Window to fix (other widgets are ignored)
     """
-    if not _is_title_bar_theme_supported():
+    if not _is_title_bar_theme_supported() or _NATIVE_COLOR_SCHEME:
         return
     app = QW.QApplication.instance()
     if _is_title_bar_filter_needed(app):

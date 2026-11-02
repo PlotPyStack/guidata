@@ -389,19 +389,23 @@ def test_errors_ignored(recorder: TitleBarRecorder, monkeypatch) -> None:
 
 
 def test_native_color_scheme(recorder: TitleBarRecorder, monkeypatch) -> None:
-    """Test that new windows are left to Qt when the color mode is applied natively
-    (Qt 6.8 or later), whereas existing windows are given the new color mode: Qt sets
-    their title bar according to their palette before it changes"""
+    """Test that title bars are left to Qt when the color mode is applied natively
+    (Qt 6.8 or later): Qt gives the windows a title bar following the color scheme,
+    and also setting it makes Windows keep drawing a previous color (e.g. the dark
+    title bar of the active window after switching to light)"""
     qth.set_color_mode(qth.DARK)
     dialog = new_dialog(recorder)
     dialog.show()
     recorder.flush()
     with monkeypatch.context() as mpatch:
         mpatch.setattr(qth, "_apply_native_color_theme", lambda app, dark: True)
-        qth.set_color_mode(qth.DARK)  # The palette remains dark
+        for mode in (qth.LIGHT, qth.DARK):
+            qth.set_color_mode(mode)
+            assert qth._TITLE_BAR_FILTER is None
+            qth.win32_fix_title_bar_background(dialog)
+            wait_refresh()
+            assert recorder.calls == [], mode
         assert qth._TITLE_BAR_FILTER is None
-        assert recorder.calls_of(dialog) == [True]
-        recorder.flush()
         new_dialog_ = new_dialog(recorder, "New")
         qth.win32_fix_title_bar_background(new_dialog_)
         assert qth._TITLE_BAR_FILTER is None
@@ -462,6 +466,9 @@ def test_windows_title_bars() -> None:
     try:
         for mode, dark in ((qth.DARK, True), (qth.LIGHT, False), (qth.DARK, True)):
             qth.set_color_mode(mode)
+            # With Qt 6.8 or later, Qt sets the title bars once it has processed the
+            # palette change events
+            wait_refresh()
             wait_refresh()
             for widget in widgets:
                 assert _get_dwm_dark_title_bar(widget) is dark, (widget, mode)
