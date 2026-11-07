@@ -242,7 +242,9 @@ When ready to release a patch version (e.g., 3.7.1, 3.7.2):
          git tag -a v3.7.1 -m "Release version 3.7.1"
          git push origin master --tags
 
-4. Keep the ``release`` branch for additional patches in the same minor version series.
+4. Pushing the tag starts the **Release** workflow, which checks the tag, runs the tests and builds the release files, then creates a draft GitHub release. Review the draft release and publish it: this uploads the package to PyPI. Never create a GitHub release by hand (see ``RELEASING.md`` at the root of the repository).
+
+5. Keep the ``release`` branch for additional patches in the same minor version series.
 
 Workflow for Minor/Major Releases
 ----------------------------------
@@ -263,14 +265,16 @@ When ready to release a new minor or major version (e.g., 3.8.0, 4.0.0):
          git tag -a v3.8.0 -m "Release version 3.8.0"
          git push origin master --tags
 
-3. Delete the old ``release`` branch (if exists):
+3. Pushing the tag starts the **Release** workflow, which checks the tag, runs the tests and builds the release files, then creates a draft GitHub release. Review the draft release and publish it: this uploads the package to PyPI. Never create a GitHub release by hand (see ``RELEASING.md`` at the root of the repository).
+
+4. Delete the old ``release`` branch (if exists):
 
    .. code-block:: sh
 
          git branch -d release
          git push origin --delete release
 
-4. Create a new ``release`` branch from ``master`` when the first patch for 3.8.1 is needed:
+5. Create a new ``release`` branch from ``master`` when the first patch for 3.8.1 is needed:
 
    .. code-block:: sh
 
