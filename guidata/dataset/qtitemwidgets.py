@@ -46,7 +46,10 @@ from qtpy.QtWidgets import (
     QLineEdit,
     QPushButton,
     QRadioButton,
+    QSizePolicy,
     QSlider,
+    QStyle,
+    QStyleOptionFrame,
     QTabWidget,
     QTextEdit,
     QVBoxLayout,
@@ -1163,12 +1166,17 @@ class FloatSliderWidget(SliderWidget):
     def value_to_slider(self, value):
         if self._auto_slider:
             return super().value_to_slider(value)
-        return int((value - self.vmin) * 100 / (self.vmax - self.vmin))
+        return round((value - self.vmin) * 100 / (self.vmax - self.vmin))
 
     def slider_to_value(self, value):
         if self._auto_slider:
-            return float(super().slider_to_value(value))
-        return value * (self.vmax - self.vmin) / 100 + self.vmin
+            exact = float(super().slider_to_value(value))
+        else:
+            exact = value * (self.vmax - self.vmin) / 100 + self.vmin
+        # Remove the binary noise of the computation (e.g. 0.30000000000000004 instead
+        # of 0.3), unless the slider resolution is too fine for 12 significant digits
+        rounded = min(self.vmax, max(self.vmin, float(f"{exact:.12g}")))
+        return rounded if self.value_to_slider(rounded) == value else exact
 
     def setup_slider(self, item):
         self.slider.setRange(0, 100)
@@ -1842,6 +1850,96 @@ def _finite_range(value: Any) -> tuple[float, float] | None:
     return None
 
 
+def _shortest_text(value: float) -> str:
+    """Return the shortest ``g``-formatted text giving back *value* exactly.
+
+    Like ``%g``, integers of up to 6 digits are written without exponent (e.g.
+    ``20`` instead of ``2e+01``).
+    """
+    for precision in range(1, 17):
+        if float(f"{value:.{precision}g}") == value:
+            break
+    else:
+        precision = 17
+    exponent = math.floor(math.log10(abs(value))) if value else 0
+    return f"{value:.{max(precision, min(exponent + 1, 6))}g}"
+
+
+def _format_range_bound(value: float, resolution: float) -> str:
+    """Format a range bound for display, according to the range resolution.
+
+    The bound is rounded to one more decimal digit than *resolution*, so that the
+    text shows the meaningful digits only (e.g. ``1.7557`` instead of
+    ``1.7556590923058577`` for a resolution of ``0.00175``). Very narrow ranges get
+    up to 17 significant digits.
+
+    Args:
+        value: Exact bound
+        resolution: Smallest meaningful change of the bound
+
+    Returns:
+        Text of the bound (exact text if *resolution* is not usable)
+    """
+    if not math.isfinite(value):
+        return str(value)
+    if not (math.isfinite(resolution) and resolution > 0.0):
+        return _shortest_text(value)
+    try:
+        rounded = round(value, 1 - math.floor(math.log10(resolution)))
+    except OverflowError:
+        return _shortest_text(value)
+    if rounded == 0.0:
+        return "0"
+    return _shortest_text(rounded)
+
+
+def _line_edit_width(edit: QLineEdit, text: str) -> int:
+    """Return the width of a line edit showing *text* entirely.
+
+    Args:
+        edit: Line edit (its font, margins and style are taken into account)
+        text: Text which must fit in the line edit
+
+    Returns:
+        Width of the line edit, frame included
+    """
+    text_margins = edit.textMargins()
+    contents_margins = edit.contentsMargins()
+    width = (
+        edit.fontMetrics().horizontalAdvance(text)
+        + 4  # Horizontal margins of the text in QLineEdit (2 pixels on each side)
+        + text_margins.left()
+        + text_margins.right()
+        + contents_margins.left()
+        + contents_margins.right()
+    )
+    style = edit.style()
+    option = QStyleOptionFrame()
+    option.initFrom(edit)
+    option.lineWidth = style.pixelMetric(QStyle.PM_DefaultFrameWidth, option, edit)
+    size = QSize(width, edit.fontMetrics().height())
+    return style.sizeFromContents(QStyle.CT_LineEdit, option, size, edit).width()
+
+
+class _RangeBoundEdit(QLineEdit):
+    """Line edit as wide as the rounded text of a range bound.
+
+    The width is computed from the current font and style of the line edit, so that
+    it also follows a style change (e.g. when the color mode changes the style).
+    """
+
+    #: Text fitting in the line edit
+    TEMPLATE = "-8.88888888e-888"
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+
+    def sizeHint(self) -> QSize:
+        """Return the size showing the template text entirely."""
+        return QSize(_line_edit_width(self, self.TEMPLATE), super().sizeHint().height())
+
+
 class _HistogramCanvas(QWidget):
     """Draw a fixed histogram and its selected range or transfer function."""
 
@@ -2005,8 +2103,7 @@ class HistogramRangeWidget(AbstractDataSetWidget):
         slider = QSlider(Qt.Horizontal)
         slider.setRange(0, self._RANGE_STEPS)
         row.addWidget(slider, 1)
-        edit = QLineEdit()
-        edit.setMaximumWidth(100)
+        edit = _RangeBoundEdit()
         row.addWidget(edit)
         parent.addLayout(row)
         return slider, edit
@@ -2096,6 +2193,11 @@ class HistogramRangeWidget(AbstractDataSetWidget):
     def _domain(self) -> tuple[float, float]:
         domain = self._payload().get("domain", [0.0, 1.0])
         return float(domain[0]), float(domain[1])
+
+    def _bound_text(self, value: float) -> str:
+        """Return the text of a bound, rounded to the resolution of the sliders."""
+        resolution = _half_span(*self._domain()) / (0.5 * self._RANGE_STEPS)
+        return _format_range_bound(value, resolution)
 
     def _minimum_width(self) -> float:
         payload = self._payload()
@@ -2221,8 +2323,13 @@ class HistogramRangeWidget(AbstractDataSetWidget):
         )
 
     def _minimum_edited(self) -> None:
+        text = self.minimum_edit.text().strip()
+        if text == self._bound_text(self._minimum):
+            # Unchanged (rounded) text: keep the exact bound
+            self._sync_controls()
+            return
         try:
-            minimum = float(self.minimum_edit.text())
+            minimum = float(text)
         except ValueError:
             self._sync_controls()
             return
@@ -2235,8 +2342,13 @@ class HistogramRangeWidget(AbstractDataSetWidget):
         self._set_range(minimum, maximum)
 
     def _maximum_edited(self) -> None:
+        text = self.maximum_edit.text().strip()
+        if text == self._bound_text(self._maximum):
+            # Unchanged (rounded) text: keep the exact bound
+            self._sync_controls()
+            return
         try:
-            maximum = float(self.maximum_edit.text())
+            maximum = float(text)
         except ValueError:
             self._sync_controls()
             return
@@ -2291,8 +2403,10 @@ class HistogramRangeWidget(AbstractDataSetWidget):
         for control, value in controls:
             with QSignalBlocker(control):
                 control.setValue(min(max(value, control.minimum()), control.maximum()))
-        self.minimum_edit.setText(f"{minimum:.17g}")
-        self.maximum_edit.setText(f"{maximum:.17g}")
+        for edit, value in ((self.minimum_edit, minimum), (self.maximum_edit, maximum)):
+            edit.setText(self._bound_text(value))
+            edit.setCursorPosition(0)  # Show the most significant digits
+            edit.setToolTip(str(value))
         style = (
             _get_readonly_stylesheet()
             if self.check()

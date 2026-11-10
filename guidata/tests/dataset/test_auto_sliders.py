@@ -265,6 +265,57 @@ def test_authored_sliders_and_nonzero_fallback():
         parent.close()
 
 
+def test_slider_values_without_binary_noise():
+    """Slider values have no binary noise and map back to the slider position."""
+
+    class Noisy(gds.DataSet):
+        auto = gds.FloatItem("Auto", default=0.5, min=0.0, max=1.0, step=0.1)
+        centered = gds.FloatItem(
+            "Centered", default=0.0, min=-1.0, max=1.0, slider=True
+        )
+        offset = gds.FloatItem("Offset", default=0.5, min=0.1, max=0.9, slider=True)
+        # Exact binary values: 1024 steps of 2**-20 above 2**30
+        fine = gds.FloatItem(
+            "Fine", default=2.0**30, min=2.0**30, max=2.0**30 + 2.0**-10, step=2.0**-20
+        )
+
+    with qt_app_context():
+        parent = QWidget()
+        editor = DataSetEditLayout(
+            parent, Noisy(), QGridLayout(parent), auto_sliders=True
+        )
+        fields = {
+            widget.item.item.get_name(): widget
+            for widget in editor.get_terminal_widgets()
+        }
+        auto = fields["auto"]
+        texts = []
+        for position in range(auto.slider.maximum() + 1):
+            auto.slider.setValue(position)
+            texts.append(auto.edit.text())
+        assert texts == [str(index / 10) for index in range(11)]
+
+        for name in ("centered", "offset"):
+            field = fields[name]
+            for position in range(field.slider.maximum() + 1):
+                field.slider.setValue(position)
+                value = float(field.edit.text())
+                assert float(f"{value:.12g}") == value, field.edit.text()
+                assert field.vmin <= value <= field.vmax
+                assert field.slider.value() == position
+
+        # Slider resolution too fine for 12 significant digits: values are kept
+        fine = fields["fine"]
+        assert fine.slider.maximum() == 1024
+        values = []
+        for position in range(fine.slider.maximum() + 1):
+            fine.slider.setValue(position)
+            values.append(float(fine.edit.text()))
+            assert fine.slider.value() == position
+        assert values == sorted(set(values))
+        parent.close()
+
+
 def test_auto_sliders():
     """Show a form opting into the local automatic slider policy."""
     with qt_app_context(exec_loop=True):

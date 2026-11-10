@@ -17,8 +17,17 @@ import math
 
 import pytest
 from qtpy.QtCore import Qt
+from qtpy.QtGui import QFont
 from qtpy.QtTest import QTest
-from qtpy.QtWidgets import QGridLayout, QGroupBox, QHBoxLayout, QWidget
+from qtpy.QtWidgets import (
+    QApplication,
+    QGridLayout,
+    QGroupBox,
+    QHBoxLayout,
+    QStyle,
+    QStyleOptionFrame,
+    QWidget,
+)
 
 import guidata.dataset as gds
 from guidata.dataset.qtitemwidgets import HistogramRangeWidget
@@ -312,6 +321,163 @@ def test_histogram_range_widget_text_round_trip_preserves_narrow_range():
         editor.accept_changes()
 
         assert (param.minimum, param.maximum) == original
+        parent.close()
+
+
+def make_range_parameters(
+    domain: tuple[float, float], bounds: tuple[float, float]
+) -> Parameters:
+    """Return parameters with the given histogram domain and range bounds."""
+    param = Parameters()
+    param.minimum, param.maximum = bounds
+    param.histogram = {
+        "counts": [1, 4, 2, 1],
+        "domain": list(domain),
+        "minimum_width": math.ulp(max(abs(domain[0]), abs(domain[1]))),
+        "reset_range": list(domain),
+        "active": True,
+    }
+    return param
+
+
+#: Domain, bounds and texts of the bounds rounded to the slider resolution
+ROUNDED_BOUNDS = [
+    (
+        (0.0, 1.7556590923058577),
+        (6.512753282872355e-44, 1.7556590923058577),
+        ("0", "1.7557"),
+    ),
+    (
+        (-0.04493952784907988, 1.7556590923058577),
+        (-0.04493952784907988, 1.0),
+        ("-0.0449", "1"),
+    ),
+    (
+        (88.1545899307029, 1336.7654121604457),
+        (88.1545899307029, 1336.7654121604457),
+        ("88.2", "1336.8"),
+    ),
+    ((0.0, 2.4997321e-06), (1.234567e-07, 2.4997321e-06), ("1.235e-07", "2.4997e-06")),
+    ((0.0, 65535.0), (0.0, 59993.4), ("0", "59993")),
+    # Very narrow ranges get up to 17 significant digits
+    (
+        (1.0, 1.0000000000005),
+        (1.0000000000001, 1.0000000000004),
+        ("1.0000000000001", "1.0000000000004"),
+    ),
+]
+
+
+@pytest.mark.parametrize("domain, bounds, texts", ROUNDED_BOUNDS)
+def test_histogram_range_widget_rounds_displayed_bounds(domain, bounds, texts):
+    """Bounds are shown with the slider resolution, exact values are kept."""
+    with qt_app_context():
+        parent = QWidget()
+        param = make_range_parameters(domain, bounds)
+        editor = DataSetEditLayout(parent, param, QGridLayout(parent))
+        widget = editor.widgets[0]
+        assert isinstance(widget, HistogramRangeWidget)
+        parent.show()
+        edits = (widget.minimum_edit, widget.maximum_edit)
+        assert tuple(edit.text() for edit in edits) == texts
+        assert tuple(edit.toolTip() for edit in edits) == tuple(map(str, bounds))
+
+        # Validating the unchanged (rounded) texts keeps the exact bounds
+        for edit in edits:
+            edit.editingFinished.emit()
+            edit.setFocus()
+            QTest.keyClick(edit, Qt.Key_Return)
+        assert widget._range() == bounds
+        editor.accept_changes()
+        assert (param.minimum, param.maximum) == bounds
+        parent.close()
+
+
+def test_histogram_range_widget_applies_edited_bounds():
+    """A bound typed in a field replaces the exact bound."""
+    with qt_app_context():
+        parent = QWidget()
+        bounds = (6.512753282872355e-44, 1.7556590923058577)
+        param = make_range_parameters((0.0, bounds[1]), bounds)
+        editor = DataSetEditLayout(parent, param, QGridLayout(parent))
+        widget = editor.widgets[0]
+        assert isinstance(widget, HistogramRangeWidget)
+        parent.show()
+        widget.minimum_edit.setFocus()
+        widget.minimum_edit.selectAll()
+        QTest.keyClicks(widget.minimum_edit, "0.5")
+        QTest.keyClick(widget.minimum_edit, Qt.Key_Return)
+        assert widget._range() == (0.5, bounds[1])
+        assert widget.minimum_edit.text() == "0.5"
+        assert widget.minimum_edit.toolTip() == "0.5"
+        editor.accept_changes()
+        assert (param.minimum, param.maximum) == (0.5, bounds[1])
+        parent.close()
+
+
+def _text_width(edit) -> int:
+    """Return the width available for the text of a line edit."""
+    option = QStyleOptionFrame()
+    option.initFrom(edit)
+    option.lineWidth = edit.style().pixelMetric(
+        QStyle.PM_DefaultFrameWidth, option, edit
+    )
+    contents = edit.style().subElementRect(QStyle.SE_LineEditContents, option, edit)
+    margins = edit.textMargins()
+    return contents.width() - margins.left() - margins.right() - 4
+
+
+def test_histogram_range_widget_fields_fit_their_values():
+    """Range fields are sized from the font to show their whole values."""
+    widths = []
+    with qt_app_context():
+        app_font = QApplication.font()
+        for scale in (1, 2):
+            font = QFont(app_font)
+            font.setPointSizeF(app_font.pointSizeF() * scale)
+            QApplication.setFont(font)
+            try:
+                parent = QWidget()
+                editor = DataSetEditLayout(
+                    parent, make_parameters(), QGridLayout(parent)
+                )
+            finally:
+                QApplication.setFont(app_font)
+            widget = editor.widgets[0]
+            assert isinstance(widget, HistogramRangeWidget)
+            parent.show()
+            for domain, bounds, _texts in ROUNDED_BOUNDS:
+                widget.item.instance.histogram["domain"] = list(domain)
+                widget._set_range(*bounds)
+                for edit in (widget.minimum_edit, widget.maximum_edit):
+                    advance = edit.fontMetrics().horizontalAdvance(edit.text())
+                    assert advance <= _text_width(edit), edit.text()
+            edit = widget.minimum_edit
+            template = edit.TEMPLATE
+            assert edit.fontMetrics().horizontalAdvance(template) <= _text_width(edit)
+            widths.append(edit.width())
+            parent.close()
+    assert widths[1] > 1.5 * widths[0]
+
+
+def test_histogram_range_widget_shows_start_of_long_bounds():
+    """Long bounds show their most significant digits, the exact value as tooltip."""
+    with qt_app_context():
+        parent = QWidget()
+        editor = DataSetEditLayout(parent, make_parameters(), QGridLayout(parent))
+        widget = editor.widgets[0]
+        assert isinstance(widget, HistogramRangeWidget)
+        parent.show()
+        widget.contrast_slider.setValue(0)
+        minimum, maximum = widget._range()
+        assert minimum < -1e300 and maximum > 1e300
+        for edit, value in (
+            (widget.minimum_edit, minimum),
+            (widget.maximum_edit, maximum),
+        ):
+            assert float(edit.text()) == value
+            assert edit.cursorPosition() == 0
+            assert edit.toolTip() == str(value)
         parent.close()
 
 
