@@ -1,5 +1,12 @@
 # Version 3.17 #
 
+## guidata Version 3.17.3 ##
+
+🛠 Bug fixes:
+
+* **Truncated and unreadable range fields** — the Minimum and Maximum fields of the histogram range editor (`HistogramRangeItem`, e.g. the **Brightness and contrast** processing of DataLab) showed 17 significant digits in a field too narrow for them, so that the beginning of the values was cut off (e.g. `835736228608e-43` instead of `6.5127532828723551e-44`). The bounds are now shown with the precision of the range sliders (e.g. `0` and `1.7557` for a range from 0 to 1.76), with their exact value in the tooltip, and the fields are sized from the font to show these values entirely. The exact bounds are kept as long as a field is not modified: validating a field without changing it no longer replaces the bound with its rounded value (fixes [Issue #152](https://github.com/PlotPyStack/guidata/issues/152)).
+* **Slider values with binary noise** — moving the slider of a floating point item gave values such as `0.30000000000000004` or `-0.8200000000000001` instead of `0.3` or `-0.82`, which were shown and stored as is. This occurred with the sliders added to bounded items by `DataSetEditLayout(..., auto_sliders=True)` (e.g. in the processing parameters of DataLab), and with the sliders of items created with `slider=True` for some bounds. Slider values are now free of this noise, and remain within the bounds of the item (fixes [Issue #152](https://github.com/PlotPyStack/guidata/issues/152)).
+
 ## guidata Version 3.17.2 ##
 
 🛠 Bug fixes:
