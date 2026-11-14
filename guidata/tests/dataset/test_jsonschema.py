@@ -585,6 +585,32 @@ def test_computed_item_is_read_only():
     assert prop["x-guidata-computed"] is True
 
 
+def test_dynamic_bounds_and_readonly_are_not_exported():
+    class P(gds.DataSet):
+        lower = 0
+        upper = 10
+        locked = False
+        val = (
+            gds.IntItem("Val", default=5)
+            .set_prop(
+                "data", min=gds.GetAttrProp("lower"), max=gds.GetAttrProp("upper")
+            )
+            .set_prop("display", readonly=gds.GetAttrProp("locked"))
+        )
+        fixed = gds.FloatItem("Fixed", default=1.0, min=0.0, max=2.0).set_prop(
+            "display", readonly=True
+        )
+
+    schema = dataset_to_schema(P)
+    json.dumps(schema)
+    props = schema["properties"]
+    for key in ("minimum", "maximum", "readOnly"):
+        assert key not in props["val"]
+    assert props["fixed"]["minimum"] == 0.0
+    assert props["fixed"]["maximum"] == 2.0
+    assert props["fixed"]["readOnly"] is True
+
+
 def test_resolve_dataset_active_static_and_dynamic():
     _uniform = gds.GetAttrProp("uniform")
 
