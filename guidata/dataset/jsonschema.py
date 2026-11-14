@@ -118,6 +118,9 @@ def dataset_to_schema(dataset_cls: type[gdt.DataSet]) -> dict[str, Any]:
     Returns:
         A JSON-serialisable dict that conforms to JSON Schema 2020-12 and
         carries guidata-specific information under ``x-guidata-*`` keys.
+        Bounds (``min``/``max``) and ``readonly`` properties are only
+        exported when static: dynamic ones (:class:`ItemProperty`, e.g.
+        ``GetAttrProp``) are omitted.
 
     Raises:
         TypeError: If *dataset_cls* is not a :class:`DataSet` subclass.
@@ -524,11 +527,13 @@ def _numeric_to_property(item: gdi.NumericTypeItem, kind: str) -> dict[str, Any]
     }
     if item.get_prop("data", "check_value", True) is False:
         prop["x-guidata-check-value"] = False
+    # Dynamic bounds (:class:`ItemProperty`) depend on an instance: they are
+    # not exported, so that the schema stays serialisable.
     minv = item.get_prop("data", "min", None)
     maxv = item.get_prop("data", "max", None)
-    if minv is not None:
+    if minv is not None and not isinstance(minv, gdt.ItemProperty):
         prop["minimum"] = minv
-    if maxv is not None:
+    if maxv is not None and not isinstance(maxv, gdt.ItemProperty):
         prop["maximum"] = maxv
     nonzero = item.get_prop("data", "nonzero", None)
     if nonzero:
@@ -735,7 +740,10 @@ def _add_common_keys(item: gdt.DataItem, prop: dict[str, Any], order: int) -> No
             prop["default"] = _serialise_value(item, default)
         except (TypeError, ValueError):
             pass
-    if item.get_prop("display", "readonly", False):
+    # Only a static ``readonly`` is exported: an :class:`ItemProperty` is
+    # always truthy, whatever its value for a given instance.
+    readonly = item.get_prop("display", "readonly", False)
+    if readonly and not isinstance(readonly, gdt.ItemProperty):
         prop["readOnly"] = True
     # ``set_computed(...)`` flags an item as derived from other fields
     # (e.g. ``ImageObj.xmin``).  ``ComputedProp`` already raises on
