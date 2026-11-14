@@ -30,6 +30,7 @@ from qtpy.QtWidgets import (
 )
 
 import guidata.dataset as gds
+from guidata.dataset.conv import dataset_to_json, json_to_dataset
 from guidata.dataset.qtitemwidgets import HistogramRangeWidget
 from guidata.dataset.qtwidgets import DataSetEditLayout, DataSetShowLayout
 from guidata.env import execenv
@@ -71,6 +72,81 @@ def make_parameters() -> Parameters:
         "active": True,
     }
     return param
+
+
+@pytest.mark.parametrize("param_class", [Parameters, GroupedParameters])
+def test_histogram_range_text_representation_ignores_payload(param_class):
+    """Text and HTML describe the bounds independently of the editor context."""
+    param = param_class()
+    param.minimum, param.maximum = 100.0, 200.0
+    param.histogram = {
+        "counts": list(range(256)),
+        "domain": [0.0, 255.0],
+        "active": True,
+    }
+
+    def representations(dataset):
+        return (
+            str(dataset),
+            dataset.to_string(show_hidden=False),
+            dataset.to_html(),
+        )
+
+    expected = representations(param)
+    for text in expected:
+        assert "100.0 \u2013 200.0" in text
+        assert "counts" not in text
+        assert "domain" not in text
+    assert "Minimum:" in expected[0]
+    assert "Maximum:" in expected[0]
+    assert "Minimum:" not in expected[1]
+    assert "Maximum:" not in expected[1]
+    assert expected[2].count("<tr>") == 1
+
+    restored = json_to_dataset(dataset_to_json(param))
+    assert restored.histogram == {}
+    assert (restored.minimum, restored.maximum) == (100.0, 200.0)
+    assert representations(restored) == expected
+
+    param.histogram = {}
+    assert representations(param) == expected
+    param.histogram = {"counts": [1], "domain": [0.0, 1.0]}
+    assert representations(param) == expected
+
+
+def test_histogram_range_text_representation_uses_linked_formats():
+    """Each bound retains its own formatting and optional-value convention."""
+
+    class FormattedRange(gds.DataSet):
+        minimum = gds.FloatItem("Minimum", default=1.25, allow_none=True).set_prop(
+            "display", format="%.1f"
+        )
+        maximum = gds.FloatItem("Maximum", default=30.0).set_prop(
+            "display", format="%.2e"
+        )
+        histogram = gds.HistogramRangeItem("Range", "minimum", "maximum")
+
+    param = FormattedRange()
+    assert FormattedRange.histogram.get_string_value(param) == "1.2 \u2013 3.00e+01"
+    param.minimum = None
+    assert FormattedRange.histogram.get_string_value(param) == "- \u2013 3.00e+01"
+
+
+@pytest.mark.parametrize(
+    ("minimum", "maximum"),
+    [("lower", "missing"), ("lower", "integer"), ("lower", "lower")],
+)
+def test_histogram_range_text_representation_rejects_invalid_links(minimum, maximum):
+    """Invalid linked fields are reported rather than rendering the payload."""
+
+    class InvalidRange(gds.DataSet):
+        lower = gds.FloatItem("Lower", default=0.0)
+        integer = gds.IntItem("Integer", default=1)
+        histogram = gds.HistogramRangeItem("Range", minimum, maximum)
+
+    param = InvalidRange()
+    with pytest.raises(ValueError, match="two distinct FloatItem fields"):
+        InvalidRange.histogram.get_string_value(param)
 
 
 def test_histogram_range_widget_commits_linked_fields_atomically():

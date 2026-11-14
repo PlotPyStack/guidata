@@ -1552,6 +1552,10 @@ class HistogramRangeItem(DataItem):
     hidden from the ordinary form; their validation and readonly properties
     still apply. The histogram domain does not constrain their values.
 
+    Text and HTML representations show the linked bounds using their display
+    settings, independently of the transient histogram payload. Invalid links
+    raise ``ValueError`` when the item is rendered.
+
     The payload describes ``counts`` spread uniformly over a finite ordered
     ``domain``, plus optional positive ``y_max`` and ``minimum_width``. Bin
     positions are always derived from ``domain``: non-uniform bin edges are not
@@ -1611,6 +1615,14 @@ class HistogramRangeItem(DataItem):
                 "HistogramRangeItem requires two distinct FloatItem fields"
             )
         return items[minimum], items[maximum]
+
+    def get_string_value(self, instance: DataSet) -> str:
+        """Return the linked bounds formatted using their display settings."""
+        minimum, maximum = self.get_range_items(instance)
+        return (
+            f"{minimum.get_string_value(instance)}"
+            f" \u2013 {maximum.get_string_value(instance)}"
+        )
 
     def serialize(
         self,
