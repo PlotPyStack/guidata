@@ -11,6 +11,7 @@ on another item's value.
 # guitest: show
 
 import guidata.dataset as gds
+from guidata.dataset.qtwidgets import DataSetEditDialog
 from guidata.env import execenv
 from guidata.qthelpers import qt_app_context
 
@@ -47,6 +48,41 @@ def test_activable_items():
         test = Parameters()
         test.edit()
         execenv.print("OK")
+
+
+class StoredParameters(gds.DataSet):
+    """Dataset whose items are activated by a checkbox through a stored value"""
+
+    _prop_enabled = gds.ValueProp(True)
+    enabled = gds.BoolItem("Enabled", default=True).set_prop(
+        "display", store=_prop_enabled
+    )
+    value = gds.FloatItem("Value", default=1.0).set_prop(
+        "display", active=_prop_enabled
+    )
+
+
+def test_stored_checkbox_state_at_opening():
+    """Items depending on a checkbox follow its state as soon as a dialog opens.
+
+    An unchecked box does not emit ``stateChanged`` when it loads ``False``: the
+    stored value must follow it anyway, including after a dialog where the box
+    was checked.
+    """
+    with qt_app_context():
+        for enabled in (True, False, True, False):
+            param = StoredParameters()
+            param.enabled = enabled
+            dialog = DataSetEditDialog(param)
+            try:
+                widgets = {
+                    widget.item.item.get_name(): widget
+                    for widget in dialog.edit_layout[0].widgets
+                }
+                assert widgets["value"].edit.isEnabled() is enabled
+            finally:
+                dialog.reject()
+                dialog.deleteLater()
 
 
 if __name__ == "__main__":
