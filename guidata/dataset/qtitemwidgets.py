@@ -686,6 +686,10 @@ class CheckBoxWidget(AbstractDataSetWidget):
         else:
             # Reset widget if value is None
             self.checkbox.setChecked(False)
+        if self.store:
+            # `stateChanged` is not emitted when the state is unchanged (e.g. an
+            # unchecked box loading `False`): the store must follow the value anyway
+            self.store.set(self.item.instance, self.item.item, self.value())
 
     def set(self) -> None:
         """Update data item value from widget contents"""
